@@ -2,19 +2,18 @@
 var inherit = core.inherit;
 var Shape = kite.Shape;
 var Node = scenery.Node;
-
 var Display = scenery.Display;
+var Input = scenery.Input;
 var PropertySet = axon.PropertySet;
-var FocusLayer = require( 'SCENERY/accessibility/FocusLayer' );
-var Util = require( 'SCENERY/util/Util' );
-var ObservableArray = require( 'AXON/ObservableArray' );
-var Rectangle = require( 'SCENERY/nodes/Rectangle' );
-var ButtonListener = require( 'SCENERY/input/ButtonListener' );
-var Input = require( 'SCENERY/input/Input' );
-var Bounds2 = require( 'DOT/Bounds2' );
-var Dimension2 = require( 'DOT/Dimension2' );
-var platform = require( 'PHET_CORE/platform' );
-var Timer = require( 'ENERGY_SIM/app/Timer' );
+var Bounds2 = dot.Bounds2;
+var Dimension2 = dot.Dimension2;
+var Util = scenery.Util;
+var ObservableArray = axon.ObservableArray;
+var Rectangle = scenery.Rectangle;
+var ButtonListener =  scenery.ButtonListener;
+
+
+var Timer = require( './Timer' );
 
 // constants
 var LAYOUT_BOUNDS = new Bounds2( 0, 0, 768, 504 );
@@ -43,14 +42,10 @@ function SimApp( titleName, screen, simId, options ) {
   sim.rootNode = new Node();
   sim.rootNode.addChild( sim.view );
   sim.display = new Display( sim.rootNode, options );
-  sim.focusLayer = new FocusLayer( window.TWEEN ? { tweenFactory: window.TWEEN } : {} );
-  //Adding the accessibility layer directly to the Display's root makes it easy to use local->global bounds.
-  sim.rootNode.addChild( this.focusLayer );
 
   var simDiv = sim.display.domElement;
   simDiv.id = simId;
   document.body.appendChild( simDiv );
-
 
   // for preventing Safari from going to sleep. see https://github.com/phetsims/joist/issues/140
   var heartbeatDiv = this.heartbeatDiv = document.createElement( 'div' );
@@ -95,7 +90,7 @@ function SimApp( titleName, screen, simId, options ) {
   sim.resizeToWindow();
 }
 
-return inherit( PropertySet, EnergySimApp, {
+inherit( PropertySet, SimApp, {
   /*
    * Adds a popup in the global coordinate frame, and optionally displays a semi-transparent black input barrier behind it.
    * Use hidePopup() to remove it.
@@ -103,15 +98,10 @@ return inherit( PropertySet, EnergySimApp, {
    * @param {boolean} isModal - Whether to display the semi-transparent black input barrier behind it.
    */
   showPopup: function( node, isModal ) {
-
-
     if ( isModal ) {
       this.barrierStack.push( node );
     }
     this.topLayer.addChild( node );
-
-    // TODO: Performance concerns
-    this.focusLayer.moveToFront();
 
     Input.pushFocusContext( node.getTrails()[ 0 ] );
   },
@@ -155,9 +145,10 @@ return inherit( PropertySet, EnergySimApp, {
     sim.display._input.eventLog.push( 'scene.display.setSize(new dot.Dimension2(' + width + ',' + height + '));' );
 
     // Fixes problems where the div would be way off center on iOS7
-    if ( platform.mobileSafari ) {
+    // TODO
+   /* if ( platform.mobileSafari ) {
       window.scrollTo( 0, 0 );
-    }
+    }*/
 
     // update our scale and bounds properties after other changes (so listeners can be fired after screens are resized)
     this.scale = scale;

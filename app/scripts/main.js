@@ -1,41 +1,35 @@
-function SceneryBootStrap() {
+/**
+ * Main entry point for the app.
+ *
+ * @author Sharfudeen Ashraf
+ */
+define( function( require ) {
+  'use strict';
+  var SimLauncher = require( './core/SimLauncher' );
+  var SimApp = require( './core/SimApp' );
+  var SimScreen = require( './core/Screen' );
 
-  // Create a scene graph over the block-level element. Everything inside is replaced
-  var scene = new scenery.Node();
+  var EcoSystemModel = require( './model/EcoSystemModel' );
+  var EcoSystemView = require( './view/EcoSystemView' );
 
-  debugger;
-  var display = new scenery.Display( scene, {
-    container: document.getElementById( 'example-scene' )
+  var energySimTitle = "EcoSystem Simulation";
+  SimLauncher.launch( function() {
+    var options = { backgroundColor: 'rgb( 242, 255, 204 )' /* Light yellow-green */ };
+    var createModel = function() {
+      return new EcoSystemModel();
+    };
+
+    var createView = function( model ) {
+      return new EcoSystemView( model );
+    };
+
+    var energySimScreen = new SimScreen( energySimTitle, createModel, createView );
+    var app = new SimApp( energySimTitle, energySimScreen, '"main-scene', options );
+    //start rendering..
+    app.start();
   } );
 
-  /*---------------------------------------------------------------------------*
-   * Built-in shapes
-   *----------------------------------------------------------------------------*/
 
-  // circle
-  scene.addChild( new scenery.Path( kite.Shape.circle( 50, 50, 40 ), {// center X, center Y, radius
-    fill: '#0ff',
-    stroke: '#000'
-  } ) );
-
-  // circle
-  scene.addChild( new scenery.Path( kite.Shape.circle( 150, 50, 40 ), {// center X, center Y, radius
-    fill: '#0ff',
-    stroke: '#000'
-  } ) );
-
-  // regular polygon
-  scene.addChild( new scenery.Path( kite.Shape.regularPolygon( 6, 22 ), { // sides, radius
-    fill: '#00f',
-    stroke: '#000',
-    x: 150,
-    y: 50
-  } ) );
-
-  // Paint any changes
-  display.updateDisplay();
-
-};
+} );
 
 
-SceneryBootStrap();

@@ -3,7 +3,6 @@
  * @author Sharfudeen Ashraf
  */
 
-
 var inherit = axon.inherit;
 var PropertySet = axon.PropertySet;
 var Color = scenery.Color;
