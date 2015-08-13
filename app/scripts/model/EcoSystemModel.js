@@ -5,7 +5,7 @@
  */
 
 // modules
-var inherit = core.inherit;
+var inherit = axon.inherit;
 
 function EcoSystemModel() {
 

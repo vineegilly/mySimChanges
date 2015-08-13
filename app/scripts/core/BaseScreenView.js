@@ -5,7 +5,7 @@
  */
 
 var Node = scenery.Node;
-var inherit = core.inherit;
+var inherit = axon.inherit;
 var Bounds2 = dot.Bounds2;
 
 var DEFAULT_LAYOUT_BOUNDS = new Bounds2( 0, 0, 1024, 618 );

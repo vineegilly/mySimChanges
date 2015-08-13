@@ -478,7 +478,7 @@ define("almond", function(){});
 
 // Copyright 2002-2014, University of Colorado Boulder
 
-define( 'PHET_CORE/core',['require'],function( require ) {
+define( 'PHET_CORE/phetCore',['require'],function( require ) {
   
 
   // no phetAllocation initialized, since we don't need it with just phet-core, and this file is required before that
@@ -503,12 +503,12 @@ define( 'PHET_CORE/core',['require'],function( require ) {
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-define( 'PHET_CORE/phetAllocation',['require','PHET_CORE/core'],function( require ) {
+define( 'PHET_CORE/phetAllocation',['require','PHET_CORE/phetCore'],function( require ) {
   
 
-  var core = require( 'PHET_CORE/core' );
+  var phetCore = require( 'PHET_CORE/phetCore' );
 
-  core.phetAllocation = function phetAllocation( name ) {
+  phetCore.phetAllocation = function phetAllocation( name ) {
     if ( window.alloc ) {
       var stack;
       try { throw new Error(); }
@@ -536,7 +536,7 @@ define( 'PHET_CORE/phetAllocation',['require','PHET_CORE/core'],function( requir
     }
   };
 
-  return core.phetAllocation;
+  return phetCore.phetAllocation;
 } );
 // Copyright 2002-2014, University of Colorado Boulder
 
@@ -559,9 +559,6 @@ define( 'SCENERY/scenery',['require','PHET_CORE/phetAllocation'],function( requi
 
   // object allocation tracking
   window.phetAllocation = require( 'PHET_CORE/phetAllocation' );
-
-  // workaround for Axon, since it needs window.arch to be defined
-  window.arch = window.arch || null;
 
   var scratchCanvas = document.createElement( 'canvas' );
   var scratchContext = scratchCanvas.getContext( '2d' );
@@ -709,24 +706,7 @@ define( 'SCENERY/scenery',['require','PHET_CORE/phetAllocation'],function( requi
 
     disableAccessibilityLogging: function() {
       window.sceneryAccessibilityLog = null;
-    },
-
-    //OHTWO TODO: remove duplication between here and Renderer?
-    bitmaskAll: 0xFFFFFFF, // 28 bits for now (don't go over 31 bits, or we'll see a 32-bit platform slowdown!)
-    bitmaskNodeDefault: 0x00003FF,
-    bitmaskPaintedDefault: 0x0000200, // bounds valid, no renderer set
-    bitmaskRendererArea: 0x00000FF,
-
-    // NOTE! If these are changed, please examine flags included in Renderer.js to make sure there are no conflicts (we use the same bitmask space)
-    bitmaskSupportsCanvas: 0x0000001,
-    bitmaskSupportsSVG: 0x0000002,
-    bitmaskSupportsDOM: 0x0000004,
-    bitmaskSupportsWebGL: 0x0000008,
-    bitmaskSupportsPixi: 0x0000010,
-    // 20, 40, 80 reserved for future renderers
-    bitmaskNotPainted: 0x0000100,
-    bitmaskBoundsValid: 0x0000200  // i.e. painted area will not spill outside of bounds
-    // TODO: what else would we need?
+    }
   };
 
   // store a reference on the PhET namespace if it exists
@@ -747,12 +727,12 @@ define( 'SCENERY/scenery',['require','PHET_CORE/phetAllocation'],function( requi
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-define( 'PHET_CORE/extend',['require','PHET_CORE/core'],function( require ) {
+define( 'PHET_CORE/extend',['require','PHET_CORE/phetCore'],function( require ) {
   
 
-  var core = require( 'PHET_CORE/core' );
+  var phetCore = require( 'PHET_CORE/phetCore' );
 
-  core.extend = function extend( obj ) {
+  phetCore.extend = function extend( obj ) {
     _.each( Array.prototype.slice.call( arguments, 1 ), function( source ) {
       if ( source ) {
         for ( var prop in source ) {
@@ -763,7 +743,7 @@ define( 'PHET_CORE/extend',['require','PHET_CORE/core'],function( require ) {
     return obj;
   };
 
-  return core.extend;
+  return phetCore.extend;
 } );
 // Copyright 2002-2014, University of Colorado Boulder
 
@@ -793,10 +773,10 @@ define( 'PHET_CORE/extend',['require','PHET_CORE/core'],function( require ) {
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
-define( 'PHET_CORE/inherit',['require','PHET_CORE/core','PHET_CORE/extend'],function( require ) {
+define( 'PHET_CORE/inherit',['require','PHET_CORE/phetCore','PHET_CORE/extend'],function( require ) {
   
 
-  var core = require( 'PHET_CORE/core' );
+  var phetCore = require( 'PHET_CORE/phetCore' );
   var extend = require( 'PHET_CORE/extend' );
 
   /**
@@ -805,7 +785,7 @@ define( 'PHET_CORE/inherit',['require','PHET_CORE/core','PHET_CORE/extend'],func
    * @param prototypeProperties [optional] object containing properties that will be set on the prototype.
    * @param staticProperties [optional] object containing properties that will be set on the constructor function itself
    */
-  core.inherit = function inherit( supertype, subtype, prototypeProperties, staticProperties ) {
+  phetCore.inherit = function inherit( supertype, subtype, prototypeProperties, staticProperties ) {
     assert && assert( typeof supertype === 'function' );
 
     function F() {}
@@ -824,8 +804,61 @@ define( 'PHET_CORE/inherit',['require','PHET_CORE/core','PHET_CORE/extend'],func
     return subtype; // pass back the subtype so it can be returned immediately as a module export
   };
 
-  return core.inherit;
+  return phetCore.inherit;
 } );
+// Copyright 2002-2014, University of Colorado Boulder
+
+/**
+ * The main 'kite' namespace object for the exported (non-Require.js) API. Used internally
+ * since it prevents Require.js issues with circular dependencies.
+ *
+ * The returned kite object namespace may be incomplete if not all modules are listed as
+ * dependencies. Please use the 'main' module for that purpose if all of Kite is desired.
+ *
+ * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ */
+
+define( 'KITE/kite',['require','PHET_CORE/phetAllocation'],function( require ) {
+  
+
+  // object allocation tracking
+  window.phetAllocation = require( 'PHET_CORE/phetAllocation' );
+
+  var kite = {
+    // Since SVG doesn't support parsing scientific notation (e.g. 7e5), we need to output fixed decimal-point strings.
+    // Since this needs to be done quickly, and we don't particularly care about slight rounding differences (it's
+    // being used for display purposes only, and is never shown to the user), we use the built-in JS toFixed instead of
+    // Dot's version of toFixed. See https://github.com/phetsims/kite/issues/50
+    svgNumber: function( n ) {
+      return n.toFixed( 20 );
+    }
+  };
+
+  // store a reference on the PhET namespace if it exists
+  if ( window.phet ) {
+    window.phet.kite = kite;
+  }
+
+  // will be filled in by other modules
+  return kite;
+} );
+
+// Copyright 2002-2015, University of Colorado Boulder
+
+define( 'AXON/axon',['require'],function( require ) {
+  
+
+  var axon = {};
+
+  // store a reference on the PhET namespace if it exists
+  if ( window.phet ) {
+    window.phet.axon = axon;
+  }
+
+  // will be filled in by other modules
+  return axon;
+} );
+
 // Copyright 2002-2014, University of Colorado Boulder
 
 /**
@@ -835,12 +868,12 @@ define( 'PHET_CORE/inherit',['require','PHET_CORE/core','PHET_CORE/extend'],func
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-define( 'PHET_CORE/cleanArray',['require','PHET_CORE/core'],function( require ) {
+define( 'PHET_CORE/cleanArray',['require','PHET_CORE/phetCore'],function( require ) {
   
 
-  var core = require( 'PHET_CORE/core' );
+  var phetCore = require( 'PHET_CORE/phetCore' );
 
-  core.cleanArray = function cleanArray( arr ) {
+  phetCore.cleanArray = function cleanArray( arr ) {
     assert && assert( !arr || ( arr instanceof Array ), 'cleanArray either takes an Array' );
 
     if ( arr ) {
@@ -856,8 +889,358 @@ define( 'PHET_CORE/cleanArray',['require','PHET_CORE/core'],function( require ) 
     }
   };
 
-  return core.cleanArray;
+  return phetCore.cleanArray;
 } );
+// Copyright 2002-2015, University of Colorado Boulder
+
+/**
+ * Lightweight event & listener abstraction.
+ * @author Sam Reid
+ */
+define( 'AXON/Events',['require','AXON/axon','PHET_CORE/cleanArray'],function( require ) {
+  
+
+  var axon = require( 'AXON/axon' );
+  var cleanArray = require( 'PHET_CORE/cleanArray' );
+
+  /**
+   * @class Events
+   * @constructor
+   */
+  axon.Events = function Events( options ) {
+    this._eventListeners = {}; // @private
+    this._staticEventListeners = {}; // @private
+
+    options && options.tandem && options.tandem.addInstance( this );
+    this.disposeEvents = function() {
+      options && options.tandem && options.tandem.removeInstance( this );
+    };
+  };
+
+  axon.Events.prototype = {
+    dispose: function() {
+      this.disposeEvents();
+    },
+
+    /////////////////////////////////////////////
+    // Below this point are the functions for event handling, basically orthogonal to property value change notifications
+
+    /**
+     * Register a listener when the specified eventName is triggered. Use off() to remove.
+     * Concurrent modification of listeners (on/off) from within the callback is acceptable.
+     * @param {string} eventName the name for the event channel
+     * @param {function} callback
+     */
+    on: function( eventName, callback ) {
+      assert && assert( typeof eventName === 'string', 'eventName should be a string' );
+      assert && assert( typeof callback === 'function', 'callback should be a function' );
+
+      this._eventListeners[ eventName ] = this._eventListeners[ eventName ] || [];
+      this._eventListeners[ eventName ].push( callback );
+    },
+
+    /**
+     * Register a listener when the specified eventName is triggered. Listener should be "static", meaning:
+     *   1. It shall not add/remove any "static" listeners (including itself) while it is being called (as any type of side-effect), and
+     *   2. "static" listeners should not be added while a non-static listener (on the same object) is being called.
+     * These restrictions allow us to guarantee that all listeners attached when an event is triggered are called.
+     * Since static listeners are stored separately, use offStatic() to remove listeners added with onStatic()
+     * @param {string} eventName the name for the event channel
+     * @param {function} callback
+     */
+    onStatic: function( eventName, callback ) {
+      assert && assert( typeof eventName === 'string', 'eventName should be a string' );
+      assert && assert( typeof callback === 'function', 'callback should be a function' );
+
+      this._staticEventListeners[ eventName ] = this._staticEventListeners[ eventName ] || [];
+      this._staticEventListeners[ eventName ].push( callback );
+    },
+
+    /**
+     * Adds a function which will only be called back once, after which it is removed as a listener.
+     * If you need to remove a function added with 'once' you will have to remove its handle, which is returned by the function.
+     * @param {string} eventName the name for the event channel
+     * @param {function} callback function to be called back once (if at all)
+     */
+    once: function( eventName, callback ) {
+      assert && assert( typeof eventName === 'string', 'eventName should be a string' );
+      assert && assert( typeof callback === 'function', 'callback should be a function' );
+
+      var events = this;
+      var wrappedCallback = function() {
+        events.off( eventName, wrappedCallback );
+
+        //If no arguments being passed through, call back without processing arguments, for possible speed
+        if ( arguments.length === 0 ) {
+          callback();
+        }
+        else {
+
+          //General case of passing events through to the wrapped callback function
+          callback.apply( this, Array.prototype.slice.call( arguments, 0 ) );
+        }
+      };
+      this.on( eventName, wrappedCallback );
+
+      //Return the handle in case it needs to be removed.
+      return wrappedCallback;
+    },
+
+    /**
+     * Remove a listener added with on() from the specified event type.  Does nothing if the listener did not exist.
+     * @param {string} eventName the name for the event channel
+     * @param {function} callback
+     */
+    off: function( eventName, callback ) {
+      assert && assert( typeof eventName === 'string', 'eventName should be a string' );
+      assert && assert( typeof callback === 'function', 'callback should be a function' );
+
+      var index = -1;
+      if ( this._eventListeners[ eventName ] ) {
+        index = this._eventListeners[ eventName ].indexOf( callback );
+        if ( index !== -1 ) {
+          this._eventListeners[ eventName ].splice( index, 1 );
+        }
+      }
+
+      return index; // so we can tell if we actually removed a listener
+    },
+
+    /**
+     * Remove a listener added with onStatic() from the specified event type.  Does nothing if the listener did not exist.
+     * @param {string} eventName the name for the event channel
+     * @param {function} callback
+     */
+    offStatic: function( eventName, callback ) {
+      assert && assert( typeof eventName === 'string', 'eventName should be a string' );
+      assert && assert( typeof callback === 'function', 'callback should be a function' );
+
+      var index = -1;
+      if ( this._staticEventListeners[ eventName ] ) {
+        index = this._staticEventListeners[ eventName ].indexOf( callback );
+        if ( index !== -1 ) {
+          this._staticEventListeners[ eventName ].splice( index, 1 );
+        }
+      }
+
+      return index; // so we can tell if we actually removed a listener
+    },
+
+    /**
+     * Checks for the existence of a specific listener, attached to a specific event name. Doesn't check for static listeners
+     * @param {string} eventName the name for the event channel
+     * @param {function} callback
+     * @returns {boolean}
+     */
+    hasListener: function( eventName, callback ) {
+      assert && assert( typeof eventName === 'string', 'eventName should be a string' );
+      assert && assert( typeof callback === 'function', 'callback should be a function' );
+
+      var array = this._eventListeners[ eventName ];
+      return !!array && array.indexOf( callback ) >= 0;
+    },
+
+    /**
+     * Checks for the existence of a specific static listener, attached to a specific event name. Doesn't check for non-static listeners
+     * @param {string} eventName the name for the event channel
+     * @param {function} callback
+     * @returns {boolean}
+     */
+    hasStaticListener: function( eventName, callback ) {
+      assert && assert( typeof eventName === 'string', 'eventName should be a string' );
+      assert && assert( typeof callback === 'function', 'callback should be a function' );
+
+      var array = this._staticEventListeners[ eventName ];
+      return !!array && array.indexOf( callback ) >= 0;
+    },
+
+    /**
+     * Removes all listeners added with on() and onStatic().
+     */
+    removeAllEventListeners: function() {
+      var eventName;
+      for ( eventName in this._eventListeners ) {
+        cleanArray( this._eventListeners[ eventName ] );
+      }
+      for ( eventName in this._staticEventListeners ) {
+        cleanArray( this._staticEventListeners[ eventName ] );
+      }
+    },
+
+    /**
+     * Trigger an event with the specified name and arguments.
+     * @param {string} eventName the name for the event channel
+     * @param args... optional arguments to pass to the listeners
+     */
+    trigger: function( eventName ) {
+      assert && assert( typeof eventName === 'string', 'eventName should be a string' );
+
+      var listeners = this._eventListeners[ eventName ];
+      var staticListeners = this._staticEventListeners[ eventName ];
+
+      // listener quantities for normal and static
+      var count = listeners ? listeners.length : 0;
+      var staticCount = staticListeners ? staticListeners.length : 0;
+
+      // only compute our arguments suffix once, instead of in our inner loop
+      var suffix;
+      var hasNoArguments = arguments.length === 1;
+      if ( !hasNoArguments && ( count > 0 || staticCount > 0 ) ) {
+        phetAllocation && phetAllocation( 'Array' );
+        suffix = Array.prototype.slice.call( arguments, 1 );
+      }
+
+      // make a copy of non-static listeners, in case callback removes listener
+      if ( count > 0 ) {
+        listeners = listeners.slice();
+      }
+
+      var i;
+
+      for ( i = 0; i < count; i++ ) {
+        var listener = listeners[ i ];
+
+        //Simple case of no arguments, call it separately for improved performance in case it is faster (untested)
+        if ( hasNoArguments ) {
+          listener();
+        }
+        else {
+          listener.apply( this, suffix );
+        }
+
+        assert && assert( !staticListeners || staticListeners.length === staticCount, 'Concurrent modifications of static listeners from within non-static listeners are forbidden' );
+      }
+
+      for ( i = 0; i < staticCount; i++ ) {
+        var staticListener = staticListeners[ i ];
+
+        //Simple case of no arguments, call it separately for improved performance in case it is faster (untested)
+        if ( hasNoArguments ) {
+          staticListener( arguments );
+        }
+        else {
+          staticListener.apply( this, suffix );
+        }
+
+        assert && assert( staticListeners.length === staticCount, 'Concurrent modifications from static listeners are forbidden' );
+      }
+    },
+
+    /**
+     * Trigger an event with the specified name, with no arguments.  Since the number of arguments is known
+     * no additional work is required to process and pass through the arguments (as opposed to trigger() itself).
+     * @param {string} eventName the name for the event channel
+     */
+    trigger0: function( eventName ) {
+      assert && assert( arguments.length === 1 );
+      assert && assert( typeof eventName === 'string', 'eventName should be a string' );
+
+      var listeners = this._eventListeners[ eventName ];
+      var staticListeners = this._staticEventListeners[ eventName ];
+
+      // listener quantities for normal and static
+      var count = listeners ? listeners.length : 0;
+      var staticCount = staticListeners ? staticListeners.length : 0;
+
+      // make a copy of non-static listeners, in case callback removes listener
+      if ( count > 0 ) {
+        listeners = listeners.slice();
+      }
+
+      var i;
+
+      for ( i = 0; i < count; i++ ) {
+        listeners[ i ]();
+
+        assert && assert( !staticListeners || staticListeners.length === staticCount, 'Concurrent modifications of static listeners from within non-static listeners are forbidden' );
+      }
+
+      for ( i = 0; i < staticCount; i++ ) {
+        staticListeners[ i ]();
+
+        assert && assert( staticListeners.length === staticCount, 'Concurrent modifications from static listeners are forbidden' );
+      }
+    },
+
+    /**
+     * Trigger an event with the specified name, with a single argument.  Since the number of arguments is known
+     * no additional work is required to process and pass through the arguments (as opposed to trigger() itself).
+     * @param {string} eventName the name for the event channel
+     * @param {Object} param1 - the argument to pass through to the listeners
+     */
+    trigger1: function( eventName, param1 ) {
+      assert && assert( arguments.length === 2 );
+      assert && assert( typeof eventName === 'string', 'eventName should be a string' );
+
+      var listeners = this._eventListeners[ eventName ];
+      var staticListeners = this._staticEventListeners[ eventName ];
+
+      // listener quantities for normal and static
+      var count = listeners ? listeners.length : 0;
+      var staticCount = staticListeners ? staticListeners.length : 0;
+
+      // make a copy of non-static listeners, in case callback removes listener
+      if ( count > 0 ) {
+        listeners = listeners.slice();
+      }
+
+      var i;
+
+      for ( i = 0; i < count; i++ ) {
+        listeners[ i ]( param1 );
+
+        assert && assert( !staticListeners || staticListeners.length === staticCount, 'Concurrent modifications of static listeners from within non-static listeners are forbidden' );
+      }
+
+      for ( i = 0; i < staticCount; i++ ) {
+        staticListeners[ i ]( param1 );
+
+        assert && assert( staticListeners.length === staticCount, 'Concurrent modifications from static listeners are forbidden' );
+      }
+    },
+
+    /**
+     * Trigger an event with the specified name, with two arguments.  Since the number of arguments is known
+     * no additional work is required to process and pass through the arguments (as opposed to trigger() itself).
+     * @param {string} eventName the name for the event channel
+     * @param {Object} param1 - the first parameter
+     * @param {Object} param2 - the second parameter
+     */
+    trigger2: function( eventName, param1, param2 ) {
+      assert && assert( arguments.length === 3 );
+      assert && assert( typeof eventName === 'string', 'eventName should be a string' );
+
+      var listeners = this._eventListeners[ eventName ];
+      var staticListeners = this._staticEventListeners[ eventName ];
+
+      // listener quantities for normal and static
+      var count = listeners ? listeners.length : 0;
+      var staticCount = staticListeners ? staticListeners.length : 0;
+
+      // make a copy of non-static listeners, in case callback removes listener
+      if ( count > 0 ) {
+        listeners = listeners.slice();
+      }
+
+      var i;
+
+      for ( i = 0; i < count; i++ ) {
+        listeners[ i ]( param1, param2 );
+
+        assert && assert( !staticListeners || staticListeners.length === staticCount, 'Concurrent modifications of static listeners from within non-static listeners are forbidden' );
+      }
+
+      for ( i = 0; i < staticCount; i++ ) {
+        staticListeners[ i ]( param1, param2 );
+
+        assert && assert( staticListeners.length === staticCount, 'Concurrent modifications from static listeners are forbidden' );
+      }
+    }
+  };
+
+  return axon.Events;
+} );
+
 // Copyright 2002-2014, University of Colorado Boulder
 
 define( 'DOT/dot',['require','PHET_CORE/phetAllocation'],function( require ) {
@@ -865,9 +1248,6 @@ define( 'DOT/dot',['require','PHET_CORE/phetAllocation'],function( require ) {
 
   // object allocation tracking
   window.phetAllocation = require( 'PHET_CORE/phetAllocation' );
-
-  // workaround for Axon, since it needs window.arch to be defined
-  window.arch = window.arch || null;
 
   var dot = function dot() {
     switch( arguments.length ) {
@@ -902,16 +1282,16 @@ define( 'DOT/dot',['require','PHET_CORE/phetAllocation'],function( require ) {
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-define( 'PHET_CORE/Poolable',['require','PHET_CORE/core','PHET_CORE/extend'],function( require ) {
+define( 'PHET_CORE/Poolable',['require','PHET_CORE/phetCore','PHET_CORE/extend'],function( require ) {
   
 
-  var core = require( 'PHET_CORE/core' );
+  var phetCore = require( 'PHET_CORE/phetCore' );
   var extend = require( 'PHET_CORE/extend' );
 
   /*
    * For option details, please see documentation inside this constructor body for now
    */
-  core.Poolable = {
+  phetCore.Poolable = {
     mixin: function ( type, options ) {
       var proto = type.prototype;
 
@@ -978,9 +1358,9 @@ define( 'PHET_CORE/Poolable',['require','PHET_CORE/core','PHET_CORE/extend'],fun
     }
   };
 
-  return core.Poolable;
+  return phetCore.Poolable;
 } );
-// Copyright 2002-2014, University of Colorado Boulder
+// Copyright 2002-2015, University of Colorado Boulder
 
 /**
  * Utility functions for Dot, placed into the dot.X namespace.
@@ -993,6 +1373,15 @@ define( 'DOT/Util',['require','DOT/dot'],function( require ) {
 
   var dot = require( 'DOT/dot' );
   // require( 'DOT/Vector2' ); // Require.js doesn't like the circular reference
+
+  // constants
+  var EPSILON = Number.MIN_VALUE;
+  var TWO_PI = 2 * Math.PI;
+
+  // "static" variables used in boxMullerTransform
+  var generate;
+  var z0;
+  var z1;
 
   dot.Util = {
     testAssert: function() {
@@ -1063,6 +1452,8 @@ define( 'DOT/Util',['require','DOT/dot'],function( require ) {
     },
 
     // intersection between the line from p1-p2 and the line from p3-p4
+    // Taken from an answer in http://stackoverflow.com/questions/385305/efficient-maths-algorithm-to-calculate-intersections
+    // Does not handle parallel lines
     lineLineIntersection: function( p1, p2, p3, p4 ) {
       var x12 = p1.x - p2.x;
       var x34 = p3.x - p4.x;
@@ -1224,22 +1615,40 @@ define( 'DOT/Util',['require','DOT/dot'],function( require ) {
     },
 
     /**
+     * Rounds using "Round half away from zero" algorithm. See dot#35.
+     *
+     * JavaScript's Math.round is not symmetric for positive and negative numbers, it uses IEEE 754 "Round half up".
+     * See https://en.wikipedia.org/wiki/Rounding#Round_half_up.
+     * For sims, we want to treat positive and negative values symmetrically, which is IEEE 754 "Round half away from zero",
+     * See https://en.wikipedia.org/wiki/Rounding#Round_half_away_from_zero
+     * Note that -0 is rounded to 0, since we typically do not want to display -0 in sims.
+     *
+     * @param {number} value                               `
+     * @returns {number}
+     */
+    roundSymmetric: function( value ) {
+      return ( ( value < 0 ) ? -1 : 1 ) * Math.round( Math.abs( value ) );
+    },
+
+    /**
      * A predictable implementation of toFixed.
      * JavaScript's toFixed is notoriously buggy, behavior differs depending on browser,
      * because the spec doesn't specify whether to round or floor.
-     * @param {number} number
+     * Rounding is symmetric for positive and negative values, see Util.roundSymmetric.
+     *
+     * @param {number} value
      * @param {number} decimalPlaces
      * @returns {string}
      */
-    toFixed: function( number, decimalPlaces ) {
+    toFixed: function( value, decimalPlaces ) {
       var multiplier = Math.pow( 10, decimalPlaces );
-      var value = Math.round( number * multiplier ) / multiplier;
-      return value.toFixed( decimalPlaces );
+      var newValue = Util.roundSymmetric( value * multiplier ) / multiplier;
+      return newValue.toFixed( decimalPlaces );
     },
 
     // Convenience for returning a number instead of a string.
-    toFixedNumber: function( number, decimalPlaces ) {
-      return parseFloat( Util.toFixed( number, decimalPlaces ) );
+    toFixedNumber: function( value, decimalPlaces ) {
+      return parseFloat( Util.toFixed( value, decimalPlaces ) );
     },
 
     isInteger: function( n ) {
@@ -1247,8 +1656,9 @@ define( 'DOT/Util',['require','DOT/dot'],function( require ) {
     },
 
     /*
-     * Computes the intersection of two line segments. Algorithm taked from Paul Bourke, 1989:
-     * http://astronomy.swin.edu.au/~pbourke/geometry/lineline2d/
+     * Computes the intersection of two line segments. Algorithm taken from Paul Bourke, 1989:
+     * http://paulbourke.net/geometry/pointlineplane/
+     * http://paulbourke.net/geometry/pointlineplane/pdb.c
      * Ported from MathUtil.java on 9/20/2013 by @samreid
      * line a goes from point 1->2 and line b goes from 3->4
      * @returns a Vector2 of the intersection point, or null if no intersection
@@ -1323,8 +1733,40 @@ define( 'DOT/Util',['require','DOT/dot'],function( require ) {
 
     log10: function( val ) {
       return Math.log( val ) / Math.LN10;
+    },
+
+    /**
+     * Generates a random Gaussian sample with the given mean and standard deviation.
+     * This method relies on the "static" variables generate, z0, and z1 defined above.
+     * Random.js is the primary client of this function, but it is defined here so it can be
+     * used other places more easily if need be.
+     * Code inspired by example here: https://en.wikipedia.org/wiki/Box%E2%80%93Muller_transform.
+     *
+     * @param mu the mean of the Gaussian
+     * @param sigma the standard deviation of the Gaussian
+     * @returns {number}
+     */
+    boxMullerTransform: function( mu, sigma ) {
+      generate = !generate;
+
+      if ( !generate ) {
+        return z1 * sigma + mu;
+      }
+
+      var u1;
+      var u2;
+      do {
+        u1 = Math.random();
+        u2 = Math.random();
+      }
+      while ( u1 <= EPSILON );
+
+      z0 = Math.sqrt( -2.0 * Math.log( u1 ) ) * Math.cos( TWO_PI * u2 );
+      z1 = Math.sqrt( -2.0 * Math.log( u1 ) ) * Math.sin( TWO_PI * u2 );
+      return z0 * sigma + mu;
     }
   };
+
   var Util = dot.Util;
 
   // make these available in the main namespace directly (for now)
@@ -1342,6 +1784,7 @@ define( 'DOT/Util',['require','DOT/dot'],function( require ) {
   dot.solveCubicRootsReal = Util.solveCubicRootsReal;
   dot.cubeRoot = Util.cubeRoot;
   dot.linear = Util.linear;
+  dot.boxMullerTransform = Util.boxMullerTransform;
 
   return Util;
 } );
@@ -1365,9 +1808,11 @@ define( 'DOT/Vector2',['require','DOT/dot','PHET_CORE/inherit','PHET_CORE/Poolab
   // require( 'DOT/Vector3' ); // commented out since Require.js complains about the circular dependency
 
   dot.Vector2 = function Vector2( x, y ) {
+
     // allow optional parameters
     this.x = x !== undefined ? x : 0;
     this.y = y !== undefined ? y : 0;
+
 
     assert && assert( typeof this.x === 'number', 'x needs to be a number' );
     assert && assert( typeof this.y === 'number', 'y needs to be a number' );
@@ -1649,8 +2094,12 @@ define( 'DOT/Vector2',['require','DOT/dot','PHET_CORE/inherit','PHET_CORE/Poolab
 
     setPolar: function( magnitude, angle ) {
       return this.setXY( magnitude * Math.cos( angle ), magnitude * Math.sin( angle ) );
-    }
+    },
 
+    // support for serialization
+    toStateObject: function() {
+      return { x: this.x, y: this.y };
+    }
   };
 
   Poolable.mixin( Vector2, {
@@ -1694,3144 +2143,13 @@ define( 'DOT/Vector2',['require','DOT/dot','PHET_CORE/inherit','PHET_CORE/Poolab
   Vector2.X_UNIT = new Immutable( 1, 0 );
   Vector2.Y_UNIT = new Immutable( 0, 1 );
 
+  // support for deserialization
+  Vector2.fromStateObject = function( json ) {
+    return new Vector2( json.x, json.y );
+  };
+
   return Vector2;
 } );
-
-// Copyright 2002-2014, University of Colorado Boulder
-
-/**
- * Basic 4-dimensional vector
- *
- * TODO: sync with Vector2 changes
- * TODO: add quaternion extension
- *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
- */
-
-define( 'DOT/Vector4',['require','DOT/dot','DOT/Util'],function( require ) {
-  
-
-  var dot = require( 'DOT/dot' );
-
-  require( 'DOT/Util' );
-  // require( 'DOT/Vector3' ); // commented out so Require.js doesn't complain about the circular dependency
-
-  dot.Vector4 = function Vector4( x, y, z, w ) {
-    // allow optional parameters
-    this.x = x !== undefined ? x : 0;
-    this.y = y !== undefined ? y : 0;
-    this.z = z !== undefined ? z : 0;
-    this.w = w !== undefined ? w : 1; // since w could be zero!
-  };
-  var Vector4 = dot.Vector4;
-
-  Vector4.prototype = {
-    constructor: Vector4,
-    isVector4: true,
-    dimension: 4,
-
-    magnitude: function() {
-      return Math.sqrt( this.magnitudeSquared() );
-    },
-
-    magnitudeSquared: function() {
-      this.dot( this );
-    },
-
-    // the distance between this vector (treated as a point) and another point
-    distance: function( point ) {
-      return this.minus( point ).magnitude();
-    },
-
-    // the squared distance between this vector (treated as a point) and another point
-    distanceSquared: function( point ) {
-      return this.minus( point ).magnitudeSquared();
-    },
-
-    dot: function( v ) {
-      return this.x * v.x + this.y * v.y + this.z * v.z + this.w * v.w;
-    },
-
-    isFinite: function() {
-      return isFinite( this.x ) && isFinite( this.y ) && isFinite( this.z ) && isFinite( this.w );
-    },
-
-    equals: function( other ) {
-      return this.x === other.x && this.y === other.y && this.z === other.z && this.w === other.w;
-    },
-
-    equalsEpsilon: function( other, epsilon ) {
-      if ( !epsilon ) {
-        epsilon = 0;
-      }
-      return Math.abs( this.x - other.x ) + Math.abs( this.y - other.y ) + Math.abs( this.z - other.z ) + Math.abs( this.w - other.w ) <= epsilon;
-    },
-
-    /*---------------------------------------------------------------------------*
-     * Immutables
-     *----------------------------------------------------------------------------*/
-
-    // create a copy, or if a vector is passed in, set that vector to our value
-    copy: function( vector ) {
-      if ( vector ) {
-        return vector.set( this );
-      }
-      else {
-        return new Vector4( this.x, this.y, this.z, this.w );
-      }
-    },
-
-    normalized: function() {
-      var mag = this.magnitude();
-      if ( mag === 0 ) {
-        throw new Error( "Cannot normalize a zero-magnitude vector" );
-      }
-      else {
-        return new Vector4( this.x / mag, this.y / mag, this.z / mag, this.w / mag );
-      }
-    },
-
-    timesScalar: function( scalar ) {
-      return new Vector4( this.x * scalar, this.y * scalar, this.z * scalar, this.w * scalar );
-    },
-
-    times: function( scalar ) {
-      // make sure it's not a vector!
-      assert && assert( scalar.dimension === undefined );
-      return this.timesScalar( scalar );
-    },
-
-    componentTimes: function( v ) {
-      return new Vector4( this.x * v.x, this.y * v.y, this.z * v.z, this.w * v.w );
-    },
-
-    plus: function( v ) {
-      return new Vector4( this.x + v.x, this.y + v.y, this.z + v.z, this.w + v.w );
-    },
-
-    plusScalar: function( scalar ) {
-      return new Vector4( this.x + scalar, this.y + scalar, this.z + scalar, this.w + scalar );
-    },
-
-    minus: function( v ) {
-      return new Vector4( this.x - v.x, this.y - v.y, this.z - v.z, this.w - v.w );
-    },
-
-    minusScalar: function( scalar ) {
-      return new Vector4( this.x - scalar, this.y - scalar, this.z - scalar, this.w - scalar );
-    },
-
-    dividedScalar: function( scalar ) {
-      return new Vector4( this.x / scalar, this.y / scalar, this.z / scalar, this.w / scalar );
-    },
-
-    negated: function() {
-      return new Vector4( -this.x, -this.y, -this.z, -this.w );
-    },
-
-    angleBetween: function( v ) {
-      return Math.acos( dot.clamp( this.normalized().dot( v.normalized() ), -1, 1 ) );
-    },
-
-    // linear interpolation from this (ratio=0) to vector (ratio=1)
-    blend: function( vector, ratio ) {
-      return this.plus( vector.minus( this ).times( ratio ) );
-    },
-
-    // average position between this and the provided vector
-    average: function( vector ) {
-      return this.blend( vector, 0.5 );
-    },
-
-    toString: function() {
-      return "Vector4(" + this.x + ", " + this.y + ", " + this.z + ", " + this.w + ")";
-    },
-
-    toVector3: function() {
-      return new dot.Vector3( this.x, this.y, this.z );
-    },
-
-    /*---------------------------------------------------------------------------*
-     * Mutables
-     *----------------------------------------------------------------------------*/
-
-    // our core mutables (all mutation should go through these)
-    setXYZW: function( x, y, z, w ) {
-      this.x = x;
-      this.y = y;
-      this.z = z;
-      this.w = w;
-      return this;
-    },
-    setX: function( x ) {
-      this.x = x;
-      return this;
-    },
-    setY: function( y ) {
-      this.y = y;
-      return this;
-    },
-    setZ: function( z ) {
-      this.z = z;
-      return this;
-    },
-    setW: function( w ) {
-      this.w = w;
-      return this;
-    },
-
-    set: function( v ) {
-      return this.setXYZW( v.x, v.y, v.z, v.w );
-    },
-
-    add: function( v ) {
-      return this.setXYZW( this.x + v.x, this.y + v.y, this.z + v.z, this.w + v.w );
-    },
-
-    addScalar: function( scalar ) {
-      return this.setXYZW( this.x + scalar, this.y + scalar, this.z + scalar, this.w + scalar );
-    },
-
-    subtract: function( v ) {
-      return this.setXYZW( this.x - v.x, this.y - v.y, this.z - v.z, this.w - v.w );
-    },
-
-    subtractScalar: function( scalar ) {
-      return this.setXYZW( this.x - scalar, this.y - scalar, this.z - scalar, this.w - scalar );
-    },
-
-    multiplyScalar: function( scalar ) {
-      return this.setXYZW( this.x * scalar, this.y * scalar, this.z * scalar, this.w * scalar );
-    },
-
-    multiply: function( scalar ) {
-      // make sure it's not a vector!
-      assert && assert( scalar.dimension === undefined );
-      return this.multiplyScalar( scalar );
-    },
-
-    componentMultiply: function( v ) {
-      return this.setXYZW( this.x * v.x, this.y * v.y, this.z * v.z, this.w * v.w );
-    },
-
-    divideScalar: function( scalar ) {
-      return this.setXYZW( this.x / scalar, this.y / scalar, this.z / scalar, this.w / scalar );
-    },
-
-    negate: function() {
-      return this.setXYZW( -this.x, -this.y, -this.z, -this.w );
-    },
-
-    normalize: function() {
-      var mag = this.magnitude();
-      if ( mag === 0 ) {
-        throw new Error( "Cannot normalize a zero-magnitude vector" );
-      }
-      else {
-        return this.divideScalar( mag );
-      }
-      return this;
-    }
-  };
-
-  /*---------------------------------------------------------------------------*
-   * Immutable Vector form
-   *----------------------------------------------------------------------------*/
-  Vector4.Immutable = function( x, y, z, w ) {
-    this.x = x !== undefined ? x : 0;
-    this.y = y !== undefined ? y : 0;
-    this.z = z !== undefined ? z : 0;
-    this.w = w !== undefined ? w : 1;
-  };
-  var Immutable = Vector4.Immutable;
-
-  Immutable.prototype = new Vector4();
-  Immutable.prototype.constructor = Immutable;
-
-  // throw errors whenever a mutable method is called on our immutable vector
-  Immutable.mutableOverrideHelper = function( mutableFunctionName ) {
-    Immutable.prototype[ mutableFunctionName ] = function() {
-      throw new Error( "Cannot call mutable method '" + mutableFunctionName + "' on immutable Vector4" );
-    };
-  };
-
-  // TODO: better way to handle this list?
-  Immutable.mutableOverrideHelper( 'setXYZW' );
-  Immutable.mutableOverrideHelper( 'setX' );
-  Immutable.mutableOverrideHelper( 'setY' );
-  Immutable.mutableOverrideHelper( 'setZ' );
-  Immutable.mutableOverrideHelper( 'setW' );
-
-  // helpful immutable constants
-  Vector4.ZERO = new Immutable( 0, 0, 0, 0 );
-  Vector4.X_UNIT = new Immutable( 1, 0, 0, 0 );
-  Vector4.Y_UNIT = new Immutable( 0, 1, 0, 0 );
-  Vector4.Z_UNIT = new Immutable( 0, 0, 1, 0 );
-  Vector4.W_UNIT = new Immutable( 0, 0, 0, 1 );
-
-  return Vector4;
-} );
-
-// Copyright 2002-2014, University of Colorado Boulder
-
-/**
- * Basic 3-dimensional vector
- *
- * TODO: sync with Vector2 changes
- *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
- */
-
-define( 'DOT/Vector3',['require','DOT/dot','DOT/Util','DOT/Vector2','DOT/Vector4'],function( require ) {
-  
-
-  var dot = require( 'DOT/dot' );
-
-  require( 'DOT/Util' );
-  require( 'DOT/Vector2' );
-  require( 'DOT/Vector4' );
-
-  dot.Vector3 = function Vector3( x, y, z ) {
-    // allow optional parameters
-    this.x = x !== undefined ? x : 0;
-    this.y = y !== undefined ? y : 0;
-    this.z = z !== undefined ? z : 0;
-  };
-  var Vector3 = dot.Vector3;
-
-  Vector3.prototype = {
-    constructor: Vector3,
-    isVector3: true,
-    dimension: 3,
-
-    magnitude: function() {
-      return Math.sqrt( this.magnitudeSquared() );
-    },
-
-    magnitudeSquared: function() {
-      return this.dot( this );
-    },
-
-    // the distance between this vector (treated as a point) and another point
-    distance: function( point ) {
-      return Math.sqrt( this.distanceSquared( point ) );
-    },
-
-    // the squared distance between this vector (treated as a point) and another point
-    distanceSquared: function( point ) {
-      var dx = this.x - point.x;
-      var dy = this.y - point.y;
-      var dz = this.z - point.z;
-      return dx * dx + dy * dy + dz * dz;
-    },
-
-    dot: function( v ) {
-      return this.x * v.x + this.y * v.y + this.z * v.z;
-    },
-
-    isFinite: function() {
-      return isFinite( this.x ) && isFinite( this.y ) && isFinite( this.z );
-    },
-
-    equals: function( other ) {
-      return this.x === other.x && this.y === other.y && this.z === other.z;
-    },
-
-    equalsEpsilon: function( other, epsilon ) {
-      if ( !epsilon ) {
-        epsilon = 0;
-      }
-      return Math.abs( this.x - other.x ) + Math.abs( this.y - other.y ) + Math.abs( this.z - other.z ) <= epsilon;
-    },
-
-    /*---------------------------------------------------------------------------*
-     * Immutables
-     *----------------------------------------------------------------------------*/
-
-    // create a copy, or if a vector is passed in, set that vector to our value
-    copy: function( vector ) {
-      if ( vector ) {
-        return vector.set( this );
-      }
-      else {
-        return new Vector3( this.x, this.y, this.z );
-      }
-    },
-
-    cross: function( v ) {
-      return new Vector3(
-        this.y * v.z - this.z * v.y,
-        this.z * v.x - this.x * v.z,
-        this.x * v.y - this.y * v.x
-      );
-    },
-
-    normalized: function() {
-      var mag = this.magnitude();
-      if ( mag === 0 ) {
-        throw new Error( "Cannot normalize a zero-magnitude vector" );
-      }
-      else {
-        return new Vector3( this.x / mag, this.y / mag, this.z / mag );
-      }
-    },
-
-    withMagnitude: function( magnitude ) {
-      return this.copy().setMagnitude( magnitude );
-    },
-
-    timesScalar: function( scalar ) {
-      return new Vector3( this.x * scalar, this.y * scalar, this.z * scalar );
-    },
-
-    times: function( scalar ) {
-      // make sure it's not a vector!
-      assert && assert( scalar.dimension === undefined );
-      return this.timesScalar( scalar );
-    },
-
-    componentTimes: function( v ) {
-      return new Vector3( this.x * v.x, this.y * v.y, this.z * v.z );
-    },
-
-    plus: function( v ) {
-      return new Vector3( this.x + v.x, this.y + v.y, this.z + v.z );
-    },
-
-    plusScalar: function( scalar ) {
-      return new Vector3( this.x + scalar, this.y + scalar, this.z + scalar );
-    },
-
-    minus: function( v ) {
-      return new Vector3( this.x - v.x, this.y - v.y, this.z - v.z );
-    },
-
-    minusScalar: function( scalar ) {
-      return new Vector3( this.x - scalar, this.y - scalar, this.z - scalar );
-    },
-
-    dividedScalar: function( scalar ) {
-      return new Vector3( this.x / scalar, this.y / scalar, this.z / scalar );
-    },
-
-    negated: function() {
-      return new Vector3( -this.x, -this.y, -this.z );
-    },
-
-    angleBetween: function( v ) {
-      return Math.acos( dot.clamp( this.normalized().dot( v.normalized() ), -1, 1 ) );
-    },
-
-    // linear interpolation from this (ratio=0) to vector (ratio=1)
-    blend: function( vector, ratio ) {
-      return this.plus( vector.minus( this ).times( ratio ) );
-    },
-
-    // average position between this and the provided vector
-    average: function( vector ) {
-      return this.blend( vector, 0.5 );
-    },
-
-    toString: function() {
-      return "Vector3(" + this.x + ", " + this.y + ", " + this.z + ")";
-    },
-
-    toVector2: function() {
-      return new dot.Vector2( this.x, this.y );
-    },
-
-    toVector4: function() {
-      return new dot.Vector4( this.x, this.y, this.z );
-    },
-
-    /*---------------------------------------------------------------------------*
-     * Mutables
-     *----------------------------------------------------------------------------*/
-
-    // our core mutables, all mutation should go through these
-    setXYZ: function( x, y, z ) {
-      this.x = x;
-      this.y = y;
-      this.z = z;
-      return this;
-    },
-    setX: function( x ) {
-      this.x = x;
-      return this;
-    },
-    setY: function( y ) {
-      this.y = y;
-      return this;
-    },
-    setZ: function( z ) {
-      this.z = z;
-      return this;
-    },
-
-    set: function( v ) {
-      return this.setXYZ( v.x, v.y, v.z );
-    },
-
-    // sets the magnitude of the vector, keeping the same direction (though a negative magnitude will flip the vector direction)
-    setMagnitude: function( m ) {
-      var scale = m / this.magnitude();
-      return this.multiplyScalar( scale );
-    },
-
-    add: function( v ) {
-      return this.setXYZ( this.x + v.x, this.y + v.y, this.z + v.z );
-    },
-
-    addScalar: function( scalar ) {
-      return this.setXYZ( this.x + scalar, this.y + scalar, this.z + scalar );
-    },
-
-    subtract: function( v ) {
-      return this.setXYZ( this.x - v.x, this.y - v.y, this.z - v.z );
-    },
-
-    subtractScalar: function( scalar ) {
-      return this.setXYZ( this.x - scalar, this.y - scalar, this.z - scalar );
-    },
-
-    multiplyScalar: function( scalar ) {
-      return this.setXYZ( this.x * scalar, this.y * scalar, this.z * scalar );
-    },
-
-    multiply: function( scalar ) {
-      // make sure it's not a vector!
-      assert && assert( scalar.dimension === undefined );
-      return this.multiplyScalar( scalar );
-    },
-
-    componentMultiply: function( v ) {
-      return this.setXYZ( this.x * v.x, this.y * v.y, this.z * v.z );
-    },
-
-    divideScalar: function( scalar ) {
-      return this.setXYZ( this.x / scalar, this.y / scalar, this.z / scalar );
-    },
-
-    negate: function() {
-      return this.setXYZ( -this.x, -this.y, -this.z );
-    },
-
-    normalize: function() {
-      var mag = this.magnitude();
-      if ( mag === 0 ) {
-        throw new Error( "Cannot normalize a zero-magnitude vector" );
-      }
-      else {
-        return this.divideScalar( mag );
-      }
-    }
-  };
-
-  /**
-   * Spherical linear interpolation between two unit vectors.
-   *
-   * @param {Vector3} start - Start unit vector
-   * @param {Vector3} end - End unit vector
-   * @param {number} ratio  - Between 0 (at start vector) and 1 (at end vector)
-   * @return Spherical linear interpolation between the start and end
-   */
-  Vector3.slerp = function( start, end, ratio ) {
-    // NOTE: we can't create a require() loop here
-    return dot.Quaternion.slerp( new dot.Quaternion(), dot.Quaternion.getRotationQuaternion( start, end ), ratio ).timesVector3( start );
-  };
-
-  /*---------------------------------------------------------------------------*
-   * Immutable Vector form
-   *----------------------------------------------------------------------------*/
-  Vector3.Immutable = function( x, y, z ) {
-    this.x = x !== undefined ? x : 0;
-    this.y = y !== undefined ? y : 0;
-    this.z = z !== undefined ? z : 0;
-  };
-  var Immutable = Vector3.Immutable;
-
-  Immutable.prototype = new Vector3();
-  Immutable.prototype.constructor = Immutable;
-
-  // throw errors whenever a mutable method is called on our immutable vector
-  Immutable.mutableOverrideHelper = function( mutableFunctionName ) {
-    Immutable.prototype[ mutableFunctionName ] = function() {
-      throw new Error( "Cannot call mutable method '" + mutableFunctionName + "' on immutable Vector3" );
-    };
-  };
-
-  // TODO: better way to handle this list?
-  Immutable.mutableOverrideHelper( 'setXYZ' );
-  Immutable.mutableOverrideHelper( 'setX' );
-  Immutable.mutableOverrideHelper( 'setY' );
-  Immutable.mutableOverrideHelper( 'setZ' );
-
-  // helpful immutable constants
-  Vector3.ZERO = new Immutable( 0, 0, 0 );
-  Vector3.X_UNIT = new Immutable( 1, 0, 0 );
-  Vector3.Y_UNIT = new Immutable( 0, 1, 0 );
-  Vector3.Z_UNIT = new Immutable( 0, 0, 1 );
-
-  return Vector3;
-} );
-
-// Copyright 2002-2014, University of Colorado Boulder
-
-/**
- * 4-dimensional Matrix
- *
- * TODO: consider adding affine flag if it will help performance (a la Matrix3)
- * TODO: get rotation angles
- *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
- */
-
-define( 'DOT/Matrix4',['require','DOT/dot','DOT/Vector3','DOT/Vector4'],function( require ) {
-  
-
-  var dot = require( 'DOT/dot' );
-
-  require( 'DOT/Vector3' );
-  require( 'DOT/Vector4' );
-
-  var Float32Array = window.Float32Array || Array;
-
-  dot.Matrix4 = function Matrix4( v00, v01, v02, v03, v10, v11, v12, v13, v20, v21, v22, v23, v30, v31, v32, v33, type ) {
-
-    // entries stored in column-major format
-    this.entries = new Float32Array( 16 );
-
-    this.rowMajor(
-      v00 !== undefined ? v00 : 1, v01 !== undefined ? v01 : 0, v02 !== undefined ? v02 : 0, v03 !== undefined ? v03 : 0,
-      v10 !== undefined ? v10 : 0, v11 !== undefined ? v11 : 1, v12 !== undefined ? v12 : 0, v13 !== undefined ? v13 : 0,
-      v20 !== undefined ? v20 : 0, v21 !== undefined ? v21 : 0, v22 !== undefined ? v22 : 1, v23 !== undefined ? v23 : 0,
-      v30 !== undefined ? v30 : 0, v31 !== undefined ? v31 : 0, v32 !== undefined ? v32 : 0, v33 !== undefined ? v33 : 1,
-      type );
-  };
-  var Matrix4 = dot.Matrix4;
-
-  Matrix4.Types = {
-    OTHER: 0, // default
-    IDENTITY: 1,
-    TRANSLATION_3D: 2,
-    SCALING: 3,
-    AFFINE: 4
-
-    // TODO: possibly add rotations
-  };
-
-  var Types = Matrix4.Types;
-
-  Matrix4.identity = function() {
-    return new Matrix4(
-      1, 0, 0, 0,
-      0, 1, 0, 0,
-      0, 0, 1, 0,
-      0, 0, 0, 1,
-      Types.IDENTITY );
-  };
-
-  Matrix4.translation = function( x, y, z ) {
-    return new Matrix4(
-      1, 0, 0, x,
-      0, 1, 0, y,
-      0, 0, 1, z,
-      0, 0, 0, 1,
-      Types.TRANSLATION_3D );
-  };
-
-  Matrix4.translationFromVector = function( v ) { return Matrix4.translation( v.x, v.y, v.z ); };
-
-  Matrix4.scaling = function( x, y, z ) {
-    // allow using one parameter to scale everything
-    y = y === undefined ? x : y;
-    z = z === undefined ? x : z;
-
-    return new Matrix4(
-      x, 0, 0, 0,
-      0, y, 0, 0,
-      0, 0, z, 0,
-      0, 0, 0, 1,
-      Types.SCALING );
-  };
-
-  // axis is a normalized Vector3, angle in radians.
-  Matrix4.rotationAxisAngle = function( axis, angle ) {
-    var c = Math.cos( angle );
-    var s = Math.sin( angle );
-    var C = 1 - c;
-
-    return new Matrix4(
-      axis.x * axis.x * C + c, axis.x * axis.y * C - axis.z * s, axis.x * axis.z * C + axis.y * s, 0,
-      axis.y * axis.x * C + axis.z * s, axis.y * axis.y * C + c, axis.y * axis.z * C - axis.x * s, 0,
-      axis.z * axis.x * C - axis.y * s, axis.z * axis.y * C + axis.x * s, axis.z * axis.z * C + c, 0,
-      0, 0, 0, 1,
-      Types.AFFINE );
-  };
-
-  // TODO: add in rotation from quaternion, and from quat + translation
-
-  Matrix4.rotationX = function( angle ) {
-    var c = Math.cos( angle );
-    var s = Math.sin( angle );
-
-    return new Matrix4(
-      1, 0, 0, 0,
-      0, c, -s, 0,
-      0, s, c, 0,
-      0, 0, 0, 1,
-      Types.AFFINE );
-  };
-
-  Matrix4.rotationY = function( angle ) {
-    var c = Math.cos( angle );
-    var s = Math.sin( angle );
-
-    return new Matrix4(
-      c, 0, s, 0,
-      0, 1, 0, 0,
-      -s, 0, c, 0,
-      0, 0, 0, 1,
-      Types.AFFINE );
-  };
-
-  Matrix4.rotationZ = function( angle ) {
-    var c = Math.cos( angle );
-    var s = Math.sin( angle );
-
-    return new Matrix4(
-      c, -s, 0, 0,
-      s, c, 0, 0,
-      0, 0, 1, 0,
-      0, 0, 0, 1,
-      Types.AFFINE );
-  };
-
-  // aspect === width / height
-  Matrix4.gluPerspective = function( fovYRadians, aspect, zNear, zFar ) {
-    var cotangent = Math.cos( fovYRadians ) / Math.sin( fovYRadians );
-
-    return new Matrix4(
-      cotangent / aspect, 0, 0, 0,
-      0, cotangent, 0, 0,
-      0, 0, ( zFar + zNear ) / ( zNear - zFar ), ( 2 * zFar * zNear ) / ( zNear - zFar ),
-      0, 0, -1, 0 );
-  };
-
-  Matrix4.prototype = {
-    constructor: Matrix4,
-
-    rowMajor: function( v00, v01, v02, v03, v10, v11, v12, v13, v20, v21, v22, v23, v30, v31, v32, v33, type ) {
-      this.entries[ 0 ] = v00;
-      this.entries[ 1 ] = v10;
-      this.entries[ 2 ] = v20;
-      this.entries[ 3 ] = v30;
-      this.entries[ 4 ] = v01;
-      this.entries[ 5 ] = v11;
-      this.entries[ 6 ] = v21;
-      this.entries[ 7 ] = v31;
-      this.entries[ 8 ] = v02;
-      this.entries[ 9 ] = v12;
-      this.entries[ 10 ] = v22;
-      this.entries[ 11 ] = v32;
-      this.entries[ 12 ] = v03;
-      this.entries[ 13 ] = v13;
-      this.entries[ 14 ] = v23;
-      this.entries[ 15 ] = v33;
-
-      // TODO: consider performance of the affine check here
-      this.type = type === undefined ? ( ( v30 === 0 && v31 === 0 && v32 === 0 && v33 === 1 ) ? Types.AFFINE : Types.OTHER ) : type;
-      return this;
-    },
-
-    columnMajor: function( v00, v10, v20, v30, v01, v11, v21, v31, v02, v12, v22, v32, v03, v13, v23, v33, type ) {
-      return this.rowMajor( v00, v01, v02, v03, v10, v11, v12, v13, v20, v21, v22, v23, v30, v31, v32, v33, type );
-    },
-
-    set: function( matrix ) {
-      return this.rowMajor(
-        matrix.m00(), matrix.m01(), matrix.m02(), matrix.m03(),
-        matrix.m10(), matrix.m11(), matrix.m12(), matrix.m13(),
-        matrix.m20(), matrix.m21(), matrix.m22(), matrix.m23(),
-        matrix.m30(), matrix.m31(), matrix.m32(), matrix.m33(),
-        matrix.type );
-    },
-
-    // convenience getters. inline usages of these when performance is critical? TODO: test performance of inlining these, with / without closure compiler
-    m00: function() { return this.entries[ 0 ]; },
-    m01: function() { return this.entries[ 4 ]; },
-    m02: function() { return this.entries[ 8 ]; },
-    m03: function() { return this.entries[ 12 ]; },
-    m10: function() { return this.entries[ 1 ]; },
-    m11: function() { return this.entries[ 5 ]; },
-    m12: function() { return this.entries[ 9 ]; },
-    m13: function() { return this.entries[ 13 ]; },
-    m20: function() { return this.entries[ 2 ]; },
-    m21: function() { return this.entries[ 6 ]; },
-    m22: function() { return this.entries[ 10 ]; },
-    m23: function() { return this.entries[ 14 ]; },
-    m30: function() { return this.entries[ 3 ]; },
-    m31: function() { return this.entries[ 7 ]; },
-    m32: function() { return this.entries[ 11 ]; },
-    m33: function() { return this.entries[ 15 ]; },
-
-    isFinite: function() {
-      return isFinite( this.m00() ) &&
-             isFinite( this.m01() ) &&
-             isFinite( this.m02() ) &&
-             isFinite( this.m03() ) &&
-             isFinite( this.m10() ) &&
-             isFinite( this.m11() ) &&
-             isFinite( this.m12() ) &&
-             isFinite( this.m13() ) &&
-             isFinite( this.m20() ) &&
-             isFinite( this.m21() ) &&
-             isFinite( this.m22() ) &&
-             isFinite( this.m23() ) &&
-             isFinite( this.m30() ) &&
-             isFinite( this.m31() ) &&
-             isFinite( this.m32() ) &&
-             isFinite( this.m33() );
-    },
-
-    // the 3D translation, assuming multiplication with a homogeneous vector
-    getTranslation: function() {
-      return new dot.Vector3( this.m03(), this.m13(), this.m23() );
-    },
-    get translation() { return this.getTranslation(); },
-
-    // returns a vector that is equivalent to ( T(1,0,0).magnitude(), T(0,1,0).magnitude(), T(0,0,1).magnitude() )
-    // where T is a relative transform
-    getScaleVector: function() {
-      var m0003 = this.m00() + this.m03();
-      var m1013 = this.m10() + this.m13();
-      var m2023 = this.m20() + this.m23();
-      var m3033 = this.m30() + this.m33();
-      var m0103 = this.m01() + this.m03();
-      var m1113 = this.m11() + this.m13();
-      var m2123 = this.m21() + this.m23();
-      var m3133 = this.m31() + this.m33();
-      var m0203 = this.m02() + this.m03();
-      var m1213 = this.m12() + this.m13();
-      var m2223 = this.m22() + this.m23();
-      var m3233 = this.m32() + this.m33();
-      return new dot.Vector3(
-        Math.sqrt( m0003 * m0003 + m1013 * m1013 + m2023 * m2023 + m3033 * m3033 ),
-        Math.sqrt( m0103 * m0103 + m1113 * m1113 + m2123 * m2123 + m3133 * m3133 ),
-        Math.sqrt( m0203 * m0203 + m1213 * m1213 + m2223 * m2223 + m3233 * m3233 ) );
-    },
-    get scaleVector() { return this.getScaleVector(); },
-
-    getCSSTransform: function() {
-      // See http://www.w3.org/TR/css3-transforms/, particularly Section 13 that discusses the SVG compatibility
-
-      // we need to prevent the numbers from being in an exponential toString form, since the CSS transform does not support that
-      // 20 is the largest guaranteed number of digits according to https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Number/toFixed
-
-      // the inner part of a CSS3 transform, but remember to add the browser-specific parts!
-      // NOTE: the toFixed calls are inlined for performance reasons
-      return 'matrix3d(' +
-             this.entries[ 0 ].toFixed( 20 ) + ',' +
-             this.entries[ 1 ].toFixed( 20 ) + ',' +
-             this.entries[ 2 ].toFixed( 20 ) + ',' +
-             this.entries[ 3 ].toFixed( 20 ) + ',' +
-             this.entries[ 4 ].toFixed( 20 ) + ',' +
-             this.entries[ 5 ].toFixed( 20 ) + ',' +
-             this.entries[ 6 ].toFixed( 20 ) + ',' +
-             this.entries[ 7 ].toFixed( 20 ) + ',' +
-             this.entries[ 8 ].toFixed( 20 ) + ',' +
-             this.entries[ 9 ].toFixed( 20 ) + ',' +
-             this.entries[ 10 ].toFixed( 20 ) + ',' +
-             this.entries[ 11 ].toFixed( 20 ) + ',' +
-             this.entries[ 12 ].toFixed( 20 ) + ',' +
-             this.entries[ 13 ].toFixed( 20 ) + ',' +
-             this.entries[ 14 ].toFixed( 20 ) + ',' +
-             this.entries[ 15 ].toFixed( 20 ) + ')';
-    },
-    get cssTransform() { return this.getCSSTransform(); },
-
-    // exact equality
-    equals: function( m ) {
-      return this.m00() === m.m00() && this.m01() === m.m01() && this.m02() === m.m02() && this.m03() === m.m03() &&
-             this.m10() === m.m10() && this.m11() === m.m11() && this.m12() === m.m12() && this.m13() === m.m13() &&
-             this.m20() === m.m20() && this.m21() === m.m21() && this.m22() === m.m22() && this.m23() === m.m23() &&
-             this.m30() === m.m30() && this.m31() === m.m31() && this.m32() === m.m32() && this.m33() === m.m33();
-    },
-
-    // equality within a margin of error
-    equalsEpsilon: function( m, epsilon ) {
-      return Math.abs( this.m00() - m.m00() ) < epsilon &&
-             Math.abs( this.m01() - m.m01() ) < epsilon &&
-             Math.abs( this.m02() - m.m02() ) < epsilon &&
-             Math.abs( this.m03() - m.m03() ) < epsilon &&
-             Math.abs( this.m10() - m.m10() ) < epsilon &&
-             Math.abs( this.m11() - m.m11() ) < epsilon &&
-             Math.abs( this.m12() - m.m12() ) < epsilon &&
-             Math.abs( this.m13() - m.m13() ) < epsilon &&
-             Math.abs( this.m20() - m.m20() ) < epsilon &&
-             Math.abs( this.m21() - m.m21() ) < epsilon &&
-             Math.abs( this.m22() - m.m22() ) < epsilon &&
-             Math.abs( this.m23() - m.m23() ) < epsilon &&
-             Math.abs( this.m30() - m.m30() ) < epsilon &&
-             Math.abs( this.m31() - m.m31() ) < epsilon &&
-             Math.abs( this.m32() - m.m32() ) < epsilon &&
-             Math.abs( this.m33() - m.m33() ) < epsilon;
-    },
-
-    /*---------------------------------------------------------------------------*
-     * Immutable operations (returning a new matrix)
-     *----------------------------------------------------------------------------*/
-
-    copy: function() {
-      return new Matrix4(
-        this.m00(), this.m01(), this.m02(), this.m03(),
-        this.m10(), this.m11(), this.m12(), this.m13(),
-        this.m20(), this.m21(), this.m22(), this.m23(),
-        this.m30(), this.m31(), this.m32(), this.m33(),
-        this.type
-      );
-    },
-
-    plus: function( m ) {
-      return new Matrix4(
-        this.m00() + m.m00(), this.m01() + m.m01(), this.m02() + m.m02(), this.m03() + m.m03(),
-        this.m10() + m.m10(), this.m11() + m.m11(), this.m12() + m.m12(), this.m13() + m.m13(),
-        this.m20() + m.m20(), this.m21() + m.m21(), this.m22() + m.m22(), this.m23() + m.m23(),
-        this.m30() + m.m30(), this.m31() + m.m31(), this.m32() + m.m32(), this.m33() + m.m33()
-      );
-    },
-
-    minus: function( m ) {
-      return new Matrix4(
-        this.m00() - m.m00(), this.m01() - m.m01(), this.m02() - m.m02(), this.m03() - m.m03(),
-        this.m10() - m.m10(), this.m11() - m.m11(), this.m12() - m.m12(), this.m13() - m.m13(),
-        this.m20() - m.m20(), this.m21() - m.m21(), this.m22() - m.m22(), this.m23() - m.m23(),
-        this.m30() - m.m30(), this.m31() - m.m31(), this.m32() - m.m32(), this.m33() - m.m33()
-      );
-    },
-
-    transposed: function() {
-      return new Matrix4(
-        this.m00(), this.m10(), this.m20(), this.m30(),
-        this.m01(), this.m11(), this.m21(), this.m31(),
-        this.m02(), this.m12(), this.m22(), this.m32(),
-        this.m03(), this.m13(), this.m23(), this.m33() );
-    },
-
-    negated: function() {
-      return new Matrix4(
-        -this.m00(), -this.m01(), -this.m02(), -this.m03(),
-        -this.m10(), -this.m11(), -this.m12(), -this.m13(),
-        -this.m20(), -this.m21(), -this.m22(), -this.m23(),
-        -this.m30(), -this.m31(), -this.m32(), -this.m33() );
-    },
-
-    inverted: function() {
-      switch( this.type ) {
-        case Types.IDENTITY:
-          return this;
-        case Types.TRANSLATION_3D:
-          return new Matrix4(
-            1, 0, 0, -this.m03(),
-            0, 1, 0, -this.m13(),
-            0, 0, 1, -this.m23(),
-            0, 0, 0, 1, Types.TRANSLATION_3D );
-        case Types.SCALING:
-          return new Matrix4(
-            1 / this.m00(), 0, 0, 0,
-            0, 1 / this.m11(), 0, 0,
-            0, 0, 1 / this.m22(), 0,
-            0, 0, 0, 1 / this.m33(), Types.SCALING );
-        case Types.AFFINE:
-        case Types.OTHER:
-          var det = this.getDeterminant();
-          if ( det !== 0 ) {
-            return new Matrix4(
-              ( -this.m31() * this.m22() * this.m13() + this.m21() * this.m32() * this.m13() + this.m31() * this.m12() * this.m23() - this.m11() * this.m32() * this.m23() - this.m21() * this.m12() * this.m33() + this.m11() * this.m22() * this.m33() ) / det,
-              ( this.m31() * this.m22() * this.m03() - this.m21() * this.m32() * this.m03() - this.m31() * this.m02() * this.m23() + this.m01() * this.m32() * this.m23() + this.m21() * this.m02() * this.m33() - this.m01() * this.m22() * this.m33() ) / det,
-              ( -this.m31() * this.m12() * this.m03() + this.m11() * this.m32() * this.m03() + this.m31() * this.m02() * this.m13() - this.m01() * this.m32() * this.m13() - this.m11() * this.m02() * this.m33() + this.m01() * this.m12() * this.m33() ) / det,
-              ( this.m21() * this.m12() * this.m03() - this.m11() * this.m22() * this.m03() - this.m21() * this.m02() * this.m13() + this.m01() * this.m22() * this.m13() + this.m11() * this.m02() * this.m23() - this.m01() * this.m12() * this.m23() ) / det,
-              ( this.m30() * this.m22() * this.m13() - this.m20() * this.m32() * this.m13() - this.m30() * this.m12() * this.m23() + this.m10() * this.m32() * this.m23() + this.m20() * this.m12() * this.m33() - this.m10() * this.m22() * this.m33() ) / det,
-              ( -this.m30() * this.m22() * this.m03() + this.m20() * this.m32() * this.m03() + this.m30() * this.m02() * this.m23() - this.m00() * this.m32() * this.m23() - this.m20() * this.m02() * this.m33() + this.m00() * this.m22() * this.m33() ) / det,
-              ( this.m30() * this.m12() * this.m03() - this.m10() * this.m32() * this.m03() - this.m30() * this.m02() * this.m13() + this.m00() * this.m32() * this.m13() + this.m10() * this.m02() * this.m33() - this.m00() * this.m12() * this.m33() ) / det,
-              ( -this.m20() * this.m12() * this.m03() + this.m10() * this.m22() * this.m03() + this.m20() * this.m02() * this.m13() - this.m00() * this.m22() * this.m13() - this.m10() * this.m02() * this.m23() + this.m00() * this.m12() * this.m23() ) / det,
-              ( -this.m30() * this.m21() * this.m13() + this.m20() * this.m31() * this.m13() + this.m30() * this.m11() * this.m23() - this.m10() * this.m31() * this.m23() - this.m20() * this.m11() * this.m33() + this.m10() * this.m21() * this.m33() ) / det,
-              ( this.m30() * this.m21() * this.m03() - this.m20() * this.m31() * this.m03() - this.m30() * this.m01() * this.m23() + this.m00() * this.m31() * this.m23() + this.m20() * this.m01() * this.m33() - this.m00() * this.m21() * this.m33() ) / det,
-              ( -this.m30() * this.m11() * this.m03() + this.m10() * this.m31() * this.m03() + this.m30() * this.m01() * this.m13() - this.m00() * this.m31() * this.m13() - this.m10() * this.m01() * this.m33() + this.m00() * this.m11() * this.m33() ) / det,
-              ( this.m20() * this.m11() * this.m03() - this.m10() * this.m21() * this.m03() - this.m20() * this.m01() * this.m13() + this.m00() * this.m21() * this.m13() + this.m10() * this.m01() * this.m23() - this.m00() * this.m11() * this.m23() ) / det,
-              ( this.m30() * this.m21() * this.m12() - this.m20() * this.m31() * this.m12() - this.m30() * this.m11() * this.m22() + this.m10() * this.m31() * this.m22() + this.m20() * this.m11() * this.m32() - this.m10() * this.m21() * this.m32() ) / det,
-              ( -this.m30() * this.m21() * this.m02() + this.m20() * this.m31() * this.m02() + this.m30() * this.m01() * this.m22() - this.m00() * this.m31() * this.m22() - this.m20() * this.m01() * this.m32() + this.m00() * this.m21() * this.m32() ) / det,
-              ( this.m30() * this.m11() * this.m02() - this.m10() * this.m31() * this.m02() - this.m30() * this.m01() * this.m12() + this.m00() * this.m31() * this.m12() + this.m10() * this.m01() * this.m32() - this.m00() * this.m11() * this.m32() ) / det,
-              ( -this.m20() * this.m11() * this.m02() + this.m10() * this.m21() * this.m02() + this.m20() * this.m01() * this.m12() - this.m00() * this.m21() * this.m12() - this.m10() * this.m01() * this.m22() + this.m00() * this.m11() * this.m22() ) / det
-            );
-          }
-          else {
-            throw new Error( 'Matrix could not be inverted, determinant === 0' );
-          }
-          break; // because JSHint totally can't tell that this can't be reached
-        default:
-          throw new Error( 'Matrix3.inverted with unknown type: ' + this.type );
-      }
-    },
-
-    timesMatrix: function( m ) {
-      // I * M === M * I === I (the identity)
-      if ( this.type === Types.IDENTITY || m.type === Types.IDENTITY ) {
-        return this.type === Types.IDENTITY ? m : this;
-      }
-
-      if ( this.type === m.type ) {
-        // currently two matrices of the same type will result in the same result type
-        if ( this.type === Types.TRANSLATION_3D ) {
-          // faster combination of translations
-          return new Matrix4(
-            1, 0, 0, this.m03() + m.m02(),
-            0, 1, 0, this.m13() + m.m12(),
-            0, 0, 1, this.m23() + m.m23(),
-            0, 0, 0, 1, Types.TRANSLATION_3D );
-        }
-        else if ( this.type === Types.SCALING ) {
-          // faster combination of scaling
-          return new Matrix4(
-            this.m00() * m.m00(), 0, 0, 0,
-            0, this.m11() * m.m11(), 0, 0,
-            0, 0, this.m22() * m.m22(), 0,
-            0, 0, 0, 1, Types.SCALING );
-        }
-      }
-
-      if ( this.type !== Types.OTHER && m.type !== Types.OTHER ) {
-        // currently two matrices that are anything but "other" are technically affine, and the result will be affine
-
-        // affine case
-        return new Matrix4(
-          this.m00() * m.m00() + this.m01() * m.m10() + this.m02() * m.m20(),
-          this.m00() * m.m01() + this.m01() * m.m11() + this.m02() * m.m21(),
-          this.m00() * m.m02() + this.m01() * m.m12() + this.m02() * m.m22(),
-          this.m00() * m.m03() + this.m01() * m.m13() + this.m02() * m.m23() + this.m03(),
-          this.m10() * m.m00() + this.m11() * m.m10() + this.m12() * m.m20(),
-          this.m10() * m.m01() + this.m11() * m.m11() + this.m12() * m.m21(),
-          this.m10() * m.m02() + this.m11() * m.m12() + this.m12() * m.m22(),
-          this.m10() * m.m03() + this.m11() * m.m13() + this.m12() * m.m23() + this.m13(),
-          this.m20() * m.m00() + this.m21() * m.m10() + this.m22() * m.m20(),
-          this.m20() * m.m01() + this.m21() * m.m11() + this.m22() * m.m21(),
-          this.m20() * m.m02() + this.m21() * m.m12() + this.m22() * m.m22(),
-          this.m20() * m.m03() + this.m21() * m.m13() + this.m22() * m.m23() + this.m23(),
-          0, 0, 0, 1, Types.AFFINE );
-      }
-
-      // general case
-      return new Matrix4(
-        this.m00() * m.m00() + this.m01() * m.m10() + this.m02() * m.m20() + this.m03() * m.m30(),
-        this.m00() * m.m01() + this.m01() * m.m11() + this.m02() * m.m21() + this.m03() * m.m31(),
-        this.m00() * m.m02() + this.m01() * m.m12() + this.m02() * m.m22() + this.m03() * m.m32(),
-        this.m00() * m.m03() + this.m01() * m.m13() + this.m02() * m.m23() + this.m03() * m.m33(),
-        this.m10() * m.m00() + this.m11() * m.m10() + this.m12() * m.m20() + this.m13() * m.m30(),
-        this.m10() * m.m01() + this.m11() * m.m11() + this.m12() * m.m21() + this.m13() * m.m31(),
-        this.m10() * m.m02() + this.m11() * m.m12() + this.m12() * m.m22() + this.m13() * m.m32(),
-        this.m10() * m.m03() + this.m11() * m.m13() + this.m12() * m.m23() + this.m13() * m.m33(),
-        this.m20() * m.m00() + this.m21() * m.m10() + this.m22() * m.m20() + this.m23() * m.m30(),
-        this.m20() * m.m01() + this.m21() * m.m11() + this.m22() * m.m21() + this.m23() * m.m31(),
-        this.m20() * m.m02() + this.m21() * m.m12() + this.m22() * m.m22() + this.m23() * m.m32(),
-        this.m20() * m.m03() + this.m21() * m.m13() + this.m22() * m.m23() + this.m23() * m.m33(),
-        this.m30() * m.m00() + this.m31() * m.m10() + this.m32() * m.m20() + this.m33() * m.m30(),
-        this.m30() * m.m01() + this.m31() * m.m11() + this.m32() * m.m21() + this.m33() * m.m31(),
-        this.m30() * m.m02() + this.m31() * m.m12() + this.m32() * m.m22() + this.m33() * m.m32(),
-        this.m30() * m.m03() + this.m31() * m.m13() + this.m32() * m.m23() + this.m33() * m.m33() );
-    },
-
-    timesVector4: function( v ) {
-      var x = this.m00() * v.x + this.m01() * v.y + this.m02() * v.z + this.m03() * v.w;
-      var y = this.m10() * v.x + this.m11() * v.y + this.m12() * v.z + this.m13() * v.w;
-      var z = this.m20() * v.x + this.m21() * v.y + this.m22() * v.z + this.m23() * v.w;
-      var w = this.m30() * v.x + this.m31() * v.y + this.m32() * v.z + this.m33() * v.w;
-      return new dot.Vector4( x, y, z, w );
-    },
-
-    timesVector3: function( v ) {
-      return this.timesVector4( v.toVector4() ).toVector3();
-    },
-
-    timesTransposeVector4: function( v ) {
-      var x = this.m00() * v.x + this.m10() * v.y + this.m20() * v.z + this.m30() * v.w;
-      var y = this.m01() * v.x + this.m11() * v.y + this.m21() * v.z + this.m31() * v.w;
-      var z = this.m02() * v.x + this.m12() * v.y + this.m22() * v.z + this.m32() * v.w;
-      var w = this.m03() * v.x + this.m13() * v.y + this.m23() * v.z + this.m33() * v.w;
-      return new dot.Vector4( x, y, z, w );
-    },
-
-    timesTransposeVector3: function( v ) {
-      return this.timesTransposeVector4( v.toVector4() ).toVector3();
-    },
-
-    timesRelativeVector3: function( v ) {
-      var x = this.m00() * v.x + this.m10() * v.y + this.m20() * v.z;
-      var y = this.m01() * v.y + this.m11() * v.y + this.m21() * v.z;
-      var z = this.m02() * v.z + this.m12() * v.y + this.m22() * v.z;
-      return new dot.Vector3( x, y, z );
-    },
-
-    getDeterminant: function() {
-      return this.m03() * this.m12() * this.m21() * this.m30() -
-             this.m02() * this.m13() * this.m21() * this.m30() -
-             this.m03() * this.m11() * this.m22() * this.m30() +
-             this.m01() * this.m13() * this.m22() * this.m30() +
-             this.m02() * this.m11() * this.m23() * this.m30() -
-             this.m01() * this.m12() * this.m23() * this.m30() -
-             this.m03() * this.m12() * this.m20() * this.m31() +
-             this.m02() * this.m13() * this.m20() * this.m31() +
-             this.m03() * this.m10() * this.m22() * this.m31() -
-             this.m00() * this.m13() * this.m22() * this.m31() -
-             this.m02() * this.m10() * this.m23() * this.m31() +
-             this.m00() * this.m12() * this.m23() * this.m31() +
-             this.m03() * this.m11() * this.m20() * this.m32() -
-             this.m01() * this.m13() * this.m20() * this.m32() -
-             this.m03() * this.m10() * this.m21() * this.m32() +
-             this.m00() * this.m13() * this.m21() * this.m32() +
-             this.m01() * this.m10() * this.m23() * this.m32() -
-             this.m00() * this.m11() * this.m23() * this.m32() -
-             this.m02() * this.m11() * this.m20() * this.m33() +
-             this.m01() * this.m12() * this.m20() * this.m33() +
-             this.m02() * this.m10() * this.m21() * this.m33() -
-             this.m00() * this.m12() * this.m21() * this.m33() -
-             this.m01() * this.m10() * this.m22() * this.m33() +
-             this.m00() * this.m11() * this.m22() * this.m33();
-    },
-    get determinant() { return this.getDeterminant(); },
-
-    toString: function() {
-      return this.m00() + " " + this.m01() + " " + this.m02() + " " + this.m03() + "\n" +
-             this.m10() + " " + this.m11() + " " + this.m12() + " " + this.m13() + "\n" +
-             this.m20() + " " + this.m21() + " " + this.m22() + " " + this.m23() + "\n" +
-             this.m30() + " " + this.m31() + " " + this.m32() + " " + this.m33();
-    },
-
-    makeImmutable: function() {
-      this.rowMajor = function() {
-        throw new Error( "Cannot modify immutable matrix" );
-      };
-    }
-  };
-
-  // create an immutable
-  Matrix4.IDENTITY = new Matrix4();
-  Matrix4.IDENTITY.makeImmutable();
-
-  return Matrix4;
-} );
-
-// Copyright 2002-2014, University of Colorado Boulder
-
-/**
- * 3-dimensional Matrix
- *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
- */
-
-define( 'DOT/Matrix3',['require','DOT/dot','PHET_CORE/Poolable','DOT/Vector2','DOT/Vector3','DOT/Matrix4'],function( require ) {
-  
-
-  var dot = require( 'DOT/dot' );
-  var Poolable = require( 'PHET_CORE/Poolable' );
-
-  var FastArray = dot.FastArray;
-
-  require( 'DOT/Vector2' );
-  require( 'DOT/Vector3' );
-  require( 'DOT/Matrix4' );
-
-  var identityFastArray = new FastArray( 9 );
-  identityFastArray[ 0 ] = 1;
-  identityFastArray[ 4 ] = 1;
-  identityFastArray[ 8 ] = 1;
-
-  var createIdentityArray = FastArray === Array ?
-                            function() {
-                              return [ 1, 0, 0, 0, 1, 0, 0, 0, 1 ];
-                            } :
-                            function() {
-                              return new FastArray( identityFastArray );
-                            };
-
-  //Create an identity matrix
-  dot.Matrix3 = function Matrix3( argumentsShouldNotExist ) {
-
-    //Make sure no clients are expecting to create a matrix with non-identity values
-    assert && assert( !argumentsShouldNotExist, 'Matrix3 constructor should not be called with any arguments.  Use Matrix3.createFromPool()/Matrix3.identity()/etc.' );
-
-    // entries stored in column-major format
-    this.entries = createIdentityArray();
-
-    phetAllocation && phetAllocation( 'Matrix3' );
-    this.type = Types.IDENTITY;
-  };
-  var Matrix3 = dot.Matrix3;
-
-  Matrix3.Types = {
-    // NOTE: if an inverted matrix of a type is not that type, change inverted()!
-    // NOTE: if two matrices with identical types are multiplied, the result should have the same type. if not, changed timesMatrix()!
-    // NOTE: on adding a type, exaustively check all type usage
-    OTHER: 0, // default
-    IDENTITY: 1,
-    TRANSLATION_2D: 2,
-    SCALING: 3,
-    AFFINE: 4
-
-    // TODO: possibly add rotations
-  };
-
-  var Types = Matrix3.Types;
-
-  Matrix3.identity = function() { return Matrix3.dirtyFromPool().setToIdentity(); };
-  Matrix3.translation = function( x, y ) { return Matrix3.dirtyFromPool().setToTranslation( x, y ); };
-  Matrix3.translationFromVector = function( v ) { return Matrix3.translation( v.x, v.y ); };
-  Matrix3.scaling = function( x, y ) { return Matrix3.dirtyFromPool().setToScale( x, y ); };
-  Matrix3.scale = Matrix3.scaling;
-  Matrix3.affine = function( m00, m10, m01, m11, m02, m12 ) { return Matrix3.dirtyFromPool().setToAffine( m00, m01, m02, m10, m11, m12 ); };
-  Matrix3.rowMajor = function( v00, v01, v02, v10, v11, v12, v20, v21, v22, type ) { return Matrix3.dirtyFromPool().rowMajor( v00, v01, v02, v10, v11, v12, v20, v21, v22, type ); };
-
-  // axis is a normalized Vector3, angle in radians.
-  Matrix3.rotationAxisAngle = function( axis, angle ) { return Matrix3.dirtyFromPool().setToRotationAxisAngle( axis, angle ); };
-
-  Matrix3.rotationX = function( angle ) { return Matrix3.dirtyFromPool().setToRotationX( angle ); };
-  Matrix3.rotationY = function( angle ) { return Matrix3.dirtyFromPool().setToRotationY( angle ); };
-  Matrix3.rotationZ = function( angle ) { return Matrix3.dirtyFromPool().setToRotationZ( angle ); };
-
-  // standard 2d rotation
-  Matrix3.rotation2 = Matrix3.rotationZ;
-
-  Matrix3.rotationAround = function( angle, x, y ) {
-    return Matrix3.translation( x, y ).timesMatrix( Matrix3.rotation2( angle ) ).timesMatrix( Matrix3.translation( -x, -y ) );
-  };
-
-  Matrix3.rotationAroundPoint = function( angle, point ) {
-    return Matrix3.rotationAround( angle, point.x, point.y );
-  };
-
-  Matrix3.fromSVGMatrix = function( svgMatrix ) { return Matrix3.dirtyFromPool().setToSVGMatrix( svgMatrix ); };
-
-  // a rotation matrix that rotates A to B, by rotating about the axis A.cross( B ) -- Shortest path. ideally should be unit vectors
-  Matrix3.rotateAToB = function( a, b ) { return Matrix3.dirtyFromPool().setRotationAToB( a, b ); };
-
-  Matrix3.prototype = {
-    constructor: Matrix3,
-
-    /*---------------------------------------------------------------------------*
-     * "Properties"
-     *----------------------------------------------------------------------------*/
-
-    // convenience getters. inline usages of these when performance is critical? TODO: test performance of inlining these, with / without closure compiler
-    m00: function() { return this.entries[ 0 ]; },
-    m01: function() { return this.entries[ 3 ]; },
-    m02: function() { return this.entries[ 6 ]; },
-    m10: function() { return this.entries[ 1 ]; },
-    m11: function() { return this.entries[ 4 ]; },
-    m12: function() { return this.entries[ 7 ]; },
-    m20: function() { return this.entries[ 2 ]; },
-    m21: function() { return this.entries[ 5 ]; },
-    m22: function() { return this.entries[ 8 ]; },
-
-    isIdentity: function() {
-      return this.type === Types.IDENTITY || this.equals( Matrix3.IDENTITY );
-    },
-
-    // returning false means "inconclusive, may be identity or not"
-    isFastIdentity: function() {
-      return this.type === Types.IDENTITY;
-    },
-
-    isAffine: function() {
-      return this.type === Types.AFFINE || ( this.m20() === 0 && this.m21() === 0 && this.m22() === 1 );
-    },
-
-    // if it's an affine matrix where the components of transforms are independent
-    // i.e. constructed from arbitrary component scaling and translation.
-    isAligned: function() {
-      // non-diagonal non-translation entries should all be zero.
-      return this.isAffine() && this.m01() === 0 && this.m10() === 0;
-    },
-
-    // if it's an affine matrix where the components of transforms are independent, but may be switched (unlike isAligned)
-    // i.e. the 2x2 rotational sub-matrix is of one of the two forms:
-    // A 0  or  0  A
-    // 0 B      B  0
-    // This means that moving a transformed point by (x,0) or (0,y) will result in a motion along one of the axes.
-    isAxisAligned: function() {
-      return this.isAffine() && ( ( this.m01() === 0 && this.m10() === 0 ) || ( this.m00() === 0 && this.m11() === 0 ) );
-    },
-
-    isFinite: function() {
-      return isFinite( this.m00() ) &&
-             isFinite( this.m01() ) &&
-             isFinite( this.m02() ) &&
-             isFinite( this.m10() ) &&
-             isFinite( this.m11() ) &&
-             isFinite( this.m12() ) &&
-             isFinite( this.m20() ) &&
-             isFinite( this.m21() ) &&
-             isFinite( this.m22() );
-    },
-
-    getDeterminant: function() {
-      return this.m00() * this.m11() * this.m22() + this.m01() * this.m12() * this.m20() + this.m02() * this.m10() * this.m21() - this.m02() * this.m11() * this.m20() - this.m01() * this.m10() * this.m22() - this.m00() * this.m12() * this.m21();
-    },
-    get determinant() { return this.getDeterminant(); },
-
-    // the 2D translation, assuming multiplication with a homogeneous vector
-    getTranslation: function() {
-      return new dot.Vector2( this.m02(), this.m12() );
-    },
-    get translation() { return this.getTranslation(); },
-
-    // returns a vector that is equivalent to ( T(1,0).magnitude(), T(0,1).magnitude() ) where T is a relative transform
-    getScaleVector: function() {
-      return new dot.Vector2(
-        Math.sqrt( this.m00() * this.m00() + this.m10() * this.m10() ),
-        Math.sqrt( this.m01() * this.m01() + this.m11() * this.m11() ) );
-    },
-    get scaleVector() { return this.getScaleVector(); },
-
-    // angle in radians for the 2d rotation from this matrix, between pi, -pi
-    getRotation: function() {
-      return Math.atan2( this.m10(), this.m00() );
-    },
-    get rotation() { return this.getRotation(); },
-
-    toMatrix4: function() {
-      return new dot.Matrix4(
-        this.m00(), this.m01(), this.m02(), 0,
-        this.m10(), this.m11(), this.m12(), 0,
-        this.m20(), this.m21(), this.m22(), 0,
-        0, 0, 0, 1 );
-    },
-
-    toAffineMatrix4: function() {
-      return new dot.Matrix4(
-        this.m00(), this.m01(), 0, this.m02(),
-        this.m10(), this.m11(), 0, this.m12(),
-        0, 0, 1, 0,
-        0, 0, 0, 1 );
-    },
-
-    toString: function() {
-      return this.m00() + ' ' + this.m01() + ' ' + this.m02() + '\n' +
-             this.m10() + ' ' + this.m11() + ' ' + this.m12() + '\n' +
-             this.m20() + ' ' + this.m21() + ' ' + this.m22();
-    },
-
-    toSVGMatrix: function() {
-      var result = document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' ).createSVGMatrix();
-
-      // top two rows
-      result.a = this.m00();
-      result.b = this.m10();
-      result.c = this.m01();
-      result.d = this.m11();
-      result.e = this.m02();
-      result.f = this.m12();
-
-      return result;
-    },
-
-    getCSSTransform: function() {
-      // See http://www.w3.org/TR/css3-transforms/, particularly Section 13 that discusses the SVG compatibility
-
-      // we need to prevent the numbers from being in an exponential toString form, since the CSS transform does not support that
-      // 20 is the largest guaranteed number of digits according to https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Number/toFixed
-
-      // the inner part of a CSS3 transform, but remember to add the browser-specific parts!
-      // NOTE: the toFixed calls are inlined for performance reasons
-      return 'matrix(' + this.entries[ 0 ].toFixed( 20 ) + ',' + this.entries[ 1 ].toFixed( 20 ) + ',' + this.entries[ 3 ].toFixed( 20 ) + ',' + this.entries[ 4 ].toFixed( 20 ) + ',' + this.entries[ 6 ].toFixed( 20 ) + ',' + this.entries[ 7 ].toFixed( 20 ) + ')';
-    },
-    get cssTransform() { return this.getCSSTransform(); },
-
-    getSVGTransform: function() {
-      // SVG transform presentation attribute. See http://www.w3.org/TR/SVG/coords.html#TransformAttribute
-
-      // we need to prevent the numbers from being in an exponential toString form, since the CSS transform does not support that
-      function svgNumber( number ) {
-        // largest guaranteed number of digits according to https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Number/toFixed
-        return number.toFixed( 20 );
-      }
-
-      switch( this.type ) {
-        case Types.IDENTITY:
-          return '';
-        case Types.TRANSLATION_2D:
-          return 'translate(' + svgNumber( this.entries[ 6 ] ) + ',' + svgNumber( this.entries[ 7 ] ) + ')';
-        case Types.SCALING:
-          return 'scale(' + svgNumber( this.entries[ 0 ] ) + ( this.entries[ 0 ] === this.entries[ 4 ] ? '' : ',' + svgNumber( this.entries[ 4 ] ) ) + ')';
-        default:
-          return 'matrix(' + svgNumber( this.entries[ 0 ] ) + ',' + svgNumber( this.entries[ 1 ] ) + ',' + svgNumber( this.entries[ 3 ] ) + ',' + svgNumber( this.entries[ 4 ] ) + ',' + svgNumber( this.entries[ 6 ] ) + ',' + svgNumber( this.entries[ 7 ] ) + ')';
-      }
-    },
-    get svgTransform() { return this.getSVGTransform(); },
-
-    // returns a parameter object suitable for use with jQuery's .css()
-    getCSSTransformStyles: function() {
-      var transformCSS = this.getCSSTransform();
-
-      // notes on triggering hardware acceleration: http://creativejs.com/2011/12/day-2-gpu-accelerate-your-dom-elements/
-      return {
-        // force iOS hardware acceleration
-        '-webkit-perspective': 1000,
-        '-webkit-backface-visibility': 'hidden',
-
-        '-webkit-transform': transformCSS + ' translateZ(0)', // trigger hardware acceleration if possible
-        '-moz-transform':    transformCSS + ' translateZ(0)', // trigger hardware acceleration if possible
-        '-ms-transform': transformCSS,
-        '-o-transform': transformCSS,
-        'transform': transformCSS,
-        'transform-origin': 'top left', // at the origin of the component. consider 0px 0px instead. Critical, since otherwise this defaults to 50% 50%!!! see https://developer.mozilla.org/en-US/docs/CSS/transform-origin
-        '-ms-transform-origin': 'top left' // TODO: do we need other platform-specific transform-origin styles?
-      };
-    },
-    get cssTransformStyles() { return this.getCSSTransformStyles(); },
-
-    // exact equality
-    equals: function( m ) {
-      return this.m00() === m.m00() && this.m01() === m.m01() && this.m02() === m.m02() &&
-             this.m10() === m.m10() && this.m11() === m.m11() && this.m12() === m.m12() &&
-             this.m20() === m.m20() && this.m21() === m.m21() && this.m22() === m.m22();
-    },
-
-    // equality within a margin of error
-    equalsEpsilon: function( m, epsilon ) {
-      return Math.abs( this.m00() - m.m00() ) < epsilon && Math.abs( this.m01() - m.m01() ) < epsilon && Math.abs( this.m02() - m.m02() ) < epsilon &&
-             Math.abs( this.m10() - m.m10() ) < epsilon && Math.abs( this.m11() - m.m11() ) < epsilon && Math.abs( this.m12() - m.m12() ) < epsilon &&
-             Math.abs( this.m20() - m.m20() ) < epsilon && Math.abs( this.m21() - m.m21() ) < epsilon && Math.abs( this.m22() - m.m22() ) < epsilon;
-    },
-
-    /*---------------------------------------------------------------------------*
-     * Immutable operations (returns a new matrix)
-     *----------------------------------------------------------------------------*/
-
-    copy: function() {
-      return Matrix3.createFromPool(
-        this.m00(), this.m01(), this.m02(),
-        this.m10(), this.m11(), this.m12(),
-        this.m20(), this.m21(), this.m22(),
-        this.type
-      );
-    },
-
-    plus: function( m ) {
-      return Matrix3.createFromPool(
-        this.m00() + m.m00(), this.m01() + m.m01(), this.m02() + m.m02(),
-        this.m10() + m.m10(), this.m11() + m.m11(), this.m12() + m.m12(),
-        this.m20() + m.m20(), this.m21() + m.m21(), this.m22() + m.m22()
-      );
-    },
-
-    minus: function( m ) {
-      return Matrix3.createFromPool(
-        this.m00() - m.m00(), this.m01() - m.m01(), this.m02() - m.m02(),
-        this.m10() - m.m10(), this.m11() - m.m11(), this.m12() - m.m12(),
-        this.m20() - m.m20(), this.m21() - m.m21(), this.m22() - m.m22()
-      );
-    },
-
-    transposed: function() {
-      return Matrix3.createFromPool(
-        this.m00(), this.m10(), this.m20(),
-        this.m01(), this.m11(), this.m21(),
-        this.m02(), this.m12(), this.m22(), ( this.type === Types.IDENTITY || this.type === Types.SCALING ) ? this.type : undefined
-      );
-    },
-
-    negated: function() {
-      return Matrix3.createFromPool(
-        -this.m00(), -this.m01(), -this.m02(),
-        -this.m10(), -this.m11(), -this.m12(),
-        -this.m20(), -this.m21(), -this.m22()
-      );
-    },
-
-    inverted: function() {
-      var det;
-
-      switch( this.type ) {
-        case Types.IDENTITY:
-          return this;
-        case Types.TRANSLATION_2D:
-          return Matrix3.createFromPool(
-            1, 0, -this.m02(),
-            0, 1, -this.m12(),
-            0, 0, 1, Types.TRANSLATION_2D );
-        case Types.SCALING:
-          return Matrix3.createFromPool(
-            1 / this.m00(), 0, 0,
-            0, 1 / this.m11(), 0,
-            0, 0, 1 / this.m22(), Types.SCALING );
-        case Types.AFFINE:
-          det = this.getDeterminant();
-          if ( det !== 0 ) {
-            return Matrix3.createFromPool(
-              ( -this.m12() * this.m21() + this.m11() * this.m22() ) / det,
-              ( this.m02() * this.m21() - this.m01() * this.m22() ) / det,
-              ( -this.m02() * this.m11() + this.m01() * this.m12() ) / det,
-              ( this.m12() * this.m20() - this.m10() * this.m22() ) / det,
-              ( -this.m02() * this.m20() + this.m00() * this.m22() ) / det,
-              ( this.m02() * this.m10() - this.m00() * this.m12() ) / det,
-              0, 0, 1, Types.AFFINE
-            );
-          }
-          else {
-            throw new Error( 'Matrix could not be inverted, determinant === 0' );
-          }
-          break; // because JSHint totally can't tell that this can't be reached
-        case Types.OTHER:
-          det = this.getDeterminant();
-          if ( det !== 0 ) {
-            return Matrix3.createFromPool(
-              ( -this.m12() * this.m21() + this.m11() * this.m22() ) / det,
-              ( this.m02() * this.m21() - this.m01() * this.m22() ) / det,
-              ( -this.m02() * this.m11() + this.m01() * this.m12() ) / det,
-              ( this.m12() * this.m20() - this.m10() * this.m22() ) / det,
-              ( -this.m02() * this.m20() + this.m00() * this.m22() ) / det,
-              ( this.m02() * this.m10() - this.m00() * this.m12() ) / det,
-              ( -this.m11() * this.m20() + this.m10() * this.m21() ) / det,
-              ( this.m01() * this.m20() - this.m00() * this.m21() ) / det,
-              ( -this.m01() * this.m10() + this.m00() * this.m11() ) / det,
-              Types.OTHER
-            );
-          }
-          else {
-            throw new Error( 'Matrix could not be inverted, determinant === 0' );
-          }
-          break; // because JSHint totally can't tell that this can't be reached
-        default:
-          throw new Error( 'Matrix3.inverted with unknown type: ' + this.type );
-      }
-    },
-
-    timesMatrix: function( m ) {
-      // I * M === M * I === M (the identity)
-      if ( this.type === Types.IDENTITY || m.type === Types.IDENTITY ) {
-        return this.type === Types.IDENTITY ? m : this;
-      }
-
-      if ( this.type === m.type ) {
-        // currently two matrices of the same type will result in the same result type
-        if ( this.type === Types.TRANSLATION_2D ) {
-          // faster combination of translations
-          return Matrix3.createFromPool(
-            1, 0, this.m02() + m.m02(),
-            0, 1, this.m12() + m.m12(),
-            0, 0, 1, Types.TRANSLATION_2D );
-        }
-        else if ( this.type === Types.SCALING ) {
-          // faster combination of scaling
-          return Matrix3.createFromPool(
-            this.m00() * m.m00(), 0, 0,
-            0, this.m11() * m.m11(), 0,
-            0, 0, 1, Types.SCALING );
-        }
-      }
-
-      if ( this.type !== Types.OTHER && m.type !== Types.OTHER ) {
-        // currently two matrices that are anything but "other" are technically affine, and the result will be affine
-
-        // affine case
-        return Matrix3.createFromPool(
-          this.m00() * m.m00() + this.m01() * m.m10(),
-          this.m00() * m.m01() + this.m01() * m.m11(),
-          this.m00() * m.m02() + this.m01() * m.m12() + this.m02(),
-          this.m10() * m.m00() + this.m11() * m.m10(),
-          this.m10() * m.m01() + this.m11() * m.m11(),
-          this.m10() * m.m02() + this.m11() * m.m12() + this.m12(),
-          0, 0, 1, Types.AFFINE );
-      }
-
-      // general case
-      return Matrix3.createFromPool(
-        this.m00() * m.m00() + this.m01() * m.m10() + this.m02() * m.m20(),
-        this.m00() * m.m01() + this.m01() * m.m11() + this.m02() * m.m21(),
-        this.m00() * m.m02() + this.m01() * m.m12() + this.m02() * m.m22(),
-        this.m10() * m.m00() + this.m11() * m.m10() + this.m12() * m.m20(),
-        this.m10() * m.m01() + this.m11() * m.m11() + this.m12() * m.m21(),
-        this.m10() * m.m02() + this.m11() * m.m12() + this.m12() * m.m22(),
-        this.m20() * m.m00() + this.m21() * m.m10() + this.m22() * m.m20(),
-        this.m20() * m.m01() + this.m21() * m.m11() + this.m22() * m.m21(),
-        this.m20() * m.m02() + this.m21() * m.m12() + this.m22() * m.m22() );
-    },
-
-    /*---------------------------------------------------------------------------*
-     * Immutable operations (returns new form of a parameter)
-     *----------------------------------------------------------------------------*/
-
-    timesVector2: function( v ) {
-      var x = this.m00() * v.x + this.m01() * v.y + this.m02();
-      var y = this.m10() * v.x + this.m11() * v.y + this.m12();
-      return new dot.Vector2( x, y );
-    },
-
-    timesVector3: function( v ) {
-      var x = this.m00() * v.x + this.m01() * v.y + this.m02() * v.z;
-      var y = this.m10() * v.x + this.m11() * v.y + this.m12() * v.z;
-      var z = this.m20() * v.x + this.m21() * v.y + this.m22() * v.z;
-      return new dot.Vector3( x, y, z );
-    },
-
-    timesTransposeVector2: function( v ) {
-      var x = this.m00() * v.x + this.m10() * v.y;
-      var y = this.m01() * v.x + this.m11() * v.y;
-      return new dot.Vector2( x, y );
-    },
-
-    // TODO: this operation seems to not work for transformDelta2, should be vetted
-    timesRelativeVector2: function( v ) {
-      var x = this.m00() * v.x + this.m01() * v.y;
-      var y = this.m10() * v.y + this.m11() * v.y;
-      return new dot.Vector2( x, y );
-    },
-
-    /*---------------------------------------------------------------------------*
-     * Mutable operations (changes this matrix)
-     *----------------------------------------------------------------------------*/
-
-    // every mutable method goes through rowMajor
-    rowMajor: function( v00, v01, v02, v10, v11, v12, v20, v21, v22, type ) {
-      this.entries[ 0 ] = v00;
-      this.entries[ 1 ] = v10;
-      this.entries[ 2 ] = v20;
-      this.entries[ 3 ] = v01;
-      this.entries[ 4 ] = v11;
-      this.entries[ 5 ] = v21;
-      this.entries[ 6 ] = v02;
-      this.entries[ 7 ] = v12;
-      this.entries[ 8 ] = v22;
-
-      // TODO: consider performance of the affine check here
-      this.type = type === undefined ? ( ( v20 === 0 && v21 === 0 && v22 === 1 ) ? Types.AFFINE : Types.OTHER ) : type;
-      return this;
-    },
-
-    set: function( matrix ) {
-      return this.rowMajor(
-        matrix.m00(), matrix.m01(), matrix.m02(),
-        matrix.m10(), matrix.m11(), matrix.m12(),
-        matrix.m20(), matrix.m21(), matrix.m22(),
-        matrix.type );
-    },
-
-    // component setters
-    set00: function( value ) { this.entries[ 0 ] = value; return this; },
-    set01: function( value ) { this.entries[ 3 ] = value; return this; },
-    set02: function( value ) { this.entries[ 6 ] = value; return this; },
-    set10: function( value ) { this.entries[ 1 ] = value; return this; },
-    set11: function( value ) { this.entries[ 4 ] = value; return this; },
-    set12: function( value ) { this.entries[ 7 ] = value; return this; },
-    set20: function( value ) { this.entries[ 2 ] = value; return this; },
-    set21: function( value ) { this.entries[ 5 ] = value; return this; },
-    set22: function( value ) { this.entries[ 8 ] = value; return this; },
-
-    makeImmutable: function() {
-      this.rowMajor = function() {
-        throw new Error( 'Cannot modify immutable matrix' );
-      };
-      return this;
-    },
-
-    columnMajor: function( v00, v10, v20, v01, v11, v21, v02, v12, v22, type ) {
-      return this.rowMajor( v00, v01, v02, v10, v11, v12, v20, v21, v22, type );
-    },
-
-    add: function( m ) {
-      return this.rowMajor(
-        this.m00() + m.m00(), this.m01() + m.m01(), this.m02() + m.m02(),
-        this.m10() + m.m10(), this.m11() + m.m11(), this.m12() + m.m12(),
-        this.m20() + m.m20(), this.m21() + m.m21(), this.m22() + m.m22()
-      );
-    },
-
-    subtract: function( m ) {
-      return this.rowMajor(
-        this.m00() - m.m00(), this.m01() - m.m01(), this.m02() - m.m02(),
-        this.m10() - m.m10(), this.m11() - m.m11(), this.m12() - m.m12(),
-        this.m20() - m.m20(), this.m21() - m.m21(), this.m22() - m.m22()
-      );
-    },
-
-    transpose: function() {
-      return this.rowMajor(
-        this.m00(), this.m10(), this.m20(),
-        this.m01(), this.m11(), this.m21(),
-        this.m02(), this.m12(), this.m22(),
-        ( this.type === Types.IDENTITY || this.type === Types.SCALING ) ? this.type : undefined
-      );
-    },
-
-    negate: function() {
-      return this.rowMajor(
-        -this.m00(), -this.m01(), -this.m02(),
-        -this.m10(), -this.m11(), -this.m12(),
-        -this.m20(), -this.m21(), -this.m22()
-      );
-    },
-
-    invert: function() {
-      var det;
-
-      switch( this.type ) {
-        case Types.IDENTITY:
-          return this;
-        case Types.TRANSLATION_2D:
-          return this.rowMajor(
-            1, 0, -this.m02(),
-            0, 1, -this.m12(),
-            0, 0, 1, Types.TRANSLATION_2D );
-        case Types.SCALING:
-          return this.rowMajor(
-            1 / this.m00(), 0, 0,
-            0, 1 / this.m11(), 0,
-            0, 0, 1 / this.m22(), Types.SCALING );
-        case Types.AFFINE:
-          det = this.getDeterminant();
-          if ( det !== 0 ) {
-            return this.rowMajor(
-              ( -this.m12() * this.m21() + this.m11() * this.m22() ) / det,
-              ( this.m02() * this.m21() - this.m01() * this.m22() ) / det,
-              ( -this.m02() * this.m11() + this.m01() * this.m12() ) / det,
-              ( this.m12() * this.m20() - this.m10() * this.m22() ) / det,
-              ( -this.m02() * this.m20() + this.m00() * this.m22() ) / det,
-              ( this.m02() * this.m10() - this.m00() * this.m12() ) / det,
-              0, 0, 1, Types.AFFINE
-            );
-          }
-          else {
-            throw new Error( 'Matrix could not be inverted, determinant === 0' );
-          }
-          break; // because JSHint totally can't tell that this can't be reached
-        case Types.OTHER:
-          det = this.getDeterminant();
-          if ( det !== 0 ) {
-            return this.rowMajor(
-              ( -this.m12() * this.m21() + this.m11() * this.m22() ) / det,
-              ( this.m02() * this.m21() - this.m01() * this.m22() ) / det,
-              ( -this.m02() * this.m11() + this.m01() * this.m12() ) / det,
-              ( this.m12() * this.m20() - this.m10() * this.m22() ) / det,
-              ( -this.m02() * this.m20() + this.m00() * this.m22() ) / det,
-              ( this.m02() * this.m10() - this.m00() * this.m12() ) / det,
-              ( -this.m11() * this.m20() + this.m10() * this.m21() ) / det,
-              ( this.m01() * this.m20() - this.m00() * this.m21() ) / det,
-              ( -this.m01() * this.m10() + this.m00() * this.m11() ) / det,
-              Types.OTHER
-            );
-          }
-          else {
-            throw new Error( 'Matrix could not be inverted, determinant === 0' );
-          }
-          break; // because JSHint totally can't tell that this can't be reached
-        default:
-          throw new Error( 'Matrix3.inverted with unknown type: ' + this.type );
-      }
-    },
-
-    multiplyMatrix: function( m ) {
-      // M * I === M (the identity)
-      if ( m.type === Types.IDENTITY ) {
-        // no change needed
-        return this;
-      }
-
-      // I * M === M (the identity)
-      if ( this.type === Types.IDENTITY ) {
-        // copy the other matrix to us
-        return this.set( m );
-      }
-
-      if ( this.type === m.type ) {
-        // currently two matrices of the same type will result in the same result type
-        if ( this.type === Types.TRANSLATION_2D ) {
-          // faster combination of translations
-          return this.rowMajor(
-            1, 0, this.m02() + m.m02(),
-            0, 1, this.m12() + m.m12(),
-            0, 0, 1, Types.TRANSLATION_2D );
-        }
-        else if ( this.type === Types.SCALING ) {
-          // faster combination of scaling
-          return this.rowMajor(
-            this.m00() * m.m00(), 0, 0,
-            0, this.m11() * m.m11(), 0,
-            0, 0, 1, Types.SCALING );
-        }
-      }
-
-      if ( this.type !== Types.OTHER && m.type !== Types.OTHER ) {
-        // currently two matrices that are anything but "other" are technically affine, and the result will be affine
-
-        // affine case
-        return this.rowMajor(
-          this.m00() * m.m00() + this.m01() * m.m10(),
-          this.m00() * m.m01() + this.m01() * m.m11(),
-          this.m00() * m.m02() + this.m01() * m.m12() + this.m02(),
-          this.m10() * m.m00() + this.m11() * m.m10(),
-          this.m10() * m.m01() + this.m11() * m.m11(),
-          this.m10() * m.m02() + this.m11() * m.m12() + this.m12(),
-          0, 0, 1, Types.AFFINE );
-      }
-
-      // general case
-      return this.rowMajor(
-        this.m00() * m.m00() + this.m01() * m.m10() + this.m02() * m.m20(),
-        this.m00() * m.m01() + this.m01() * m.m11() + this.m02() * m.m21(),
-        this.m00() * m.m02() + this.m01() * m.m12() + this.m02() * m.m22(),
-        this.m10() * m.m00() + this.m11() * m.m10() + this.m12() * m.m20(),
-        this.m10() * m.m01() + this.m11() * m.m11() + this.m12() * m.m21(),
-        this.m10() * m.m02() + this.m11() * m.m12() + this.m12() * m.m22(),
-        this.m20() * m.m00() + this.m21() * m.m10() + this.m22() * m.m20(),
-        this.m20() * m.m01() + this.m21() * m.m11() + this.m22() * m.m21(),
-        this.m20() * m.m02() + this.m21() * m.m12() + this.m22() * m.m22() );
-    },
-
-    prependTranslation: function( x, y ) {
-      this.set02( this.m02() + x );
-      this.set12( this.m12() + y );
-
-      if ( this.type === Types.IDENTITY || this.type === Types.TRANSLATION_2D ) {
-        this.type = Types.TRANSLATION_2D;
-      }
-      else if ( this.type === Types.OTHER ) {
-        this.type = Types.OTHER;
-      }
-      else {
-        this.type = Types.AFFINE;
-      }
-      return this; // for chaining
-    },
-
-    setToIdentity: function() {
-      return this.rowMajor(
-        1, 0, 0,
-        0, 1, 0,
-        0, 0, 1,
-        Types.IDENTITY );
-    },
-
-    setToTranslation: function( x, y ) {
-      return this.rowMajor(
-        1, 0, x,
-        0, 1, y,
-        0, 0, 1,
-        Types.TRANSLATION_2D );
-    },
-
-    setToScale: function( x, y ) {
-      // allow using one parameter to scale everything
-      y = y === undefined ? x : y;
-
-      return this.rowMajor(
-        x, 0, 0,
-        0, y, 0,
-        0, 0, 1,
-        Types.SCALING );
-    },
-
-    // row major
-    setToAffine: function( m00, m01, m02, m10, m11, m12 ) {
-      return this.rowMajor( m00, m01, m02, m10, m11, m12, 0, 0, 1, Types.AFFINE );
-    },
-
-    // axis is a normalized Vector3, angle in radians.
-    setToRotationAxisAngle: function( axis, angle ) {
-      var c = Math.cos( angle );
-      var s = Math.sin( angle );
-      var C = 1 - c;
-
-      return this.rowMajor(
-        axis.x * axis.x * C + c, axis.x * axis.y * C - axis.z * s, axis.x * axis.z * C + axis.y * s,
-        axis.y * axis.x * C + axis.z * s, axis.y * axis.y * C + c, axis.y * axis.z * C - axis.x * s,
-        axis.z * axis.x * C - axis.y * s, axis.z * axis.y * C + axis.x * s, axis.z * axis.z * C + c,
-        Types.OTHER );
-    },
-
-    setToRotationX: function( angle ) {
-      var c = Math.cos( angle );
-      var s = Math.sin( angle );
-
-      return this.rowMajor(
-        1, 0, 0,
-        0, c, -s,
-        0, s, c,
-        Types.OTHER );
-    },
-
-    setToRotationY: function( angle ) {
-      var c = Math.cos( angle );
-      var s = Math.sin( angle );
-
-      return this.rowMajor(
-        c, 0, s,
-        0, 1, 0,
-        -s, 0, c,
-        Types.OTHER );
-    },
-
-    setToRotationZ: function( angle ) {
-      var c = Math.cos( angle );
-      var s = Math.sin( angle );
-
-      return this.rowMajor(
-        c, -s, 0,
-        s, c, 0,
-        0, 0, 1,
-        Types.AFFINE );
-    },
-
-    setToSVGMatrix: function( svgMatrix ) {
-      return this.rowMajor(
-        svgMatrix.a, svgMatrix.c, svgMatrix.e,
-        svgMatrix.b, svgMatrix.d, svgMatrix.f,
-        0, 0, 1,
-        Types.AFFINE );
-    },
-
-    // a rotation matrix that rotates A to B (Vector3 instances), by rotating about the axis A.cross( B ) -- Shortest path. ideally should be unit vectors
-    setRotationAToB: function( a, b ) {
-      // see http://graphics.cs.brown.edu/~jfh/papers/Moller-EBA-1999/paper.pdf for information on this implementation
-      var start = a;
-      var end = b;
-
-      var epsilon = 0.0001;
-
-      var e, h, f;
-
-      var v = start.cross( end );
-      e = start.dot( end );
-      f = ( e < 0 ) ? -e : e;
-
-      // if "from" and "to" vectors are nearly parallel
-      if ( f > 1.0 - epsilon ) {
-        var c1, c2, c3;
-
-        var x = new dot.Vector3(
-          ( start.x > 0.0 ) ? start.x : -start.x,
-          ( start.y > 0.0 ) ? start.y : -start.y,
-          ( start.z > 0.0 ) ? start.z : -start.z
-        );
-
-        if ( x.x < x.y ) {
-          if ( x.x < x.z ) {
-            x = dot.Vector3.X_UNIT;
-          }
-          else {
-            x = dot.Vector3.Z_UNIT;
-          }
-        }
-        else {
-          if ( x.y < x.z ) {
-            x = dot.Vector3.Y_UNIT;
-          }
-          else {
-            x = dot.Vector3.Z_UNIT;
-          }
-        }
-
-        var u = x.minus( start );
-        v = x.minus( end );
-
-        c1 = 2.0 / u.dot( u );
-        c2 = 2.0 / v.dot( v );
-        c3 = c1 * c2 * u.dot( v );
-
-        return this.rowMajor(
-          -c1 * u.x * u.x - c2 * v.x * v.x + c3 * v.x * u.x + 1,
-          -c1 * u.x * u.y - c2 * v.x * v.y + c3 * v.x * u.y,
-          -c1 * u.x * u.z - c2 * v.x * v.z + c3 * v.x * u.z,
-          -c1 * u.y * u.x - c2 * v.y * v.x + c3 * v.y * u.x,
-          -c1 * u.y * u.y - c2 * v.y * v.y + c3 * v.y * u.y + 1,
-          -c1 * u.y * u.z - c2 * v.y * v.z + c3 * v.y * u.z,
-          -c1 * u.z * u.x - c2 * v.z * v.x + c3 * v.z * u.x,
-          -c1 * u.z * u.y - c2 * v.z * v.y + c3 * v.z * u.y,
-          -c1 * u.z * u.z - c2 * v.z * v.z + c3 * v.z * u.z + 1
-        );
-      }
-      else {
-        // the most common case, unless "start"="end", or "start"=-"end"
-        var hvx, hvz, hvxy, hvxz, hvyz;
-        h = 1.0 / ( 1.0 + e );
-        hvx = h * v.x;
-        hvz = h * v.z;
-        hvxy = hvx * v.y;
-        hvxz = hvx * v.z;
-        hvyz = hvz * v.y;
-
-        return this.rowMajor(
-          e + hvx * v.x, hvxy - v.z, hvxz + v.y,
-          hvxy + v.z, e + h * v.y * v.y, hvyz - v.x,
-          hvxz - v.y, hvyz + v.x, e + hvz * v.z
-        );
-      }
-    },
-
-    setTo32Bit: function() {
-      if ( window.Float32Array ) {
-        this.entries = new window.Float32Array( this.entries );
-      }
-      return this;
-    },
-
-    setTo64Bit: function() {
-      if ( window.Float64Array ) {
-        this.entries = new window.Float64Array( this.entries );
-      }
-      return this;
-    },
-
-    /*---------------------------------------------------------------------------*
-     * Mutable operations (changes the parameter)
-     *----------------------------------------------------------------------------*/
-
-    multiplyVector2: function( v ) {
-      return v.setXY(
-        this.m00() * v.x + this.m01() * v.y + this.m02(),
-        this.m10() * v.x + this.m11() * v.y + this.m12() );
-    },
-
-    multiplyVector3: function( v ) {
-      return v.setXYZ(
-        this.m00() * v.x + this.m01() * v.y + this.m02() * v.z,
-        this.m10() * v.x + this.m11() * v.y + this.m12() * v.z,
-        this.m20() * v.x + this.m21() * v.y + this.m22() * v.z );
-    },
-
-    multiplyTransposeVector2: function( v ) {
-      return v.setXY(
-        this.m00() * v.x + this.m10() * v.y,
-        this.m01() * v.x + this.m11() * v.y );
-    },
-
-    multiplyRelativeVector2: function( v ) {
-      return v.setXY(
-        this.m00() * v.x + this.m01() * v.y,
-        this.m10() * v.y + this.m11() * v.y );
-    },
-
-    // sets the transform of a Canvas 2D rendering context to the affine part of this matrix
-    canvasSetTransform: function( context ) {
-      context.setTransform(
-        // inlined array entries
-        this.entries[ 0 ],
-        this.entries[ 1 ],
-        this.entries[ 3 ],
-        this.entries[ 4 ],
-        this.entries[ 6 ],
-        this.entries[ 7 ]
-      );
-    },
-
-    // appends the affine part of this matrix to the Canvas 2D rendering context
-    canvasAppendTransform: function( context ) {
-      if ( this.type !== Types.IDENTITY ) {
-        context.transform(
-          // inlined array entries
-          this.entries[ 0 ],
-          this.entries[ 1 ],
-          this.entries[ 3 ],
-          this.entries[ 4 ],
-          this.entries[ 6 ],
-          this.entries[ 7 ]
-        );
-      }
-    }
-  };
-
-  Poolable.mixin( Matrix3, {
-
-    //The default factory creates an identity matrix
-    defaultFactory: function() { return new Matrix3(); },
-
-    constructorDuplicateFactory: function( pool ) {
-      return function( v00, v01, v02, v10, v11, v12, v20, v21, v22, type ) {
-        var instance = pool.length ? pool.pop() : new Matrix3();
-        return instance.rowMajor( v00, v01, v02, v10, v11, v12, v20, v21, v22, type );
-      };
-    }
-  } );
-
-  // create an immutable
-  Matrix3.IDENTITY = Matrix3.identity();
-  Matrix3.IDENTITY.makeImmutable();
-
-  Matrix3.X_REFLECTION = Matrix3.createFromPool(
-    -1, 0, 0,
-    0, 1, 0,
-    0, 0, 1,
-    Types.AFFINE );
-  Matrix3.X_REFLECTION.makeImmutable();
-
-  Matrix3.Y_REFLECTION = Matrix3.createFromPool(
-    1, 0, 0,
-    0, -1, 0,
-    0, 0, 1,
-    Types.AFFINE );
-  Matrix3.Y_REFLECTION.makeImmutable();
-
-  //Shortcut for translation times a matrix (without allocating a translation matrix), see scenery#119
-  Matrix3.translationTimesMatrix = function( x, y, m ) {
-    var type;
-    if ( m.type === Types.IDENTITY || m.type === Types.TRANSLATION_2D ) {
-      return Matrix3.createFromPool(
-        1, 0, m.m02() + x,
-        0, 1, m.m12() + y,
-        0, 0, 1,
-        Types.TRANSLATION_2D );
-    }
-    else if ( m.type === Types.OTHER ) {
-      type = Types.OTHER;
-    }
-    else {
-      type = Types.AFFINE;
-    }
-    return Matrix3.createFromPool(
-      m.m00(), m.m01(), m.m02() + x,
-      m.m10(), m.m11(), m.m12() + y,
-      m.m20(), m.m21(), m.m22(),
-      type );
-  };
-
-  Matrix3.printer = {
-    print: function( matrix ) {
-      console.log( matrix.toString() );
-    }
-  };
-
-  return Matrix3;
-} );
-
-// Copyright 2002-2013, University of Colorado Boulder
-
-define( 'AXON/axon',['require'],function( require ) {
-  
-
-  var axon = {};
-
-  // workaround for Axon, since it needs window.arch to be defined
-  window.arch = window.arch || null;
-
-  // store a reference on the PhET namespace if it exists
-  if ( window.phet ) {
-    window.phet.axon = axon;
-  }
-
-  // will be filled in by other modules
-  return axon;
-} );
-
-// Copyright 2002-2013, University of Colorado Boulder
-
-/**
- * Lightweight event & listener abstraction.
- * @author Sam Reid
- */
-define( 'AXON/Events',['require','AXON/axon'],function( require ) {
-  
-
-  var axon = require( 'AXON/axon' );
-
-  /**
-   * @class Events
-   * @constructor
-   */
-  axon.Events = function Events() {
-    this._eventListeners = {}; // @private
-    this._staticEventListeners = {}; // @private
-  };
-
-  axon.Events.prototype = {
-
-    /////////////////////////////////////////////
-    // Below this point are the functions for event handling, basically orthogonal to property value change notifications
-
-    /**
-     * Register a listener when the specified eventName is triggered. Use off() to remove.
-     * Concurrent modification of listeners (on/off) from within the callback is acceptable.
-     * @param {string} eventName the name for the event channel
-     * @param {function} callback
-     */
-    on: function( eventName, callback ) {
-      assert && assert( typeof eventName === 'string', 'eventName should be a string' );
-      assert && assert( typeof callback === 'function', 'callback should be a function' );
-
-      this._eventListeners[ eventName ] = this._eventListeners[ eventName ] || [];
-      this._eventListeners[ eventName ].push( callback );
-    },
-
-    /**
-     * Register a listener when the specified eventName is triggered. Listener should be "static", meaning:
-     *   1. It shall not add/remove any "static" listeners (including itself) while it is being called (as any type of side-effect), and
-     *   2. "static" listeners should not be added while a non-static listener (on the same object) is being called.
-     * These restrictions allow us to guarantee that all listeners attached when an event is triggered are called.
-     * Since static listeners are stored separately, use offStatic() to remove listeners added with onStatic()
-     * @param {string} eventName the name for the event channel
-     * @param {function} callback
-     */
-    onStatic: function( eventName, callback ) {
-      assert && assert( typeof eventName === 'string', 'eventName should be a string' );
-      assert && assert( typeof callback === 'function', 'callback should be a function' );
-
-      this._staticEventListeners[ eventName ] = this._staticEventListeners[ eventName ] || [];
-      this._staticEventListeners[ eventName ].push( callback );
-    },
-
-    /**
-     * Adds a function which will only be called back once, after which it is removed as a listener.
-     * If you need to remove a function added with 'once' you will have to remove its handle, which is returned by the function.
-     * @param {string} eventName the name for the event channel
-     * @param {function} callback function to be called back once (if at all)
-     */
-    once: function( eventName, callback ) {
-      assert && assert( typeof eventName === 'string', 'eventName should be a string' );
-      assert && assert( typeof callback === 'function', 'callback should be a function' );
-
-      var events = this;
-      var wrappedCallback = function() {
-        events.off( eventName, wrappedCallback );
-
-        //If no arguments being passed through, call back without processing arguments, for possible speed
-        if ( arguments.length === 0 ) {
-          callback();
-        }
-        else {
-
-          //General case of passing events through to the wrapped callback function
-          callback.apply( this, Array.prototype.slice.call( arguments, 0 ) );
-        }
-      };
-      this.on( eventName, wrappedCallback );
-
-      //Return the handle in case it needs to be removed.
-      return wrappedCallback;
-    },
-
-    /**
-     * Remove a listener added with on() from the specified event type.  Does nothing if the listener did not exist.
-     * @param {string} eventName the name for the event channel
-     * @param {function} callback
-     */
-    off: function( eventName, callback ) {
-      assert && assert( typeof eventName === 'string', 'eventName should be a string' );
-      assert && assert( typeof callback === 'function', 'callback should be a function' );
-
-      var index = -1;
-      if ( this._eventListeners[ eventName ] ) {
-        index = this._eventListeners[ eventName ].indexOf( callback );
-        if ( index !== -1 ) {
-          this._eventListeners[ eventName ].splice( index, 1 );
-        }
-      }
-
-      return index; // so we can tell if we actually removed a listener
-    },
-
-    /**
-     * Remove a listener added with onStatic() from the specified event type.  Does nothing if the listener did not exist.
-     * @param {string} eventName the name for the event channel
-     * @param {function} callback
-     */
-    offStatic: function( eventName, callback ) {
-      assert && assert( typeof eventName === 'string', 'eventName should be a string' );
-      assert && assert( typeof callback === 'function', 'callback should be a function' );
-
-      var index = -1;
-      if ( this._staticEventListeners[ eventName ] ) {
-        index = this._staticEventListeners[ eventName ].indexOf( callback );
-        if ( index !== -1 ) {
-          this._staticEventListeners[ eventName ].splice( index, 1 );
-        }
-      }
-
-      return index; // so we can tell if we actually removed a listener
-    },
-
-    /**
-     * Checks for the existence of a specific listener, attached to a specific event name. Doesn't check for static listeners
-     * @param {string} eventName the name for the event channel
-     * @param {function} callback
-     * @returns {boolean}
-     */
-    hasListener: function( eventName, callback ) {
-      assert && assert( typeof eventName === 'string', 'eventName should be a string' );
-      assert && assert( typeof callback === 'function', 'callback should be a function' );
-
-      var array = this._eventListeners[ eventName ];
-      return !!array && array.indexOf( callback ) >= 0;
-    },
-
-    /**
-     * Checks for the existence of a specific static listener, attached to a specific event name. Doesn't check for non-static listeners
-     * @param {string} eventName the name for the event channel
-     * @param {function} callback
-     * @returns {boolean}
-     */
-    hasStaticListener: function( eventName, callback ) {
-      assert && assert( typeof eventName === 'string', 'eventName should be a string' );
-      assert && assert( typeof callback === 'function', 'callback should be a function' );
-
-      var array = this._staticEventListeners[ eventName ];
-      return !!array && array.indexOf( callback ) >= 0;
-    },
-
-    /**
-     * Trigger an event with the specified name and arguments.
-     * @param {string} eventName the name for the event channel
-     * @param args... optional arguments to pass to the listeners
-     */
-    trigger: function( eventName ) {
-      assert && assert( typeof eventName === 'string', 'eventName should be a string' );
-
-      var listeners = this._eventListeners[ eventName ];
-      var staticListeners = this._staticEventListeners[ eventName ];
-
-      // listener quantities for normal and static
-      var count = listeners ? listeners.length : 0;
-      var staticCount = staticListeners ? staticListeners.length : 0;
-
-      // only compute our arguments suffix once, instead of in our inner loop
-      var suffix;
-      var hasNoArguments = arguments.length === 1;
-      if ( !hasNoArguments && ( count > 0 || staticCount > 0 ) ) {
-        phetAllocation && phetAllocation( 'Array' );
-        suffix = Array.prototype.slice.call( arguments, 1 );
-      }
-
-      // make a copy of non-static listeners, in case callback removes listener
-      if ( count > 0 ) {
-        listeners = listeners.slice();
-      }
-
-      var i;
-
-      for ( i = 0; i < count; i++ ) {
-        var listener = listeners[ i ];
-
-        //Simple case of no arguments, call it separately for improved performance in case it is faster (untested)
-        if ( hasNoArguments ) {
-          listener( arguments );
-        }
-        else {
-          listener.apply( this, suffix );
-        }
-
-        assert && assert( !staticListeners || staticListeners.length === staticCount, 'Concurrent modifications of static listeners from within non-static listeners are forbidden' );
-      }
-
-      for ( i = 0; i < staticCount; i++ ) {
-        var staticListener = staticListeners[ i ];
-
-        //Simple case of no arguments, call it separately for improved performance in case it is faster (untested)
-        if ( hasNoArguments ) {
-          staticListener( arguments );
-        }
-        else {
-          staticListener.apply( this, suffix );
-        }
-
-        assert && assert( staticListeners.length === staticCount, 'Concurrent modifications from static listeners are forbidden' );
-      }
-    },
-
-    /**
-     * Trigger an event with the specified name, with no arguments. Should get optimized in browsers better than trigger, so we have code duplication for now.
-     * @param {string} eventName the name for the event channel
-     */
-    trigger0: function( eventName ) {
-      assert && assert( typeof eventName === 'string', 'eventName should be a string' );
-
-      var listeners = this._eventListeners[ eventName ];
-      var staticListeners = this._staticEventListeners[ eventName ];
-
-      // listener quantities for normal and static
-      var count = listeners ? listeners.length : 0;
-      var staticCount = staticListeners ? staticListeners.length : 0;
-
-      // make a copy of non-static listeners, in case callback removes listener
-      if ( count > 0 ) {
-        listeners = listeners.slice();
-      }
-
-      var i;
-
-      for ( i = 0; i < count; i++ ) {
-        listeners[ i ]();
-
-        assert && assert( !staticListeners || staticListeners.length === staticCount, 'Concurrent modifications of static listeners from within non-static listeners are forbidden' );
-      }
-
-      for ( i = 0; i < staticCount; i++ ) {
-        staticListeners[ i ]();
-
-        assert && assert( staticListeners.length === staticCount, 'Concurrent modifications from static listeners are forbidden' );
-      }
-    },
-
-    /**
-     * Trigger an event with the specified name, with a single argument. Should get optimized in browsers better than trigger, so we have code duplication for now.
-     * @param {string} eventName the name for the event channel
-     */
-    trigger1: function( eventName, param1 ) {
-      assert && assert( typeof eventName === 'string', 'eventName should be a string' );
-
-      var listeners = this._eventListeners[ eventName ];
-      var staticListeners = this._staticEventListeners[ eventName ];
-
-      // listener quantities for normal and static
-      var count = listeners ? listeners.length : 0;
-      var staticCount = staticListeners ? staticListeners.length : 0;
-
-      // make a copy of non-static listeners, in case callback removes listener
-      if ( count > 0 ) {
-        listeners = listeners.slice();
-      }
-
-      var i;
-
-      for ( i = 0; i < count; i++ ) {
-        listeners[ i ]( param1 );
-
-        assert && assert( !staticListeners || staticListeners.length === staticCount, 'Concurrent modifications of static listeners from within non-static listeners are forbidden' );
-      }
-
-      for ( i = 0; i < staticCount; i++ ) {
-        staticListeners[ i ]( param1 );
-
-        assert && assert( staticListeners.length === staticCount, 'Concurrent modifications from static listeners are forbidden' );
-      }
-    },
-
-    /**
-     * Trigger an event with the specified name, with a two arguments. Should get optimized in browsers better than trigger, so we have code duplication for now.
-     * @param {string} eventName the name for the event channel
-     */
-    trigger2: function( eventName, param1, param2 ) {
-      assert && assert( typeof eventName === 'string', 'eventName should be a string' );
-
-      var listeners = this._eventListeners[ eventName ];
-      var staticListeners = this._staticEventListeners[ eventName ];
-
-      // listener quantities for normal and static
-      var count = listeners ? listeners.length : 0;
-      var staticCount = staticListeners ? staticListeners.length : 0;
-
-      // make a copy of non-static listeners, in case callback removes listener
-      if ( count > 0 ) {
-        listeners = listeners.slice();
-      }
-
-      var i;
-
-      for ( i = 0; i < count; i++ ) {
-        listeners[ i ]( param1, param2 );
-
-        assert && assert( !staticListeners || staticListeners.length === staticCount, 'Concurrent modifications of static listeners from within non-static listeners are forbidden' );
-      }
-
-      for ( i = 0; i < staticCount; i++ ) {
-        staticListeners[ i ]( param1, param2 );
-
-        assert && assert( staticListeners.length === staticCount, 'Concurrent modifications from static listeners are forbidden' );
-      }
-    }
-  };
-
-  return axon.Events;
-} );
-
-// Copyright 2002-2014, University of Colorado Boulder
-
-/**
- * 2-dimensional ray
- *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
- */
-
-define( 'DOT/Ray2',['require','DOT/dot'],function( require ) {
-  
-
-  var dot = require( 'DOT/dot' );
-
-  dot.Ray2 = function Ray2( pos, dir ) {
-    this.pos = pos;
-    this.dir = dir;
-
-    assert && assert( Math.abs( dir.magnitude() - 1 ) < 0.01 );
-
-    phetAllocation && phetAllocation( 'Ray2' );
-  };
-  var Ray2 = dot.Ray2;
-
-  Ray2.prototype = {
-    constructor: Ray2,
-
-    shifted: function( distance ) {
-      return new Ray2( this.pointAtDistance( distance ), this.dir );
-    },
-
-    pointAtDistance: function( distance ) {
-      return this.pos.plus( this.dir.timesScalar( distance ) );
-    },
-
-    toString: function() {
-      return this.pos.toString() + " => " + this.dir.toString();
-    }
-  };
-
-  return Ray2;
-} );
-
-// Copyright 2002-2014, University of Colorado Boulder
-
-/**
- * Forward and inverse transforms with 3x3 matrices
- *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
- */
-
-define( 'DOT/Transform3',['require','PHET_CORE/inherit','AXON/Events','DOT/dot','DOT/Matrix3','DOT/Vector2','DOT/Ray2'],function( require ) {
-  
-
-  var inherit = require( 'PHET_CORE/inherit' );
-  var Events = require( 'AXON/Events' );
-  var dot = require( 'DOT/dot' );
-
-  require( 'DOT/Matrix3' );
-  require( 'DOT/Vector2' );
-  require( 'DOT/Ray2' );
-
-  var scratchMatrix = new dot.Matrix3();
-
-  function checkMatrix( matrix ) {
-    return ( matrix instanceof dot.Matrix3 ) && matrix.isFinite();
-  }
-
-  /**
-   * @param {Matrix3} matrix
-   */
-  dot.Transform3 = function Transform3( matrix ) {
-    Events.call( this );
-
-    this.matrix = dot.Matrix3.IDENTITY.copy();
-
-    this.inverse = dot.Matrix3.IDENTITY.copy();
-    this.matrixTransposed = dot.Matrix3.IDENTITY.copy();
-    this.inverseTransposed = dot.Matrix3.IDENTITY.copy();
-
-    // all three dependent matrices are valid at the start since everything is the identity matrix!
-    this.inverseValid = true;
-    this.transposeValid = true;
-    this.inverseTransposeValid = true;
-
-    if ( matrix ) {
-      this.setMatrix( matrix );
-    }
-
-    phetAllocation && phetAllocation( 'Transform3' );
-  };
-  var Transform3 = dot.Transform3;
-
-  inherit( Events, Transform3, {
-    /*---------------------------------------------------------------------------*
-     * mutators
-     *----------------------------------------------------------------------------*/
-
-    /**
-     * Sets the value of the matrix directly from a Matrix3. Does not change the Matrix3 instance of this Transform3.
-     *
-     * @param {Matrix3} matrix
-     */
-    setMatrix: function( matrix ) {
-      assert && assert( checkMatrix( matrix ), 'Matrix has NaNs, non-finite values, or isn\'t a matrix!' );
-
-      // copy the matrix over to our matrix
-      this.matrix.set( matrix );
-
-      // set flags and notify
-      this.invalidate();
-    },
-
-    /**
-     * This should be called after our internal matrix is changed. It marks the other dependent matrices as invalid,
-     * and sends out notifications of the change
-     */
-    invalidate: function() {
-      // sanity check
-      assert && assert( this.matrix.isFinite() );
-
-      // dependent matrices now invalid
-      this.inverseValid = false;
-      this.transposeValid = false;
-      this.inverseTransposeValid = false;
-
-      this.trigger0( 'change' );
-    },
-
-    /**
-     * this.matrix = matrix * this.matrix
-     *
-     * @param {Matrix3} matrix
-     */
-    prepend: function( matrix ) {
-      assert && assert( checkMatrix( matrix ), 'Matrix has NaNs, non-finite values, or isn\'t a matrix!' );
-
-      // In the absence of a prepend-multiply function in Matrix3, copy over to a scratch matrix instead
-      // TODO: implement a prepend-multiply directly in Matrix3 for a performance increase
-      scratchMatrix.set( this.matrix );
-      this.matrix.set( matrix );
-      this.matrix.multiplyMatrix( scratchMatrix );
-
-      // set flags and notify
-      this.invalidate();
-    },
-
-    /**
-     * this.matrix = translation( x, y ) * this.matrix, see (scenery#119)
-     *
-     * @param {Matrix3} matrix
-     */
-    prependTranslation: function( x, y ) {
-      assert && assert( typeof x === 'number' && typeof y === 'number' && isFinite( x ) && isFinite( y ),
-        'Attempted to prepend non-finite or non-number (x,y) to the transform' );
-
-      this.matrix.prependTranslation( x, y );
-
-      // set flags and notify
-      this.invalidate();
-    },
-
-    /**
-     * this.matrix = this.matrix * matrix
-     *
-     * @param {Matrix3} matrix
-     */
-    append: function( matrix ) {
-      assert && assert( checkMatrix( matrix ), 'Matrix has NaNs, non-finite values, or isn\'t a matrix!' );
-
-      this.matrix.multiplyMatrix( matrix );
-
-      // set flags and notify
-      this.invalidate();
-    },
-
-    prependTransform: function( transform ) {
-      this.prepend( transform.matrix );
-    },
-
-    appendTransform: function( transform ) {
-      this.append( transform.matrix );
-    },
-
-    applyToCanvasContext: function( context ) {
-      context.setTransform( this.matrix.m00(), this.matrix.m10(), this.matrix.m01(), this.matrix.m11(), this.matrix.m02(), this.matrix.m12() );
-    },
-
-    /*---------------------------------------------------------------------------*
-     * getters
-     *----------------------------------------------------------------------------*/
-
-    copy: function() {
-      var transform = new Transform3( this.matrix );
-
-      transform.inverse = this.inverse;
-      transform.matrixTransposed = this.matrixTransposed;
-      transform.inverseTransposed = this.inverseTransposed;
-
-      transform.inverseValid = this.inverseValid;
-      transform.transposeValid = this.transposeValid;
-      transform.inverseTransposeValid = this.inverseTransposeValid;
-    },
-
-    getMatrix: function() {
-      return this.matrix;
-    },
-
-    getInverse: function() {
-      if ( !this.inverseValid ) {
-        this.inverseValid = true;
-
-        this.inverse.set( this.matrix );
-        this.inverse.invert();
-      }
-      return this.inverse;
-    },
-
-    getMatrixTransposed: function() {
-      if ( !this.transposeValid ) {
-        this.transposeValid = true;
-
-        this.matrixTransposed.set( this.matrix );
-        this.matrixTransposed.transpose();
-      }
-      return this.matrixTransposed;
-    },
-
-    getInverseTransposed: function() {
-      if ( !this.inverseTransposeValid ) {
-        this.inverseTransposeValid = true;
-
-        this.inverseTransposed.set( this.getInverse() ); // triggers inverse to be valid
-        this.inverseTransposed.transpose();
-      }
-      return this.inverseTransposed;
-    },
-
-    // false is "inconclusive"
-    isIdentity: function() {
-      return this.matrix.type === dot.Matrix3.Types.IDENTITY;
-    },
-
-    isFinite: function() {
-      return this.matrix.isFinite();
-    },
-
-    /*---------------------------------------------------------------------------*
-     * forward transforms (for Vector2 or scalar)
-     *----------------------------------------------------------------------------*/
-
-    // transform a position (includes translation)
-    transformPosition2: function( vec2 ) {
-      return this.matrix.timesVector2( vec2 );
-    },
-
-    // transform a vector (exclude translation)
-    transformDelta2: function( vec2 ) {
-      var m = this.getMatrix();
-      // m . vec2 - m . Vector2.ZERO
-      return new dot.Vector2( m.m00() * vec2.x + m.m01() * vec2.y, m.m10() * vec2.x + m.m11() * vec2.y );
-    },
-
-    // transform a normal vector (different than a normal vector)
-    transformNormal2: function( vec2 ) {
-      return this.getInverse().timesTransposeVector2( vec2 );
-    },
-
-    transformX: function( x ) {
-      var m = this.getMatrix();
-      assert && assert( !m.m01(), 'Transforming an X value with a rotation/shear is ill-defined' );
-      return m.m00() * x + m.m02();
-    },
-
-    transformY: function( y ) {
-      var m = this.getMatrix();
-      assert && assert( !m.m10(), 'Transforming a Y value with a rotation/shear is ill-defined' );
-      return m.m11() * y + m.m12();
-    },
-
-    transformDeltaX: function( x ) {
-      var m = this.getMatrix();
-      assert && assert( !m.m01(), 'Transforming an X value with a rotation/shear is ill-defined' );
-      // same as this.transformDelta2( new dot.Vector2( x, 0 ) ).x;
-      return m.m00() * x;
-    },
-
-    transformDeltaY: function( y ) {
-      var m = this.getMatrix();
-      assert && assert( !m.m10(), 'Transforming a Y value with a rotation/shear is ill-defined' );
-      // same as this.transformDelta2( new dot.Vector2( 0, y ) ).y;
-      return m.m11() * y;
-    },
-
-    transformBounds2: function( bounds2 ) {
-      return bounds2.transformed( this.matrix );
-    },
-
-    transformShape: function( shape ) {
-      return shape.transformed( this.matrix );
-    },
-
-    transformRay2: function( ray ) {
-      return new dot.Ray2( this.transformPosition2( ray.pos ), this.transformDelta2( ray.dir ).normalized() );
-    },
-
-    /*---------------------------------------------------------------------------*
-     * inverse transforms (for Vector2 or scalar)
-     *----------------------------------------------------------------------------*/
-
-    inversePosition2: function( vec2 ) {
-      return this.getInverse().timesVector2( vec2 );
-    },
-
-    inverseDelta2: function( vec2 ) {
-      var m = this.getInverse();
-      // m . vec2 - m . Vector2.ZERO
-      return new dot.Vector2( m.m00() * vec2.x + m.m01() * vec2.y, m.m10() * vec2.x + m.m11() * vec2.y );
-    },
-
-    inverseNormal2: function( vec2 ) {
-      return this.matrix.timesTransposeVector2( vec2 );
-    },
-
-    inverseX: function( x ) {
-      var m = this.getInverse();
-      assert && assert( !m.m01(), 'Inverting an X value with a rotation/shear is ill-defined' );
-      return m.m00() * x + m.m02();
-    },
-
-    inverseY: function( y ) {
-      var m = this.getInverse();
-      assert && assert( !m.m10(), 'Inverting a Y value with a rotation/shear is ill-defined' );
-      return m.m11() * y + m.m12();
-    },
-
-    inverseDeltaX: function( x ) {
-      var m = this.getInverse();
-      assert && assert( !m.m01(), 'Inverting an X value with a rotation/shear is ill-defined' );
-      // same as this.inverseDelta2( new dot.Vector2( x, 0 ) ).x;
-      return m.m00() * x;
-    },
-
-    inverseDeltaY: function( y ) {
-      var m = this.getInverse();
-      assert && assert( !m.m10(), 'Inverting a Y value with a rotation/shear is ill-defined' );
-      // same as this.inverseDelta2( new dot.Vector2( 0, y ) ).y;
-      return m.m11() * y;
-    },
-
-    inverseBounds2: function( bounds2 ) {
-      return bounds2.transformed( this.getInverse() );
-    },
-
-    inverseShape: function( shape ) {
-      return shape.transformed( this.getInverse() );
-    },
-
-    inverseRay2: function( ray ) {
-      return new dot.Ray2( this.inversePosition2( ray.pos ), this.inverseDelta2( ray.dir ).normalized() );
-    }
-  } );
-
-  return Transform3;
-} );
-
-// Copyright 2002-2014, University of Colorado Boulder
-
-
-/**
- * Points to a specific node (with a trail), and whether it is conceptually before or after the node.
- *
- * There are two orderings:
- * - rendering order: the order that node selves would be rendered, matching the Trail implicit order
- * - nesting order:   the order in depth first with entering a node being "before" and exiting a node being "after"
- *
- * TODO: more seamless handling of the orders. or just exclusively use the nesting order
- *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
- */
-
-define( 'SCENERY/util/TrailPointer',['require','PHET_CORE/inherit','SCENERY/scenery'],function( require ) {
-  
-
-  var inherit = require( 'PHET_CORE/inherit' );
-  var scenery = require( 'SCENERY/scenery' );
-
-  /*
-   * isBefore: whether this points to before the node (and its children) have been rendered, or after
-   */
-  //@deprecated
-  scenery.TrailPointer = function TrailPointer( trail, isBefore ) {
-    assert && assert( trail instanceof scenery.Trail, 'trail is not a trail' );
-    this.trail = trail;
-
-    this.setBefore( isBefore );
-
-    phetAllocation && phetAllocation( 'TrailPointer' );
-  };
-  var TrailPointer = scenery.TrailPointer;
-
-  inherit( Object, TrailPointer, {
-    copy: function() {
-      return new TrailPointer( this.trail.copy(), this.isBefore );
-    },
-
-    setBefore: function( isBefore ) {
-      this.isBefore = isBefore;
-      this.isAfter = !isBefore;
-    },
-
-    // return the equivalent pointer that swaps before and after (may return null if it doesn't exist)
-    getRenderSwappedPointer: function() {
-      var newTrail = this.isBefore ? this.trail.previous() : this.trail.next();
-
-      if ( newTrail === null ) {
-        return null;
-      }
-      else {
-        return new TrailPointer( newTrail, !this.isBefore );
-      }
-    },
-
-    getRenderBeforePointer: function() {
-      return this.isBefore ? this : this.getRenderSwappedPointer();
-    },
-
-    getRenderAfterPointer: function() {
-      return this.isAfter ? this : this.getRenderSwappedPointer();
-    },
-
-    /*
-     * In the render order, will return 0 if the pointers are equivalent, -1 if this pointer is before the
-     * other pointer, and 1 if this pointer is after the other pointer.
-     */
-    compareRender: function( other ) {
-      assert && assert( other !== null );
-
-      var a = this.getRenderBeforePointer();
-      var b = other.getRenderBeforePointer();
-
-      if ( a !== null && b !== null ) {
-        // normal (non-degenerate) case
-        return a.trail.compare( b.trail );
-      }
-      else {
-        // null "before" point is equivalent to the "after" pointer on the last rendered node.
-        if ( a === b ) {
-          return 0; // uniqueness guarantees they were the same
-        }
-        else {
-          return a === null ? 1 : -1;
-        }
-      }
-    },
-
-    /*
-     * Like compareRender, but for the nested (depth-first) order
-     *
-     * TODO: optimization?
-     */
-    compareNested: function( other ) {
-      assert && assert( other );
-
-      var comparison = this.trail.compare( other.trail );
-
-      if ( comparison === 0 ) {
-        // if trails are equal, just compare before/after
-        if ( this.isBefore === other.isBefore ) {
-          return 0;
-        }
-        else {
-          return this.isBefore ? -1 : 1;
-        }
-      }
-      else {
-        // if one is an extension of the other, the shorter isBefore flag determines the order completely
-        if ( this.trail.isExtensionOf( other.trail ) ) {
-          return other.isBefore ? 1 : -1;
-        }
-        else if ( other.trail.isExtensionOf( this.trail ) ) {
-          return this.isBefore ? -1 : 1;
-        }
-        else {
-          // neither is a subtrail of the other, so a straight trail comparison should give the answer
-          return comparison;
-        }
-      }
-    },
-
-    equalsRender: function( other ) {
-      return this.compareRender( other ) === 0;
-    },
-
-    equalsNested: function( other ) {
-      return this.compareNested( other ) === 0;
-    },
-
-    // will return false if this pointer has gone off of the beginning or end of the tree (will be marked with isAfter or isBefore though)
-    hasTrail: function() {
-      return !!this.trail;
-    },
-
-    // TODO: refactor with "Side"-like handling
-    // moves this pointer forwards one step in the nested order
-    nestedForwards: function() {
-      if ( this.isBefore ) {
-        if ( this.trail.lastNode()._children.length > 0 ) {
-          // stay as before, just walk to the first child
-          this.trail.addDescendant( this.trail.lastNode()._children[ 0 ], 0 );
-        }
-        else {
-          // stay on the same node, but switch to after
-          this.setBefore( false );
-        }
-      }
-      else {
-        if ( this.trail.indices.length === 0 ) {
-          // nothing else to jump to below, so indicate the lack of existence
-          this.trail = null;
-          // stays isAfter
-          return null;
-        }
-        else {
-          var index = this.trail.indices[ this.trail.indices.length - 1 ];
-          this.trail.removeDescendant();
-
-          if ( this.trail.lastNode()._children.length > index + 1 ) {
-            // more siblings, switch to the beginning of the next one
-            this.trail.addDescendant( this.trail.lastNode()._children[ index + 1 ], index + 1 );
-            this.setBefore( true );
-          }
-          else {
-            // no more siblings. exit on parent. nothing else needed since we're already isAfter
-          }
-        }
-      }
-      return this;
-    },
-
-    // moves this pointer backwards one step in the nested order
-    nestedBackwards: function() {
-      if ( this.isBefore ) {
-        if ( this.trail.indices.length === 0 ) {
-          // jumping off the front
-          this.trail = null;
-          // stays isBefore
-          return null;
-        }
-        else {
-          var index = this.trail.indices[ this.trail.indices.length - 1 ];
-          this.trail.removeDescendant();
-
-          if ( index - 1 >= 0 ) {
-            // more siblings, switch to the beginning of the previous one and switch to isAfter
-            this.trail.addDescendant( this.trail.lastNode()._children[ index - 1 ], index - 1 );
-            this.setBefore( false );
-          }
-          else {
-            // no more siblings. enter on parent. nothing else needed since we're already isBefore
-          }
-        }
-      }
-      else {
-        if ( this.trail.lastNode()._children.length > 0 ) {
-          // stay isAfter, but walk to the last child
-          var children = this.trail.lastNode()._children;
-          this.trail.addDescendant( children[ children.length - 1 ], children.length - 1 );
-        }
-        else {
-          // switch to isBefore, since this is a leaf node
-          this.setBefore( true );
-        }
-      }
-      return this;
-    },
-
-    // treats the pointer as render-ordered (includes the start pointer 'before' if applicable, excludes the end pointer 'before' if applicable
-    eachNodeBetween: function( other, callback ) {
-      this.eachTrailBetween( other, function( trail ) {
-        return callback( trail.lastNode() );
-      } );
-    },
-
-    // treats the pointer as render-ordered (includes the start pointer 'before' if applicable, excludes the end pointer 'before' if applicable
-    eachTrailBetween: function( other, callback ) {
-      // this should trigger on all pointers that have the 'before' flag, except a pointer equal to 'other'.
-
-      // since we exclude endpoints in the depthFirstUntil call, we need to fire this off first
-      if ( this.isBefore ) {
-        callback( this.trail );
-      }
-
-      this.depthFirstUntil( other, function( pointer ) {
-        if ( pointer.isBefore ) {
-          return callback( pointer.trail );
-        }
-      }, true ); // exclude the endpoints so we can ignore the ending 'before' case
-    },
-
-    /*
-     * Recursively (depth-first) iterates over all pointers between this pointer and 'other', calling
-     * callback( pointer ) for each pointer. If excludeEndpoints is truthy, the callback will not be
-     * called if pointer is equivalent to this pointer or 'other'.
-     *
-     * If the callback returns a truthy value, the subtree for the current pointer will be skipped
-     * (applies only to before-pointers)
-     */
-    depthFirstUntil: function( other, callback, excludeEndpoints ) {
-      // make sure this pointer is before the other, but allow start === end if we are not excluding endpoints
-      assert && assert( this.compareNested( other ) <= ( excludeEndpoints ? -1 : 0 ), 'TrailPointer.depthFirstUntil pointers out of order, possibly in both meanings of the phrase!' );
-      assert && assert( this.trail.rootNode() === other.trail.rootNode(), 'TrailPointer.depthFirstUntil takes pointers with the same root' );
-
-      // sanity check TODO: remove later
-      this.trail.reindex();
-      other.trail.reindex();
-
-      var pointer = this.copy();
-      pointer.trail.setMutable(); // this trail will be modified in the iteration, so references to it may be modified
-
-      var first = true;
-
-      while ( !pointer.equalsNested( other ) ) {
-        assert && assert( pointer.compareNested( other ) !== 1, 'skipped in depthFirstUntil' );
-        var skipSubtree = false;
-
-        if ( first ) {
-          // start point
-          if ( !excludeEndpoints ) {
-            skipSubtree = callback( pointer );
-          }
-          first = false;
-        }
-        else {
-          // between point
-          skipSubtree = callback( pointer );
-        }
-
-        if ( skipSubtree && pointer.isBefore ) {
-          // to skip the subtree, we just change to isAfter
-          pointer.setBefore( false );
-
-          // if we skip a subtree, make sure we don't run past the ending pointer
-          if ( pointer.compareNested( other ) === 1 ) {
-            break;
-          }
-        }
-        else {
-          pointer.nestedForwards();
-        }
-      }
-
-      // end point
-      if ( !excludeEndpoints ) {
-        callback( pointer );
-      }
-    },
-
-    toString: function() {
-      return '[' + ( this.isBefore ? 'before' : 'after' ) + ' ' + this.trail.toString().slice( 1 );
-    }
-  } );
-
-  // same as new TrailPointer( trailA, isBeforeA ).compareNested( new TrailPointer( trailB, isBeforeB ) )
-  TrailPointer.compareNested = function( trailA, isBeforeA, trailB, isBeforeB ) {
-    var comparison = trailA.compare( trailB );
-
-    if ( comparison === 0 ) {
-      // if trails are equal, just compare before/after
-      if ( isBeforeA === isBeforeB ) {
-        return 0;
-      }
-      else {
-        return isBeforeA ? -1 : 1;
-      }
-    }
-    else {
-      // if one is an extension of the other, the shorter isBefore flag determines the order completely
-      if ( trailA.isExtensionOf( trailB ) ) {
-        return isBeforeB ? 1 : -1;
-      }
-      else if ( trailB.isExtensionOf( trailA ) ) {
-        return isBeforeA ? -1 : 1;
-      }
-      else {
-        // neither is a subtrail of the other, so a straight trail comparison should give the answer
-        return comparison;
-      }
-    }
-  };
-
-  return TrailPointer;
-} );
-
 
 // Copyright 2002-2014, University of Colorado Boulder
 
@@ -4848,13 +2166,12 @@ define( 'SCENERY/util/TrailPointer',['require','PHET_CORE/inherit','SCENERY/scen
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-define( 'DOT/Bounds2',['require','DOT/dot','PHET_CORE/Poolable','DOT/Vector2'],function( require ) {
+define( 'DOT/Bounds2',['require','DOT/dot','DOT/Vector2','PHET_CORE/Poolable'],function( require ) {
   
 
   var dot = require( 'DOT/dot' );
+  var Vector2 = require( 'DOT/Vector2' );
   var Poolable = require( 'PHET_CORE/Poolable' );
-
-  require( 'DOT/Vector2' );
 
   //Temporary instances to be used in the transform method.
   var scratchVector2 = new dot.Vector2();
@@ -4955,6 +2272,23 @@ define( 'DOT/Bounds2',['require','DOT/dot','PHET_CORE/Poolable','DOT/Vector2'],f
 
     isValid: function() {
       return !this.isEmpty() && this.isFinite();
+    },
+
+    /**
+     * Returns (1) the same location if the location is within the bounds
+     * or (2) a location on the edge of the bounds if the location is outside the bounds
+     * @param {Vector2} location
+     * @returns {Vector2}
+     */
+    closestPointTo: function( location ) {
+      if ( this.containsCoordinates( location.x, location.y ) ) {
+        return location;
+      }
+      else {
+        var xConstrained = Math.max( Math.min( location.x, this.maxX ), this.x );
+        var yConstrained = Math.max( Math.min( location.y, this.maxY ), this.y );
+        return new Vector2( xConstrained, yConstrained );
+      }
     },
 
     // whether the coordinates are inside the bounding box (or on the boundary)
@@ -5397,37 +2731,43 @@ define( 'DOT/Bounds2',['require','DOT/dot','PHET_CORE/Poolable','DOT/Vector2'],f
 // Copyright 2002-2014, University of Colorado Boulder
 
 /**
- * The main 'kite' namespace object for the exported (non-Require.js) API. Used internally
- * since it prevents Require.js issues with circular dependencies.
- *
- * The returned kite object namespace may be incomplete if not all modules are listed as
- * dependencies. Please use the 'main' module for that purpose if all of Kite is desired.
+ * 2-dimensional ray
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-define( 'KITE/kite',['require','PHET_CORE/phetAllocation'],function( require ) {
+define( 'DOT/Ray2',['require','DOT/dot'],function( require ) {
   
 
-  // object allocation tracking
-  window.phetAllocation = require( 'PHET_CORE/phetAllocation' );
+  var dot = require( 'DOT/dot' );
 
-  // workaround for Axon, since it needs window.arch to be defined
-  window.arch = window.arch || null;
+  dot.Ray2 = function Ray2( pos, dir ) {
+    this.pos = pos;
+    this.dir = dir;
 
-  var kite = {
-    svgNumber: function( n ) {
-      return n.toFixed( 20 );
+    assert && assert( Math.abs( dir.magnitude() - 1 ) < 0.01 );
+
+    phetAllocation && phetAllocation( 'Ray2' );
+  };
+  var Ray2 = dot.Ray2;
+
+  Ray2.prototype = {
+    constructor: Ray2,
+
+    shifted: function( distance ) {
+      return new Ray2( this.pointAtDistance( distance ), this.dir );
+    },
+
+    pointAtDistance: function( distance ) {
+      return this.pos.plus( this.dir.timesScalar( distance ) );
+    },
+
+    toString: function() {
+      return this.pos.toString() + " => " + this.dir.toString();
     }
   };
 
-  // store a reference on the PhET namespace if it exists
-  if ( window.phet ) {
-    window.phet.kite = kite;
-  }
-
-  // will be filled in by other modules
-  return kite;
+  return Ray2;
 } );
 
 // Copyright 2002-2014, University of Colorado Boulder
@@ -5438,11 +2778,13 @@ define( 'KITE/kite',['require','PHET_CORE/phetAllocation'],function( require ) {
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-define( 'KITE/segments/Segment',['require','KITE/kite','DOT/Util','DOT/Bounds2'],function( require ) {
+define( 'KITE/segments/Segment',['require','KITE/kite','PHET_CORE/inherit','AXON/Events','DOT/Util','DOT/Bounds2'],function( require ) {
   
 
   var kite = require( 'KITE/kite' );
 
+  var inherit = require( 'PHET_CORE/inherit' );
+  var Events = require( 'AXON/Events' );
   var DotUtil = require( 'DOT/Util' );
   var Bounds2 = require( 'DOT/Bounds2' );
 
@@ -5463,21 +2805,20 @@ define( 'KITE/segments/Segment',['require','KITE/kite','DOT/Util','DOT/Bounds2']
    * getSVGPathFragment()     - returns a string containing the SVG path. assumes that the start point is already provided, so anything that calls this needs to put the M calls first
    * strokeLeft( lineWidth )  - returns an array of segments that will draw an offset curve on the logical left side
    * strokeRight( lineWidth ) - returns an array of segments that will draw an offset curve on the logical right side
-   * intersectsBounds         - whether this segment intersects the specified bounding box (not just the segment's bounding box, but the actual segment)
    * windingIntersection      - returns the winding number for intersection with a ray
    * getInteriorExtremaTs     - returns a list of t values where dx/dt or dy/dt is 0 where 0 < t < 1. subdividing on these will result in monotonic segments
    *
    * writeToContext( context ) - draws the segment to the 2D Canvas context, assuming the context's current location is already at the start point
    * transformed( matrix )     - returns a new segment that represents this segment after transformation by the matrix
    */
-  kite.Segment = function Segment() {}; // no common construction for now
+  kite.Segment = function Segment() {
+    Events.call( this );
+  };
   var Segment = kite.Segment;
 
   var identityFunction = function identityFunction( x ) { return x; };
 
-  Segment.prototype = {
-    constructor: Segment,
-
+  inherit( Events, Segment, {
     // TODO: override everywhere so this isn't necessary (it's not particularly efficient!)
     getBoundsWithTransform: function( matrix ) {
       var transformedSegment = this.transformed( matrix );
@@ -5548,7 +2889,7 @@ define( 'KITE/segments/Segment',['require','KITE/kite','DOT/Util','DOT/Bounds2']
       }
 
       if ( finished ) {
-        segments.push( new Segment.Line( start, end ) );
+        segments.push( new kite.Line( start, end ) );
       }
       else {
         var subdividedSegments = this.subdivided( 0.5 );
@@ -5557,6 +2898,43 @@ define( 'KITE/segments/Segment',['require','KITE/kite','DOT/Util','DOT/Bounds2']
       }
       return segments;
     }
+  } );
+
+  /**
+   * Adds getter/setter function pairs and ES5 pairs, e.g. addInvalidatingGetterSetter( Arc, 'radius' ) would add:
+   * - segment.getRadius()
+   * - segment.setRadius( value )
+   * - segment.radius // getter and setter
+   *
+   * It assumes the following is the internal name: '_' + name
+   *
+   * @param {Function} type - Should be the constructor of the type. We will modify its prototype
+   * @param {string} name - Name of the
+   */
+  Segment.addInvalidatingGetterSetter = function( type, name ) {
+    var internalName = '_' + name;
+    var capitalizedName = name.charAt( 0 ).toUpperCase() + name.slice( 1 );
+    var getterName = 'get' + capitalizedName;
+    var setterName = 'set' + capitalizedName;
+
+    // e.g. getRadius()
+    type.prototype[ getterName ] = function() {
+      return this[ internalName ];
+    };
+
+    // e.g. setRadius( value )
+    type.prototype[ setterName ] = function( value ) {
+      if ( this[ internalName ] !== value ) {
+        this[ internalName ] = value;
+        this.invalidate();
+      }
+      return this; // allow chaining
+    };
+
+    Object.defineProperty( type.prototype, name, {
+      set: type.prototype[ setterName ],
+      get: type.prototype[ getterName ]
+    } );
   };
 
   // list of { segment: ..., t: ..., closestPoint: ..., distanceSquared: ... } (since there can be duplicates), threshold is used for subdivision,
@@ -5711,28 +3089,27 @@ define( 'KITE/segments/Line',['require','PHET_CORE/inherit','DOT/Bounds2','DOT/V
 
   var scratchVector2 = new Vector2();
 
-  Segment.Line = function Line( start, end ) {
+  kite.Line = Segment.Line = function Line( start, end ) {
+    Segment.call( this );
+
     this._start = start;
     this._end = end;
 
-    // TODO: performance test removal of these undefined declarations
-    this._tangent = undefined;
-    this._bounds = undefined;
+    this.invalidate();
   };
   inherit( Segment, Segment.Line, {
 
-    getStart: function() {
-      return this._start;
-    },
-    get start() { return this._start; },
+    // @public - Clears cached information, should be called when any of the 'constructor arguments' are mutated.
+    invalidate: function() {
+      // Lazily-computed derived information
+      this._tangent = null; // {Vector2 | null}
+      this._bounds = null; // {Bounds2 | null}
 
-    getEnd: function() {
-      return this._end;
+      this.trigger0( 'invalidated' );
     },
-    get end() { return this._end; },
 
     getStartTangent: function() {
-      if ( this._tangent === undefined ) {
+      if ( this._tangent === null ) {
         // TODO: allocation reduction
         this._tangent = this._end.minus( this._start ).normalized();
       }
@@ -5747,7 +3124,7 @@ define( 'KITE/segments/Line',['require','PHET_CORE/inherit','DOT/Bounds2','DOT/V
 
     getBounds: function() {
       // TODO: allocation reduction
-      if ( this._bounds === undefined ) {
+      if ( this._bounds === null ) {
         this._bounds = Bounds2.NOTHING.copy().addPoint( this._start ).addPoint( this._end );
       }
       return this._bounds;
@@ -5791,12 +3168,12 @@ define( 'KITE/segments/Line',['require','PHET_CORE/inherit','DOT/Bounds2','DOT/V
 
     strokeLeft: function( lineWidth ) {
       var offset = this.getEndTangent().perpendicular().negated().times( lineWidth / 2 );
-      return [ new Segment.Line( this._start.plus( offset ), this._end.plus( offset ) ) ];
+      return [ new kite.Line( this._start.plus( offset ), this._end.plus( offset ) ) ];
     },
 
     strokeRight: function( lineWidth ) {
       var offset = this.getStartTangent().perpendicular().times( lineWidth / 2 );
-      return [ new Segment.Line( this._end.plus( offset ), this._start.plus( offset ) ) ];
+      return [ new kite.Line( this._end.plus( offset ), this._start.plus( offset ) ) ];
     },
 
     // lines are already monotone
@@ -5805,13 +3182,9 @@ define( 'KITE/segments/Line',['require','PHET_CORE/inherit','DOT/Bounds2','DOT/V
     subdivided: function( t ) {
       var pt = this.positionAt( t );
       return [
-        new Segment.Line( this._start, pt ),
-        new Segment.Line( pt, this._end )
+        new kite.Line( this._start, pt ),
+        new kite.Line( pt, this._end )
       ];
-    },
-
-    intersectsBounds: function( bounds ) {
-      throw new Error( 'Segment.Line.intersectsBounds unimplemented' ); // TODO: implement
     },
 
     intersection: function( ray ) {
@@ -5848,7 +3221,7 @@ define( 'KITE/segments/Line',['require','PHET_CORE/inherit','DOT/Bounds2','DOT/V
       var s = ( diff.x * ( start.y - ray.pos.y ) - diff.y * ( start.x - ray.pos.x ) ) / denom;
 
       // bail if it is behind our ray
-      if ( s < 0.000001 ) {
+      if ( s < 0.00000001 ) {
         return result;
       }
 
@@ -5881,7 +3254,7 @@ define( 'KITE/segments/Line',['require','PHET_CORE/inherit','DOT/Bounds2','DOT/V
     },
 
     transformed: function( matrix ) {
-      return new Segment.Line( matrix.timesVector2( this._start ), matrix.timesVector2( this._end ) );
+      return new kite.Line( matrix.timesVector2( this._start ), matrix.timesVector2( this._end ) );
     },
 
     explicitClosestToPoint: function( point ) {
@@ -5901,23 +3274,26 @@ define( 'KITE/segments/Line',['require','PHET_CORE/inherit','DOT/Bounds2','DOT/V
 
     // given the current curve parameterized by t, will return a curve parameterized by x where t = a * x + b
     reparameterized: function( a, b ) {
-      return new Segment.Line( this.positionAt( b ), this.positionAt( a + b ) );
+      return new kite.Line( this.positionAt( b ), this.positionAt( a + b ) );
     },
 
     polarToCartesian: function( options ) {
       if ( this._start.x === this._end.x ) {
         // angle is the same, we are still a line segment!
-        return [ new Segment.Line( Vector2.createPolar( this._start.y, this._start.x ), Vector2.createPolar( this._end.y, this._end.x ) ) ];
+        return [ new kite.Line( Vector2.createPolar( this._start.y, this._start.x ), Vector2.createPolar( this._end.y, this._end.x ) ) ];
       }
       else if ( this._start.y === this._end.y ) {
         // we have a constant radius, so we are a circular arc
-        return [ new Segment.Arc( Vector2.ZERO, this._start.y, this._start.x, this._end.x, this._start.x > this._end.x ) ];
+        return [ new kite.Arc( Vector2.ZERO, this._start.y, this._start.x, this._end.x, this._start.x > this._end.x ) ];
       }
       else {
         return this.toPiecewiseLinearSegments( options );
       }
     }
   } );
+
+  Segment.addInvalidatingGetterSetter( Segment.Line, 'start' );
+  Segment.addInvalidatingGetterSetter( Segment.Line, 'end' );
 
   return Segment.Line;
 } );
@@ -5941,13 +3317,19 @@ define( 'KITE/segments/Arc',['require','PHET_CORE/inherit','DOT/Vector2','DOT/Bo
   var kite = require( 'KITE/kite' );
   var Segment = require( 'KITE/segments/Segment' );
 
-  Segment.Arc = function Arc( center, radius, startAngle, endAngle, anticlockwise ) {
-    if ( radius < 0 ) {
-      // support this case since we might actually need to handle it inside of strokes?
-      radius = -radius;
-      startAngle += Math.PI;
-      endAngle += Math.PI;
-    }
+  /**
+   * Creates a circular arc (or circle if the startAngle/endAngle difference is ~2pi).
+   * See http://www.w3.org/TR/2dcontext/#dom-context-2d-arc for detailed information on the parameters.
+   *
+   * @param {Vector2} center - Center of the arc (every point on the arc is equally far from the center)
+   * @param {number} radius - How far from the center the arc will be
+   * @param {number} startAngle - Angle (radians) of the start of the arc
+   * @param {number} endAngle - Angle (radians) of the end of the arc
+   * @param {boolean} anticlockwise - Decides which direction the arc takes around the center
+   * @constructor
+   */
+  kite.Arc = Segment.Arc = function Arc( center, radius, startAngle, endAngle, anticlockwise ) {
+    Segment.call( this );
 
     this._center = center;
     this._radius = radius;
@@ -5955,48 +3337,42 @@ define( 'KITE/segments/Arc',['require','PHET_CORE/inherit','DOT/Vector2','DOT/Bo
     this._endAngle = endAngle;
     this._anticlockwise = anticlockwise;
 
-    // TODO: performance test removal of these undefined declarations
-    this._start = undefined;
-    this._end = undefined;
-    this._startTangent = undefined;
-    this._endTangent = undefined;
-    this._actualEndAngle = undefined;
-    this._isFullPerimeter = undefined;
-    this._angleDifference = undefined;
-
-    // constraints
-    assert && assert( !( ( !anticlockwise && endAngle - startAngle <= -Math.PI * 2 ) || ( anticlockwise && startAngle - endAngle <= -Math.PI * 2 ) ), 'Not handling arcs with start/end angles that show differences in-between browser handling' );
-    assert && assert( !( ( !anticlockwise && endAngle - startAngle > Math.PI * 2 ) || ( anticlockwise && startAngle - endAngle > Math.PI * 2 ) ), 'Not handling arcs with start/end angles that show differences in-between browser handling' );
+    this.invalidate();
   };
   inherit( Segment, Segment.Arc, {
+    // @public - Clears cached information, should be called when any of the 'constructor arguments' are mutated.
+    invalidate: function() {
+      // Lazily-computed derived information
+      this._start = null; // {Vector2 | null}
+      this._end = null; // {Vector2 | null}
+      this._startTangent = null; // {Vector2 | null}
+      this._endTangent = null; // {Vector2 | null}
+      this._actualEndAngle = null; // {number | null} - End angle in relation to our start angle (can get remapped)
+      this._isFullPerimeter = null; // {boolean | null} - Whether it's a full circle (and not just an arc)
+      this._angleDifference = null; // {number | null}
+      this._bounds = null; // {Bounds2 | null}
 
-    getCenter: function() {
-      return this._center;
-    },
-    get center() { return this.getCenter(); },
+      // Remap negative radius to a positive radius
+      if ( this._radius < 0 ) {
+        // support this case since we might actually need to handle it inside of strokes?
+        this._radius = -this._radius;
+        this._startAngle += Math.PI;
+        this._endAngle += Math.PI;
+      }
 
-    getRadius: function() {
-      return this._radius;
-    },
-    get radius() { return this.getRadius(); },
+      // Constraints that should always be satisfied
+      assert && assert( !( ( !this.anticlockwise && this.endAngle - this.startAngle <= -Math.PI * 2 ) ||
+                           ( this.anticlockwise && this.startAngle - this.endAngle <= -Math.PI * 2 ) ),
+        'Not handling arcs with start/end angles that show differences in-between browser handling' );
+      assert && assert( !( ( !this.anticlockwise && this.endAngle - this.startAngle > Math.PI * 2 ) ||
+                           ( this.anticlockwise && this.startAngle - this.endAngle > Math.PI * 2 ) ),
+        'Not handling arcs with start/end angles that show differences in-between browser handling' );
 
-    getStartAngle: function() {
-      return this._startAngle;
+      this.trigger0( 'invalidated' );
     },
-    get startAngle() { return this.getStartAngle(); },
-
-    getEndAngle: function() {
-      return this._endAngle;
-    },
-    get endAngle() { return this.getEndAngle(); },
-
-    getAnticlockwise: function() {
-      return this._anticlockwise;
-    },
-    get anticlockwise() { return this.getAnticlockwise(); },
 
     getStart: function() {
-      if ( this._start === undefined ) {
+      if ( this._start === null ) {
         this._start = this.positionAtAngle( this._startAngle );
       }
       return this._start;
@@ -6004,7 +3380,7 @@ define( 'KITE/segments/Arc',['require','PHET_CORE/inherit','DOT/Vector2','DOT/Bo
     get start() { return this.getStart(); },
 
     getEnd: function() {
-      if ( this._end === undefined ) {
+      if ( this._end === null ) {
         this._end = this.positionAtAngle( this._endAngle );
       }
       return this._end;
@@ -6012,7 +3388,7 @@ define( 'KITE/segments/Arc',['require','PHET_CORE/inherit','DOT/Vector2','DOT/Bo
     get end() { return this.getEnd(); },
 
     getStartTangent: function() {
-      if ( this._startTangent === undefined ) {
+      if ( this._startTangent === null ) {
         this._startTangent = this.tangentAtAngle( this._startAngle );
       }
       return this._startTangent;
@@ -6020,7 +3396,7 @@ define( 'KITE/segments/Arc',['require','PHET_CORE/inherit','DOT/Vector2','DOT/Bo
     get startTangent() { return this.getStartTangent(); },
 
     getEndTangent: function() {
-      if ( this._endTangent === undefined ) {
+      if ( this._endTangent === null ) {
         this._endTangent = this.tangentAtAngle( this._endAngle );
       }
       return this._endTangent;
@@ -6028,7 +3404,7 @@ define( 'KITE/segments/Arc',['require','PHET_CORE/inherit','DOT/Vector2','DOT/Bo
     get endTangent() { return this.getEndTangent(); },
 
     getActualEndAngle: function() {
-      if ( this._actualEndAngle === undefined ) {
+      if ( this._actualEndAngle === null ) {
         // compute an actual end angle so that we can smoothly go from this._startAngle to this._actualEndAngle
         if ( this._anticlockwise ) {
           // angle is 'decreasing'
@@ -6064,7 +3440,7 @@ define( 'KITE/segments/Arc',['require','PHET_CORE/inherit','DOT/Vector2','DOT/Bo
     get actualEndAngle() { return this.getActualEndAngle(); },
 
     getIsFullPerimeter: function() {
-      if ( this._isFullPerimeter === undefined ) {
+      if ( this._isFullPerimeter === null ) {
         this._isFullPerimeter = ( !this._anticlockwise && this._endAngle - this._startAngle >= Math.PI * 2 ) || ( this._anticlockwise && this._startAngle - this._endAngle >= Math.PI * 2 );
       }
       return this._isFullPerimeter;
@@ -6072,7 +3448,7 @@ define( 'KITE/segments/Arc',['require','PHET_CORE/inherit','DOT/Vector2','DOT/Bo
     get isFullPerimeter() { return this.getIsFullPerimeter(); },
 
     getAngleDifference: function() {
-      if ( this._angleDifference === undefined ) {
+      if ( this._angleDifference === null ) {
         // compute an angle difference that represents how "much" of the circle our arc covers
         this._angleDifference = this._anticlockwise ? this._startAngle - this._endAngle : this._endAngle - this._startAngle;
         if ( this._angleDifference < 0 ) {
@@ -6085,7 +3461,7 @@ define( 'KITE/segments/Arc',['require','PHET_CORE/inherit','DOT/Vector2','DOT/Bo
     get angleDifference() { return this.getAngleDifference(); },
 
     getBounds: function() {
-      if ( this._bounds === undefined ) {
+      if ( this._bounds === null ) {
         // acceleration for intersection
         this._bounds = Bounds2.NOTHING.copy().withPoint( this.getStart() )
           .withPoint( this.getEnd() );
@@ -6201,11 +3577,11 @@ define( 'KITE/segments/Arc',['require','PHET_CORE/inherit','DOT/Vector2','DOT/Bo
     },
 
     strokeLeft: function( lineWidth ) {
-      return [ new Segment.Arc( this._center, this._radius + ( this._anticlockwise ? 1 : -1 ) * lineWidth / 2, this._startAngle, this._endAngle, this._anticlockwise ) ];
+      return [ new kite.Arc( this._center, this._radius + ( this._anticlockwise ? 1 : -1 ) * lineWidth / 2, this._startAngle, this._endAngle, this._anticlockwise ) ];
     },
 
     strokeRight: function( lineWidth ) {
-      return [ new Segment.Arc( this._center, this._radius + ( this._anticlockwise ? -1 : 1 ) * lineWidth / 2, this._endAngle, this._startAngle, !this._anticlockwise ) ];
+      return [ new kite.Arc( this._center, this._radius + ( this._anticlockwise ? -1 : 1 ) * lineWidth / 2, this._endAngle, this._startAngle, !this._anticlockwise ) ];
     },
 
     // not including 0 and 1
@@ -6230,13 +3606,9 @@ define( 'KITE/segments/Arc',['require','PHET_CORE/inherit','DOT/Vector2','DOT/Bo
       var angleT = this.angleAt( t );
       var angle1 = this.angleAt( 1 );
       return [
-        new Segment.Arc( this._center, this._radius, angle0, angleT, this._anticlockwise ),
-        new Segment.Arc( this._center, this._radius, angleT, angle1, this._anticlockwise )
+        new kite.Arc( this._center, this._radius, angle0, angleT, this._anticlockwise ),
+        new kite.Arc( this._center, this._radius, angleT, angle1, this._anticlockwise )
       ];
-    },
-
-    intersectsBounds: function( bounds ) {
-      throw new Error( 'Segment.intersectsBounds unimplemented!' );
     },
 
     intersection: function( ray ) {
@@ -6337,16 +3709,175 @@ define( 'KITE/segments/Arc',['require','PHET_CORE/inherit','DOT/Vector2','DOT/Bo
       if ( scaleVector.x !== scaleVector.y ) {
         var radiusX = scaleVector.x * this._radius;
         var radiusY = scaleVector.y * this._radius;
-        return new Segment.EllipticalArc( matrix.timesVector2( this._center ), radiusX, radiusY, 0, startAngle, endAngle, anticlockwise );
+        return new kite.EllipticalArc( matrix.timesVector2( this._center ), radiusX, radiusY, 0, startAngle, endAngle, anticlockwise );
       }
       else {
         var radius = scaleVector.x * this._radius;
-        return new Segment.Arc( matrix.timesVector2( this._center ), radius, startAngle, endAngle, anticlockwise );
+        return new kite.Arc( matrix.timesVector2( this._center ), radius, startAngle, endAngle, anticlockwise );
       }
     }
   } );
 
+  Segment.addInvalidatingGetterSetter( Segment.Arc, 'center' );
+  Segment.addInvalidatingGetterSetter( Segment.Arc, 'radius' );
+  Segment.addInvalidatingGetterSetter( Segment.Arc, 'startAngle' );
+  Segment.addInvalidatingGetterSetter( Segment.Arc, 'endAngle' );
+  Segment.addInvalidatingGetterSetter( Segment.Arc, 'anticlockwise' );
+
   return Segment.Arc;
+} );
+
+// Copyright 2002-2014, University of Colorado Boulder
+
+/**
+ * Styles needed to determine a stroked line shape.
+ *
+ * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ */
+
+define( 'KITE/util/LineStyles',['require','KITE/kite','DOT/Util','PHET_CORE/inherit','KITE/segments/Arc','KITE/segments/Line'],function( require ) {
+  
+
+  var kite = require( 'KITE/kite' );
+  var lineLineIntersection = require( 'DOT/Util' ).lineLineIntersection;
+  var inherit = require( 'PHET_CORE/inherit' );
+
+  var Arc = require( 'KITE/segments/Arc' );
+  var Line = require( 'KITE/segments/Line' );
+
+  kite.LineStyles = function( args ) {
+    if ( args === undefined ) {
+      args = {};
+    }
+    this.lineWidth = args.lineWidth !== undefined ? args.lineWidth : 1;
+    this.lineCap = args.lineCap !== undefined ? args.lineCap : 'butt'; // butt, round, square
+    this.lineJoin = args.lineJoin !== undefined ? args.lineJoin : 'miter'; // miter, round, bevel
+    this.lineDash = args.lineDash ? args.lineDash : []; // [] is default, otherwise an array of numbers
+    this.lineDashOffset = args.lineDashOffset !== undefined ? args.lineDashOffset : 0; // 0 default, any number
+    this.miterLimit = args.miterLimit !== undefined ? args.miterLimit : 10; // see https://svgwg.org/svg2-draft/painting.html for miterLimit computations
+
+    assert && assert( Array.isArray( this.lineDash ) );
+  };
+  var LineStyles = kite.LineStyles;
+
+  inherit( Object, LineStyles, {
+
+    equals: function( other ) {
+      var typical = this.lineWidth === other.lineWidth &&
+                    this.lineCap === other.lineCap &&
+                    this.lineJoin === other.lineJoin &&
+                    this.miterLimit === other.miterLimit &&
+                    this.lineDashOffset === other.lineDashOffset;
+      if ( !typical ) {
+        return false;
+      }
+
+      if ( this.lineDash.length === other.lineDash.length ) {
+        for ( var i = 0; i < this.lineDash.length; i++ ) {
+          if ( this.lineDash[ i ] !== other.lineDash[ i ] ) {
+            return false;
+          }
+        }
+      }
+      else {
+        // line dashes must be different
+        return false;
+      }
+
+      return true;
+    },
+
+    /*
+     * Creates an array of Segments that make up a line join, to the left side.
+     *
+     * Joins two segments together on the logical "left" side, at 'center' (where they meet), and un-normalized tangent
+     * vectors in the direction of the stroking. To join on the "right" side, switch the tangent order and negate them.
+     */
+    leftJoin: function( center, fromTangent, toTangent ) {
+      fromTangent = fromTangent.normalized();
+      toTangent = toTangent.normalized();
+
+      // where our join path starts and ends
+      var fromPoint = center.plus( fromTangent.perpendicular().negated().times( this.lineWidth / 2 ) );
+      var toPoint = center.plus( toTangent.perpendicular().negated().times( this.lineWidth / 2 ) );
+
+      var bevel = ( fromPoint.equals( toPoint ) ? [] : [ new Line( fromPoint, toPoint ) ] );
+
+      // only insert a join on the non-acute-angle side
+      if ( fromTangent.perpendicular().dot( toTangent ) > 0 ) {
+        switch( this.lineJoin ) {
+          case 'round':
+            var fromAngle = fromTangent.angle() + Math.PI / 2;
+            var toAngle = toTangent.angle() + Math.PI / 2;
+            return [ new Arc( center, this.lineWidth / 2, fromAngle, toAngle, true ) ];
+          case 'miter':
+            var theta = fromTangent.angleBetween( toTangent.negated() );
+            if ( 1 / Math.sin( theta / 2 ) <= this.miterLimit && theta < Math.PI - 0.00001 ) {
+              // draw the miter
+              var miterPoint = lineLineIntersection( fromPoint, fromPoint.plus( fromTangent ), toPoint, toPoint.plus( toTangent ) );
+              return [
+                new Line( fromPoint, miterPoint ),
+                new Line( miterPoint, toPoint )
+              ];
+            }
+            else {
+              // angle too steep, use bevel instead. same as below, but copied for linter
+              return bevel;
+            }
+            break;
+          case 'bevel':
+            return bevel;
+        }
+      }
+      else {
+        // no join necessary here since we have the acute angle. just simple lineTo for now so that the next segment starts from the right place
+        // TODO: can we prevent self-intersection here?
+        return bevel;
+      }
+    },
+
+    /*
+     * Creates an array of Segments that make up a line join, to the right side.
+     *
+     * Joins two segments together on the logical "right" side, at 'center' (where they meet), and normalized tangent
+     * vectors in the direction of the stroking. To join on the "left" side, switch the tangent order and negate them.
+     */
+    rightJoin: function( center, fromTangent, toTangent ) {
+      return this.leftJoin( center, toTangent.negated(), fromTangent.negated() );
+    },
+
+    /*
+     * Creates an array of Segments that make up a line cap from the endpoint 'center' in the direction of the tangent
+     */
+    cap: function( center, tangent ) {
+      tangent = tangent.normalized();
+
+      var fromPoint = center.plus( tangent.perpendicular().times( -this.lineWidth / 2 ) );
+      var toPoint = center.plus( tangent.perpendicular().times( this.lineWidth / 2 ) );
+
+      switch( this.lineCap ) {
+        case 'butt':
+          return [ new Line( fromPoint, toPoint ) ];
+        case 'round':
+          var tangentAngle = tangent.angle();
+          return [ new Arc( center, this.lineWidth / 2, tangentAngle + Math.PI / 2, tangentAngle - Math.PI / 2, true ) ];
+        case 'square':
+          var toLeft = tangent.perpendicular().negated().times( this.lineWidth / 2 );
+          var toRight = tangent.perpendicular().times( this.lineWidth / 2 );
+          var toFront = tangent.times( this.lineWidth / 2 );
+
+          var left = center.plus( toLeft ).plus( toFront );
+          var right = center.plus( toRight ).plus( toFront );
+          return [
+            new Line( fromPoint, left ),
+            new Line( left, right ),
+            new Line( right, toPoint )
+          ];
+      }
+    }
+  } );
+
+  return kite.LineStyles;
 } );
 
 // Copyright 2002-2014, University of Colorado Boulder
@@ -6360,19 +3891,26 @@ define( 'KITE/segments/Arc',['require','PHET_CORE/inherit','DOT/Vector2','DOT/Bo
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-define( 'KITE/util/Subpath',['require','DOT/Bounds2','KITE/kite','KITE/segments/Line','KITE/segments/Arc'],function( require ) {
+define( 'KITE/util/Subpath',['require','DOT/Bounds2','PHET_CORE/inherit','AXON/Events','KITE/kite','KITE/segments/Line','KITE/segments/Arc','KITE/util/LineStyles'],function( require ) {
   
 
   var Bounds2 = require( 'DOT/Bounds2' );
+  var inherit = require( 'PHET_CORE/inherit' );
+  var Events = require( 'AXON/Events' );
 
   var kite = require( 'KITE/kite' );
 
-  require( 'KITE/segments/Line' );
-  require( 'KITE/segments/Arc' );
+  var Line = require( 'KITE/segments/Line' );
+  var Arc = require( 'KITE/segments/Arc' );
+  var LineStyles = require( 'KITE/util/LineStyles' );
 
   // all arguments optional (they are for the copy() method)
   kite.Subpath = function Subpath( segments, points, closed ) {
-    this.segments = segments || [];
+    Events.call( this );
+
+    var self = this;
+
+    this.segments = [];
 
     // recombine points if necessary, based off of start points of segments + the end point of the last segment
     this.points = points || ( ( segments && segments.length ) ? _.map( segments, function( segment ) { return segment.start; } ).concat( segments[ segments.length - 1 ].end ) : [] );
@@ -6383,27 +3921,71 @@ define( 'KITE/util/Subpath',['require','DOT/Bounds2','KITE/kite','KITE/segments/
     this._strokedSubpathsComputed = false;
     this._strokedStyles = null;
 
-    var bounds = this.bounds = Bounds2.NOTHING.copy();
-    _.each( this.segments, function( segment ) {
-      bounds.includeBounds( segment.bounds );
-    } );
+    this._bounds = null; // {Bounds2 | null} - If non-null, the bounds of the subpath
+
+    this._invalidateListener = this.invalidate.bind( this );
+    this._invalidatingPoints = false; // So we can invalidate all of the points without firing invalidation tons of times
+
+    // Add all segments directly (hooks up invalidation listeners properly)
+    if ( segments ) {
+      for ( var i = 0; i < segments.length; i++ ) {
+        _.each( segments[i].getNondegenerateSegments(), function( segment ) {
+          self.addSegmentDirectly( segment );
+        } );
+      }
+    }
   };
   var Subpath = kite.Subpath;
-  Subpath.prototype = {
+
+  inherit( Events, Subpath, {
+    getBounds: function() {
+      if ( this._bounds === null ) {
+        var bounds = Bounds2.NOTHING.copy();
+        _.each( this.segments, function( segment ) {
+          bounds.includeBounds( segment.getBounds() );
+        } );
+        this._bounds = bounds;
+      }
+      return this._bounds;
+    },
+    get bounds() { return this.getBounds(); },
+
     copy: function() {
       return new Subpath( this.segments.slice( 0 ), this.points.slice( 0 ), this.closed );
     },
 
+    invalidatePoints: function() {
+      this._invalidatingPoints = true;
+
+      var numSegments = this.segments.length;
+      for ( var i = 0; i < numSegments; i++ ) {
+        this.segments[i].invalidate();
+      }
+
+      this._invalidatingPoints = false;
+      this.invalidate();
+    },
+
     invalidate: function() {
-      this._strokedSubpathsComputed = false;
+      if ( !this._invalidatingPoints ) {
+        this._bounds = null;
+        this._strokedSubpathsComputed = false;
+        this.trigger0( 'invalidated' );
+      }
     },
 
     addPoint: function( point ) {
+
+     /* if ( (!_.isFinite(point.x )) || (!_.isFinite( point.y )) ) {
+        debugger;
+      } */
+
       this.points.push( point );
 
       return this; // allow chaining
     },
 
+    // @private - REALLY! Make sure we invalidate() after this is called
     addSegmentDirectly: function( segment ) {
       assert && assert( segment.start.isFinite(), 'Segment start is infinite' );
       assert && assert( segment.end.isFinite(), 'Segment end is infinite' );
@@ -6411,9 +3993,10 @@ define( 'KITE/util/Subpath',['require','DOT/Bounds2','KITE/kite','KITE/segments/
       assert && assert( segment.endTangent.isFinite(), 'Segment endTangent is infinite' );
       assert && assert( segment.bounds.isEmpty() || segment.bounds.isFinite(), 'Segment bounds is infinite and non-empty' );
       this.segments.push( segment );
-      this.invalidate();
 
-      this.bounds.includeBounds( segment.getBounds() );
+      // Hook up an invalidation listener, so if this segment is invalidated, it will invalidate our subpath!
+      // NOTE: if we add removal of segments, we'll need to remove these listeners, or we'll leak!
+      segment.onStatic( 'invalidated', this._invalidateListener );
 
       return this; // allow chaining
     },
@@ -6423,6 +4006,7 @@ define( 'KITE/util/Subpath',['require','DOT/Bounds2','KITE/kite','KITE/segments/
       _.each( segment.getNondegenerateSegments(), function( segment ) {
         subpath.addSegmentDirectly( segment );
       } );
+      this.invalidate(); // need to invalidate after addSegmentDirectly
 
       return this; // allow chaining
     },
@@ -6433,6 +4017,7 @@ define( 'KITE/util/Subpath',['require','DOT/Bounds2','KITE/kite','KITE/segments/
       if ( this.hasClosingSegment() ) {
         var closingSegment = this.getClosingSegment();
         this.addSegmentDirectly( closingSegment );
+        this.invalidate(); // need to invalidate after addSegmentDirectly
         this.addPoint( this.getFirstPoint() );
         this.closed = true;
       }
@@ -6477,7 +4062,7 @@ define( 'KITE/util/Subpath',['require','DOT/Bounds2','KITE/kite','KITE/segments/
 
     getClosingSegment: function() {
       assert && assert( this.hasClosingSegment(), 'Implicit closing segment unnecessary on a fully closed path' );
-      return new kite.Segment.Line( this.getLastPoint(), this.getFirstPoint() );
+      return new Line( this.getLastPoint(), this.getFirstPoint() );
     },
 
     writeToContext: function( context ) {
@@ -6572,7 +4157,7 @@ define( 'KITE/util/Subpath',['require','DOT/Bounds2','KITE/kite','KITE/segments/
           var startAngle = fromTangent.perpendicular().negated().times( distance ).angle();
           var endAngle = toTangent.perpendicular().negated().times( distance ).angle();
           var anticlockwise = fromTangent.perpendicular().dot( toTangent ) > 0;
-          segments.push( new kite.Segment.Arc( center, Math.abs( distance ), startAngle, endAngle, anticlockwise ) );
+          segments.push( new Arc( center, Math.abs( distance ), startAngle, endAngle, anticlockwise ) );
         }
         segments = segments.concat( offsets[ i ] );
       }
@@ -6588,7 +4173,7 @@ define( 'KITE/util/Subpath',['require','DOT/Bounds2','KITE/kite','KITE/segments/
       }
 
       if ( lineStyles === undefined ) {
-        lineStyles = new kite.LineStyles();
+        lineStyles = new LineStyles();
       }
 
       // return a cached version if possible
@@ -6615,7 +4200,7 @@ define( 'KITE/util/Subpath',['require','DOT/Bounds2','KITE/kite','KITE/segments/
       // we don't need to insert an implicit closing segment if the start and end points are the same
       var alreadyClosed = lastSegment.end.equals( firstSegment.start );
       // if there is an implicit closing segment
-      var closingSegment = alreadyClosed ? null : new kite.Segment.Line( this.segments[ this.segments.length - 1 ].end, this.segments[ 0 ].start );
+      var closingSegment = alreadyClosed ? null : new Line( this.segments[ this.segments.length - 1 ].end, this.segments[ 0 ].start );
 
       // stroke the logical "left" side of our path
       for ( i = 0; i < this.segments.length; i++ ) {
@@ -6667,19 +4252,19 @@ define( 'KITE/util/Subpath',['require','DOT/Bounds2','KITE/kite','KITE/segments/
 
       this._strokedSubpaths = subpaths;
       this._strokedSubpathsComputed = true;
-      this._strokedStyles = new kite.LineStyles( lineStyles ); // shallow copy, since we consider linestyles to be mutable
+      this._strokedStyles = new LineStyles( lineStyles ); // shallow copy, since we consider linestyles to be mutable
 
       return subpaths;
     }
-  };
+  } );
 
   return kite.Subpath;
 } );
 
-// generated from svgPath.pegjs, with added kite namespace and require.js compatibility
+// NOTE: Generated from svgPath.pegjs using PEG.js, with added kite namespace and require.js compatibility.
+// See svgPath.pegjs for more documentation, or run "grunt generate-svgPath-parser" to regenerate.
 
 define( 'KITE/parser/svgPath',['require','KITE/kite'],function( require ) {
-
   var kite = require( 'KITE/kite' );
 
   /*
@@ -6711,7 +4296,7 @@ define( 'KITE/parser/svgPath',['require','KITE/kite'],function( require ) {
            + '"';
   }
 
-  kite.svgPath = {
+  var result = {
     /*
      * Parses the input with a generated parser. If the parsing is successfull,
      * returns a value explicitly or implicitly specified by the grammar from
@@ -9346,12 +6931,10 @@ define( 'KITE/parser/svgPath',['require','KITE/kite'],function( require ) {
 
 
       function createMoveTo( args, isRelative ) {
-        var result = [
-          {
-            cmd: isRelative ? 'moveToRelative' : 'moveTo',
-            args: [ args[ 0 ].x, args[ 0 ].y ]
-          }
-        ];
+        var result = [ {
+          cmd: isRelative ? 'moveToRelative' : 'moveTo',
+          args: [ args[ 0 ].x, args[ 0 ].y ]
+        } ];
 
         // any other coordinate pairs are implicit lineTos
         if ( args.length > 1 ) {
@@ -9412,7 +6995,6 @@ define( 'KITE/parser/svgPath',['require','KITE/kite'],function( require ) {
     /* Returns the parser source code. */
     toSource: function() { return this._source; }
   };
-  var result = kite.svgPath;
 
   /* Thrown when a parser encounters a syntax error. */
 
@@ -9449,151 +7031,2121 @@ define( 'KITE/parser/svgPath',['require','KITE/kite'],function( require ) {
 
   result.SyntaxError.prototype = Error.prototype;
 
-  return result;
+  kite.svgPath = result;
+  return kite.svgPath;
 } );
 
 // Copyright 2002-2014, University of Colorado Boulder
 
 /**
- * Styles needed to determine a stroked line shape.
+ * Basic 4-dimensional vector
+ *
+ * TODO: sync with Vector2 changes
+ * TODO: add quaternion extension
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-define( 'KITE/util/LineStyles',['require','KITE/kite','DOT/Util'],function( require ) {
+define( 'DOT/Vector4',['require','DOT/dot','DOT/Util'],function( require ) {
   
 
-  var kite = require( 'KITE/kite' );
-  var lineLineIntersection = require( 'DOT/Util' ).lineLineIntersection;
+  var dot = require( 'DOT/dot' );
 
-  kite.LineStyles = function( args ) {
-    if ( args === undefined ) {
-      args = {};
-    }
-    this.lineWidth = args.lineWidth !== undefined ? args.lineWidth : 1;
-    this.lineCap = args.lineCap !== undefined ? args.lineCap : 'butt'; // butt, round, square
-    this.lineJoin = args.lineJoin !== undefined ? args.lineJoin : 'miter'; // miter, round, bevel
-    this.lineDash = args.lineDash ? args.lineDash : []; // [] is default, otherwise an array of numbers
-    this.lineDashOffset = args.lineDashOffset !== undefined ? args.lineDashOffset : 0; // 0 default, any number
-    this.miterLimit = args.miterLimit !== undefined ? args.miterLimit : 10; // see https://svgwg.org/svg2-draft/painting.html for miterLimit computations
+  require( 'DOT/Util' );
+  // require( 'DOT/Vector3' ); // commented out so Require.js doesn't complain about the circular dependency
 
-    assert && assert( Array.isArray( this.lineDash ) );
+  dot.Vector4 = function Vector4( x, y, z, w ) {
+    // allow optional parameters
+    this.x = x !== undefined ? x : 0;
+    this.y = y !== undefined ? y : 0;
+    this.z = z !== undefined ? z : 0;
+    this.w = w !== undefined ? w : 1; // since w could be zero!
   };
-  var LineStyles = kite.LineStyles;
-  LineStyles.prototype = {
-    constructor: LineStyles,
+  var Vector4 = dot.Vector4;
+
+  Vector4.prototype = {
+    constructor: Vector4,
+    isVector4: true,
+    dimension: 4,
+
+    magnitude: function() {
+      return Math.sqrt( this.magnitudeSquared() );
+    },
+
+    magnitudeSquared: function() {
+      this.dot( this );
+    },
+
+    // the distance between this vector (treated as a point) and another point
+    distance: function( point ) {
+      return this.minus( point ).magnitude();
+    },
+
+    // the squared distance between this vector (treated as a point) and another point
+    distanceSquared: function( point ) {
+      return this.minus( point ).magnitudeSquared();
+    },
+
+    dot: function( v ) {
+      return this.x * v.x + this.y * v.y + this.z * v.z + this.w * v.w;
+    },
+
+    isFinite: function() {
+      return isFinite( this.x ) && isFinite( this.y ) && isFinite( this.z ) && isFinite( this.w );
+    },
 
     equals: function( other ) {
-      var typical = this.lineWidth === other.lineWidth &&
-                    this.lineCap === other.lineCap &&
-                    this.lineJoin === other.lineJoin &&
-                    this.miterLimit === other.miterLimit &&
-                    this.lineDashOffset === other.lineDashOffset;
-      if ( !typical ) {
-        return false;
-      }
+      return this.x === other.x && this.y === other.y && this.z === other.z && this.w === other.w;
+    },
 
-      if ( this.lineDash.length === other.lineDash.length ) {
-        for ( var i = 0; i < this.lineDash.length; i++ ) {
-          if ( this.lineDash[ i ] !== other.lineDash[ i ] ) {
-            return false;
-          }
-        }
+    equalsEpsilon: function( other, epsilon ) {
+      if ( !epsilon ) {
+        epsilon = 0;
+      }
+      return Math.abs( this.x - other.x ) + Math.abs( this.y - other.y ) + Math.abs( this.z - other.z ) + Math.abs( this.w - other.w ) <= epsilon;
+    },
+
+    /*---------------------------------------------------------------------------*
+     * Immutables
+     *----------------------------------------------------------------------------*/
+
+    // create a copy, or if a vector is passed in, set that vector to our value
+    copy: function( vector ) {
+      if ( vector ) {
+        return vector.set( this );
       }
       else {
-        // line dashes must be different
-        return false;
+        return new Vector4( this.x, this.y, this.z, this.w );
       }
-
-      return true;
     },
 
-    /*
-     * Creates an array of Segments that make up a line join, to the left side.
-     *
-     * Joins two segments together on the logical "left" side, at 'center' (where they meet), and normalized tangent
-     * vectors in the direction of the stroking. To join on the "right" side, switch the tangent order and negate them.
-     */
-    leftJoin: function( center, fromTangent, toTangent ) {
-      // where our join path starts and ends
-      var fromPoint = center.plus( fromTangent.perpendicular().negated().times( this.lineWidth / 2 ) );
-      var toPoint = center.plus( toTangent.perpendicular().negated().times( this.lineWidth / 2 ) );
-
-      var bevel = ( fromPoint.equals( toPoint ) ? [] : [ new kite.Segment.Line( fromPoint, toPoint ) ] );
-
-      // only insert a join on the non-acute-angle side
-      if ( fromTangent.perpendicular().dot( toTangent ) > 0 ) {
-        switch( this.lineJoin ) {
-          case 'round':
-            var fromAngle = fromTangent.angle() + Math.PI / 2;
-            var toAngle = toTangent.angle() + Math.PI / 2;
-            return [ new kite.Segment.Arc( center, this.lineWidth / 2, fromAngle, toAngle, true ) ];
-          case 'miter':
-            var theta = fromTangent.angleBetween( toTangent.negated() );
-            if ( 1 / Math.sin( theta / 2 ) <= this.miterLimit && theta < Math.PI - 0.00001 ) {
-              // draw the miter
-              var miterPoint = lineLineIntersection( fromPoint, fromPoint.plus( fromTangent ), toPoint, toPoint.plus( toTangent ) );
-              return [
-                new kite.Segment.Line( fromPoint, miterPoint ),
-                new kite.Segment.Line( miterPoint, toPoint )
-              ];
-            }
-            else {
-              // angle too steep, use bevel instead. same as below, but copied for linter
-              return bevel;
-            }
-            break;
-          case 'bevel':
-            return bevel;
-        }
+    normalized: function() {
+      var mag = this.magnitude();
+      if ( mag === 0 ) {
+        throw new Error( "Cannot normalize a zero-magnitude vector" );
       }
       else {
-        // no join necessary here since we have the acute angle. just simple lineTo for now so that the next segment starts from the right place
-        // TODO: can we prevent self-intersection here?
-        return bevel;
+        return new Vector4( this.x / mag, this.y / mag, this.z / mag, this.w / mag );
       }
     },
 
-    /*
-     * Creates an array of Segments that make up a line join, to the right side.
-     *
-     * Joins two segments together on the logical "right" side, at 'center' (where they meet), and normalized tangent
-     * vectors in the direction of the stroking. To join on the "left" side, switch the tangent order and negate them.
-     */
-    rightJoin: function( center, fromTangent, toTangent ) {
-      return this.leftJoin( center, toTangent.negated(), fromTangent.negated() );
+    timesScalar: function( scalar ) {
+      return new Vector4( this.x * scalar, this.y * scalar, this.z * scalar, this.w * scalar );
     },
 
-    /*
-     * Creates an array of Segments that make up a line cap from the endpoint 'center' in the direction of the tangent
-     */
-    cap: function( center, tangent ) {
-      var fromPoint = center.plus( tangent.perpendicular().times( -this.lineWidth / 2 ) );
-      var toPoint = center.plus( tangent.perpendicular().times( this.lineWidth / 2 ) );
+    times: function( scalar ) {
+      // make sure it's not a vector!
+      assert && assert( scalar.dimension === undefined );
+      return this.timesScalar( scalar );
+    },
 
-      switch( this.lineCap ) {
-        case 'butt':
-          return [ new kite.Segment.Line( fromPoint, toPoint ) ];
-        case 'round':
-          var tangentAngle = tangent.angle();
-          return [ new kite.Segment.Arc( center, this.lineWidth / 2, tangentAngle + Math.PI / 2, tangentAngle - Math.PI / 2, true ) ];
-        case 'square':
-          var toLeft = tangent.perpendicular().negated().times( this.lineWidth / 2 );
-          var toRight = tangent.perpendicular().times( this.lineWidth / 2 );
-          var toFront = tangent.times( this.lineWidth / 2 );
+    componentTimes: function( v ) {
+      return new Vector4( this.x * v.x, this.y * v.y, this.z * v.z, this.w * v.w );
+    },
 
-          var left = center.plus( toLeft ).plus( toFront );
-          var right = center.plus( toRight ).plus( toFront );
-          return [
-            new kite.Segment.Line( fromPoint, left ),
-            new kite.Segment.Line( left, right ),
-            new kite.Segment.Line( right, toPoint )
-          ];
+    plus: function( v ) {
+      return new Vector4( this.x + v.x, this.y + v.y, this.z + v.z, this.w + v.w );
+    },
+
+    plusScalar: function( scalar ) {
+      return new Vector4( this.x + scalar, this.y + scalar, this.z + scalar, this.w + scalar );
+    },
+
+    minus: function( v ) {
+      return new Vector4( this.x - v.x, this.y - v.y, this.z - v.z, this.w - v.w );
+    },
+
+    minusScalar: function( scalar ) {
+      return new Vector4( this.x - scalar, this.y - scalar, this.z - scalar, this.w - scalar );
+    },
+
+    dividedScalar: function( scalar ) {
+      return new Vector4( this.x / scalar, this.y / scalar, this.z / scalar, this.w / scalar );
+    },
+
+    negated: function() {
+      return new Vector4( -this.x, -this.y, -this.z, -this.w );
+    },
+
+    angleBetween: function( v ) {
+      return Math.acos( dot.clamp( this.normalized().dot( v.normalized() ), -1, 1 ) );
+    },
+
+    // linear interpolation from this (ratio=0) to vector (ratio=1)
+    blend: function( vector, ratio ) {
+      return this.plus( vector.minus( this ).times( ratio ) );
+    },
+
+    // average position between this and the provided vector
+    average: function( vector ) {
+      return this.blend( vector, 0.5 );
+    },
+
+    toString: function() {
+      return "Vector4(" + this.x + ", " + this.y + ", " + this.z + ", " + this.w + ")";
+    },
+
+    toVector3: function() {
+      return new dot.Vector3( this.x, this.y, this.z );
+    },
+
+    /*---------------------------------------------------------------------------*
+     * Mutables
+     *----------------------------------------------------------------------------*/
+
+    // our core mutables (all mutation should go through these)
+    setXYZW: function( x, y, z, w ) {
+      this.x = x;
+      this.y = y;
+      this.z = z;
+      this.w = w;
+      return this;
+    },
+    setX: function( x ) {
+      this.x = x;
+      return this;
+    },
+    setY: function( y ) {
+      this.y = y;
+      return this;
+    },
+    setZ: function( z ) {
+      this.z = z;
+      return this;
+    },
+    setW: function( w ) {
+      this.w = w;
+      return this;
+    },
+
+    set: function( v ) {
+      return this.setXYZW( v.x, v.y, v.z, v.w );
+    },
+
+    add: function( v ) {
+      return this.setXYZW( this.x + v.x, this.y + v.y, this.z + v.z, this.w + v.w );
+    },
+
+    addScalar: function( scalar ) {
+      return this.setXYZW( this.x + scalar, this.y + scalar, this.z + scalar, this.w + scalar );
+    },
+
+    subtract: function( v ) {
+      return this.setXYZW( this.x - v.x, this.y - v.y, this.z - v.z, this.w - v.w );
+    },
+
+    subtractScalar: function( scalar ) {
+      return this.setXYZW( this.x - scalar, this.y - scalar, this.z - scalar, this.w - scalar );
+    },
+
+    multiplyScalar: function( scalar ) {
+      return this.setXYZW( this.x * scalar, this.y * scalar, this.z * scalar, this.w * scalar );
+    },
+
+    multiply: function( scalar ) {
+      // make sure it's not a vector!
+      assert && assert( scalar.dimension === undefined );
+      return this.multiplyScalar( scalar );
+    },
+
+    componentMultiply: function( v ) {
+      return this.setXYZW( this.x * v.x, this.y * v.y, this.z * v.z, this.w * v.w );
+    },
+
+    divideScalar: function( scalar ) {
+      return this.setXYZW( this.x / scalar, this.y / scalar, this.z / scalar, this.w / scalar );
+    },
+
+    negate: function() {
+      return this.setXYZW( -this.x, -this.y, -this.z, -this.w );
+    },
+
+    normalize: function() {
+      var mag = this.magnitude();
+      if ( mag === 0 ) {
+        throw new Error( "Cannot normalize a zero-magnitude vector" );
+      }
+      else {
+        return this.divideScalar( mag );
+      }
+      return this;
+    }
+  };
+
+  /*---------------------------------------------------------------------------*
+   * Immutable Vector form
+   *----------------------------------------------------------------------------*/
+  Vector4.Immutable = function( x, y, z, w ) {
+    this.x = x !== undefined ? x : 0;
+    this.y = y !== undefined ? y : 0;
+    this.z = z !== undefined ? z : 0;
+    this.w = w !== undefined ? w : 1;
+  };
+  var Immutable = Vector4.Immutable;
+
+  Immutable.prototype = new Vector4();
+  Immutable.prototype.constructor = Immutable;
+
+  // throw errors whenever a mutable method is called on our immutable vector
+  Immutable.mutableOverrideHelper = function( mutableFunctionName ) {
+    Immutable.prototype[ mutableFunctionName ] = function() {
+      throw new Error( "Cannot call mutable method '" + mutableFunctionName + "' on immutable Vector4" );
+    };
+  };
+
+  // TODO: better way to handle this list?
+  Immutable.mutableOverrideHelper( 'setXYZW' );
+  Immutable.mutableOverrideHelper( 'setX' );
+  Immutable.mutableOverrideHelper( 'setY' );
+  Immutable.mutableOverrideHelper( 'setZ' );
+  Immutable.mutableOverrideHelper( 'setW' );
+
+  // helpful immutable constants
+  Vector4.ZERO = new Immutable( 0, 0, 0, 0 );
+  Vector4.X_UNIT = new Immutable( 1, 0, 0, 0 );
+  Vector4.Y_UNIT = new Immutable( 0, 1, 0, 0 );
+  Vector4.Z_UNIT = new Immutable( 0, 0, 1, 0 );
+  Vector4.W_UNIT = new Immutable( 0, 0, 0, 1 );
+
+  return Vector4;
+} );
+
+// Copyright 2002-2014, University of Colorado Boulder
+
+/**
+ * Basic 3-dimensional vector
+ *
+ * TODO: sync with Vector2 changes
+ *
+ * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ */
+
+define( 'DOT/Vector3',['require','DOT/dot','DOT/Util','DOT/Vector2','DOT/Vector4'],function( require ) {
+  
+
+  var dot = require( 'DOT/dot' );
+
+  require( 'DOT/Util' );
+  require( 'DOT/Vector2' );
+  require( 'DOT/Vector4' );
+
+  dot.Vector3 = function Vector3( x, y, z ) {
+    // allow optional parameters
+    this.x = x !== undefined ? x : 0;
+    this.y = y !== undefined ? y : 0;
+    this.z = z !== undefined ? z : 0;
+  };
+  var Vector3 = dot.Vector3;
+
+  Vector3.prototype = {
+    constructor: Vector3,
+    isVector3: true,
+    dimension: 3,
+
+    magnitude: function() {
+      return Math.sqrt( this.magnitudeSquared() );
+    },
+
+    magnitudeSquared: function() {
+      return this.dot( this );
+    },
+
+    // the distance between this vector (treated as a point) and another point
+    distance: function( point ) {
+      return Math.sqrt( this.distanceSquared( point ) );
+    },
+
+    // the squared distance between this vector (treated as a point) and another point
+    distanceSquared: function( point ) {
+      var dx = this.x - point.x;
+      var dy = this.y - point.y;
+      var dz = this.z - point.z;
+      return dx * dx + dy * dy + dz * dz;
+    },
+
+    dot: function( v ) {
+      return this.x * v.x + this.y * v.y + this.z * v.z;
+    },
+
+    isFinite: function() {
+      return isFinite( this.x ) && isFinite( this.y ) && isFinite( this.z );
+    },
+
+    equals: function( other ) {
+      return this.x === other.x && this.y === other.y && this.z === other.z;
+    },
+
+    equalsEpsilon: function( other, epsilon ) {
+      if ( !epsilon ) {
+        epsilon = 0;
+      }
+      return Math.abs( this.x - other.x ) + Math.abs( this.y - other.y ) + Math.abs( this.z - other.z ) <= epsilon;
+    },
+
+    /*---------------------------------------------------------------------------*
+     * Immutables
+     *----------------------------------------------------------------------------*/
+
+    // create a copy, or if a vector is passed in, set that vector to our value
+    copy: function( vector ) {
+      if ( vector ) {
+        return vector.set( this );
+      }
+      else {
+        return new Vector3( this.x, this.y, this.z );
+      }
+    },
+
+    cross: function( v ) {
+      return new Vector3(
+        this.y * v.z - this.z * v.y,
+        this.z * v.x - this.x * v.z,
+        this.x * v.y - this.y * v.x
+      );
+    },
+
+    normalized: function() {
+      var mag = this.magnitude();
+      if ( mag === 0 ) {
+        throw new Error( "Cannot normalize a zero-magnitude vector" );
+      }
+      else {
+        return new Vector3( this.x / mag, this.y / mag, this.z / mag );
+      }
+    },
+
+    withMagnitude: function( magnitude ) {
+      return this.copy().setMagnitude( magnitude );
+    },
+
+    timesScalar: function( scalar ) {
+      return new Vector3( this.x * scalar, this.y * scalar, this.z * scalar );
+    },
+
+    times: function( scalar ) {
+      // make sure it's not a vector!
+      assert && assert( scalar.dimension === undefined );
+      return this.timesScalar( scalar );
+    },
+
+    componentTimes: function( v ) {
+      return new Vector3( this.x * v.x, this.y * v.y, this.z * v.z );
+    },
+
+    plus: function( v ) {
+      return new Vector3( this.x + v.x, this.y + v.y, this.z + v.z );
+    },
+
+    plusScalar: function( scalar ) {
+      return new Vector3( this.x + scalar, this.y + scalar, this.z + scalar );
+    },
+
+    minus: function( v ) {
+      return new Vector3( this.x - v.x, this.y - v.y, this.z - v.z );
+    },
+
+    minusScalar: function( scalar ) {
+      return new Vector3( this.x - scalar, this.y - scalar, this.z - scalar );
+    },
+
+    dividedScalar: function( scalar ) {
+      return new Vector3( this.x / scalar, this.y / scalar, this.z / scalar );
+    },
+
+    negated: function() {
+      return new Vector3( -this.x, -this.y, -this.z );
+    },
+
+    angleBetween: function( v ) {
+      return Math.acos( dot.clamp( this.normalized().dot( v.normalized() ), -1, 1 ) );
+    },
+
+    // linear interpolation from this (ratio=0) to vector (ratio=1)
+    blend: function( vector, ratio ) {
+      return this.plus( vector.minus( this ).times( ratio ) );
+    },
+
+    // average position between this and the provided vector
+    average: function( vector ) {
+      return this.blend( vector, 0.5 );
+    },
+
+    toString: function() {
+      return "Vector3(" + this.x + ", " + this.y + ", " + this.z + ")";
+    },
+
+    toVector2: function() {
+      return new dot.Vector2( this.x, this.y );
+    },
+
+    toVector4: function() {
+      return new dot.Vector4( this.x, this.y, this.z );
+    },
+
+    /*---------------------------------------------------------------------------*
+     * Mutables
+     *----------------------------------------------------------------------------*/
+
+    // our core mutables, all mutation should go through these
+    setXYZ: function( x, y, z ) {
+      this.x = x;
+      this.y = y;
+      this.z = z;
+      return this;
+    },
+    setX: function( x ) {
+      this.x = x;
+      return this;
+    },
+    setY: function( y ) {
+      this.y = y;
+      return this;
+    },
+    setZ: function( z ) {
+      this.z = z;
+      return this;
+    },
+
+    set: function( v ) {
+      return this.setXYZ( v.x, v.y, v.z );
+    },
+
+    // sets the magnitude of the vector, keeping the same direction (though a negative magnitude will flip the vector direction)
+    setMagnitude: function( m ) {
+      var scale = m / this.magnitude();
+      return this.multiplyScalar( scale );
+    },
+
+    add: function( v ) {
+      return this.setXYZ( this.x + v.x, this.y + v.y, this.z + v.z );
+    },
+
+    addScalar: function( scalar ) {
+      return this.setXYZ( this.x + scalar, this.y + scalar, this.z + scalar );
+    },
+
+    subtract: function( v ) {
+      return this.setXYZ( this.x - v.x, this.y - v.y, this.z - v.z );
+    },
+
+    subtractScalar: function( scalar ) {
+      return this.setXYZ( this.x - scalar, this.y - scalar, this.z - scalar );
+    },
+
+    multiplyScalar: function( scalar ) {
+      return this.setXYZ( this.x * scalar, this.y * scalar, this.z * scalar );
+    },
+
+    multiply: function( scalar ) {
+      // make sure it's not a vector!
+      assert && assert( scalar.dimension === undefined );
+      return this.multiplyScalar( scalar );
+    },
+
+    componentMultiply: function( v ) {
+      return this.setXYZ( this.x * v.x, this.y * v.y, this.z * v.z );
+    },
+
+    divideScalar: function( scalar ) {
+      return this.setXYZ( this.x / scalar, this.y / scalar, this.z / scalar );
+    },
+
+    negate: function() {
+      return this.setXYZ( -this.x, -this.y, -this.z );
+    },
+
+    normalize: function() {
+      var mag = this.magnitude();
+      if ( mag === 0 ) {
+        throw new Error( "Cannot normalize a zero-magnitude vector" );
+      }
+      else {
+        return this.divideScalar( mag );
       }
     }
   };
 
-  return kite.LineStyles;
+  /**
+   * Spherical linear interpolation between two unit vectors.
+   *
+   * @param {Vector3} start - Start unit vector
+   * @param {Vector3} end - End unit vector
+   * @param {number} ratio  - Between 0 (at start vector) and 1 (at end vector)
+   * @return Spherical linear interpolation between the start and end
+   */
+  Vector3.slerp = function( start, end, ratio ) {
+    // NOTE: we can't create a require() loop here
+    return dot.Quaternion.slerp( new dot.Quaternion(), dot.Quaternion.getRotationQuaternion( start, end ), ratio ).timesVector3( start );
+  };
+
+  /*---------------------------------------------------------------------------*
+   * Immutable Vector form
+   *----------------------------------------------------------------------------*/
+  Vector3.Immutable = function( x, y, z ) {
+    this.x = x !== undefined ? x : 0;
+    this.y = y !== undefined ? y : 0;
+    this.z = z !== undefined ? z : 0;
+  };
+  var Immutable = Vector3.Immutable;
+
+  Immutable.prototype = new Vector3();
+  Immutable.prototype.constructor = Immutable;
+
+  // throw errors whenever a mutable method is called on our immutable vector
+  Immutable.mutableOverrideHelper = function( mutableFunctionName ) {
+    Immutable.prototype[ mutableFunctionName ] = function() {
+      throw new Error( "Cannot call mutable method '" + mutableFunctionName + "' on immutable Vector3" );
+    };
+  };
+
+  // TODO: better way to handle this list?
+  Immutable.mutableOverrideHelper( 'setXYZ' );
+  Immutable.mutableOverrideHelper( 'setX' );
+  Immutable.mutableOverrideHelper( 'setY' );
+  Immutable.mutableOverrideHelper( 'setZ' );
+
+  // helpful immutable constants
+  Vector3.ZERO = new Immutable( 0, 0, 0 );
+  Vector3.X_UNIT = new Immutable( 1, 0, 0 );
+  Vector3.Y_UNIT = new Immutable( 0, 1, 0 );
+  Vector3.Z_UNIT = new Immutable( 0, 0, 1 );
+
+  return Vector3;
+} );
+
+// Copyright 2002-2014, University of Colorado Boulder
+
+/**
+ * 4-dimensional Matrix
+ *
+ * TODO: consider adding affine flag if it will help performance (a la Matrix3)
+ * TODO: get rotation angles
+ *
+ * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ */
+
+define( 'DOT/Matrix4',['require','DOT/dot','DOT/Vector3','DOT/Vector4'],function( require ) {
+  
+
+  var dot = require( 'DOT/dot' );
+
+  require( 'DOT/Vector3' );
+  require( 'DOT/Vector4' );
+
+  var Float32Array = window.Float32Array || Array;
+
+  dot.Matrix4 = function Matrix4( v00, v01, v02, v03, v10, v11, v12, v13, v20, v21, v22, v23, v30, v31, v32, v33, type ) {
+
+    // entries stored in column-major format
+    this.entries = new Float32Array( 16 );
+
+    this.rowMajor(
+      v00 !== undefined ? v00 : 1, v01 !== undefined ? v01 : 0, v02 !== undefined ? v02 : 0, v03 !== undefined ? v03 : 0,
+      v10 !== undefined ? v10 : 0, v11 !== undefined ? v11 : 1, v12 !== undefined ? v12 : 0, v13 !== undefined ? v13 : 0,
+      v20 !== undefined ? v20 : 0, v21 !== undefined ? v21 : 0, v22 !== undefined ? v22 : 1, v23 !== undefined ? v23 : 0,
+      v30 !== undefined ? v30 : 0, v31 !== undefined ? v31 : 0, v32 !== undefined ? v32 : 0, v33 !== undefined ? v33 : 1,
+      type );
+  };
+  var Matrix4 = dot.Matrix4;
+
+  Matrix4.Types = {
+    OTHER: 0, // default
+    IDENTITY: 1,
+    TRANSLATION_3D: 2,
+    SCALING: 3,
+    AFFINE: 4
+
+    // TODO: possibly add rotations
+  };
+
+  var Types = Matrix4.Types;
+
+  Matrix4.identity = function() {
+    return new Matrix4(
+      1, 0, 0, 0,
+      0, 1, 0, 0,
+      0, 0, 1, 0,
+      0, 0, 0, 1,
+      Types.IDENTITY );
+  };
+
+  Matrix4.translation = function( x, y, z ) {
+    return new Matrix4(
+      1, 0, 0, x,
+      0, 1, 0, y,
+      0, 0, 1, z,
+      0, 0, 0, 1,
+      Types.TRANSLATION_3D );
+  };
+
+  Matrix4.translationFromVector = function( v ) { return Matrix4.translation( v.x, v.y, v.z ); };
+
+  Matrix4.scaling = function( x, y, z ) {
+    // allow using one parameter to scale everything
+    y = y === undefined ? x : y;
+    z = z === undefined ? x : z;
+
+    return new Matrix4(
+      x, 0, 0, 0,
+      0, y, 0, 0,
+      0, 0, z, 0,
+      0, 0, 0, 1,
+      Types.SCALING );
+  };
+
+  // axis is a normalized Vector3, angle in radians.
+  Matrix4.rotationAxisAngle = function( axis, angle ) {
+    var c = Math.cos( angle );
+    var s = Math.sin( angle );
+    var C = 1 - c;
+
+    return new Matrix4(
+      axis.x * axis.x * C + c, axis.x * axis.y * C - axis.z * s, axis.x * axis.z * C + axis.y * s, 0,
+      axis.y * axis.x * C + axis.z * s, axis.y * axis.y * C + c, axis.y * axis.z * C - axis.x * s, 0,
+      axis.z * axis.x * C - axis.y * s, axis.z * axis.y * C + axis.x * s, axis.z * axis.z * C + c, 0,
+      0, 0, 0, 1,
+      Types.AFFINE );
+  };
+
+  // TODO: add in rotation from quaternion, and from quat + translation
+
+  Matrix4.rotationX = function( angle ) {
+    var c = Math.cos( angle );
+    var s = Math.sin( angle );
+
+    return new Matrix4(
+      1, 0, 0, 0,
+      0, c, -s, 0,
+      0, s, c, 0,
+      0, 0, 0, 1,
+      Types.AFFINE );
+  };
+
+  Matrix4.rotationY = function( angle ) {
+    var c = Math.cos( angle );
+    var s = Math.sin( angle );
+
+    return new Matrix4(
+      c, 0, s, 0,
+      0, 1, 0, 0,
+      -s, 0, c, 0,
+      0, 0, 0, 1,
+      Types.AFFINE );
+  };
+
+  Matrix4.rotationZ = function( angle ) {
+    var c = Math.cos( angle );
+    var s = Math.sin( angle );
+
+    return new Matrix4(
+      c, -s, 0, 0,
+      s, c, 0, 0,
+      0, 0, 1, 0,
+      0, 0, 0, 1,
+      Types.AFFINE );
+  };
+
+  // aspect === width / height
+  Matrix4.gluPerspective = function( fovYRadians, aspect, zNear, zFar ) {
+    var cotangent = Math.cos( fovYRadians ) / Math.sin( fovYRadians );
+
+    return new Matrix4(
+      cotangent / aspect, 0, 0, 0,
+      0, cotangent, 0, 0,
+      0, 0, ( zFar + zNear ) / ( zNear - zFar ), ( 2 * zFar * zNear ) / ( zNear - zFar ),
+      0, 0, -1, 0 );
+  };
+
+  Matrix4.prototype = {
+    constructor: Matrix4,
+
+    rowMajor: function( v00, v01, v02, v03, v10, v11, v12, v13, v20, v21, v22, v23, v30, v31, v32, v33, type ) {
+      this.entries[ 0 ] = v00;
+      this.entries[ 1 ] = v10;
+      this.entries[ 2 ] = v20;
+      this.entries[ 3 ] = v30;
+      this.entries[ 4 ] = v01;
+      this.entries[ 5 ] = v11;
+      this.entries[ 6 ] = v21;
+      this.entries[ 7 ] = v31;
+      this.entries[ 8 ] = v02;
+      this.entries[ 9 ] = v12;
+      this.entries[ 10 ] = v22;
+      this.entries[ 11 ] = v32;
+      this.entries[ 12 ] = v03;
+      this.entries[ 13 ] = v13;
+      this.entries[ 14 ] = v23;
+      this.entries[ 15 ] = v33;
+
+      // TODO: consider performance of the affine check here
+      this.type = type === undefined ? ( ( v30 === 0 && v31 === 0 && v32 === 0 && v33 === 1 ) ? Types.AFFINE : Types.OTHER ) : type;
+      return this;
+    },
+
+    columnMajor: function( v00, v10, v20, v30, v01, v11, v21, v31, v02, v12, v22, v32, v03, v13, v23, v33, type ) {
+      return this.rowMajor( v00, v01, v02, v03, v10, v11, v12, v13, v20, v21, v22, v23, v30, v31, v32, v33, type );
+    },
+
+    set: function( matrix ) {
+      return this.rowMajor(
+        matrix.m00(), matrix.m01(), matrix.m02(), matrix.m03(),
+        matrix.m10(), matrix.m11(), matrix.m12(), matrix.m13(),
+        matrix.m20(), matrix.m21(), matrix.m22(), matrix.m23(),
+        matrix.m30(), matrix.m31(), matrix.m32(), matrix.m33(),
+        matrix.type );
+    },
+
+    // convenience getters. inline usages of these when performance is critical? TODO: test performance of inlining these, with / without closure compiler
+    m00: function() { return this.entries[ 0 ]; },
+    m01: function() { return this.entries[ 4 ]; },
+    m02: function() { return this.entries[ 8 ]; },
+    m03: function() { return this.entries[ 12 ]; },
+    m10: function() { return this.entries[ 1 ]; },
+    m11: function() { return this.entries[ 5 ]; },
+    m12: function() { return this.entries[ 9 ]; },
+    m13: function() { return this.entries[ 13 ]; },
+    m20: function() { return this.entries[ 2 ]; },
+    m21: function() { return this.entries[ 6 ]; },
+    m22: function() { return this.entries[ 10 ]; },
+    m23: function() { return this.entries[ 14 ]; },
+    m30: function() { return this.entries[ 3 ]; },
+    m31: function() { return this.entries[ 7 ]; },
+    m32: function() { return this.entries[ 11 ]; },
+    m33: function() { return this.entries[ 15 ]; },
+
+    isFinite: function() {
+      return isFinite( this.m00() ) &&
+             isFinite( this.m01() ) &&
+             isFinite( this.m02() ) &&
+             isFinite( this.m03() ) &&
+             isFinite( this.m10() ) &&
+             isFinite( this.m11() ) &&
+             isFinite( this.m12() ) &&
+             isFinite( this.m13() ) &&
+             isFinite( this.m20() ) &&
+             isFinite( this.m21() ) &&
+             isFinite( this.m22() ) &&
+             isFinite( this.m23() ) &&
+             isFinite( this.m30() ) &&
+             isFinite( this.m31() ) &&
+             isFinite( this.m32() ) &&
+             isFinite( this.m33() );
+    },
+
+    // the 3D translation, assuming multiplication with a homogeneous vector
+    getTranslation: function() {
+      return new dot.Vector3( this.m03(), this.m13(), this.m23() );
+    },
+    get translation() { return this.getTranslation(); },
+
+    // returns a vector that is equivalent to ( T(1,0,0).magnitude(), T(0,1,0).magnitude(), T(0,0,1).magnitude() )
+    // where T is a relative transform
+    getScaleVector: function() {
+      var m0003 = this.m00() + this.m03();
+      var m1013 = this.m10() + this.m13();
+      var m2023 = this.m20() + this.m23();
+      var m3033 = this.m30() + this.m33();
+      var m0103 = this.m01() + this.m03();
+      var m1113 = this.m11() + this.m13();
+      var m2123 = this.m21() + this.m23();
+      var m3133 = this.m31() + this.m33();
+      var m0203 = this.m02() + this.m03();
+      var m1213 = this.m12() + this.m13();
+      var m2223 = this.m22() + this.m23();
+      var m3233 = this.m32() + this.m33();
+      return new dot.Vector3(
+        Math.sqrt( m0003 * m0003 + m1013 * m1013 + m2023 * m2023 + m3033 * m3033 ),
+        Math.sqrt( m0103 * m0103 + m1113 * m1113 + m2123 * m2123 + m3133 * m3133 ),
+        Math.sqrt( m0203 * m0203 + m1213 * m1213 + m2223 * m2223 + m3233 * m3233 ) );
+    },
+    get scaleVector() { return this.getScaleVector(); },
+
+    getCSSTransform: function() {
+      // See http://www.w3.org/TR/css3-transforms/, particularly Section 13 that discusses the SVG compatibility
+
+      // We need to prevent the numbers from being in an exponential toString form, since the CSS transform does not support that
+      // 20 is the largest guaranteed number of digits according to https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Number/toFixed
+      // See https://github.com/phetsims/dot/issues/36
+
+      // the inner part of a CSS3 transform, but remember to add the browser-specific parts!
+      // NOTE: the toFixed calls are inlined for performance reasons
+      return 'matrix3d(' +
+             this.entries[ 0 ].toFixed( 20 ) + ',' +
+             this.entries[ 1 ].toFixed( 20 ) + ',' +
+             this.entries[ 2 ].toFixed( 20 ) + ',' +
+             this.entries[ 3 ].toFixed( 20 ) + ',' +
+             this.entries[ 4 ].toFixed( 20 ) + ',' +
+             this.entries[ 5 ].toFixed( 20 ) + ',' +
+             this.entries[ 6 ].toFixed( 20 ) + ',' +
+             this.entries[ 7 ].toFixed( 20 ) + ',' +
+             this.entries[ 8 ].toFixed( 20 ) + ',' +
+             this.entries[ 9 ].toFixed( 20 ) + ',' +
+             this.entries[ 10 ].toFixed( 20 ) + ',' +
+             this.entries[ 11 ].toFixed( 20 ) + ',' +
+             this.entries[ 12 ].toFixed( 20 ) + ',' +
+             this.entries[ 13 ].toFixed( 20 ) + ',' +
+             this.entries[ 14 ].toFixed( 20 ) + ',' +
+             this.entries[ 15 ].toFixed( 20 ) + ')';
+    },
+    get cssTransform() { return this.getCSSTransform(); },
+
+    // exact equality
+    equals: function( m ) {
+      return this.m00() === m.m00() && this.m01() === m.m01() && this.m02() === m.m02() && this.m03() === m.m03() &&
+             this.m10() === m.m10() && this.m11() === m.m11() && this.m12() === m.m12() && this.m13() === m.m13() &&
+             this.m20() === m.m20() && this.m21() === m.m21() && this.m22() === m.m22() && this.m23() === m.m23() &&
+             this.m30() === m.m30() && this.m31() === m.m31() && this.m32() === m.m32() && this.m33() === m.m33();
+    },
+
+    // equality within a margin of error
+    equalsEpsilon: function( m, epsilon ) {
+      return Math.abs( this.m00() - m.m00() ) < epsilon &&
+             Math.abs( this.m01() - m.m01() ) < epsilon &&
+             Math.abs( this.m02() - m.m02() ) < epsilon &&
+             Math.abs( this.m03() - m.m03() ) < epsilon &&
+             Math.abs( this.m10() - m.m10() ) < epsilon &&
+             Math.abs( this.m11() - m.m11() ) < epsilon &&
+             Math.abs( this.m12() - m.m12() ) < epsilon &&
+             Math.abs( this.m13() - m.m13() ) < epsilon &&
+             Math.abs( this.m20() - m.m20() ) < epsilon &&
+             Math.abs( this.m21() - m.m21() ) < epsilon &&
+             Math.abs( this.m22() - m.m22() ) < epsilon &&
+             Math.abs( this.m23() - m.m23() ) < epsilon &&
+             Math.abs( this.m30() - m.m30() ) < epsilon &&
+             Math.abs( this.m31() - m.m31() ) < epsilon &&
+             Math.abs( this.m32() - m.m32() ) < epsilon &&
+             Math.abs( this.m33() - m.m33() ) < epsilon;
+    },
+
+    /*---------------------------------------------------------------------------*
+     * Immutable operations (returning a new matrix)
+     *----------------------------------------------------------------------------*/
+
+    copy: function() {
+      return new Matrix4(
+        this.m00(), this.m01(), this.m02(), this.m03(),
+        this.m10(), this.m11(), this.m12(), this.m13(),
+        this.m20(), this.m21(), this.m22(), this.m23(),
+        this.m30(), this.m31(), this.m32(), this.m33(),
+        this.type
+      );
+    },
+
+    plus: function( m ) {
+      return new Matrix4(
+        this.m00() + m.m00(), this.m01() + m.m01(), this.m02() + m.m02(), this.m03() + m.m03(),
+        this.m10() + m.m10(), this.m11() + m.m11(), this.m12() + m.m12(), this.m13() + m.m13(),
+        this.m20() + m.m20(), this.m21() + m.m21(), this.m22() + m.m22(), this.m23() + m.m23(),
+        this.m30() + m.m30(), this.m31() + m.m31(), this.m32() + m.m32(), this.m33() + m.m33()
+      );
+    },
+
+    minus: function( m ) {
+      return new Matrix4(
+        this.m00() - m.m00(), this.m01() - m.m01(), this.m02() - m.m02(), this.m03() - m.m03(),
+        this.m10() - m.m10(), this.m11() - m.m11(), this.m12() - m.m12(), this.m13() - m.m13(),
+        this.m20() - m.m20(), this.m21() - m.m21(), this.m22() - m.m22(), this.m23() - m.m23(),
+        this.m30() - m.m30(), this.m31() - m.m31(), this.m32() - m.m32(), this.m33() - m.m33()
+      );
+    },
+
+    transposed: function() {
+      return new Matrix4(
+        this.m00(), this.m10(), this.m20(), this.m30(),
+        this.m01(), this.m11(), this.m21(), this.m31(),
+        this.m02(), this.m12(), this.m22(), this.m32(),
+        this.m03(), this.m13(), this.m23(), this.m33() );
+    },
+
+    negated: function() {
+      return new Matrix4(
+        -this.m00(), -this.m01(), -this.m02(), -this.m03(),
+        -this.m10(), -this.m11(), -this.m12(), -this.m13(),
+        -this.m20(), -this.m21(), -this.m22(), -this.m23(),
+        -this.m30(), -this.m31(), -this.m32(), -this.m33() );
+    },
+
+    inverted: function() {
+      switch( this.type ) {
+        case Types.IDENTITY:
+          return this;
+        case Types.TRANSLATION_3D:
+          return new Matrix4(
+            1, 0, 0, -this.m03(),
+            0, 1, 0, -this.m13(),
+            0, 0, 1, -this.m23(),
+            0, 0, 0, 1, Types.TRANSLATION_3D );
+        case Types.SCALING:
+          return new Matrix4(
+            1 / this.m00(), 0, 0, 0,
+            0, 1 / this.m11(), 0, 0,
+            0, 0, 1 / this.m22(), 0,
+            0, 0, 0, 1 / this.m33(), Types.SCALING );
+        case Types.AFFINE:
+        case Types.OTHER:
+          var det = this.getDeterminant();
+          if ( det !== 0 ) {
+            return new Matrix4(
+              ( -this.m31() * this.m22() * this.m13() + this.m21() * this.m32() * this.m13() + this.m31() * this.m12() * this.m23() - this.m11() * this.m32() * this.m23() - this.m21() * this.m12() * this.m33() + this.m11() * this.m22() * this.m33() ) / det,
+              ( this.m31() * this.m22() * this.m03() - this.m21() * this.m32() * this.m03() - this.m31() * this.m02() * this.m23() + this.m01() * this.m32() * this.m23() + this.m21() * this.m02() * this.m33() - this.m01() * this.m22() * this.m33() ) / det,
+              ( -this.m31() * this.m12() * this.m03() + this.m11() * this.m32() * this.m03() + this.m31() * this.m02() * this.m13() - this.m01() * this.m32() * this.m13() - this.m11() * this.m02() * this.m33() + this.m01() * this.m12() * this.m33() ) / det,
+              ( this.m21() * this.m12() * this.m03() - this.m11() * this.m22() * this.m03() - this.m21() * this.m02() * this.m13() + this.m01() * this.m22() * this.m13() + this.m11() * this.m02() * this.m23() - this.m01() * this.m12() * this.m23() ) / det,
+              ( this.m30() * this.m22() * this.m13() - this.m20() * this.m32() * this.m13() - this.m30() * this.m12() * this.m23() + this.m10() * this.m32() * this.m23() + this.m20() * this.m12() * this.m33() - this.m10() * this.m22() * this.m33() ) / det,
+              ( -this.m30() * this.m22() * this.m03() + this.m20() * this.m32() * this.m03() + this.m30() * this.m02() * this.m23() - this.m00() * this.m32() * this.m23() - this.m20() * this.m02() * this.m33() + this.m00() * this.m22() * this.m33() ) / det,
+              ( this.m30() * this.m12() * this.m03() - this.m10() * this.m32() * this.m03() - this.m30() * this.m02() * this.m13() + this.m00() * this.m32() * this.m13() + this.m10() * this.m02() * this.m33() - this.m00() * this.m12() * this.m33() ) / det,
+              ( -this.m20() * this.m12() * this.m03() + this.m10() * this.m22() * this.m03() + this.m20() * this.m02() * this.m13() - this.m00() * this.m22() * this.m13() - this.m10() * this.m02() * this.m23() + this.m00() * this.m12() * this.m23() ) / det,
+              ( -this.m30() * this.m21() * this.m13() + this.m20() * this.m31() * this.m13() + this.m30() * this.m11() * this.m23() - this.m10() * this.m31() * this.m23() - this.m20() * this.m11() * this.m33() + this.m10() * this.m21() * this.m33() ) / det,
+              ( this.m30() * this.m21() * this.m03() - this.m20() * this.m31() * this.m03() - this.m30() * this.m01() * this.m23() + this.m00() * this.m31() * this.m23() + this.m20() * this.m01() * this.m33() - this.m00() * this.m21() * this.m33() ) / det,
+              ( -this.m30() * this.m11() * this.m03() + this.m10() * this.m31() * this.m03() + this.m30() * this.m01() * this.m13() - this.m00() * this.m31() * this.m13() - this.m10() * this.m01() * this.m33() + this.m00() * this.m11() * this.m33() ) / det,
+              ( this.m20() * this.m11() * this.m03() - this.m10() * this.m21() * this.m03() - this.m20() * this.m01() * this.m13() + this.m00() * this.m21() * this.m13() + this.m10() * this.m01() * this.m23() - this.m00() * this.m11() * this.m23() ) / det,
+              ( this.m30() * this.m21() * this.m12() - this.m20() * this.m31() * this.m12() - this.m30() * this.m11() * this.m22() + this.m10() * this.m31() * this.m22() + this.m20() * this.m11() * this.m32() - this.m10() * this.m21() * this.m32() ) / det,
+              ( -this.m30() * this.m21() * this.m02() + this.m20() * this.m31() * this.m02() + this.m30() * this.m01() * this.m22() - this.m00() * this.m31() * this.m22() - this.m20() * this.m01() * this.m32() + this.m00() * this.m21() * this.m32() ) / det,
+              ( this.m30() * this.m11() * this.m02() - this.m10() * this.m31() * this.m02() - this.m30() * this.m01() * this.m12() + this.m00() * this.m31() * this.m12() + this.m10() * this.m01() * this.m32() - this.m00() * this.m11() * this.m32() ) / det,
+              ( -this.m20() * this.m11() * this.m02() + this.m10() * this.m21() * this.m02() + this.m20() * this.m01() * this.m12() - this.m00() * this.m21() * this.m12() - this.m10() * this.m01() * this.m22() + this.m00() * this.m11() * this.m22() ) / det
+            );
+          }
+          else {
+            throw new Error( 'Matrix could not be inverted, determinant === 0' );
+          }
+          break; // because JSHint totally can't tell that this can't be reached
+        default:
+          throw new Error( 'Matrix3.inverted with unknown type: ' + this.type );
+      }
+    },
+
+    timesMatrix: function( m ) {
+      // I * M === M * I === I (the identity)
+      if ( this.type === Types.IDENTITY || m.type === Types.IDENTITY ) {
+        return this.type === Types.IDENTITY ? m : this;
+      }
+
+      if ( this.type === m.type ) {
+        // currently two matrices of the same type will result in the same result type
+        if ( this.type === Types.TRANSLATION_3D ) {
+          // faster combination of translations
+          return new Matrix4(
+            1, 0, 0, this.m03() + m.m02(),
+            0, 1, 0, this.m13() + m.m12(),
+            0, 0, 1, this.m23() + m.m23(),
+            0, 0, 0, 1, Types.TRANSLATION_3D );
+        }
+        else if ( this.type === Types.SCALING ) {
+          // faster combination of scaling
+          return new Matrix4(
+            this.m00() * m.m00(), 0, 0, 0,
+            0, this.m11() * m.m11(), 0, 0,
+            0, 0, this.m22() * m.m22(), 0,
+            0, 0, 0, 1, Types.SCALING );
+        }
+      }
+
+      if ( this.type !== Types.OTHER && m.type !== Types.OTHER ) {
+        // currently two matrices that are anything but "other" are technically affine, and the result will be affine
+
+        // affine case
+        return new Matrix4(
+          this.m00() * m.m00() + this.m01() * m.m10() + this.m02() * m.m20(),
+          this.m00() * m.m01() + this.m01() * m.m11() + this.m02() * m.m21(),
+          this.m00() * m.m02() + this.m01() * m.m12() + this.m02() * m.m22(),
+          this.m00() * m.m03() + this.m01() * m.m13() + this.m02() * m.m23() + this.m03(),
+          this.m10() * m.m00() + this.m11() * m.m10() + this.m12() * m.m20(),
+          this.m10() * m.m01() + this.m11() * m.m11() + this.m12() * m.m21(),
+          this.m10() * m.m02() + this.m11() * m.m12() + this.m12() * m.m22(),
+          this.m10() * m.m03() + this.m11() * m.m13() + this.m12() * m.m23() + this.m13(),
+          this.m20() * m.m00() + this.m21() * m.m10() + this.m22() * m.m20(),
+          this.m20() * m.m01() + this.m21() * m.m11() + this.m22() * m.m21(),
+          this.m20() * m.m02() + this.m21() * m.m12() + this.m22() * m.m22(),
+          this.m20() * m.m03() + this.m21() * m.m13() + this.m22() * m.m23() + this.m23(),
+          0, 0, 0, 1, Types.AFFINE );
+      }
+
+      // general case
+      return new Matrix4(
+        this.m00() * m.m00() + this.m01() * m.m10() + this.m02() * m.m20() + this.m03() * m.m30(),
+        this.m00() * m.m01() + this.m01() * m.m11() + this.m02() * m.m21() + this.m03() * m.m31(),
+        this.m00() * m.m02() + this.m01() * m.m12() + this.m02() * m.m22() + this.m03() * m.m32(),
+        this.m00() * m.m03() + this.m01() * m.m13() + this.m02() * m.m23() + this.m03() * m.m33(),
+        this.m10() * m.m00() + this.m11() * m.m10() + this.m12() * m.m20() + this.m13() * m.m30(),
+        this.m10() * m.m01() + this.m11() * m.m11() + this.m12() * m.m21() + this.m13() * m.m31(),
+        this.m10() * m.m02() + this.m11() * m.m12() + this.m12() * m.m22() + this.m13() * m.m32(),
+        this.m10() * m.m03() + this.m11() * m.m13() + this.m12() * m.m23() + this.m13() * m.m33(),
+        this.m20() * m.m00() + this.m21() * m.m10() + this.m22() * m.m20() + this.m23() * m.m30(),
+        this.m20() * m.m01() + this.m21() * m.m11() + this.m22() * m.m21() + this.m23() * m.m31(),
+        this.m20() * m.m02() + this.m21() * m.m12() + this.m22() * m.m22() + this.m23() * m.m32(),
+        this.m20() * m.m03() + this.m21() * m.m13() + this.m22() * m.m23() + this.m23() * m.m33(),
+        this.m30() * m.m00() + this.m31() * m.m10() + this.m32() * m.m20() + this.m33() * m.m30(),
+        this.m30() * m.m01() + this.m31() * m.m11() + this.m32() * m.m21() + this.m33() * m.m31(),
+        this.m30() * m.m02() + this.m31() * m.m12() + this.m32() * m.m22() + this.m33() * m.m32(),
+        this.m30() * m.m03() + this.m31() * m.m13() + this.m32() * m.m23() + this.m33() * m.m33() );
+    },
+
+    timesVector4: function( v ) {
+      var x = this.m00() * v.x + this.m01() * v.y + this.m02() * v.z + this.m03() * v.w;
+      var y = this.m10() * v.x + this.m11() * v.y + this.m12() * v.z + this.m13() * v.w;
+      var z = this.m20() * v.x + this.m21() * v.y + this.m22() * v.z + this.m23() * v.w;
+      var w = this.m30() * v.x + this.m31() * v.y + this.m32() * v.z + this.m33() * v.w;
+      return new dot.Vector4( x, y, z, w );
+    },
+
+    timesVector3: function( v ) {
+      return this.timesVector4( v.toVector4() ).toVector3();
+    },
+
+    timesTransposeVector4: function( v ) {
+      var x = this.m00() * v.x + this.m10() * v.y + this.m20() * v.z + this.m30() * v.w;
+      var y = this.m01() * v.x + this.m11() * v.y + this.m21() * v.z + this.m31() * v.w;
+      var z = this.m02() * v.x + this.m12() * v.y + this.m22() * v.z + this.m32() * v.w;
+      var w = this.m03() * v.x + this.m13() * v.y + this.m23() * v.z + this.m33() * v.w;
+      return new dot.Vector4( x, y, z, w );
+    },
+
+    timesTransposeVector3: function( v ) {
+      return this.timesTransposeVector4( v.toVector4() ).toVector3();
+    },
+
+    timesRelativeVector3: function( v ) {
+      var x = this.m00() * v.x + this.m10() * v.y + this.m20() * v.z;
+      var y = this.m01() * v.y + this.m11() * v.y + this.m21() * v.z;
+      var z = this.m02() * v.z + this.m12() * v.y + this.m22() * v.z;
+      return new dot.Vector3( x, y, z );
+    },
+
+    getDeterminant: function() {
+      return this.m03() * this.m12() * this.m21() * this.m30() -
+             this.m02() * this.m13() * this.m21() * this.m30() -
+             this.m03() * this.m11() * this.m22() * this.m30() +
+             this.m01() * this.m13() * this.m22() * this.m30() +
+             this.m02() * this.m11() * this.m23() * this.m30() -
+             this.m01() * this.m12() * this.m23() * this.m30() -
+             this.m03() * this.m12() * this.m20() * this.m31() +
+             this.m02() * this.m13() * this.m20() * this.m31() +
+             this.m03() * this.m10() * this.m22() * this.m31() -
+             this.m00() * this.m13() * this.m22() * this.m31() -
+             this.m02() * this.m10() * this.m23() * this.m31() +
+             this.m00() * this.m12() * this.m23() * this.m31() +
+             this.m03() * this.m11() * this.m20() * this.m32() -
+             this.m01() * this.m13() * this.m20() * this.m32() -
+             this.m03() * this.m10() * this.m21() * this.m32() +
+             this.m00() * this.m13() * this.m21() * this.m32() +
+             this.m01() * this.m10() * this.m23() * this.m32() -
+             this.m00() * this.m11() * this.m23() * this.m32() -
+             this.m02() * this.m11() * this.m20() * this.m33() +
+             this.m01() * this.m12() * this.m20() * this.m33() +
+             this.m02() * this.m10() * this.m21() * this.m33() -
+             this.m00() * this.m12() * this.m21() * this.m33() -
+             this.m01() * this.m10() * this.m22() * this.m33() +
+             this.m00() * this.m11() * this.m22() * this.m33();
+    },
+    get determinant() { return this.getDeterminant(); },
+
+    toString: function() {
+      return this.m00() + " " + this.m01() + " " + this.m02() + " " + this.m03() + "\n" +
+             this.m10() + " " + this.m11() + " " + this.m12() + " " + this.m13() + "\n" +
+             this.m20() + " " + this.m21() + " " + this.m22() + " " + this.m23() + "\n" +
+             this.m30() + " " + this.m31() + " " + this.m32() + " " + this.m33();
+    },
+
+    makeImmutable: function() {
+      this.rowMajor = function() {
+        throw new Error( "Cannot modify immutable matrix" );
+      };
+    }
+  };
+
+  // create an immutable
+  Matrix4.IDENTITY = new Matrix4();
+  Matrix4.IDENTITY.makeImmutable();
+
+  return Matrix4;
+} );
+
+// Copyright 2002-2014, University of Colorado Boulder
+
+/**
+ * 3-dimensional Matrix
+ *
+ * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ */
+
+define( 'DOT/Matrix3',['require','DOT/dot','PHET_CORE/Poolable','DOT/Vector2','DOT/Vector3','DOT/Matrix4'],function( require ) {
+  
+
+  var dot = require( 'DOT/dot' );
+  var Poolable = require( 'PHET_CORE/Poolable' );
+
+  var FastArray = dot.FastArray;
+
+  require( 'DOT/Vector2' );
+  require( 'DOT/Vector3' );
+  require( 'DOT/Matrix4' );
+
+  var identityFastArray = new FastArray( 9 );
+  identityFastArray[ 0 ] = 1;
+  identityFastArray[ 4 ] = 1;
+  identityFastArray[ 8 ] = 1;
+
+  var createIdentityArray = FastArray === Array ?
+                            function() {
+                              return [ 1, 0, 0, 0, 1, 0, 0, 0, 1 ];
+                            } :
+                            function() {
+                              return new FastArray( identityFastArray );
+                            };
+
+  //Create an identity matrix
+  dot.Matrix3 = function Matrix3( argumentsShouldNotExist ) {
+
+    //Make sure no clients are expecting to create a matrix with non-identity values
+    assert && assert( !argumentsShouldNotExist, 'Matrix3 constructor should not be called with any arguments.  Use Matrix3.createFromPool()/Matrix3.identity()/etc.' );
+
+    // entries stored in column-major format
+    this.entries = createIdentityArray();
+
+    phetAllocation && phetAllocation( 'Matrix3' );
+    this.type = Types.IDENTITY;
+  };
+  var Matrix3 = dot.Matrix3;
+
+  Matrix3.Types = {
+    // NOTE: if an inverted matrix of a type is not that type, change inverted()!
+    // NOTE: if two matrices with identical types are multiplied, the result should have the same type. if not, changed timesMatrix()!
+    // NOTE: on adding a type, exaustively check all type usage
+    OTHER: 0, // default
+    IDENTITY: 1,
+    TRANSLATION_2D: 2,
+    SCALING: 3,
+    AFFINE: 4
+
+    // TODO: possibly add rotations
+  };
+
+  var Types = Matrix3.Types;
+
+  Matrix3.identity = function() { return Matrix3.dirtyFromPool().setToIdentity(); };
+  Matrix3.translation = function( x, y ) { return Matrix3.dirtyFromPool().setToTranslation( x, y ); };
+  Matrix3.translationFromVector = function( v ) { return Matrix3.translation( v.x, v.y ); };
+  Matrix3.scaling = function( x, y ) { return Matrix3.dirtyFromPool().setToScale( x, y ); };
+  Matrix3.scale = Matrix3.scaling;
+  Matrix3.affine = function( m00, m10, m01, m11, m02, m12 ) { return Matrix3.dirtyFromPool().setToAffine( m00, m01, m02, m10, m11, m12 ); };
+  Matrix3.rowMajor = function( v00, v01, v02, v10, v11, v12, v20, v21, v22, type ) { return Matrix3.dirtyFromPool().rowMajor( v00, v01, v02, v10, v11, v12, v20, v21, v22, type ); };
+
+  // axis is a normalized Vector3, angle in radians.
+  Matrix3.rotationAxisAngle = function( axis, angle ) { return Matrix3.dirtyFromPool().setToRotationAxisAngle( axis, angle ); };
+
+  Matrix3.rotationX = function( angle ) { return Matrix3.dirtyFromPool().setToRotationX( angle ); };
+  Matrix3.rotationY = function( angle ) { return Matrix3.dirtyFromPool().setToRotationY( angle ); };
+  Matrix3.rotationZ = function( angle ) { return Matrix3.dirtyFromPool().setToRotationZ( angle ); };
+
+  // standard 2d rotation
+  Matrix3.rotation2 = Matrix3.rotationZ;
+
+  Matrix3.rotationAround = function( angle, x, y ) {
+    return Matrix3.translation( x, y ).timesMatrix( Matrix3.rotation2( angle ) ).timesMatrix( Matrix3.translation( -x, -y ) );
+  };
+
+  Matrix3.rotationAroundPoint = function( angle, point ) {
+    return Matrix3.rotationAround( angle, point.x, point.y );
+  };
+
+  Matrix3.fromSVGMatrix = function( svgMatrix ) { return Matrix3.dirtyFromPool().setToSVGMatrix( svgMatrix ); };
+
+  // a rotation matrix that rotates A to B, by rotating about the axis A.cross( B ) -- Shortest path. ideally should be unit vectors
+  Matrix3.rotateAToB = function( a, b ) { return Matrix3.dirtyFromPool().setRotationAToB( a, b ); };
+
+  Matrix3.prototype = {
+    constructor: Matrix3,
+
+    /*---------------------------------------------------------------------------*
+     * "Properties"
+     *----------------------------------------------------------------------------*/
+
+    // convenience getters. inline usages of these when performance is critical? TODO: test performance of inlining these, with / without closure compiler
+    m00: function() { return this.entries[ 0 ]; },
+    m01: function() { return this.entries[ 3 ]; },
+    m02: function() { return this.entries[ 6 ]; },
+    m10: function() { return this.entries[ 1 ]; },
+    m11: function() { return this.entries[ 4 ]; },
+    m12: function() { return this.entries[ 7 ]; },
+    m20: function() { return this.entries[ 2 ]; },
+    m21: function() { return this.entries[ 5 ]; },
+    m22: function() { return this.entries[ 8 ]; },
+
+    isIdentity: function() {
+      return this.type === Types.IDENTITY || this.equals( Matrix3.IDENTITY );
+    },
+
+    // returning false means "inconclusive, may be identity or not"
+    isFastIdentity: function() {
+      return this.type === Types.IDENTITY;
+    },
+
+    isAffine: function() {
+      return this.type === Types.AFFINE || ( this.m20() === 0 && this.m21() === 0 && this.m22() === 1 );
+    },
+
+    // if it's an affine matrix where the components of transforms are independent
+    // i.e. constructed from arbitrary component scaling and translation.
+    isAligned: function() {
+      // non-diagonal non-translation entries should all be zero.
+      return this.isAffine() && this.m01() === 0 && this.m10() === 0;
+    },
+
+    // if it's an affine matrix where the components of transforms are independent, but may be switched (unlike isAligned)
+    // i.e. the 2x2 rotational sub-matrix is of one of the two forms:
+    // A 0  or  0  A
+    // 0 B      B  0
+    // This means that moving a transformed point by (x,0) or (0,y) will result in a motion along one of the axes.
+    isAxisAligned: function() {
+      return this.isAffine() && ( ( this.m01() === 0 && this.m10() === 0 ) || ( this.m00() === 0 && this.m11() === 0 ) );
+    },
+
+    isFinite: function() {
+      return isFinite( this.m00() ) &&
+             isFinite( this.m01() ) &&
+             isFinite( this.m02() ) &&
+             isFinite( this.m10() ) &&
+             isFinite( this.m11() ) &&
+             isFinite( this.m12() ) &&
+             isFinite( this.m20() ) &&
+             isFinite( this.m21() ) &&
+             isFinite( this.m22() );
+    },
+
+    getDeterminant: function() {
+      return this.m00() * this.m11() * this.m22() + this.m01() * this.m12() * this.m20() + this.m02() * this.m10() * this.m21() - this.m02() * this.m11() * this.m20() - this.m01() * this.m10() * this.m22() - this.m00() * this.m12() * this.m21();
+    },
+    get determinant() { return this.getDeterminant(); },
+
+    // the 2D translation, assuming multiplication with a homogeneous vector
+    getTranslation: function() {
+      return new dot.Vector2( this.m02(), this.m12() );
+    },
+    get translation() { return this.getTranslation(); },
+
+    // returns a vector that is equivalent to ( T(1,0).magnitude(), T(0,1).magnitude() ) where T is a relative transform
+    getScaleVector: function() {
+      return new dot.Vector2(
+        Math.sqrt( this.m00() * this.m00() + this.m10() * this.m10() ),
+        Math.sqrt( this.m01() * this.m01() + this.m11() * this.m11() ) );
+    },
+    get scaleVector() { return this.getScaleVector(); },
+
+    // angle in radians for the 2d rotation from this matrix, between pi, -pi
+    getRotation: function() {
+      return Math.atan2( this.m10(), this.m00() );
+    },
+    get rotation() { return this.getRotation(); },
+
+    toMatrix4: function() {
+      return new dot.Matrix4(
+        this.m00(), this.m01(), this.m02(), 0,
+        this.m10(), this.m11(), this.m12(), 0,
+        this.m20(), this.m21(), this.m22(), 0,
+        0, 0, 0, 1 );
+    },
+
+    toAffineMatrix4: function() {
+      return new dot.Matrix4(
+        this.m00(), this.m01(), 0, this.m02(),
+        this.m10(), this.m11(), 0, this.m12(),
+        0, 0, 1, 0,
+        0, 0, 0, 1 );
+    },
+
+    toString: function() {
+      return this.m00() + ' ' + this.m01() + ' ' + this.m02() + '\n' +
+             this.m10() + ' ' + this.m11() + ' ' + this.m12() + '\n' +
+             this.m20() + ' ' + this.m21() + ' ' + this.m22();
+    },
+
+    toSVGMatrix: function() {
+      var result = document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' ).createSVGMatrix();
+
+      // top two rows
+      result.a = this.m00();
+      result.b = this.m10();
+      result.c = this.m01();
+      result.d = this.m11();
+      result.e = this.m02();
+      result.f = this.m12();
+
+      return result;
+    },
+
+    getCSSTransform: function() {
+      // See http://www.w3.org/TR/css3-transforms/, particularly Section 13 that discusses the SVG compatibility
+
+      // We need to prevent the numbers from being in an exponential toString form, since the CSS transform does not support that
+      // 20 is the largest guaranteed number of digits according to https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Number/toFixed
+      // See https://github.com/phetsims/dot/issues/36
+
+      // the inner part of a CSS3 transform, but remember to add the browser-specific parts!
+      // NOTE: the toFixed calls are inlined for performance reasons
+      return 'matrix(' + this.entries[ 0 ].toFixed( 20 ) + ',' + this.entries[ 1 ].toFixed( 20 ) + ',' + this.entries[ 3 ].toFixed( 20 ) + ',' + this.entries[ 4 ].toFixed( 20 ) + ',' + this.entries[ 6 ].toFixed( 20 ) + ',' + this.entries[ 7 ].toFixed( 20 ) + ')';
+    },
+    get cssTransform() { return this.getCSSTransform(); },
+
+    getSVGTransform: function() {
+      // SVG transform presentation attribute. See http://www.w3.org/TR/SVG/coords.html#TransformAttribute
+
+      // we need to prevent the numbers from being in an exponential toString form, since the CSS transform does not support that
+      function svgNumber( number ) {
+        // Largest guaranteed number of digits according to https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Number/toFixed
+        // See https://github.com/phetsims/dot/issues/36
+        return number.toFixed( 20 );
+      }
+
+      switch( this.type ) {
+        case Types.IDENTITY:
+          return '';
+        case Types.TRANSLATION_2D:
+          return 'translate(' + svgNumber( this.entries[ 6 ] ) + ',' + svgNumber( this.entries[ 7 ] ) + ')';
+        case Types.SCALING:
+          return 'scale(' + svgNumber( this.entries[ 0 ] ) + ( this.entries[ 0 ] === this.entries[ 4 ] ? '' : ',' + svgNumber( this.entries[ 4 ] ) ) + ')';
+        default:
+          return 'matrix(' + svgNumber( this.entries[ 0 ] ) + ',' + svgNumber( this.entries[ 1 ] ) + ',' + svgNumber( this.entries[ 3 ] ) + ',' + svgNumber( this.entries[ 4 ] ) + ',' + svgNumber( this.entries[ 6 ] ) + ',' + svgNumber( this.entries[ 7 ] ) + ')';
+      }
+    },
+    get svgTransform() { return this.getSVGTransform(); },
+
+    // returns a parameter object suitable for use with jQuery's .css()
+    getCSSTransformStyles: function() {
+      var transformCSS = this.getCSSTransform();
+
+      // notes on triggering hardware acceleration: http://creativejs.com/2011/12/day-2-gpu-accelerate-your-dom-elements/
+      return {
+        // force iOS hardware acceleration
+        '-webkit-perspective': 1000,
+        '-webkit-backface-visibility': 'hidden',
+
+        '-webkit-transform': transformCSS + ' translateZ(0)', // trigger hardware acceleration if possible
+        '-moz-transform':    transformCSS + ' translateZ(0)', // trigger hardware acceleration if possible
+        '-ms-transform': transformCSS,
+        '-o-transform': transformCSS,
+        'transform': transformCSS,
+        'transform-origin': 'top left', // at the origin of the component. consider 0px 0px instead. Critical, since otherwise this defaults to 50% 50%!!! see https://developer.mozilla.org/en-US/docs/CSS/transform-origin
+        '-ms-transform-origin': 'top left' // TODO: do we need other platform-specific transform-origin styles?
+      };
+    },
+    get cssTransformStyles() { return this.getCSSTransformStyles(); },
+
+    // exact equality
+    equals: function( m ) {
+      return this.m00() === m.m00() && this.m01() === m.m01() && this.m02() === m.m02() &&
+             this.m10() === m.m10() && this.m11() === m.m11() && this.m12() === m.m12() &&
+             this.m20() === m.m20() && this.m21() === m.m21() && this.m22() === m.m22();
+    },
+
+    // equality within a margin of error
+    equalsEpsilon: function( m, epsilon ) {
+      return Math.abs( this.m00() - m.m00() ) < epsilon && Math.abs( this.m01() - m.m01() ) < epsilon && Math.abs( this.m02() - m.m02() ) < epsilon &&
+             Math.abs( this.m10() - m.m10() ) < epsilon && Math.abs( this.m11() - m.m11() ) < epsilon && Math.abs( this.m12() - m.m12() ) < epsilon &&
+             Math.abs( this.m20() - m.m20() ) < epsilon && Math.abs( this.m21() - m.m21() ) < epsilon && Math.abs( this.m22() - m.m22() ) < epsilon;
+    },
+
+    /*---------------------------------------------------------------------------*
+     * Immutable operations (returns a new matrix)
+     *----------------------------------------------------------------------------*/
+
+    copy: function() {
+      return Matrix3.createFromPool(
+        this.m00(), this.m01(), this.m02(),
+        this.m10(), this.m11(), this.m12(),
+        this.m20(), this.m21(), this.m22(),
+        this.type
+      );
+    },
+
+    plus: function( m ) {
+      return Matrix3.createFromPool(
+        this.m00() + m.m00(), this.m01() + m.m01(), this.m02() + m.m02(),
+        this.m10() + m.m10(), this.m11() + m.m11(), this.m12() + m.m12(),
+        this.m20() + m.m20(), this.m21() + m.m21(), this.m22() + m.m22()
+      );
+    },
+
+    minus: function( m ) {
+      return Matrix3.createFromPool(
+        this.m00() - m.m00(), this.m01() - m.m01(), this.m02() - m.m02(),
+        this.m10() - m.m10(), this.m11() - m.m11(), this.m12() - m.m12(),
+        this.m20() - m.m20(), this.m21() - m.m21(), this.m22() - m.m22()
+      );
+    },
+
+    transposed: function() {
+      return Matrix3.createFromPool(
+        this.m00(), this.m10(), this.m20(),
+        this.m01(), this.m11(), this.m21(),
+        this.m02(), this.m12(), this.m22(), ( this.type === Types.IDENTITY || this.type === Types.SCALING ) ? this.type : undefined
+      );
+    },
+
+    negated: function() {
+      return Matrix3.createFromPool(
+        -this.m00(), -this.m01(), -this.m02(),
+        -this.m10(), -this.m11(), -this.m12(),
+        -this.m20(), -this.m21(), -this.m22()
+      );
+    },
+
+    inverted: function() {
+      var det;
+
+      switch( this.type ) {
+        case Types.IDENTITY:
+          return this;
+        case Types.TRANSLATION_2D:
+          return Matrix3.createFromPool(
+            1, 0, -this.m02(),
+            0, 1, -this.m12(),
+            0, 0, 1, Types.TRANSLATION_2D );
+        case Types.SCALING:
+          return Matrix3.createFromPool(
+            1 / this.m00(), 0, 0,
+            0, 1 / this.m11(), 0,
+            0, 0, 1 / this.m22(), Types.SCALING );
+        case Types.AFFINE:
+          det = this.getDeterminant();
+          if ( det !== 0 ) {
+            return Matrix3.createFromPool(
+              ( -this.m12() * this.m21() + this.m11() * this.m22() ) / det,
+              ( this.m02() * this.m21() - this.m01() * this.m22() ) / det,
+              ( -this.m02() * this.m11() + this.m01() * this.m12() ) / det,
+              ( this.m12() * this.m20() - this.m10() * this.m22() ) / det,
+              ( -this.m02() * this.m20() + this.m00() * this.m22() ) / det,
+              ( this.m02() * this.m10() - this.m00() * this.m12() ) / det,
+              0, 0, 1, Types.AFFINE
+            );
+          }
+          else {
+            throw new Error( 'Matrix could not be inverted, determinant === 0' );
+          }
+          break; // because JSHint totally can't tell that this can't be reached
+        case Types.OTHER:
+          det = this.getDeterminant();
+          if ( det !== 0 ) {
+            return Matrix3.createFromPool(
+              ( -this.m12() * this.m21() + this.m11() * this.m22() ) / det,
+              ( this.m02() * this.m21() - this.m01() * this.m22() ) / det,
+              ( -this.m02() * this.m11() + this.m01() * this.m12() ) / det,
+              ( this.m12() * this.m20() - this.m10() * this.m22() ) / det,
+              ( -this.m02() * this.m20() + this.m00() * this.m22() ) / det,
+              ( this.m02() * this.m10() - this.m00() * this.m12() ) / det,
+              ( -this.m11() * this.m20() + this.m10() * this.m21() ) / det,
+              ( this.m01() * this.m20() - this.m00() * this.m21() ) / det,
+              ( -this.m01() * this.m10() + this.m00() * this.m11() ) / det,
+              Types.OTHER
+            );
+          }
+          else {
+            throw new Error( 'Matrix could not be inverted, determinant === 0' );
+          }
+          break; // because JSHint totally can't tell that this can't be reached
+        default:
+          throw new Error( 'Matrix3.inverted with unknown type: ' + this.type );
+      }
+    },
+
+    timesMatrix: function( m ) {
+      // I * M === M * I === M (the identity)
+      if ( this.type === Types.IDENTITY || m.type === Types.IDENTITY ) {
+        return this.type === Types.IDENTITY ? m : this;
+      }
+
+      if ( this.type === m.type ) {
+        // currently two matrices of the same type will result in the same result type
+        if ( this.type === Types.TRANSLATION_2D ) {
+          // faster combination of translations
+          return Matrix3.createFromPool(
+            1, 0, this.m02() + m.m02(),
+            0, 1, this.m12() + m.m12(),
+            0, 0, 1, Types.TRANSLATION_2D );
+        }
+        else if ( this.type === Types.SCALING ) {
+          // faster combination of scaling
+          return Matrix3.createFromPool(
+            this.m00() * m.m00(), 0, 0,
+            0, this.m11() * m.m11(), 0,
+            0, 0, 1, Types.SCALING );
+        }
+      }
+
+      if ( this.type !== Types.OTHER && m.type !== Types.OTHER ) {
+        // currently two matrices that are anything but "other" are technically affine, and the result will be affine
+
+        // affine case
+        return Matrix3.createFromPool(
+          this.m00() * m.m00() + this.m01() * m.m10(),
+          this.m00() * m.m01() + this.m01() * m.m11(),
+          this.m00() * m.m02() + this.m01() * m.m12() + this.m02(),
+          this.m10() * m.m00() + this.m11() * m.m10(),
+          this.m10() * m.m01() + this.m11() * m.m11(),
+          this.m10() * m.m02() + this.m11() * m.m12() + this.m12(),
+          0, 0, 1, Types.AFFINE );
+      }
+
+      // general case
+      return Matrix3.createFromPool(
+        this.m00() * m.m00() + this.m01() * m.m10() + this.m02() * m.m20(),
+        this.m00() * m.m01() + this.m01() * m.m11() + this.m02() * m.m21(),
+        this.m00() * m.m02() + this.m01() * m.m12() + this.m02() * m.m22(),
+        this.m10() * m.m00() + this.m11() * m.m10() + this.m12() * m.m20(),
+        this.m10() * m.m01() + this.m11() * m.m11() + this.m12() * m.m21(),
+        this.m10() * m.m02() + this.m11() * m.m12() + this.m12() * m.m22(),
+        this.m20() * m.m00() + this.m21() * m.m10() + this.m22() * m.m20(),
+        this.m20() * m.m01() + this.m21() * m.m11() + this.m22() * m.m21(),
+        this.m20() * m.m02() + this.m21() * m.m12() + this.m22() * m.m22() );
+    },
+
+    /*---------------------------------------------------------------------------*
+     * Immutable operations (returns new form of a parameter)
+     *----------------------------------------------------------------------------*/
+
+    timesVector2: function( v ) {
+      var x = this.m00() * v.x + this.m01() * v.y + this.m02();
+      var y = this.m10() * v.x + this.m11() * v.y + this.m12();
+      return new dot.Vector2( x, y );
+    },
+
+    timesVector3: function( v ) {
+      var x = this.m00() * v.x + this.m01() * v.y + this.m02() * v.z;
+      var y = this.m10() * v.x + this.m11() * v.y + this.m12() * v.z;
+      var z = this.m20() * v.x + this.m21() * v.y + this.m22() * v.z;
+      return new dot.Vector3( x, y, z );
+    },
+
+    timesTransposeVector2: function( v ) {
+      var x = this.m00() * v.x + this.m10() * v.y;
+      var y = this.m01() * v.x + this.m11() * v.y;
+      return new dot.Vector2( x, y );
+    },
+
+    // TODO: this operation seems to not work for transformDelta2, should be vetted
+    timesRelativeVector2: function( v ) {
+      var x = this.m00() * v.x + this.m01() * v.y;
+      var y = this.m10() * v.y + this.m11() * v.y;
+      return new dot.Vector2( x, y );
+    },
+
+    /*---------------------------------------------------------------------------*
+     * Mutable operations (changes this matrix)
+     *----------------------------------------------------------------------------*/
+
+    // every mutable method goes through rowMajor
+    rowMajor: function( v00, v01, v02, v10, v11, v12, v20, v21, v22, type ) {
+      this.entries[ 0 ] = v00;
+      this.entries[ 1 ] = v10;
+      this.entries[ 2 ] = v20;
+      this.entries[ 3 ] = v01;
+      this.entries[ 4 ] = v11;
+      this.entries[ 5 ] = v21;
+      this.entries[ 6 ] = v02;
+      this.entries[ 7 ] = v12;
+      this.entries[ 8 ] = v22;
+
+      // TODO: consider performance of the affine check here
+      this.type = type === undefined ? ( ( v20 === 0 && v21 === 0 && v22 === 1 ) ? Types.AFFINE : Types.OTHER ) : type;
+      return this;
+    },
+
+    set: function( matrix ) {
+      return this.rowMajor(
+        matrix.m00(), matrix.m01(), matrix.m02(),
+        matrix.m10(), matrix.m11(), matrix.m12(),
+        matrix.m20(), matrix.m21(), matrix.m22(),
+        matrix.type );
+    },
+
+    setArray: function( array ) {
+      return this.rowMajor( array[0], array[3], array[6],
+                            array[1], array[4], array[7],
+                            array[2], array[5], array[8] );
+    },
+
+    // component setters
+    set00: function( value ) { this.entries[ 0 ] = value; return this; },
+    set01: function( value ) { this.entries[ 3 ] = value; return this; },
+    set02: function( value ) { this.entries[ 6 ] = value; return this; },
+    set10: function( value ) { this.entries[ 1 ] = value; return this; },
+    set11: function( value ) { this.entries[ 4 ] = value; return this; },
+    set12: function( value ) { this.entries[ 7 ] = value; return this; },
+    set20: function( value ) { this.entries[ 2 ] = value; return this; },
+    set21: function( value ) { this.entries[ 5 ] = value; return this; },
+    set22: function( value ) { this.entries[ 8 ] = value; return this; },
+
+    makeImmutable: function() {
+      this.rowMajor = function() {
+        throw new Error( 'Cannot modify immutable matrix' );
+      };
+      return this;
+    },
+
+    columnMajor: function( v00, v10, v20, v01, v11, v21, v02, v12, v22, type ) {
+      return this.rowMajor( v00, v01, v02, v10, v11, v12, v20, v21, v22, type );
+    },
+
+    add: function( m ) {
+      return this.rowMajor(
+        this.m00() + m.m00(), this.m01() + m.m01(), this.m02() + m.m02(),
+        this.m10() + m.m10(), this.m11() + m.m11(), this.m12() + m.m12(),
+        this.m20() + m.m20(), this.m21() + m.m21(), this.m22() + m.m22()
+      );
+    },
+
+    subtract: function( m ) {
+      return this.rowMajor(
+        this.m00() - m.m00(), this.m01() - m.m01(), this.m02() - m.m02(),
+        this.m10() - m.m10(), this.m11() - m.m11(), this.m12() - m.m12(),
+        this.m20() - m.m20(), this.m21() - m.m21(), this.m22() - m.m22()
+      );
+    },
+
+    transpose: function() {
+      return this.rowMajor(
+        this.m00(), this.m10(), this.m20(),
+        this.m01(), this.m11(), this.m21(),
+        this.m02(), this.m12(), this.m22(),
+        ( this.type === Types.IDENTITY || this.type === Types.SCALING ) ? this.type : undefined
+      );
+    },
+
+    negate: function() {
+      return this.rowMajor(
+        -this.m00(), -this.m01(), -this.m02(),
+        -this.m10(), -this.m11(), -this.m12(),
+        -this.m20(), -this.m21(), -this.m22()
+      );
+    },
+
+    invert: function() {
+      var det;
+
+      switch( this.type ) {
+        case Types.IDENTITY:
+          return this;
+        case Types.TRANSLATION_2D:
+          return this.rowMajor(
+            1, 0, -this.m02(),
+            0, 1, -this.m12(),
+            0, 0, 1, Types.TRANSLATION_2D );
+        case Types.SCALING:
+          return this.rowMajor(
+            1 / this.m00(), 0, 0,
+            0, 1 / this.m11(), 0,
+            0, 0, 1 / this.m22(), Types.SCALING );
+        case Types.AFFINE:
+          det = this.getDeterminant();
+          if ( det !== 0 ) {
+            return this.rowMajor(
+              ( -this.m12() * this.m21() + this.m11() * this.m22() ) / det,
+              ( this.m02() * this.m21() - this.m01() * this.m22() ) / det,
+              ( -this.m02() * this.m11() + this.m01() * this.m12() ) / det,
+              ( this.m12() * this.m20() - this.m10() * this.m22() ) / det,
+              ( -this.m02() * this.m20() + this.m00() * this.m22() ) / det,
+              ( this.m02() * this.m10() - this.m00() * this.m12() ) / det,
+              0, 0, 1, Types.AFFINE
+            );
+          }
+          else {
+            throw new Error( 'Matrix could not be inverted, determinant === 0' );
+          }
+          break; // because JSHint totally can't tell that this can't be reached
+        case Types.OTHER:
+          det = this.getDeterminant();
+          if ( det !== 0 ) {
+            return this.rowMajor(
+              ( -this.m12() * this.m21() + this.m11() * this.m22() ) / det,
+              ( this.m02() * this.m21() - this.m01() * this.m22() ) / det,
+              ( -this.m02() * this.m11() + this.m01() * this.m12() ) / det,
+              ( this.m12() * this.m20() - this.m10() * this.m22() ) / det,
+              ( -this.m02() * this.m20() + this.m00() * this.m22() ) / det,
+              ( this.m02() * this.m10() - this.m00() * this.m12() ) / det,
+              ( -this.m11() * this.m20() + this.m10() * this.m21() ) / det,
+              ( this.m01() * this.m20() - this.m00() * this.m21() ) / det,
+              ( -this.m01() * this.m10() + this.m00() * this.m11() ) / det,
+              Types.OTHER
+            );
+          }
+          else {
+            throw new Error( 'Matrix could not be inverted, determinant === 0' );
+          }
+          break; // because JSHint totally can't tell that this can't be reached
+        default:
+          throw new Error( 'Matrix3.inverted with unknown type: ' + this.type );
+      }
+    },
+
+    multiplyMatrix: function( m ) {
+      // M * I === M (the identity)
+      if ( m.type === Types.IDENTITY ) {
+        // no change needed
+        return this;
+      }
+
+      // I * M === M (the identity)
+      if ( this.type === Types.IDENTITY ) {
+        // copy the other matrix to us
+        return this.set( m );
+      }
+
+      if ( this.type === m.type ) {
+        // currently two matrices of the same type will result in the same result type
+        if ( this.type === Types.TRANSLATION_2D ) {
+          // faster combination of translations
+          return this.rowMajor(
+            1, 0, this.m02() + m.m02(),
+            0, 1, this.m12() + m.m12(),
+            0, 0, 1, Types.TRANSLATION_2D );
+        }
+        else if ( this.type === Types.SCALING ) {
+          // faster combination of scaling
+          return this.rowMajor(
+            this.m00() * m.m00(), 0, 0,
+            0, this.m11() * m.m11(), 0,
+            0, 0, 1, Types.SCALING );
+        }
+      }
+
+      if ( this.type !== Types.OTHER && m.type !== Types.OTHER ) {
+        // currently two matrices that are anything but "other" are technically affine, and the result will be affine
+
+        // affine case
+        return this.rowMajor(
+          this.m00() * m.m00() + this.m01() * m.m10(),
+          this.m00() * m.m01() + this.m01() * m.m11(),
+          this.m00() * m.m02() + this.m01() * m.m12() + this.m02(),
+          this.m10() * m.m00() + this.m11() * m.m10(),
+          this.m10() * m.m01() + this.m11() * m.m11(),
+          this.m10() * m.m02() + this.m11() * m.m12() + this.m12(),
+          0, 0, 1, Types.AFFINE );
+      }
+
+      // general case
+      return this.rowMajor(
+        this.m00() * m.m00() + this.m01() * m.m10() + this.m02() * m.m20(),
+        this.m00() * m.m01() + this.m01() * m.m11() + this.m02() * m.m21(),
+        this.m00() * m.m02() + this.m01() * m.m12() + this.m02() * m.m22(),
+        this.m10() * m.m00() + this.m11() * m.m10() + this.m12() * m.m20(),
+        this.m10() * m.m01() + this.m11() * m.m11() + this.m12() * m.m21(),
+        this.m10() * m.m02() + this.m11() * m.m12() + this.m12() * m.m22(),
+        this.m20() * m.m00() + this.m21() * m.m10() + this.m22() * m.m20(),
+        this.m20() * m.m01() + this.m21() * m.m11() + this.m22() * m.m21(),
+        this.m20() * m.m02() + this.m21() * m.m12() + this.m22() * m.m22() );
+    },
+
+    prependTranslation: function( x, y ) {
+      this.set02( this.m02() + x );
+      this.set12( this.m12() + y );
+
+      if ( this.type === Types.IDENTITY || this.type === Types.TRANSLATION_2D ) {
+        this.type = Types.TRANSLATION_2D;
+      }
+      else if ( this.type === Types.OTHER ) {
+        this.type = Types.OTHER;
+      }
+      else {
+        this.type = Types.AFFINE;
+      }
+      return this; // for chaining
+    },
+
+    setToIdentity: function() {
+      return this.rowMajor(
+        1, 0, 0,
+        0, 1, 0,
+        0, 0, 1,
+        Types.IDENTITY );
+    },
+
+    setToTranslation: function( x, y ) {
+      return this.rowMajor(
+        1, 0, x,
+        0, 1, y,
+        0, 0, 1,
+        Types.TRANSLATION_2D );
+    },
+
+    setToScale: function( x, y ) {
+      // allow using one parameter to scale everything
+      y = y === undefined ? x : y;
+
+      return this.rowMajor(
+        x, 0, 0,
+        0, y, 0,
+        0, 0, 1,
+        Types.SCALING );
+    },
+
+    // row major
+    setToAffine: function( m00, m01, m02, m10, m11, m12 ) {
+      return this.rowMajor( m00, m01, m02, m10, m11, m12, 0, 0, 1, Types.AFFINE );
+    },
+
+    // axis is a normalized Vector3, angle in radians.
+    setToRotationAxisAngle: function( axis, angle ) {
+      var c = Math.cos( angle );
+      var s = Math.sin( angle );
+      var C = 1 - c;
+
+      return this.rowMajor(
+        axis.x * axis.x * C + c, axis.x * axis.y * C - axis.z * s, axis.x * axis.z * C + axis.y * s,
+        axis.y * axis.x * C + axis.z * s, axis.y * axis.y * C + c, axis.y * axis.z * C - axis.x * s,
+        axis.z * axis.x * C - axis.y * s, axis.z * axis.y * C + axis.x * s, axis.z * axis.z * C + c,
+        Types.OTHER );
+    },
+
+    setToRotationX: function( angle ) {
+      var c = Math.cos( angle );
+      var s = Math.sin( angle );
+
+      return this.rowMajor(
+        1, 0, 0,
+        0, c, -s,
+        0, s, c,
+        Types.OTHER );
+    },
+
+    setToRotationY: function( angle ) {
+      var c = Math.cos( angle );
+      var s = Math.sin( angle );
+
+      return this.rowMajor(
+        c, 0, s,
+        0, 1, 0,
+        -s, 0, c,
+        Types.OTHER );
+    },
+
+    setToRotationZ: function( angle ) {
+      var c = Math.cos( angle );
+      var s = Math.sin( angle );
+
+      return this.rowMajor(
+        c, -s, 0,
+        s, c, 0,
+        0, 0, 1,
+        Types.AFFINE );
+    },
+
+    setToSVGMatrix: function( svgMatrix ) {
+      return this.rowMajor(
+        svgMatrix.a, svgMatrix.c, svgMatrix.e,
+        svgMatrix.b, svgMatrix.d, svgMatrix.f,
+        0, 0, 1,
+        Types.AFFINE );
+    },
+
+    // a rotation matrix that rotates A to B (Vector3 instances), by rotating about the axis A.cross( B ) -- Shortest path. ideally should be unit vectors
+    setRotationAToB: function( a, b ) {
+      // see http://graphics.cs.brown.edu/~jfh/papers/Moller-EBA-1999/paper.pdf for information on this implementation
+      var start = a;
+      var end = b;
+
+      var epsilon = 0.0001;
+
+      var e, h, f;
+
+      var v = start.cross( end );
+      e = start.dot( end );
+      f = ( e < 0 ) ? -e : e;
+
+      // if "from" and "to" vectors are nearly parallel
+      if ( f > 1.0 - epsilon ) {
+        var c1, c2, c3;
+
+        var x = new dot.Vector3(
+          ( start.x > 0.0 ) ? start.x : -start.x,
+          ( start.y > 0.0 ) ? start.y : -start.y,
+          ( start.z > 0.0 ) ? start.z : -start.z
+        );
+
+        if ( x.x < x.y ) {
+          if ( x.x < x.z ) {
+            x = dot.Vector3.X_UNIT;
+          }
+          else {
+            x = dot.Vector3.Z_UNIT;
+          }
+        }
+        else {
+          if ( x.y < x.z ) {
+            x = dot.Vector3.Y_UNIT;
+          }
+          else {
+            x = dot.Vector3.Z_UNIT;
+          }
+        }
+
+        var u = x.minus( start );
+        v = x.minus( end );
+
+        c1 = 2.0 / u.dot( u );
+        c2 = 2.0 / v.dot( v );
+        c3 = c1 * c2 * u.dot( v );
+
+        return this.rowMajor(
+          -c1 * u.x * u.x - c2 * v.x * v.x + c3 * v.x * u.x + 1,
+          -c1 * u.x * u.y - c2 * v.x * v.y + c3 * v.x * u.y,
+          -c1 * u.x * u.z - c2 * v.x * v.z + c3 * v.x * u.z,
+          -c1 * u.y * u.x - c2 * v.y * v.x + c3 * v.y * u.x,
+          -c1 * u.y * u.y - c2 * v.y * v.y + c3 * v.y * u.y + 1,
+          -c1 * u.y * u.z - c2 * v.y * v.z + c3 * v.y * u.z,
+          -c1 * u.z * u.x - c2 * v.z * v.x + c3 * v.z * u.x,
+          -c1 * u.z * u.y - c2 * v.z * v.y + c3 * v.z * u.y,
+          -c1 * u.z * u.z - c2 * v.z * v.z + c3 * v.z * u.z + 1
+        );
+      }
+      else {
+        // the most common case, unless "start"="end", or "start"=-"end"
+        var hvx, hvz, hvxy, hvxz, hvyz;
+        h = 1.0 / ( 1.0 + e );
+        hvx = h * v.x;
+        hvz = h * v.z;
+        hvxy = hvx * v.y;
+        hvxz = hvx * v.z;
+        hvyz = hvz * v.y;
+
+        return this.rowMajor(
+          e + hvx * v.x, hvxy - v.z, hvxz + v.y,
+          hvxy + v.z, e + h * v.y * v.y, hvyz - v.x,
+          hvxz - v.y, hvyz + v.x, e + hvz * v.z
+        );
+      }
+    },
+
+    setTo32Bit: function() {
+      if ( window.Float32Array ) {
+        this.entries = new window.Float32Array( this.entries );
+      }
+      return this;
+    },
+
+    setTo64Bit: function() {
+      if ( window.Float64Array ) {
+        this.entries = new window.Float64Array( this.entries );
+      }
+      return this;
+    },
+
+    /*---------------------------------------------------------------------------*
+     * Mutable operations (changes the parameter)
+     *----------------------------------------------------------------------------*/
+
+    multiplyVector2: function( v ) {
+      return v.setXY(
+        this.m00() * v.x + this.m01() * v.y + this.m02(),
+        this.m10() * v.x + this.m11() * v.y + this.m12() );
+    },
+
+    multiplyVector3: function( v ) {
+      return v.setXYZ(
+        this.m00() * v.x + this.m01() * v.y + this.m02() * v.z,
+        this.m10() * v.x + this.m11() * v.y + this.m12() * v.z,
+        this.m20() * v.x + this.m21() * v.y + this.m22() * v.z );
+    },
+
+    multiplyTransposeVector2: function( v ) {
+      return v.setXY(
+        this.m00() * v.x + this.m10() * v.y,
+        this.m01() * v.x + this.m11() * v.y );
+    },
+
+    multiplyRelativeVector2: function( v ) {
+      return v.setXY(
+        this.m00() * v.x + this.m01() * v.y,
+        this.m10() * v.y + this.m11() * v.y );
+    },
+
+    // sets the transform of a Canvas 2D rendering context to the affine part of this matrix
+    canvasSetTransform: function( context ) {
+      context.setTransform(
+        // inlined array entries
+        this.entries[ 0 ],
+        this.entries[ 1 ],
+        this.entries[ 3 ],
+        this.entries[ 4 ],
+        this.entries[ 6 ],
+        this.entries[ 7 ]
+      );
+    },
+
+    // appends the affine part of this matrix to the Canvas 2D rendering context
+    canvasAppendTransform: function( context ) {
+      if ( this.type !== Types.IDENTITY ) {
+        context.transform(
+          // inlined array entries
+          this.entries[ 0 ],
+          this.entries[ 1 ],
+          this.entries[ 3 ],
+          this.entries[ 4 ],
+          this.entries[ 6 ],
+          this.entries[ 7 ]
+        );
+      }
+    }
+  };
+
+  Poolable.mixin( Matrix3, {
+
+    //The default factory creates an identity matrix
+    defaultFactory: function() { return new Matrix3(); },
+
+    constructorDuplicateFactory: function( pool ) {
+      return function( v00, v01, v02, v10, v11, v12, v20, v21, v22, type ) {
+        var instance = pool.length ? pool.pop() : new Matrix3();
+        return instance.rowMajor( v00, v01, v02, v10, v11, v12, v20, v21, v22, type );
+      };
+    }
+  } );
+
+  // create an immutable
+  Matrix3.IDENTITY = Matrix3.identity();
+  Matrix3.IDENTITY.makeImmutable();
+
+  Matrix3.X_REFLECTION = Matrix3.createFromPool(
+    -1, 0, 0,
+    0, 1, 0,
+    0, 0, 1,
+    Types.AFFINE );
+  Matrix3.X_REFLECTION.makeImmutable();
+
+  Matrix3.Y_REFLECTION = Matrix3.createFromPool(
+    1, 0, 0,
+    0, -1, 0,
+    0, 0, 1,
+    Types.AFFINE );
+  Matrix3.Y_REFLECTION.makeImmutable();
+
+  //Shortcut for translation times a matrix (without allocating a translation matrix), see scenery#119
+  Matrix3.translationTimesMatrix = function( x, y, m ) {
+    var type;
+    if ( m.type === Types.IDENTITY || m.type === Types.TRANSLATION_2D ) {
+      return Matrix3.createFromPool(
+        1, 0, m.m02() + x,
+        0, 1, m.m12() + y,
+        0, 0, 1,
+        Types.TRANSLATION_2D );
+    }
+    else if ( m.type === Types.OTHER ) {
+      type = Types.OTHER;
+    }
+    else {
+      type = Types.AFFINE;
+    }
+    return Matrix3.createFromPool(
+      m.m00(), m.m01(), m.m02() + x,
+      m.m10(), m.m11(), m.m12() + y,
+      m.m20(), m.m21(), m.m22(),
+      type );
+  };
+
+  Matrix3.printer = {
+    print: function( matrix ) {
+      console.log( matrix.toString() );
+    }
+  };
+
+  return Matrix3;
 } );
 
 // Copyright 2002-2014, University of Colorado Boulder
@@ -9618,39 +9170,34 @@ define( 'KITE/segments/Quadratic',['require','PHET_CORE/inherit','DOT/Bounds2','
   var kite = require( 'KITE/kite' );
   var Segment = require( 'KITE/segments/Segment' );
 
-  Segment.Quadratic = function Quadratic( start, control, end ) {
+  kite.Quadratic = Segment.Quadratic = function Quadratic( start, control, end ) {
+    Segment.call( this );
+
     this._start = start;
     this._control = control;
     this._end = end;
 
-    // TODO: performance test removal of these undefined declarations
-    this._startTangent = undefined;
-    this._endTangent = undefined;
-    this._tCriticalX = undefined; // replaced with null if not in range
-    this._tCriticalY = undefined; // replaced with null if not in range
-    this._bounds = undefined;
+    this.invalidate();
   };
   inherit( Segment, Segment.Quadratic, {
 
     degree: 2,
 
-    getStart: function() {
-      return this._start;
-    },
-    get start() { return this._start; },
+    // @public - Clears cached information, should be called when any of the 'constructor arguments' are mutated.
+    invalidate: function() {
+      // Lazily-computed derived information
+      this._startTangent = null; // {Vector2 | null}
+      this._endTangent = null; // {Vector2 | null}
+      this._tCriticalX = null; // {number | null} T where x-derivative is 0 (replaced with NaN if not in range)
+      this._tCriticalY = null; // {number | null} T where y-derivative is 0 (replaced with NaN if not in range)
 
-    getControl: function() {
-      return this._control;
-    },
-    get control() { return this._control; },
+      this._bounds = null; // {Bounds2 | null}
 
-    getEnd: function() {
-      return this._end;
+      this.trigger0( 'invalidated' );
     },
-    get end() { return this._end; },
 
     getStartTangent: function() {
-      if ( this._startTangent === undefined ) {
+      if ( this._startTangent === null ) {
         var controlIsStart = this._start.equals( this._control );
         // TODO: allocation reduction
         this._startTangent = controlIsStart ?
@@ -9662,7 +9209,7 @@ define( 'KITE/segments/Quadratic',['require','PHET_CORE/inherit','DOT/Bounds2','
     get startTangent() { return this.getStartTangent(); },
 
     getEndTangent: function() {
-      if ( this._endTangent === undefined ) {
+      if ( this._endTangent === null ) {
         var controlIsEnd = this._end.equals( this._control );
         // TODO: allocation reduction
         this._endTangent = controlIsEnd ?
@@ -9675,7 +9222,7 @@ define( 'KITE/segments/Quadratic',['require','PHET_CORE/inherit','DOT/Bounds2','
 
     getTCriticalX: function() {
       // compute x where the derivative is 0 (used for bounds and other things)
-      if ( this._tCriticalX === undefined ) {
+      if ( this._tCriticalX === null ) {
         this._tCriticalX = Segment.Quadratic.extremaT( this._start.x, this._control.x, this._end.x );
       }
       return this._tCriticalX;
@@ -9684,7 +9231,7 @@ define( 'KITE/segments/Quadratic',['require','PHET_CORE/inherit','DOT/Bounds2','
 
     getTCriticalY: function() {
       // compute y where the derivative is 0 (used for bounds and other things)
-      if ( this._tCriticalY === undefined ) {
+      if ( this._tCriticalY === null ) {
         this._tCriticalY = Segment.Quadratic.extremaT( this._start.y, this._control.y, this._end.y );
       }
       return this._tCriticalY;
@@ -9708,8 +9255,8 @@ define( 'KITE/segments/Quadratic',['require','PHET_CORE/inherit','DOT/Bounds2','
         // this is a special collinear case, we basically line out to the farthest point and back
         var halfPoint = this.positionAt( 0.5 );
         return [
-          new Segment.Line( start, halfPoint ),
-          new Segment.Line( halfPoint, end )
+          new kite.Line( start, halfPoint ),
+          new kite.Line( halfPoint, end )
         ];
       }
       else if ( arePointsCollinear( start, control, end ) ) {
@@ -9717,24 +9264,24 @@ define( 'KITE/segments/Quadratic',['require','PHET_CORE/inherit','DOT/Bounds2','
         // also, start !== end (handled earlier)
         if ( startIsControl || endIsControl ) {
           // just a line segment!
-          return [ new Segment.Line( start, end ) ]; // no extra nondegenerate check since start !== end
+          return [ new kite.Line( start, end ) ]; // no extra nondegenerate check since start !== end
         }
         // now control point must be unique. we check to see if our rendered path will be outside of the start->end line segment
         var delta = end.minus( start );
         var p1d = control.minus( start ).dot( delta.normalized ) / delta.magnitude();
         var t = Segment.Quadratic.extremaT( 0, p1d, 1 );
-        if ( t !== null && t > 0 && t < 1 ) {
+        if ( !isNaN( t ) && t > 0 && t < 1 ) {
           // we have a local max inside the range, indicating that our extrema point is outside of start->end
           // we'll line to and from it
           var pt = this.positionAt( t );
           return _.flatten( [
-            new Segment.Line( start, pt ).getNondegenerateSegments(),
-            new Segment.Line( pt, end ).getNondegenerateSegments()
+            new kite.Line( start, pt ).getNondegenerateSegments(),
+            new kite.Line( pt, end ).getNondegenerateSegments()
           ] );
         }
         else {
           // just provide a line segment, our rendered path doesn't go outside of this
-          return [ new Segment.Line( start, end ) ]; // no extra nondegenerate check since start !== end
+          return [ new kite.Line( start, end ) ]; // no extra nondegenerate check since start !== end
         }
       }
       else {
@@ -9744,17 +9291,17 @@ define( 'KITE/segments/Quadratic',['require','PHET_CORE/inherit','DOT/Bounds2','
 
     getBounds: function() {
       // calculate our temporary guaranteed lower bounds based on the end points
-      if ( this._bounds === undefined ) {
+      if ( this._bounds === null ) {
         this._bounds = new Bounds2( Math.min( this._start.x, this._end.x ), Math.min( this._start.y, this._end.y ), Math.max( this._start.x, this._end.x ), Math.max( this._start.y, this._end.y ) );
 
         // compute x and y where the derivative is 0, so we can include this in the bounds
         var tCriticalX = this.getTCriticalX();
         var tCriticalY = this.getTCriticalY();
 
-        if ( tCriticalX !== null && tCriticalX > 0 && tCriticalX < 1 ) {
+        if ( !isNaN( tCriticalX ) && tCriticalX > 0 && tCriticalX < 1 ) {
           this._bounds = this._bounds.withPoint( this.positionAt( tCriticalX ) );
         }
-        if ( tCriticalY !== null && tCriticalY > 0 && tCriticalY < 1 ) {
+        if ( !isNaN( tCriticalY ) && tCriticalY > 0 && tCriticalY < 1 ) {
           this._bounds = this._bounds.withPoint( this.positionAt( tCriticalY ) );
         }
       }
@@ -9826,15 +9373,15 @@ define( 'KITE/segments/Quadratic',['require','PHET_CORE/inherit','DOT/Bounds2','
       var rightMid = this._control.blend( this._end, t );
       var mid = leftMid.blend( rightMid, t );
       return [
-        new Segment.Quadratic( this._start, leftMid, mid ),
-        new Segment.Quadratic( mid, rightMid, this._end )
+        new kite.Quadratic( this._start, leftMid, mid ),
+        new kite.Quadratic( mid, rightMid, this._end )
       ];
     },
 
     // elevation of this quadratic Bezier curve to a cubic Bezier curve
     degreeElevated: function() {
       // TODO: allocation reduction
-      return new Segment.Cubic(
+      return new kite.Cubic(
         this._start,
         this._start.plus( this._control.timesScalar( 2 ) ).dividedScalar( 3 ),
         this._end.plus( this._control.timesScalar( 2 ) ).dividedScalar( 3 ),
@@ -9843,11 +9390,11 @@ define( 'KITE/segments/Quadratic',['require','PHET_CORE/inherit','DOT/Bounds2','
     },
 
     reversed: function() {
-      return new Segment.Quadratic( this._end, this._control, this._start );
+      return new kite.Quadratic( this._end, this._control, this._start );
     },
 
     approximateOffset: function( r ) {
-      return new Segment.Quadratic(
+      return new kite.Quadratic(
         this._start.plus( ( this._start.equals( this._control ) ? this._end.minus( this._start ) : this._control.minus( this._start ) ).perpendicular().normalized().times( r ) ),
         this._control.plus( this._end.minus( this._start ).perpendicular().normalized().times( r ) ),
         this._end.plus( ( this._end.equals( this._control ) ? this._end.minus( this._start ) : this._end.minus( this._control ) ).perpendicular().normalized().times( r ) )
@@ -9871,17 +9418,17 @@ define( 'KITE/segments/Quadratic',['require','PHET_CORE/inherit','DOT/Bounds2','
       // TODO: we assume here we are reduce, so that a criticalX doesn't equal a criticalY?
       var result = [];
       var epsilon = 0.0000000001; // TODO: general kite epsilon?
-      if ( this.tCriticalX !== undefined && this.tCriticalX > epsilon && this.tCriticalX < 1 - epsilon ) {
+
+      var criticalX = this.getTCriticalX();
+      var criticalY = this.getTCriticalY();
+
+      if ( !isNaN( criticalX ) && criticalX > epsilon && criticalX < 1 - epsilon ) {
         result.push( this.tCriticalX );
       }
-      if ( this.tCriticalY !== undefined && this.tCriticalY > epsilon && this.tCriticalY < 1 - epsilon ) {
+      if ( !isNaN( criticalY ) && criticalY > epsilon && criticalY < 1 - epsilon ) {
         result.push( this.tCriticalY );
       }
       return result.sort();
-    },
-
-    intersectsBounds: function( bounds ) {
-      throw new Error( 'Segment.Quadratic.intersectsBounds unimplemented' ); // TODO: implement
     },
 
     // returns the resultant winding number of this ray intersecting this segment.
@@ -9939,7 +9486,7 @@ define( 'KITE/segments/Quadratic',['require','PHET_CORE/inherit','DOT/Bounds2','
     },
 
     transformed: function( matrix ) {
-      return new Segment.Quadratic( matrix.timesVector2( this._start ), matrix.timesVector2( this._control ), matrix.timesVector2( this._end ) );
+      return new kite.Quadratic( matrix.timesVector2( this._start ), matrix.timesVector2( this._control ), matrix.timesVector2( this._end ) );
     },
 
     // given the current curve parameterized by t, will return a curve parameterized by x where t = a * x + b
@@ -9955,9 +9502,13 @@ define( 'KITE/segments/Quadratic',['require','PHET_CORE/inherit','DOT/Bounds2','
       var gamma = p.timesScalar( b * b ).plus( q.timesScalar( b ) ).plus( r );
 
       // back to the form start,control,end
-      return new Segment.Quadratic( gamma, beta.timesScalar( 0.5 ).plus( gamma ), alpha.plus( beta ).plus( gamma ) );
+      return new kite.Quadratic( gamma, beta.timesScalar( 0.5 ).plus( gamma ), alpha.plus( beta ).plus( gamma ) );
     }
   } );
+
+  Segment.addInvalidatingGetterSetter( Segment.Quadratic, 'start' );
+  Segment.addInvalidatingGetterSetter( Segment.Quadratic, 'control' );
+  Segment.addInvalidatingGetterSetter( Segment.Quadratic, 'end' );
 
   // one-dimensional solution to extrema
   Segment.Quadratic.extremaT = function( start, control, end ) {
@@ -9967,7 +9518,7 @@ define( 'KITE/segments/Quadratic',['require','PHET_CORE/inherit','DOT/Bounds2','
       return -2 * ( control - start ) / divisorX;
     }
     else {
-      return null;
+      return NaN;
     }
   };
 
@@ -10001,56 +9552,54 @@ define( 'KITE/segments/Cubic',['require','PHET_CORE/inherit','DOT/Bounds2','DOT/
   var Segment = require( 'KITE/segments/Segment' );
   require( 'KITE/segments/Quadratic' );
 
-  Segment.Cubic = function Cubic( start, control1, control2, end ) {
+  /**
+   * @param {Vector2} start - Start point of the cubic bezier
+   * @param {Vector2} control1 - First control point
+   * @param {Vector2} control2 - Second control point
+   * @param {Vector2} end - End point of the cubic bezier
+   * @constructor
+   */
+  kite.Cubic = Segment.Cubic = function Cubic( start, control1, control2, end ) {
+    Segment.call( this );
+
     this._start = start;
     this._control1 = control1;
     this._control2 = control2;
     this._end = end;
 
-    // TODO: performance test removal of these undefined declarations
-    this._startTangent = undefined;
-    this._endTangent = undefined;
-    this._r = undefined;
-    this._s = undefined;
-
-    this._tCusp = undefined;
-    this._tDeterminant = undefined;
-    this._tInflection1 = undefined;
-    this._tInflection2 = undefined;
-    this._startQuadratic = undefined;
-    this._endQuadratic = undefined;
-
-    this._xExtremaT = undefined;
-    this._yExtremaT = undefined;
-
-    this._bounds = undefined;
+    this.invalidate();
   };
   inherit( Segment, Segment.Cubic, {
 
     degree: 3,
 
-    getStart: function() {
-      return this._start;
-    },
-    get start() { return this._start; },
+    // @public - Clears cached information, should be called when any of the 'constructor arguments' are mutated.
+    invalidate: function() {
+      // Lazily-computed derived information
+      this._startTangent = null; // {Vector2 | null}
+      this._endTangent = null; // {Vector2 | null}
+      this._r = null; // {number | null}
+      this._s = null; // {number | null}
 
-    getControl1: function() {
-      return this._control1;
-    },
-    get control1() { return this._control1; },
+      // Cusp-specific information
+      this._tCusp = null; // {number | null} - T value for a potential cusp
+      this._tDeterminant = null; // {number | null}
+      this._tInflection1 = null; // {number | null} - NaN if not applicable
+      this._tInflection2 = null; // {number | null} - NaN if not applicable
+      this._startQuadratic = null; // {Segment.Quadratic | null}
+      this._endQuadratic = null; // {Segment.Quadratic | null}
 
-    getControl2: function() {
-      return this._control2;
-    },
-    get control2() { return this._control2; },
+      // T-values where X and Y (respectively) reach an extrema (not necessarily including 0 and 1)
+      this._xExtremaT = null; // {Array.<number> | null}
+      this._yExtremaT = null; // {Array.<number> | null}
 
-    getEnd: function() {
-      return this._end;
+      this._bounds = null; // {Bounds2 | null}
+
+      this.trigger0( 'invalidated' );
     },
-    get end() { return this._end; },
 
     getStartTangent: function() {
-      if ( this._startTangent === undefined ) {
+      if ( this._startTangent === null ) {
         this._startTangent = this.tangentAt( 0 ).normalized();
       }
       return this._startTangent;
@@ -10058,7 +9607,7 @@ define( 'KITE/segments/Cubic',['require','PHET_CORE/inherit','DOT/Bounds2','DOT/
     get startTangent() { return this.getStartTangent(); },
 
     getEndTangent: function() {
-      if ( this._endTangent === undefined ) {
+      if ( this._endTangent === null ) {
         this._endTangent = this.tangentAt( 1 ).normalized();
       }
       return this._endTangent;
@@ -10067,7 +9616,7 @@ define( 'KITE/segments/Cubic',['require','PHET_CORE/inherit','DOT/Bounds2','DOT/
 
     getR: function() {
       // from http://www.cis.usouthal.edu/~hain/general/Publications/Bezier/BezierFlattening.pdf
-      if ( this._r === undefined ) {
+      if ( this._r === null ) {
         this._r = this._control1.minus( this._start ).normalized();
       }
       return this._r;
@@ -10076,7 +9625,7 @@ define( 'KITE/segments/Cubic',['require','PHET_CORE/inherit','DOT/Bounds2','DOT/
 
     getS: function() {
       // from http://www.cis.usouthal.edu/~hain/general/Publications/Bezier/BezierFlattening.pdf
-      if ( this._s === undefined ) {
+      if ( this._s === null ) {
         this._s = this.getR().perpendicular();
       }
       return this._s;
@@ -10084,61 +9633,61 @@ define( 'KITE/segments/Cubic',['require','PHET_CORE/inherit','DOT/Bounds2','DOT/
     get s() { return this.getS(); },
 
     getTCusp: function() {
-      if ( this._tCusp === undefined ) {
+      if ( this._tCusp === null ) {
         this.computeCuspInfo();
       }
-      assert && assert( this._tCusp !== undefined );
+      assert && assert( this._tCusp !== null );
       return this._tCusp;
     },
     get tCusp() { return this.getTCusp(); },
 
     getTDeterminant: function() {
-      if ( this._tDeterminant === undefined ) {
+      if ( this._tDeterminant === null ) {
         this.computeCuspInfo();
       }
-      assert && assert( this._tDeterminant !== undefined );
+      assert && assert( this._tDeterminant !== null );
       return this._tDeterminant;
     },
     get tDeterminant() { return this.getTDeterminant(); },
 
     getTInflection1: function() {
-      if ( this._tInflection1 === undefined ) {
+      if ( this._tInflection1 === null ) {
         this.computeCuspInfo();
       }
-      assert && assert( this._tInflection1 !== undefined );
+      assert && assert( this._tInflection1 !== null );
       return this._tInflection1;
     },
     get tInflection1() { return this.getTInflection1(); },
 
     getTInflection2: function() {
-      if ( this._tInflection2 === undefined ) {
+      if ( this._tInflection2 === null ) {
         this.computeCuspInfo();
       }
-      assert && assert( this._tInflection2 !== undefined );
+      assert && assert( this._tInflection2 !== null );
       return this._tInflection2;
     },
     get tInflection2() { return this.getTInflection2(); },
 
     getStartQuadratic: function() {
-      if ( this._startQuadratic === undefined ) {
+      if ( this._startQuadratic === null ) {
         this.computeCuspSegments();
       }
-      assert && assert( this._startQuadratic !== undefined );
+      assert && assert( this._startQuadratic !== null );
       return this._startQuadratic;
     },
     get startQuadratic() { return this.getStartQuadratic(); },
 
     getEndQuadratic: function() {
-      if ( this._endQuadratic === undefined ) {
+      if ( this._endQuadratic === null ) {
         this.computeCuspSegments();
       }
-      assert && assert( this._endQuadratic !== undefined );
+      assert && assert( this._endQuadratic !== null );
       return this._endQuadratic;
     },
     get endQuadratic() { return this.getEndQuadratic(); },
 
     getXExtremaT: function() {
-      if ( this._xExtremaT === undefined ) {
+      if ( this._xExtremaT === null ) {
         this._xExtremaT = Segment.Cubic.extremaT( this._start.x, this._control1.x, this._control2.x, this._end.x );
       }
       return this._xExtremaT;
@@ -10146,7 +9695,7 @@ define( 'KITE/segments/Cubic',['require','PHET_CORE/inherit','DOT/Bounds2','DOT/
     get xExtremaT() { return this.getXExtremaT(); },
 
     getYExtremaT: function() {
-      if ( this._yExtremaT === undefined ) {
+      if ( this._yExtremaT === null ) {
         this._yExtremaT = Segment.Cubic.extremaT( this._start.y, this._control1.y, this._control2.y, this._end.y );
       }
       return this._yExtremaT;
@@ -10154,7 +9703,7 @@ define( 'KITE/segments/Cubic',['require','PHET_CORE/inherit','DOT/Bounds2','DOT/
     get yExtremaT() { return this.getYExtremaT(); },
 
     getBounds: function() {
-      if ( this._bounds === undefined ) {
+      if ( this._bounds === null ) {
         this._bounds = Bounds2.NOTHING;
         this._bounds = this._bounds.withPoint( this._start );
         this._bounds = this._bounds.withPoint( this._end );
@@ -10199,8 +9748,8 @@ define( 'KITE/segments/Cubic',['require','PHET_CORE/inherit','DOT/Bounds2','DOT/
         this._tInflection2 = this._tCusp + sqrtDet;
       }
       else {
-        this._tInflection1 = null;
-        this._tInflection2 = null;
+        this._tInflection1 = NaN;
+        this._tInflection2 = NaN;
       }
     },
 
@@ -10210,8 +9759,8 @@ define( 'KITE/segments/Cubic',['require','PHET_CORE/inherit','DOT/Bounds2','DOT/
         // if there is a cusp, we'll split at the cusp into two quadratic bezier curves.
         // see http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.94.8088&rep=rep1&type=pdf (Singularities of rational Bezier curves - J Monterde, 2001)
         var subdividedAtCusp = this.subdivided( this.getTCusp );
-        this._startQuadratic = new Segment.Quadratic( subdividedAtCusp[ 0 ].start, subdividedAtCusp[ 0 ].control1, subdividedAtCusp[ 0 ].end, false );
-        this._endQuadratic = new Segment.Quadratic( subdividedAtCusp[ 1 ].start, subdividedAtCusp[ 1 ].control2, subdividedAtCusp[ 1 ].end, false );
+        this._startQuadratic = new kite.Quadratic( subdividedAtCusp[ 0 ].start, subdividedAtCusp[ 0 ].control1, subdividedAtCusp[ 0 ].end, false );
+        this._endQuadratic = new kite.Quadratic( subdividedAtCusp[ 1 ].start, subdividedAtCusp[ 1 ].control2, subdividedAtCusp[ 1 ].end, false );
       }
       else {
         this._startQuadratic = null;
@@ -10220,6 +9769,8 @@ define( 'KITE/segments/Cubic',['require','PHET_CORE/inherit','DOT/Bounds2','DOT/
     },
 
     getNondegenerateSegments: function() {
+      var self = this;
+
       var start = this._start;
       var control1 = this._control1;
       var control2 = this._control2;
@@ -10242,7 +9793,23 @@ define( 'KITE/segments/Cubic',['require','PHET_CORE/inherit','DOT/Bounds2','DOT/
         return reduced.getNondegenerateSegments();
       }
       else if ( arePointsCollinear( start, control1, end ) && arePointsCollinear( start, control2, end ) ) {
-        throw new Error( 'TODO, use extrema T funcs' );
+        var extremaPoints = this.getXExtremaT().concat( this.getYExtremaT() ).sort().map( function( t ) {
+          return self.positionAt( t );
+        } );
+
+        var segments = [];
+        var lastPoint = start;
+        if ( extremaPoints.length ) {
+          segments.push( new kite.Line( start, extremaPoints[ 0 ] ) );
+          lastPoint = extremaPoints[ 0 ];
+        }
+        for ( var i = 1; i < extremaPoints.length; i++ ) {
+          segments.push( new kite.Line( extremaPoints[ i - 1 ], extremaPoints[ i ] ) );
+          lastPoint = extremaPoints[ i ];
+        }
+        segments.push( new kite.Line( lastPoint, end ) );
+
+        return _.flatten( segments.map( function( segment ) { return segment.getNondegenerateSegments(); } ), true );
       }
       else {
         return [ this ];
@@ -10302,8 +9869,8 @@ define( 'KITE/segments/Cubic',['require','PHET_CORE/inherit','DOT/Bounds2','DOT/
       var rightMid = middle.blend( right, t );
       var mid = leftMid.blend( rightMid, t );
       return [
-        new Segment.Cubic( this._start, left, leftMid, mid ),
-        new Segment.Cubic( mid, rightMid, right, this._end )
+        new kite.Cubic( this._start, left, leftMid, mid ),
+        new kite.Cubic( mid, rightMid, right, this._end )
       ];
     },
 
@@ -10324,7 +9891,7 @@ define( 'KITE/segments/Cubic',['require','PHET_CORE/inherit','DOT/Bounds2','DOT/
 
         points.push( this.positionAt( t ).plus( this.tangentAt( t ).perpendicular().normalized().times( r ) ) );
         if ( i > 0 ) {
-          result.push( new Segment.Line( points[ i - 1 ], points[ i ] ) );
+          result.push( new kite.Line( points[ i - 1 ], points[ i ] ) );
         }
       }
 
@@ -10358,10 +9925,6 @@ define( 'KITE/segments/Cubic',['require','PHET_CORE/inherit','DOT/Bounds2','DOT/
         }
       } );
       return result.sort();
-    },
-
-    intersectsBounds: function( bounds ) {
-      throw new Error( 'Segment.Cubic.intersectsBounds unimplemented' ); // TODO: implement
     },
 
     // returns the resultant winding number of this ray intersecting this segment.
@@ -10421,7 +9984,7 @@ define( 'KITE/segments/Cubic',['require','PHET_CORE/inherit','DOT/Bounds2','DOT/
     },
 
     transformed: function( matrix ) {
-      return new Segment.Cubic( matrix.timesVector2( this._start ), matrix.timesVector2( this._control1 ), matrix.timesVector2( this._control2 ), matrix.timesVector2( this._end ) );
+      return new kite.Cubic( matrix.timesVector2( this._start ), matrix.timesVector2( this._control1 ), matrix.timesVector2( this._control2 ), matrix.timesVector2( this._end ) );
     },
 
     // returns a degree-reduced quadratic Bezier if possible, otherwise it returns null
@@ -10432,7 +9995,7 @@ define( 'KITE/segments/Cubic',['require','PHET_CORE/inherit','DOT/Bounds2','DOT/
       var controlA = this._control1.timesScalar( 3 ).minus( this._start ).dividedScalar( 2 );
       var controlB = this._control2.timesScalar( 3 ).minus( this._end ).dividedScalar( 2 );
       if ( controlA.minus( controlB ).magnitude() <= epsilon ) {
-        return new Segment.Quadratic(
+        return new kite.Quadratic(
           this._start,
           controlA.average( controlB ), // average the control points for stability. they should be almost identical
           this._end
@@ -10477,8 +10040,17 @@ define( 'KITE/segments/Cubic',['require','PHET_CORE/inherit','DOT/Bounds2','DOT/
     // }
   } );
 
+  Segment.addInvalidatingGetterSetter( Segment.Cubic, 'start' );
+  Segment.addInvalidatingGetterSetter( Segment.Cubic, 'control1' );
+  Segment.addInvalidatingGetterSetter( Segment.Cubic, 'control2' );
+  Segment.addInvalidatingGetterSetter( Segment.Cubic, 'end' );
+
   // finds what t values the cubic extrema are at (if any). This is just the 1-dimensional case, used for multiple purposes
   Segment.Cubic.extremaT = function( v0, v1, v2, v3 ) {
+    if ( v0 === v1 && v0 === v2 && v0 === v3 ) {
+      return [];
+    }
+
     // coefficients of derivative
     var a = -3 * v0 + 9 * v1 - 9 * v2 + 3 * v3;
     var b = 6 * v0 - 12 * v1 + 6 * v2;
@@ -10493,12 +10065,335 @@ define( 'KITE/segments/Cubic',['require','PHET_CORE/inherit','DOT/Bounds2','DOT/
 // Copyright 2002-2014, University of Colorado Boulder
 
 /**
+ * Forward and inverse transforms with 3x3 matrices
+ *
+ * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ */
+
+define( 'DOT/Transform3',['require','PHET_CORE/inherit','AXON/Events','DOT/dot','DOT/Matrix3','DOT/Vector2','DOT/Ray2'],function( require ) {
+  
+
+  var inherit = require( 'PHET_CORE/inherit' );
+  var Events = require( 'AXON/Events' );
+  var dot = require( 'DOT/dot' );
+
+  require( 'DOT/Matrix3' );
+  require( 'DOT/Vector2' );
+  require( 'DOT/Ray2' );
+
+  var scratchMatrix = new dot.Matrix3();
+
+  function checkMatrix( matrix ) {
+    return ( matrix instanceof dot.Matrix3 ) && matrix.isFinite();
+  }
+
+  /**
+   * @param {Matrix3} matrix
+   */
+  dot.Transform3 = function Transform3( matrix ) {
+    Events.call( this );
+
+    this.matrix = dot.Matrix3.IDENTITY.copy();
+
+    this.inverse = dot.Matrix3.IDENTITY.copy();
+    this.matrixTransposed = dot.Matrix3.IDENTITY.copy();
+    this.inverseTransposed = dot.Matrix3.IDENTITY.copy();
+
+    // all three dependent matrices are valid at the start since everything is the identity matrix!
+    this.inverseValid = true;
+    this.transposeValid = true;
+    this.inverseTransposeValid = true;
+
+    if ( matrix ) {
+      this.setMatrix( matrix );
+    }
+
+    phetAllocation && phetAllocation( 'Transform3' );
+  };
+  var Transform3 = dot.Transform3;
+
+  inherit( Events, Transform3, {
+    /*---------------------------------------------------------------------------*
+     * mutators
+     *----------------------------------------------------------------------------*/
+
+    /**
+     * Sets the value of the matrix directly from a Matrix3. Does not change the Matrix3 instance of this Transform3.
+     *
+     * @param {Matrix3} matrix
+     */
+    setMatrix: function( matrix ) {
+      assert && assert( checkMatrix( matrix ), 'Matrix has NaNs, non-finite values, or isn\'t a matrix!' );
+
+      // copy the matrix over to our matrix
+      this.matrix.set( matrix );
+
+      // set flags and notify
+      this.invalidate();
+    },
+
+    /**
+     * This should be called after our internal matrix is changed. It marks the other dependent matrices as invalid,
+     * and sends out notifications of the change
+     */
+    invalidate: function() {
+      // sanity check
+      assert && assert( this.matrix.isFinite() );
+
+      // dependent matrices now invalid
+      this.inverseValid = false;
+      this.transposeValid = false;
+      this.inverseTransposeValid = false;
+
+      this.trigger0( 'change' );
+    },
+
+    /**
+     * this.matrix = matrix * this.matrix
+     *
+     * @param {Matrix3} matrix
+     */
+    prepend: function( matrix ) {
+      assert && assert( checkMatrix( matrix ), 'Matrix has NaNs, non-finite values, or isn\'t a matrix!' );
+
+      // In the absence of a prepend-multiply function in Matrix3, copy over to a scratch matrix instead
+      // TODO: implement a prepend-multiply directly in Matrix3 for a performance increase
+      scratchMatrix.set( this.matrix );
+      this.matrix.set( matrix );
+      this.matrix.multiplyMatrix( scratchMatrix );
+
+      // set flags and notify
+      this.invalidate();
+    },
+
+    /**
+     * this.matrix = translation( x, y ) * this.matrix, see (scenery#119)
+     *
+     * @param {Matrix3} matrix
+     */
+    prependTranslation: function( x, y ) {
+      assert && assert( typeof x === 'number' && typeof y === 'number' && isFinite( x ) && isFinite( y ),
+        'Attempted to prepend non-finite or non-number (x,y) to the transform' );
+
+      this.matrix.prependTranslation( x, y );
+
+      // set flags and notify
+      this.invalidate();
+    },
+
+    /**
+     * this.matrix = this.matrix * matrix
+     *
+     * @param {Matrix3} matrix
+     */
+    append: function( matrix ) {
+      assert && assert( checkMatrix( matrix ), 'Matrix has NaNs, non-finite values, or isn\'t a matrix!' );
+
+      this.matrix.multiplyMatrix( matrix );
+
+      // set flags and notify
+      this.invalidate();
+    },
+
+    prependTransform: function( transform ) {
+      this.prepend( transform.matrix );
+    },
+
+    appendTransform: function( transform ) {
+      this.append( transform.matrix );
+    },
+
+    applyToCanvasContext: function( context ) {
+      context.setTransform( this.matrix.m00(), this.matrix.m10(), this.matrix.m01(), this.matrix.m11(), this.matrix.m02(), this.matrix.m12() );
+    },
+
+    /*---------------------------------------------------------------------------*
+     * getters
+     *----------------------------------------------------------------------------*/
+
+    copy: function() {
+      var transform = new Transform3( this.matrix );
+
+      transform.inverse = this.inverse;
+      transform.matrixTransposed = this.matrixTransposed;
+      transform.inverseTransposed = this.inverseTransposed;
+
+      transform.inverseValid = this.inverseValid;
+      transform.transposeValid = this.transposeValid;
+      transform.inverseTransposeValid = this.inverseTransposeValid;
+    },
+
+    getMatrix: function() {
+      return this.matrix;
+    },
+
+    getInverse: function() {
+      if ( !this.inverseValid ) {
+        this.inverseValid = true;
+
+        this.inverse.set( this.matrix );
+        this.inverse.invert();
+      }
+      return this.inverse;
+    },
+
+    getMatrixTransposed: function() {
+      if ( !this.transposeValid ) {
+        this.transposeValid = true;
+
+        this.matrixTransposed.set( this.matrix );
+        this.matrixTransposed.transpose();
+      }
+      return this.matrixTransposed;
+    },
+
+    getInverseTransposed: function() {
+      if ( !this.inverseTransposeValid ) {
+        this.inverseTransposeValid = true;
+
+        this.inverseTransposed.set( this.getInverse() ); // triggers inverse to be valid
+        this.inverseTransposed.transpose();
+      }
+      return this.inverseTransposed;
+    },
+
+    // false is "inconclusive"
+    isIdentity: function() {
+      return this.matrix.type === dot.Matrix3.Types.IDENTITY;
+    },
+
+    isFinite: function() {
+      return this.matrix.isFinite();
+    },
+
+    /*---------------------------------------------------------------------------*
+     * forward transforms (for Vector2 or scalar)
+     *----------------------------------------------------------------------------*/
+
+    // transform a position (includes translation)
+    transformPosition2: function( vec2 ) {
+      return this.matrix.timesVector2( vec2 );
+    },
+
+    // transform a vector (exclude translation)
+    transformDelta2: function( vec2 ) {
+      var m = this.getMatrix();
+      // m . vec2 - m . Vector2.ZERO
+      return new dot.Vector2( m.m00() * vec2.x + m.m01() * vec2.y, m.m10() * vec2.x + m.m11() * vec2.y );
+    },
+
+    // transform a normal vector (different than a normal vector)
+    transformNormal2: function( vec2 ) {
+      return this.getInverse().timesTransposeVector2( vec2 );
+    },
+
+    transformX: function( x ) {
+      var m = this.getMatrix();
+      assert && assert( !m.m01(), 'Transforming an X value with a rotation/shear is ill-defined' );
+      return m.m00() * x + m.m02();
+    },
+
+    transformY: function( y ) {
+      var m = this.getMatrix();
+      assert && assert( !m.m10(), 'Transforming a Y value with a rotation/shear is ill-defined' );
+      return m.m11() * y + m.m12();
+    },
+
+    transformDeltaX: function( x ) {
+      var m = this.getMatrix();
+      assert && assert( !m.m01(), 'Transforming an X value with a rotation/shear is ill-defined' );
+      // same as this.transformDelta2( new dot.Vector2( x, 0 ) ).x;
+      return m.m00() * x;
+    },
+
+    transformDeltaY: function( y ) {
+      var m = this.getMatrix();
+      assert && assert( !m.m10(), 'Transforming a Y value with a rotation/shear is ill-defined' );
+      // same as this.transformDelta2( new dot.Vector2( 0, y ) ).y;
+      return m.m11() * y;
+    },
+
+    transformBounds2: function( bounds2 ) {
+      return bounds2.transformed( this.matrix );
+    },
+
+    transformShape: function( shape ) {
+      return shape.transformed( this.matrix );
+    },
+
+    transformRay2: function( ray ) {
+      return new dot.Ray2( this.transformPosition2( ray.pos ), this.transformDelta2( ray.dir ).normalized() );
+    },
+
+    /*---------------------------------------------------------------------------*
+     * inverse transforms (for Vector2 or scalar)
+     *----------------------------------------------------------------------------*/
+
+    inversePosition2: function( vec2 ) {
+      return this.getInverse().timesVector2( vec2 );
+    },
+
+    inverseDelta2: function( vec2 ) {
+      var m = this.getInverse();
+      // m . vec2 - m . Vector2.ZERO
+      return new dot.Vector2( m.m00() * vec2.x + m.m01() * vec2.y, m.m10() * vec2.x + m.m11() * vec2.y );
+    },
+
+    inverseNormal2: function( vec2 ) {
+      return this.matrix.timesTransposeVector2( vec2 );
+    },
+
+    inverseX: function( x ) {
+      var m = this.getInverse();
+      assert && assert( !m.m01(), 'Inverting an X value with a rotation/shear is ill-defined' );
+      return m.m00() * x + m.m02();
+    },
+
+    inverseY: function( y ) {
+      var m = this.getInverse();
+      assert && assert( !m.m10(), 'Inverting a Y value with a rotation/shear is ill-defined' );
+      return m.m11() * y + m.m12();
+    },
+
+    inverseDeltaX: function( x ) {
+      var m = this.getInverse();
+      assert && assert( !m.m01(), 'Inverting an X value with a rotation/shear is ill-defined' );
+      // same as this.inverseDelta2( new dot.Vector2( x, 0 ) ).x;
+      return m.m00() * x;
+    },
+
+    inverseDeltaY: function( y ) {
+      var m = this.getInverse();
+      assert && assert( !m.m10(), 'Inverting a Y value with a rotation/shear is ill-defined' );
+      // same as this.inverseDelta2( new dot.Vector2( 0, y ) ).y;
+      return m.m11() * y;
+    },
+
+    inverseBounds2: function( bounds2 ) {
+      return bounds2.transformed( this.getInverse() );
+    },
+
+    inverseShape: function( shape ) {
+      return shape.transformed( this.getInverse() );
+    },
+
+    inverseRay2: function( ray ) {
+      return new dot.Ray2( this.inversePosition2( ray.pos ), this.inverseDelta2( ray.dir ).normalized() );
+    }
+  } );
+
+  return Transform3;
+} );
+
+// Copyright 2002-2014, University of Colorado Boulder
+
+/**
  * Elliptical arc segment
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-define( 'KITE/segments/EllipticalArc',['require','PHET_CORE/inherit','DOT/Vector2','DOT/Bounds2','DOT/Matrix3','DOT/Transform3','DOT/Util','DOT/Util','KITE/kite','KITE/segments/Segment','KITE/util/Subpath'],function( require ) {
+define( 'KITE/segments/EllipticalArc',['require','PHET_CORE/inherit','DOT/Vector2','DOT/Bounds2','DOT/Matrix3','DOT/Transform3','DOT/Util','DOT/Util','KITE/kite','KITE/segments/Segment'],function( require ) {
   
 
   var inherit = require( 'PHET_CORE/inherit' );
@@ -10511,37 +10406,12 @@ define( 'KITE/segments/EllipticalArc',['require','PHET_CORE/inherit','DOT/Vector
 
   var kite = require( 'KITE/kite' );
   var Segment = require( 'KITE/segments/Segment' );
-  require( 'KITE/util/Subpath' );
 
   // TODO: notes at http://www.w3.org/TR/SVG/implnote.html#PathElementImplementationNotes
   // Canvas notes were at http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-ellipse
   // context.ellipse was removed from the Canvas spec
-  Segment.EllipticalArc = function EllipticalArc( center, radiusX, radiusY, rotation, startAngle, endAngle, anticlockwise ) {
-    if ( radiusX < 0 ) {
-      // support this case since we might actually need to handle it inside of strokes?
-      radiusX = -radiusX;
-      startAngle = Math.PI - startAngle;
-      endAngle = Math.PI - endAngle;
-      anticlockwise = !anticlockwise;
-    }
-    if ( radiusY < 0 ) {
-      // support this case since we might actually need to handle it inside of strokes?
-      radiusY = -radiusY;
-      startAngle = -startAngle;
-      endAngle = -endAngle;
-      anticlockwise = !anticlockwise;
-    }
-    if ( radiusX < radiusY ) {
-      // swap radiusX and radiusY internally for consistent Canvas / SVG output
-      rotation += Math.PI / 2;
-      startAngle -= Math.PI / 2;
-      endAngle -= Math.PI / 2;
-
-      // swap radiusX and radiusY
-      var tmpR = radiusX;
-      radiusX = radiusY;
-      radiusY = tmpR;
-    }
+  kite.EllipticalArc = Segment.EllipticalArc = function EllipticalArc( center, radiusX, radiusY, rotation, startAngle, endAngle, anticlockwise ) {
+    Segment.call( this );
 
     this._center = center;
     this._radiusX = radiusX;
@@ -10551,65 +10421,67 @@ define( 'KITE/segments/EllipticalArc',['require','PHET_CORE/inherit','DOT/Vector
     this._endAngle = endAngle;
     this._anticlockwise = anticlockwise;
 
-    // TODO: performance test removal of these undefined declarations
-    this._unitTransform = undefined;
-    this._start = undefined;
-    this._end = undefined;
-    this._startTangent = undefined;
-    this._endTangent = undefined;
-    this._actualEndAngle = undefined;
-    this._isFullPerimeter = undefined;
-    this._angleDifference = undefined;
-    this._unitArcSegment = undefined;
-
-    if ( radiusX < radiusY ) {
-      // TODO: check this
-      throw new Error( 'Not verified to work if radiusX < radiusY' );
-    }
-
-    // constraints shared with Segment.Arc
-    assert && assert( !( ( !anticlockwise && endAngle - startAngle <= -Math.PI * 2 ) || ( anticlockwise && startAngle - endAngle <= -Math.PI * 2 ) ), 'Not handling elliptical arcs with start/end angles that show differences in-between browser handling' );
-    assert && assert( !( ( !anticlockwise && endAngle - startAngle > Math.PI * 2 ) || ( anticlockwise && startAngle - endAngle > Math.PI * 2 ) ), 'Not handling elliptical arcs with start/end angles that show differences in-between browser handling' );
+    this.invalidate();
   };
   inherit( Segment, Segment.EllipticalArc, {
 
-    getCenter: function() {
-      return this._center;
-    },
-    get center() { return this.getCenter(); },
+    // @public - Clears cached information, should be called when any of the 'constructor arguments' are mutated.
+    invalidate: function() {
+      // Lazily-computed derived information
+      this._unitTransform = null; // {Transform3 | null} - Mapping between our ellipse and a unit circle
+      this._start = null; // {Vector2 | null}
+      this._end = null; // {Vector2 | null}
+      this._startTangent = null; // {Vector2 | null}
+      this._endTangent = null; // {Vector2 | null}
+      this._actualEndAngle = null; // {number | null} - End angle in relation to our start angle (can get remapped)
+      this._isFullPerimeter = null; // {boolean | null} - Whether it's a full ellipse (and not just an arc)
+      this._angleDifference = null; // {number | null}
+      this._unitArcSegment = null; // {Segment.Arc | null} - Corresponding circular arc for our unit transform.
+      this._bounds = null; // {Bounds2 | null}
 
-    getRadiusX: function() {
-      return this._radiusX;
-    },
-    get radiusX() { return this.getRadiusX(); },
+      // remapping of negative radii
+      if ( this._radiusX < 0 ) {
+        // support this case since we might actually need to handle it inside of strokes?
+        this._radiusX = -this._radiusX;
+        this._startAngle = Math.PI - this._startAngle;
+        this._endAngle = Math.PI - this._endAngle;
+        this._anticlockwise = !this._anticlockwise;
+      }
+      if ( this._radiusY < 0 ) {
+        // support this case since we might actually need to handle it inside of strokes?
+        this._radiusY = -this._radiusY;
+        this._startAngle = -this._startAngle;
+        this._endAngle = -this._endAngle;
+        this._anticlockwise = !this._anticlockwise;
+      }
+      if ( this._radiusX < this._radiusY ) {
+        // swap radiusX and radiusY internally for consistent Canvas / SVG output
+        this._rotation += Math.PI / 2;
+        this._startAngle -= Math.PI / 2;
+        this._endAngle -= Math.PI / 2;
 
-    getRadiusY: function() {
-      return this._radiusY;
-    },
-    get radiusY() { return this.getRadiusY(); },
+        // swap radiusX and radiusY
+        var tmpR = this._radiusX;
+        this._radiusX = this._radiusY;
+        this._radiusY = tmpR;
+      }
 
-    getRotation: function() {
-      return this._rotation;
-    },
-    get rotation() { return this.getRotation(); },
+      if ( this._radiusX < this._radiusY ) {
+        // TODO: check this
+        throw new Error( 'Not verified to work if radiusX < radiusY' );
+      }
 
-    getStartAngle: function() {
-      return this._startAngle;
+      // constraints shared with Segment.Arc
+      assert && assert( !( ( !this.anticlockwise && this.endAngle - this.startAngle <= -Math.PI * 2 ) ||
+                           ( this.anticlockwise && this.startAngle - this.endAngle <= -Math.PI * 2 ) ),
+        'Not handling elliptical arcs with start/end angles that show differences in-between browser handling' );
+      assert && assert( !( ( !this.anticlockwise && this.endAngle - this.startAngle > Math.PI * 2 ) ||
+                           ( this.anticlockwise && this.startAngle - this.endAngle > Math.PI * 2 ) ),
+        'Not handling elliptical arcs with start/end angles that show differences in-between browser handling' );
     },
-    get startAngle() { return this.getStartAngle(); },
-
-    getEndAngle: function() {
-      return this._endAngle;
-    },
-    get endAngle() { return this.getEndAngle(); },
-
-    getAnticlockwise: function() {
-      return this._anticlockwise;
-    },
-    get anticlockwise() { return this.getAnticlockwise(); },
 
     getUnitTransform: function() {
-      if ( this._unitTransform === undefined ) {
+      if ( this._unitTransform === null ) {
         this._unitTransform = Segment.EllipticalArc.computeUnitTransform( this._center, this._radiusX, this._radiusY, this._rotation );
       }
       return this._unitTransform;
@@ -10617,7 +10489,7 @@ define( 'KITE/segments/EllipticalArc',['require','PHET_CORE/inherit','DOT/Vector
     get unitTransform() { return this.getUnitTransform(); },
 
     getStart: function() {
-      if ( this._start === undefined ) {
+      if ( this._start === null ) {
         this._start = this.positionAtAngle( this._startAngle );
       }
       return this._start;
@@ -10625,7 +10497,7 @@ define( 'KITE/segments/EllipticalArc',['require','PHET_CORE/inherit','DOT/Vector
     get start() { return this.getStart(); },
 
     getEnd: function() {
-      if ( this._end === undefined ) {
+      if ( this._end === null ) {
         this._end = this.positionAtAngle( this._endAngle );
       }
       return this._end;
@@ -10633,7 +10505,7 @@ define( 'KITE/segments/EllipticalArc',['require','PHET_CORE/inherit','DOT/Vector
     get end() { return this.getEnd(); },
 
     getStartTangent: function() {
-      if ( this._startTangent === undefined ) {
+      if ( this._startTangent === null ) {
         this._startTangent = this.tangentAtAngle( this._startAngle );
       }
       return this._startTangent;
@@ -10641,7 +10513,7 @@ define( 'KITE/segments/EllipticalArc',['require','PHET_CORE/inherit','DOT/Vector
     get startTangent() { return this.getStartTangent(); },
 
     getEndTangent: function() {
-      if ( this._endTangent === undefined ) {
+      if ( this._endTangent === null ) {
         this._endTangent = this.tangentAtAngle( this._endAngle );
       }
       return this._endTangent;
@@ -10649,7 +10521,7 @@ define( 'KITE/segments/EllipticalArc',['require','PHET_CORE/inherit','DOT/Vector
     get endTangent() { return this.getEndTangent(); },
 
     getActualEndAngle: function() {
-      if ( this._actualEndAngle === undefined ) {
+      if ( this._actualEndAngle === null ) {
         // compute an actual end angle so that we can smoothly go from this._startAngle to this._actualEndAngle
         if ( this._anticlockwise ) {
           // angle is 'decreasing'
@@ -10685,7 +10557,7 @@ define( 'KITE/segments/EllipticalArc',['require','PHET_CORE/inherit','DOT/Vector
     get actualEndAngle() { return this.getActualEndAngle(); },
 
     getIsFullPerimeter: function() {
-      if ( this._isFullPerimeter === undefined ) {
+      if ( this._isFullPerimeter === null ) {
         this._isFullPerimeter = ( !this._anticlockwise && this._endAngle - this._startAngle >= Math.PI * 2 ) || ( this._anticlockwise && this._startAngle - this._endAngle >= Math.PI * 2 );
       }
       return this._isFullPerimeter;
@@ -10693,7 +10565,7 @@ define( 'KITE/segments/EllipticalArc',['require','PHET_CORE/inherit','DOT/Vector
     get isFullPerimeter() { return this.getIsFullPerimeter(); },
 
     getAngleDifference: function() {
-      if ( this._angleDifference === undefined ) {
+      if ( this._angleDifference === null ) {
         // compute an angle difference that represents how "much" of the circle our arc covers
         this._angleDifference = this._anticlockwise ? this._startAngle - this._endAngle : this._endAngle - this._startAngle;
         if ( this._angleDifference < 0 ) {
@@ -10707,15 +10579,15 @@ define( 'KITE/segments/EllipticalArc',['require','PHET_CORE/inherit','DOT/Vector
 
     // a unit arg segment that we can map to our ellipse. useful for hit testing and such.
     getUnitArcSegment: function() {
-      if ( this._unitArcSegment === undefined ) {
-        this._unitArcSegment = new Segment.Arc( Vector2.ZERO, 1, this._startAngle, this._endAngle, this._anticlockwise );
+      if ( this._unitArcSegment === null ) {
+        this._unitArcSegment = new kite.Arc( Vector2.ZERO, 1, this._startAngle, this._endAngle, this._anticlockwise );
       }
       return this._unitArcSegment;
     },
 
     // temporary shims
     getBounds: function() {
-      if ( this._bounds === undefined ) {
+      if ( this._bounds === null ) {
         this._bounds = Bounds2.NOTHING.withPoint( this.getStart() )
           .withPoint( this.getEnd() );
 
@@ -10754,7 +10626,7 @@ define( 'KITE/segments/EllipticalArc',['require','PHET_CORE/inherit','DOT/Vector
         if ( Math.abs( this._endAngle - this._startAngle ) === Math.PI * 2 ) {
           endAngle = this._anticlockwise ? startAngle - Math.PI * 2 : startAngle + Math.PI * 2;
         }
-        return [ new Segment.Arc( this._center, this._radiusX, startAngle, endAngle, this._anticlockwise ) ];
+        return [ new kite.Arc( this._center, this._radiusX, startAngle, endAngle, this._anticlockwise ) ];
       }
       else {
         return [ this ];
@@ -10843,7 +10715,7 @@ define( 'KITE/segments/EllipticalArc',['require','PHET_CORE/inherit','DOT/Vector
 
         points.push( this.positionAtAngle( angle ).plus( this.tangentAtAngle( angle ).perpendicular().normalized().times( r ) ) );
         if ( i > 0 ) {
-          result.push( new Segment.Line( points[ i - 1 ], points[ i ] ) );
+          result.push( new kite.Line( points[ i - 1 ], points[ i ] ) );
         }
       }
 
@@ -10913,13 +10785,9 @@ define( 'KITE/segments/EllipticalArc',['require','PHET_CORE/inherit','DOT/Vector
       var angleT = this.angleAt( t );
       var angle1 = this.angleAt( 1 );
       return [
-        new Segment.EllipticalArc( this._center, this._radiusX, this._radiusY, this._rotation, angle0, angleT, this._anticlockwise ),
-        new Segment.EllipticalArc( this._center, this._radiusX, this._radiusY, this._rotation, angleT, angle1, this._anticlockwise )
+        new kite.EllipticalArc( this._center, this._radiusX, this._radiusY, this._rotation, angle0, angleT, this._anticlockwise ),
+        new kite.EllipticalArc( this._center, this._radiusX, this._radiusY, this._rotation, angleT, angle1, this._anticlockwise )
       ];
-    },
-
-    intersectsBounds: function( bounds ) {
-      throw new Error( 'Segment.EllipticalArc.intersectsBounds unimplemented' );
     },
 
     intersection: function( ray ) {
@@ -10978,9 +10846,17 @@ define( 'KITE/segments/EllipticalArc',['require','PHET_CORE/inherit','DOT/Vector
         endAngle = anticlockwise ? startAngle - Math.PI * 2 : startAngle + Math.PI * 2;
       }
 
-      return new Segment.EllipticalArc( matrix.timesVector2( this._center ), radiusX, radiusY, rotation, startAngle, endAngle, anticlockwise );
+      return new kite.EllipticalArc( matrix.timesVector2( this._center ), radiusX, radiusY, rotation, startAngle, endAngle, anticlockwise );
     }
   } );
+
+  Segment.addInvalidatingGetterSetter( Segment.EllipticalArc, 'center' );
+  Segment.addInvalidatingGetterSetter( Segment.EllipticalArc, 'radiusX' );
+  Segment.addInvalidatingGetterSetter( Segment.EllipticalArc, 'radiusY' );
+  Segment.addInvalidatingGetterSetter( Segment.EllipticalArc, 'rotation' );
+  Segment.addInvalidatingGetterSetter( Segment.EllipticalArc, 'startAngle' );
+  Segment.addInvalidatingGetterSetter( Segment.EllipticalArc, 'endAngle' );
+  Segment.addInvalidatingGetterSetter( Segment.EllipticalArc, 'anticlockwise' );
 
   // adapted from http://www.w3.org/TR/SVG/implnote.html#PathElementImplementationNotes
   // transforms the unit circle onto our ellipse
@@ -11013,61 +10889,85 @@ define( 'KITE/segments/EllipticalArc',['require','PHET_CORE/inherit','DOT/Vector
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-define( 'KITE/Shape',['require','KITE/kite','DOT/Vector2','DOT/Bounds2','DOT/Ray2','KITE/util/Subpath','KITE/parser/svgPath','KITE/util/LineStyles','KITE/segments/Arc','KITE/segments/Cubic','KITE/segments/EllipticalArc','KITE/segments/Line','KITE/segments/Quadratic'],function( require ) {
+define( 'KITE/Shape',['require','KITE/kite','PHET_CORE/inherit','AXON/Events','DOT/Vector2','DOT/Bounds2','DOT/Ray2','KITE/util/Subpath','KITE/parser/svgPath','KITE/segments/Arc','KITE/segments/Cubic','KITE/segments/EllipticalArc','KITE/segments/Line','KITE/segments/Quadratic'],function( require ) {
   
 
   var kite = require( 'KITE/kite' );
 
-  // TODO: clean up imports
+  var inherit = require( 'PHET_CORE/inherit' );
+  var Events = require( 'AXON/Events' );
+
   var Vector2 = require( 'DOT/Vector2' );
   var Bounds2 = require( 'DOT/Bounds2' );
   var Ray2 = require( 'DOT/Ray2' );
 
   var Subpath = require( 'KITE/util/Subpath' );
-
   var svgPath = require( 'KITE/parser/svgPath' );
-  require( 'KITE/util/LineStyles' );
-  require( 'KITE/segments/Arc' );
-  require( 'KITE/segments/Cubic' );
-  require( 'KITE/segments/EllipticalArc' );
-  require( 'KITE/segments/Line' );
-  require( 'KITE/segments/Quadratic' );
+  var Arc = require( 'KITE/segments/Arc' );
+  var Cubic = require( 'KITE/segments/Cubic' );
+  var EllipticalArc = require( 'KITE/segments/EllipticalArc' );
+  var Line = require( 'KITE/segments/Line' );
+  var Quadratic = require( 'KITE/segments/Quadratic' );
 
   // for brevity
   function p( x, y ) { return new Vector2( x, y ); }
 
   function v( x, y ) { return new Vector2( x, y ); } // TODO: use this version in general, it makes more sense and is easier to type
 
+  // The tension parameter controls how smoothly the curve turns through its control points. For a Catmull-Rom
+  // curve, the tension is zero. The tension should range from -1 to 1.
+  function weightedSplineVector( beforeVector, currentVector, afterVector, tension ) {
+    return afterVector.copy()
+      .subtract( beforeVector )
+      .multiplyScalar( ( 1 - tension ) / 6 )
+      .add( currentVector );
+  }
+
   // a normalized vector for non-zero winding checks
   // var weirdDir = p( Math.PI, 22 / 7 );
 
   // all arguments optional, they are for the copy() method. if used, ensure that 'bounds' is consistent with 'subpaths'
   kite.Shape = function Shape( subpaths, bounds ) {
-    // lower-level piecewise mathematical description using segments, also individually immutable
-    this.subpaths = ( typeof subpaths === 'object' ) ? subpaths : [];
-    assert && assert( this.subpaths.length === 0 || this.subpaths[ 0 ].constructor.name !== 'Array' );
+    var self = this;
 
-    // computed bounds for all pieces added so far
-    this.bounds = ( bounds || Bounds2.NOTHING ).copy();
+    Events.call( this );
 
-    var that = this;
+    // @public Lower-level piecewise mathematical description using segments, also individually immutable
+    this.subpaths = [];
+
+    // If non-null, computed bounds for all pieces added so far. Lazily computed with getBounds/bounds ES5 getter
+    this._bounds = bounds ? bounds.copy() : null; // {Bounds2 | null}
+
+    this.resetControlPoints();
+
+    this._invalidateListener = this.invalidate.bind( this );
+    this._invalidatingPoints = false; // So we can invalidate all of the points without firing invalidation tons of times
+
+    // Add in subpaths from the constructor (if applicable)
+    if ( typeof subpaths === 'object' ) {
+      // assume it's an array
+      for ( var i = 0; i < subpaths.length; i++ ) {
+        this.addSubpath( subpaths[ i ] );
+      }
+    }
+
     if ( subpaths && typeof subpaths !== 'object' ) {
       assert && assert( typeof subpaths === 'string', 'if subpaths is not an object, it must be a string' );
       // parse the SVG path
       _.each( svgPath.parse( subpaths ), function( item ) {
         assert && assert( Shape.prototype[ item.cmd ] !== undefined, 'method ' + item.cmd + ' from parsed SVG does not exist' );
-        that[ item.cmd ].apply( that, item.args );
+        self[ item.cmd ].apply( self, item.args );
       } );
     }
 
-    this.resetControlPoints();
+    // defines _bounds if not already defined (among other things)
+    this.invalidate();
 
     phetAllocation && phetAllocation( 'Shape' );
   };
   var Shape = kite.Shape;
 
-  Shape.prototype = {
-    constructor: Shape,
+  inherit( Events, Shape, {
 
     // for tracking the last quadratic/cubic control point for smooth* functions
     // see https://github.com/phetsims/kite/issues/38
@@ -11084,11 +10984,21 @@ define( 'KITE/Shape',['require','KITE/kite','DOT/Vector2','DOT/Bounds2','DOT/Ray
       this.lastCubicControlPoint = point;
     },
 
+    // Adds a new subpath if there have already been draw calls made. Will prevent any line or connection from the last
+    // draw call to future draw calls.
+    subpath: function() {
+      if ( this.hasSubpaths() ) {
+        this.addSubpath( new Subpath() );
+      }
+
+      return this; // for chaining
+    },
+
     moveTo: function( x, y ) { return this.moveToPoint( v( x, y ) ); },
     moveToRelative: function( x, y ) { return this.moveToPointRelative( v( x, y ) ); },
     moveToPointRelative: function( point ) { return this.moveToPoint( this.getRelativePoint().plus( point ) ); },
     moveToPoint: function( point ) {
-      this.addSubpath( new kite.Subpath().addPoint( point ) );
+      this.addSubpath( new Subpath().addPoint( point ) );
       this.resetControlPoints();
 
       return this;
@@ -11102,10 +11012,9 @@ define( 'KITE/Shape',['require','KITE/kite','DOT/Vector2','DOT/Bounds2','DOT/Ray
       if ( this.hasSubpaths() ) {
         var start = this.getLastSubpath().getLastPoint();
         var end = point;
-        var line = new kite.Segment.Line( start, end );
+        var line = new Line( start, end );
         this.getLastSubpath().addPoint( end );
         this.addSegmentAndBounds( line );
-        assert && assert( !isNaN( this.bounds.getX() ) );
       }
       else {
         this.ensure( point );
@@ -11136,7 +11045,7 @@ define( 'KITE/Shape',['require','KITE/kite','DOT/Vector2','DOT/Bounds2','DOT/Ray
       // see http://www.w3.org/TR/2dcontext/#dom-context-2d-quadraticcurveto
       this.ensure( controlPoint );
       var start = this.getLastSubpath().getLastPoint();
-      var quadratic = new kite.Segment.Quadratic( start, controlPoint, point );
+      var quadratic = new Quadratic( start, controlPoint, point );
       this.getLastSubpath().addPoint( point );
       var nondegenerateSegments = quadratic.getNondegenerateSegments();
       _.each( nondegenerateSegments, function( segment ) {
@@ -11161,7 +11070,7 @@ define( 'KITE/Shape',['require','KITE/kite','DOT/Vector2','DOT/Bounds2','DOT/Ray
       // see http://www.w3.org/TR/2dcontext/#dom-context-2d-quadraticcurveto
       this.ensure( control1 );
       var start = this.getLastSubpath().getLastPoint();
-      var cubic = new kite.Segment.Cubic( start, control1, control2, point );
+      var cubic = new Cubic( start, control1, control2, point );
 
       var nondegenerateSegments = cubic.getNondegenerateSegments();
       _.each( nondegenerateSegments, function( segment ) {
@@ -11178,7 +11087,7 @@ define( 'KITE/Shape',['require','KITE/kite','DOT/Vector2','DOT/Bounds2','DOT/Ray
     arcPoint: function( center, radius, startAngle, endAngle, anticlockwise ) {
       // see http://www.w3.org/TR/2dcontext/#dom-context-2d-arc
 
-      var arc = new kite.Segment.Arc( center, radius, startAngle, endAngle, anticlockwise );
+      var arc = new Arc( center, radius, startAngle, endAngle, anticlockwise );
 
       // we are assuming that the normal conditions were already met (or exceptioned out) so that these actually work with canvas
       var startPoint = arc.getStart();
@@ -11186,11 +11095,11 @@ define( 'KITE/Shape',['require','KITE/kite','DOT/Vector2','DOT/Bounds2','DOT/Ray
 
       // if there is already a point on the subpath, and it is different than our starting point, draw a line between them
       if ( this.hasSubpaths() && this.getLastSubpath().getLength() > 0 && !startPoint.equals( this.getLastSubpath().getLastPoint(), 0 ) ) {
-        this.addSegmentAndBounds( new kite.Segment.Line( this.getLastSubpath().getLastPoint(), startPoint ) );
+        this.addSegmentAndBounds( new Line( this.getLastSubpath().getLastPoint(), startPoint ) );
       }
 
       if ( !this.hasSubpaths() ) {
-        this.addSubpath( new kite.Subpath() );
+        this.addSubpath( new Subpath() );
       }
 
       // technically the Canvas spec says to add the start point, so we do this even though it is probably completely unnecessary (there is no conditional)
@@ -11207,7 +11116,7 @@ define( 'KITE/Shape',['require','KITE/kite','DOT/Vector2','DOT/Bounds2','DOT/Ray
     ellipticalArcPoint: function( center, radiusX, radiusY, rotation, startAngle, endAngle, anticlockwise ) {
       // see http://www.w3.org/TR/2dcontext/#dom-context-2d-arc
 
-      var ellipticalArc = new kite.Segment.EllipticalArc( center, radiusX, radiusY, rotation, startAngle, endAngle, anticlockwise );
+      var ellipticalArc = new EllipticalArc( center, radiusX, radiusY, rotation, startAngle, endAngle, anticlockwise );
 
       // we are assuming that the normal conditions were already met (or exceptioned out) so that these actually work with canvas
       var startPoint = ellipticalArc.start;
@@ -11215,11 +11124,11 @@ define( 'KITE/Shape',['require','KITE/kite','DOT/Vector2','DOT/Bounds2','DOT/Ray
 
       // if there is already a point on the subpath, and it is different than our starting point, draw a line between them
       if ( this.hasSubpaths() && this.getLastSubpath().getLength() > 0 && !startPoint.equals( this.getLastSubpath().getLastPoint(), 0 ) ) {
-        this.addSegmentAndBounds( new kite.Segment.Line( this.getLastSubpath().getLastPoint(), startPoint ) );
+        this.addSegmentAndBounds( new Line( this.getLastSubpath().getLastPoint(), startPoint ) );
       }
 
       if ( !this.hasSubpaths() ) {
-        this.addSubpath( new kite.Subpath() );
+        this.addSubpath( new Subpath() );
       }
 
       // technically the Canvas spec says to add the start point, so we do this even though it is probably completely unnecessary (there is no conditional)
@@ -11235,7 +11144,7 @@ define( 'KITE/Shape',['require','KITE/kite','DOT/Vector2','DOT/Bounds2','DOT/Ray
     close: function() {
       if ( this.hasSubpaths() ) {
         var previousPath = this.getLastSubpath();
-        var nextPath = new kite.Subpath();
+        var nextPath = new Subpath();
 
         previousPath.close();
         this.addSubpath( nextPath );
@@ -11297,17 +11206,17 @@ define( 'KITE/Shape',['require','KITE/kite','DOT/Vector2','DOT/Bounds2','DOT/Ray
     },
 
     rect: function( x, y, width, height ) {
-      var subpath = new kite.Subpath();
+      var subpath = new Subpath();
       this.addSubpath( subpath );
       subpath.addPoint( v( x, y ) );
       subpath.addPoint( v( x + width, y ) );
       subpath.addPoint( v( x + width, y + height ) );
       subpath.addPoint( v( x, y + height ) );
-      this.addSegmentAndBounds( new kite.Segment.Line( subpath.points[ 0 ], subpath.points[ 1 ] ) );
-      this.addSegmentAndBounds( new kite.Segment.Line( subpath.points[ 1 ], subpath.points[ 2 ] ) );
-      this.addSegmentAndBounds( new kite.Segment.Line( subpath.points[ 2 ], subpath.points[ 3 ] ) );
+      this.addSegmentAndBounds( new Line( subpath.points[ 0 ], subpath.points[ 1 ] ) );
+      this.addSegmentAndBounds( new Line( subpath.points[ 1 ], subpath.points[ 2 ] ) );
+      this.addSegmentAndBounds( new Line( subpath.points[ 2 ], subpath.points[ 3 ] ) );
       subpath.close();
-      this.addSubpath( new kite.Subpath() );
+      this.addSubpath( new Subpath() );
       this.getLastSubpath().addPoint( v( x, y ) );
       assert && assert( !isNaN( this.bounds.getX() ) );
       this.resetControlPoints();
@@ -11354,6 +11263,88 @@ define( 'KITE/Shape',['require','KITE/kite','DOT/Vector2','DOT/Bounds2','DOT/Ray
       return this.close();
     },
 
+    /**
+     * This is a convenience function that allows to generate Cardinal splines
+     * from a position array. Cardinal spline differs from Bezier curves in that all
+     * defined points on a Cardinal spline are on the path itself.
+     *
+     * It includes a tension parameter to allow the client to specify how tightly
+     * the path interpolates between points. One can think of the tension as the tension in
+     * a rubber band around pegs. however unlike a rubber band the tension can be negative.
+     * the tension ranges from -1 to 1
+     *
+     * @param {Array.<Vector2>} positions
+     * @param {Object} [options] - see documentation below
+     * @returns {Shape}
+     */
+    cardinalSpline: function( positions, options ) {
+      options = _.extend( {
+        // the tension parameter controls how smoothly the curve turns through its
+        // control points. For a Catmull-Rom curve the tension is zero.
+        // the tension should range from  -1 to 1
+        tension: 0,
+
+        // is the resulting shape forming a closed line?
+        isClosedLineSegments: false
+      }, options );
+
+      assert && assert( options.tension < 1 && options.tension > -1, ' the tension goes from -1 to 1 ' );
+
+      var pointNumber = positions.length; // number of points in the array
+
+      // if the line is open, there is one less segments than point vectors
+      var segmentNumber = ( options.isClosedLineSegments ) ? pointNumber : pointNumber - 1;
+
+      for ( var i = 0; i < segmentNumber; i++ ) {
+        var cardinalPoints; // {Array.<Vector2>} cardinal points Array
+        if ( i === 0 && !options.isClosedLineSegments ) {
+          cardinalPoints = [
+            positions[ 0 ],
+            positions[ 0 ],
+            positions[ 1 ],
+            positions[ 2 ] ];
+        }
+        else if ( (i === segmentNumber - 1) && !options.isClosedLineSegments ) {
+          cardinalPoints = [
+            positions[ i - 1 ],
+            positions[ i ],
+            positions[ i + 1 ],
+            positions[ i + 1 ] ];
+        }
+        else {
+          cardinalPoints = [
+            positions[ ( i - 1 + pointNumber ) % pointNumber ],
+            positions[ i % pointNumber ],
+            positions[ ( i + 1 ) % pointNumber ],
+            positions[ ( i + 2 ) % pointNumber ] ];
+        }
+
+        // Cardinal Spline to Cubic Bezier conversion matrix
+        //    0                 1             0            0
+        //  (-1+tension)/6      1      (1-tension)/6       0
+        //    0            (1-tension)/6      1       (-1+tension)/6
+        //    0                 0             1           0
+
+        // {Array.<Vector2>} bezier points Array
+        var bezierPoints = [
+          cardinalPoints[ 1 ],
+          weightedSplineVector( cardinalPoints[ 0 ], cardinalPoints[ 1 ], cardinalPoints[ 2 ], options.tension ),
+          weightedSplineVector( cardinalPoints[ 3 ], cardinalPoints[ 2 ], cardinalPoints[ 1 ], options.tension ),
+          cardinalPoints[ 2 ]
+        ];
+
+        // special operations on the first point
+        if ( i === 0 ) {
+          this.ensure( bezierPoints[ 0 ] );
+          this.getLastSubpath().addPoint( bezierPoints[ 0 ] );
+        }
+
+        this.cubicCurveToPoint( bezierPoints[ 1 ], bezierPoints[ 2 ], bezierPoints[ 3 ] );
+      }
+
+      return this;
+    },
+
     copy: function() {
       // copy each individual subpath, so future modifications to either Shape doesn't affect the other one
       return new Shape( _.map( this.subpaths, function( subpath ) { return subpath.copy(); } ), this.bounds );
@@ -11376,7 +11367,7 @@ define( 'KITE/Shape',['require','KITE/kite','DOT/Vector2','DOT/Bounds2','DOT/Ray
         if ( subpath.isDrawable() ) {
           // since the commands after this are relative to the previous 'point', we need to specify a move to the initial point
           var startPoint = subpath.getFirstSegment().start;
-          assert && assert( startPoint.equals( subpath.getFirstPoint(), 0.00001 ) ); // sanity check
+          assert && assert( startPoint.equalsEpsilon( subpath.getFirstPoint(), 0.00001 ) ); // sanity check
           var string = 'M ' + kite.svgNumber( startPoint.x ) + ' ' + kite.svgNumber( startPoint.y ) + ' ';
 
           string += _.map( subpath.segments, function( segment ) { return segment.getSVGPathFragment(); } ).join( ' ' );
@@ -11465,27 +11456,6 @@ define( 'KITE/Shape',['require','KITE/kite','DOT/Vector2','DOT/Bounds2','DOT/Ray
       }
     },
 
-    getBoundsWithTransform: function( matrix, lineStyles ) {
-      // if we don't need to handle rotation/shear, don't use the extra effort!
-      if ( matrix.isAxisAligned() ) {
-        return this.computeBounds( lineStyles );
-      }
-
-      var bounds = Bounds2.NOTHING.copy();
-
-      var numSubpaths = this.subpaths.length;
-      for ( var i = 0; i < numSubpaths; i++ ) {
-        var subpath = this.subpaths[ i ];
-        bounds.includeBounds( subpath.getBoundsWithTransform( matrix ) );
-      }
-
-      if ( lineStyles ) {
-        bounds.includeBounds( this.getStrokedShape( lineStyles ).getBoundsWithTransform( matrix ) );
-      }
-
-      return bounds;
-    },
-
     containsPoint: function( point ) {
       // we pick a ray, and determine the winding number over that ray. if the number of segments crossing it CCW == number of segments crossing it CW, then the point is contained in the shape
       var ray = new Ray2( point, Vector2.X_UNIT );
@@ -11537,27 +11507,44 @@ define( 'KITE/Shape',['require','KITE/kite','DOT/Vector2','DOT/Bounds2','DOT/Ray
       return wind;
     },
 
+    /**
+     * Whether the path of the Shape intersects (or is contained in) the provided bounding box.
+     * Computed by checking intersections with all four edges of the bounding box, or whether the Shape is totally
+     * contained within the bounding box.
+     *
+     * @param {Bounds2} bounds
+     */
     intersectsBounds: function( bounds ) {
-      var numSubpaths = this.subpaths.length;
-      for ( var i = 0; i < numSubpaths; i++ ) {
-        var subpath = this.subpaths[ i ];
+      // If the bounding box completely surrounds our shape, it intersects the bounds
+      if ( this.bounds.intersection( bounds ).equals( this.bounds ) ) {
+        return true;
+      }
 
-        if ( subpath.isDrawable() ) {
-          var numSegments = subpath.segments.length;
-          for ( var k = 0; k < numSegments; k++ ) {
-            if ( subpath.segments[ k ].intersectsBounds( bounds ) ) {
-              return true;
-            }
-          }
+      // rays for hit testing along the bounding box edges
+      var minHorizontalRay = new Ray2( new Vector2( bounds.minX, bounds.minY ), new Vector2( 1, 0 ) );
+      var minVerticalRay = new Ray2( new Vector2( bounds.minX, bounds.minY ), new Vector2( 0, 1 ) );
+      var maxHorizontalRay = new Ray2( new Vector2( bounds.maxX, bounds.maxY ), new Vector2( -1, 0 ) );
+      var maxVerticalRay = new Ray2( new Vector2( bounds.maxX, bounds.maxY ), new Vector2( 0, -1 ) );
 
-          // handle the implicit closing line segment
-          if ( subpath.hasClosingSegment() ) {
-            if ( subpath.getClosingSegment().intersectsBounds( bounds ) ) {
-              return true;
-            }
-          }
+      var hitPoint, i;
+      // TODO: could optimize to intersect differently so we bail sooner
+      var horizontalRayIntersections = this.intersection( minHorizontalRay ).concat( this.intersection( maxHorizontalRay ) );
+      for ( i = 0; i < horizontalRayIntersections.length; i++ ) {
+        hitPoint = horizontalRayIntersections[ i ].point;
+        if ( hitPoint.x >= bounds.minX && hitPoint.x <= bounds.maxX ) {
+          return true;
         }
       }
+
+      var verticalRayIntersections = this.intersection( minVerticalRay ).concat( this.intersection( maxVerticalRay ) );
+      for ( i = 0; i < verticalRayIntersections.length; i++ ) {
+        hitPoint = verticalRayIntersections[ i ].point;
+        if ( hitPoint.y >= bounds.minY && hitPoint.y <= bounds.maxY ) {
+          return true;
+        }
+      }
+
+      // not contained, and no intersections with the sides of the bounding box
       return false;
     },
 
@@ -11595,6 +11582,56 @@ define( 'KITE/Shape',['require','KITE/kite','DOT/Vector2','DOT/Bounds2','DOT/Ray
       return new Shape( subpaths, bounds );
     },
 
+    getBounds: function() {
+      if ( this._bounds === null ) {
+        var bounds = Bounds2.NOTHING.copy();
+        _.each( this.subpaths, function( subpath ) {
+          bounds.includeBounds( subpath.getBounds() );
+        } );
+        this._bounds = bounds;
+      }
+      return this._bounds;
+    },
+    get bounds() { return this.getBounds(); },
+
+    getBoundsWithTransform: function( matrix, lineStyles ) {
+      // if we don't need to handle rotation/shear, don't use the extra effort!
+      if ( matrix.isAxisAligned() ) {
+        return this.computeBounds( lineStyles );
+      }
+
+      var bounds = Bounds2.NOTHING.copy();
+
+      var numSubpaths = this.subpaths.length;
+      for ( var i = 0; i < numSubpaths; i++ ) {
+        var subpath = this.subpaths[ i ];
+        bounds.includeBounds( subpath.getBoundsWithTransform( matrix ) );
+      }
+
+      if ( lineStyles ) {
+        bounds.includeBounds( this.getStrokedShape( lineStyles ).getBoundsWithTransform( matrix ) );
+      }
+
+      return bounds;
+    },
+
+    /**
+     * Should be called after mutating the x/y of Vector2 points that were passed in to various Shape calls, so that
+     * derived information computed (bounds, etc.) will be correct, and any clients (e.g. Scenery Paths) will be
+     * notified of the updates.
+     */
+    invalidatePoints: function() {
+      this._invalidatingPoints = true;
+
+      var numSubpaths = this.subpaths.length;
+      for ( var i = 0; i < numSubpaths; i++ ) {
+        this.subpaths[i].invalidatePoints();
+      }
+
+      this._invalidatingPoints = false;
+      this.invalidate();
+    },
+
     toString: function() {
       // TODO: consider a more verbose but safer way?
       return 'new kite.Shape( \'' + this.getSVGPath() + '\' )';
@@ -11604,11 +11641,22 @@ define( 'KITE/Shape',['require','KITE/kite','DOT/Vector2','DOT/Bounds2','DOT/Ray
      * Internal subpath computations
      *----------------------------------------------------------------------------*/
 
-    addSegmentAndBounds: function( segment ) {
-      this.getLastSubpath().addSegment( segment );
-      this.bounds = this.bounds.includeBounds( this.getLastSubpath().bounds );
+    // @private
+    invalidate: function() {
+      if ( !this._invalidatingPoints ) {
+        this._bounds = null;
+
+        this.trigger0( 'invalidated' );
+      }
     },
 
+    // @private
+    addSegmentAndBounds: function( segment ) {
+      this.getLastSubpath().addSegment( segment );
+      this.invalidate();
+    },
+
+    // @private
     ensure: function( point ) {
       if ( !this.hasSubpaths() ) {
         this.addSubpath( new Subpath() );
@@ -11616,25 +11664,34 @@ define( 'KITE/Shape',['require','KITE/kite','DOT/Vector2','DOT/Bounds2','DOT/Ray
       }
     },
 
+    // @private
     addSubpath: function( subpath ) {
       this.subpaths.push( subpath );
+
+      // listen to when the subpath is invalidated (will cause bounds recomputation here)
+      subpath.onStatic( 'invalidated', this._invalidateListener );
+
+      this.invalidate();
 
       return this; // allow chaining
     },
 
+    // @private
     hasSubpaths: function() {
       return this.subpaths.length > 0;
     },
 
+    // @private
     getLastSubpath: function() {
       return _.last( this.subpaths );
     },
 
-    // gets the last point in the last subpath, or null if it doesn't exist
+    // @private - gets the last point in the last subpath, or null if it doesn't exist
     getLastPoint: function() {
       return this.hasSubpaths() ? this.getLastSubpath().getLastPoint() : null;
     },
 
+    // @private
     getLastSegment: function() {
       if ( !this.hasSubpaths() ) { return null; }
 
@@ -11644,7 +11701,7 @@ define( 'KITE/Shape',['require','KITE/kite','DOT/Vector2','DOT/Bounds2','DOT/Ray
       return subpath.getLastSegment();
     },
 
-    // returns the point to be used for smooth quadratic segments
+    // @private - returns the point to be used for smooth quadratic segments
     getSmoothQuadraticControlPoint: function() {
       var lastPoint = this.getLastPoint();
 
@@ -11656,7 +11713,7 @@ define( 'KITE/Shape',['require','KITE/kite','DOT/Vector2','DOT/Bounds2','DOT/Ray
       }
     },
 
-    // returns the point to be used for smooth cubic segments
+    // @private - returns the point to be used for smooth cubic segments
     getSmoothCubicControlPoint: function() {
       var lastPoint = this.getLastPoint();
 
@@ -11668,11 +11725,12 @@ define( 'KITE/Shape',['require','KITE/kite','DOT/Vector2','DOT/Bounds2','DOT/Ray
       }
     },
 
+    // @private
     getRelativePoint: function() {
       var lastPoint = this.getLastPoint();
       return lastPoint ? lastPoint : Vector2.ZERO;
     }
-  };
+  } );
 
   /*---------------------------------------------------------------------------*
    * Shape shortcuts
@@ -11751,6 +11809,191 @@ define( 'KITE/Shape',['require','KITE/kite','DOT/Vector2','DOT/Bounds2','DOT/Ray
 
 
 /**
+ * An enumeration of different back-end technologies used for rendering. It also essentially represents the API that
+ * nodes need to implement to be used with this specified back-end.
+ *
+ * We use a bitmask to represent renderers currently, in a way that can be logically-ANDed in order to obtain
+ * information about "what renderer can support all of these Nodes?"
+ *
+ * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ */
+
+define( 'SCENERY/display/Renderer',['require','SCENERY/scenery'],function( require ) {
+  
+
+  var scenery = require( 'SCENERY/scenery' );
+
+  // now it's a namespace
+  scenery.Renderer = {};
+  var Renderer = scenery.Renderer;
+
+  //OHTWO TODO: rename to take advantage of lack of deprecated names? (remove bitmask prefix)
+
+  /*---------------------------------------------------------------------------*
+   * Renderer bitmask flags
+   *----------------------------------------------------------------------------*/
+
+  Renderer.numActiveRenderers = 5;
+  Renderer.bitmaskRendererArea = 0x00000FF;
+  Renderer.bitmaskCurrentRendererArea = 0x000001F;
+  Renderer.bitmaskLacksOffset = 0x10000;
+  Renderer.bitmaskLacksShift = 16; // number of bits between the main renderer bitmask and the "lacks" variety
+  Renderer.bitmaskNodeDefault = Renderer.bitmaskRendererArea;
+
+  Renderer.bitmaskCanvas = 0x0000001;
+  Renderer.bitmaskSVG = 0x0000002;
+  Renderer.bitmaskDOM = 0x0000004;
+  Renderer.bitmaskWebGL = 0x0000008;
+  Renderer.bitmaskPixi = 0x0000010;
+  // 20, 40, 80 reserved for future renderers NOTE: update bitmaskCurrentRendererArea/numActiveRenderers if they are added/removed
+
+  // summary bits (for RendererSummary):
+  Renderer.bitmaskSingleCanvas = 0x100;
+  Renderer.bitmaskSingleSVG = 0x200;
+  // reserved gap 0x400, 0x800, 0x1000, 0x2000, 0x4000, 0x8000 for future renderer-specific single information
+  Renderer.bitmaskNotPainted = 0x1000;
+  Renderer.bitmaskBoundsValid = 0x2000;
+  // summary bits for whether a renderer could be potentially used to display a Node.
+  Renderer.bitmaskLacksCanvas = Renderer.bitmaskCanvas << Renderer.bitmaskLacksShift; // 0x10000
+  Renderer.bitmaskLacksSVG = Renderer.bitmaskSVG << Renderer.bitmaskLacksShift; // 0x20000
+  Renderer.bitmaskLacksDOM = Renderer.bitmaskDOM << Renderer.bitmaskLacksShift; // 0x40000
+  Renderer.bitmaskLacksWebGL = Renderer.bitmaskWebGL << Renderer.bitmaskLacksShift; // 0x80000
+  Renderer.bitmaskLacksPixi = Renderer.bitmaskPixi << Renderer.bitmaskLacksShift; // 0x100000
+  // reserved gap 0x20000, 0x40000, 0x80000 for future renderers
+
+  Renderer.isCanvas = function( bitmask ) {
+    return ( bitmask & Renderer.bitmaskCanvas ) !== 0;
+  };
+  Renderer.isSVG = function( bitmask ) {
+    return ( bitmask & Renderer.bitmaskSVG ) !== 0;
+  };
+  Renderer.isDOM = function( bitmask ) {
+    return ( bitmask & Renderer.bitmaskDOM ) !== 0;
+  };
+  Renderer.isWebGL = function( bitmask ) {
+    return ( bitmask & Renderer.bitmaskWebGL ) !== 0;
+  };
+  Renderer.isPixi = function( bitmask ) {
+    return ( bitmask & Renderer.bitmaskPixi ) !== 0;
+  };
+
+  var rendererMap = {
+    canvas: Renderer.bitmaskCanvas,
+    svg: Renderer.bitmaskSVG,
+    dom: Renderer.bitmaskDOM,
+    webgl: Renderer.bitmaskWebGL,
+    pixi: Renderer.bitmaskPixi
+  };
+  Renderer.fromName = function( name ) {
+    return rendererMap[ name ];
+  };
+
+  // returns the part of the bitmask that should contain only Canvas/SVG/DOM/WebGL/Pixi flags
+  //OHTWO TODO: use this instead of direct access to bitmaskRendererArea
+  Renderer.stripBitmask = function( bitmask ) {
+    return bitmask & Renderer.bitmaskRendererArea;
+  };
+
+  Renderer.createOrderBitmask = function( firstRenderer, secondRenderer, thirdRenderer, fourthRenderer, fifthRenderer ) {
+    firstRenderer = firstRenderer || 0;
+    secondRenderer = secondRenderer || 0;
+    thirdRenderer = thirdRenderer || 0;
+    fourthRenderer = fourthRenderer || 0;
+    fifthRenderer = fifthRenderer || 0;
+
+    // uses 25 bits now with 5 renderers
+    return firstRenderer |
+           ( secondRenderer << 5 ) |
+           ( thirdRenderer << 10 ) |
+           ( fourthRenderer << 15 ) |
+           ( fifthRenderer << 20 );
+  };
+  // bitmaskOrderN with n=0 is bitmaskOrderFirst, n=1 is bitmaskOrderSecond, etc.
+  Renderer.bitmaskOrder = function( bitmask, n ) {
+    return ( bitmask >> ( 5 * n ) ) & Renderer.bitmaskCurrentRendererArea;
+  };
+  Renderer.bitmaskOrderFirst = function( bitmask ) {
+    return bitmask & Renderer.bitmaskCurrentRendererArea;
+  };
+  Renderer.bitmaskOrderSecond = function( bitmask ) {
+    return ( bitmask >> 5 ) & Renderer.bitmaskCurrentRendererArea;
+  };
+  Renderer.bitmaskOrderThird = function( bitmask ) {
+    return ( bitmask >> 10 ) & Renderer.bitmaskCurrentRendererArea;
+  };
+  Renderer.bitmaskOrderFourth = function( bitmask ) {
+    return ( bitmask >> 15 ) & Renderer.bitmaskCurrentRendererArea;
+  };
+  Renderer.bitmaskOrderFifth = function( bitmask ) {
+    return ( bitmask >> 20 ) & Renderer.bitmaskCurrentRendererArea;
+  };
+  Renderer.pushOrderBitmask = function( bitmask, renderer ) {
+    assert && assert( typeof bitmask === 'number' );
+    assert && assert( typeof renderer === 'number' );
+    var rendererToInsert = renderer;
+    for ( var i = 0; i < 30; i += 5 ) {
+      var currentRenderer = ( bitmask >> i ) & Renderer.bitmaskCurrentRendererArea;
+      if ( currentRenderer === rendererToInsert ) {
+        return bitmask;
+      }
+      else if ( currentRenderer === 0 ) {
+        // place the renderer and exit
+        bitmask = bitmask | ( rendererToInsert << i );
+        return bitmask;
+      }
+      else {
+        // clear out that slot
+        bitmask = ( bitmask & ~( Renderer.bitmaskCurrentRendererArea << i ) );
+
+        // place in the renderer to insert
+        bitmask = bitmask | ( rendererToInsert << i );
+
+        rendererToInsert = currentRenderer;
+      }
+
+      // don't walk over and re-place our initial renderer
+      if ( rendererToInsert === renderer ) {
+        return bitmask;
+      }
+    }
+
+    throw new Error( 'pushOrderBitmask overflow' );
+  };
+
+  Renderer.createSelfDrawable = function( instance, node, selfRenderer ) {
+    if ( Renderer.isCanvas( selfRenderer ) ) {
+      return node.createCanvasDrawable( selfRenderer, instance );
+    }
+    else if ( Renderer.isSVG( selfRenderer ) ) {
+      return node.createSVGDrawable( selfRenderer, instance );
+    }
+    else if ( Renderer.isDOM( selfRenderer ) ) {
+      return node.createDOMDrawable( selfRenderer, instance );
+    }
+    else if ( Renderer.isWebGL( selfRenderer ) ) {
+      return node.createWebGLDrawable( selfRenderer, instance );
+    }
+    else if ( Renderer.isPixi( selfRenderer ) ) {
+      return node.createPixiDrawable( selfRenderer, instance );
+    }
+    else {
+      throw new Error( 'Unrecognized renderer: ' + selfRenderer );
+    }
+  };
+
+  /*---------------------------------------------------------------------------*
+  * WebGL Renderer type enumeration
+  *----------------------------------------------------------------------------*/
+  Renderer.webglCustom = 0x1;
+  Renderer.webglTexturedTriangles = 0x2;
+
+  return Renderer;
+} );
+
+// Copyright 2002-2014, University of Colorado Boulder
+
+
+/**
  * Contains information about what renderers (and a few other flags) are supported for an entire subtree.
  *
  * We effectively do this by tracking bitmask changes from scenery.js (used for rendering properties in general). In particular, we count
@@ -11759,114 +12002,334 @@ define( 'KITE/Shape',['require','KITE/kite','DOT/Vector2','DOT/Bounds2','DOT/Ray
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-define( 'SCENERY/util/RendererSummary',['require','PHET_CORE/inherit','SCENERY/scenery'],function( require ) {
+define( 'SCENERY/util/RendererSummary',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/display/Renderer'],function( require ) {
   
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
-  // require( 'SCENERY/display/Renderer' );
+  var Renderer = require( 'SCENERY/display/Renderer' );
 
-  var bits = [
-    scenery.bitmaskSupportsCanvas,
-    scenery.bitmaskSupportsSVG,
-    scenery.bitmaskSupportsDOM,
-    scenery.bitmaskSupportsWebGL,
-    scenery.bitmaskSupportsPixi,
-    scenery.bitmaskNotPainted,
-    scenery.bitmaskBoundsValid
+  var summaryBits = [
+    // renderer bits ("Is renderer X supported by the entire sub-tree?")
+    Renderer.bitmaskCanvas,
+    Renderer.bitmaskSVG,
+    Renderer.bitmaskDOM,
+    Renderer.bitmaskWebGL,
+    Renderer.bitmaskPixi,
+
+    // summary bits (added to the renderer bitmask to handle special flags for the summary)
+    Renderer.bitmaskSingleCanvas,
+    Renderer.bitmaskSingleSVG,
+    Renderer.bitmaskNotPainted,
+    Renderer.bitmaskBoundsValid,
+
+    // inverse renderer bits ("Do all painted nodes NOT support renderer X in this sub-tree?")
+    Renderer.bitmaskLacksCanvas,
+    Renderer.bitmaskLacksSVG,
+    Renderer.bitmaskLacksDOM,
+    Renderer.bitmaskLacksWebGL,
+    Renderer.bitmaskLacksPixi
   ];
-  var numBits = bits.length;
+  var numSummaryBits = summaryBits.length;
+
+  // A bitmask with all of the bits set that we record
+  var bitmaskAll = 0;
+  for ( var l = 0; l < numSummaryBits; l++ ) {
+    bitmaskAll |= summaryBits[ l ];
+  }
 
   scenery.RendererSummary = function RendererSummary( node ) {
     // NOTE: assumes that we are created in the Node constructor
-    assert && assert( node._rendererBitmask === scenery.bitmaskNodeDefault, 'Node must have a default bitmask when creating a RenderSummary' );
-    assert && assert( node._children.length === 0, 'Node cannot have children when creating a RenderSummary' );
+    assert && assert( node._rendererBitmask === Renderer.bitmaskNodeDefault, 'Node must have a default bitmask when creating a RendererSummary' );
+    assert && assert( node._children.length === 0, 'Node cannot have children when creating a RendererSummary' );
 
     this.node = node;
 
-    // initialize all of the defaults
-    for ( var i = 0; i < numBits; i++ ) {
-      var bit = bits[ i ];
-      // we count the number of 0s
-      this[ bit ] = ( scenery.bitmaskNodeDefault & bit ) === 0 ? 1 : 0;
+    // Maps stringified bitmask bit (e.g. "1" for Canvas, since Renderer.bitmaskCanvas is 0x01) to
+    // a count of how many children (or self) have that property (e.g. can't renderer all of their contents with Canvas)
+    this._counts = {};
+    for ( var i = 0; i < numSummaryBits; i++ ) {
+      this._counts[ summaryBits[ i ] ] = 0; // set everything to 0 at first
     }
 
-    this.bitmask = this.computeBitmask();
+    // @public
+    this.bitmask = bitmaskAll;
+
+    this.selfBitmask = RendererSummary.summaryBitmaskForNodeSelf( node );
+
+    this.summaryChange( this.bitmask, this.selfBitmask );
+
+    // required listeners to update our summary based on painted/non-painted information
+    var listener = this.selfChange.bind( this );
+    this.node.on( 'opacity', listener );
+    this.node.on( 'hint', listener ); // should fire on things like node.renderer being changed
+    this.node.on( 'clip', listener );
+    this.node.on( 'selfBoundsValid', listener ); // e.g. Text, may change based on boundsMethod
   };
   var RendererSummary = scenery.RendererSummary;
 
   inherit( Object, RendererSummary, {
+    /*
+     * @public
+     * Use a bitmask of all 1s to represent 'does not exist' since we count zeros
+     */
+    summaryChange: function( oldBitmask, newBitmask ) {
+      assert && this.audit();
+
+      var changeBitmask = oldBitmask ^ newBitmask; // bit set only if it changed
+
+      var ancestorOldMask = 0;
+      var ancestorNewMask = 0;
+      for ( var i = 0; i < numSummaryBits; i++ ) {
+        var bit = summaryBits[ i ];
+
+        // If the bit for the renderer has changed
+        if ( bit & changeBitmask ) {
+
+          // If it is now set (wasn't before), gained support for the renderer
+          if ( bit & newBitmask ) {
+            this._counts[ bit ]--; // reduce count, since we count the number of 0s (unsupported)
+            if ( this._counts[ bit ] === 0 ) {
+              ancestorNewMask |= bit; // add our bit to the "new" mask we will send to ancestors
+            }
+          }
+          // It was set before (now isn't), lost support for the renderer
+          else {
+            this._counts[ bit ]++; // increment the count, since we count the number of 0s (unsupported)
+            if ( this._counts[ bit ] === 1 ) {
+              ancestorOldMask |= bit; // add our bit to the "old" mask we will send to ancestors
+            }
+          }
+        }
+      }
+
+      if ( ancestorOldMask || ancestorNewMask ) {
+        for ( var j = 0; j < numSummaryBits; j++ ) {
+          var ancestorBit = summaryBits[ j ];
+          // Check for added bits
+          if ( ancestorNewMask & ancestorBit ) {
+            this.bitmask |= ancestorBit;
+          }
+
+          // Check for removed bits
+          if ( ancestorOldMask & ancestorBit ) {
+            this.bitmask ^= ancestorBit;
+            assert && assert( !( this.bitmask & ancestorBit ),
+              'Should be cleared, doing cheaper XOR assuming it already was set' );
+          }
+        }
+
+        this.node.trigger0( 'rendererSummary' ); // please don't change children when listening to this!
+
+        var len = this.node._parents.length;
+        for ( var k = 0; k < len; k++ ) {
+          this.node._parents[ k ]._rendererSummary.summaryChange( ancestorOldMask, ancestorNewMask );
+        }
+
+        assert && assert( this.bitmask === this.computeBitmask(), 'Sanity check' );
+      }
+
+      assert && this.audit();
+    },
+
+    // @public
+    selfChange: function() {
+      var oldBitmask = this.selfBitmask;
+      var newBitmask = RendererSummary.summaryBitmaskForNodeSelf( this.node );
+      if ( oldBitmask !== newBitmask ) {
+        this.summaryChange( oldBitmask, newBitmask );
+        this.selfBitmask = newBitmask;
+      }
+    },
+
+    // @private
     computeBitmask: function() {
       var bitmask = 0;
-      for ( var i = 0; i < numBits; i++ ) {
-        var bit = bits[ i ];
-
-        // remember, if the count is zero, the bit is set
-        if ( !this[ bit ] ) {
-          bitmask |= bit;
+      for ( var i = 0; i < numSummaryBits; i++ ) {
+        if ( this._counts[ summaryBits[ i ] ] === 0 ) {
+          bitmask |= summaryBits[ i ];
         }
       }
       return bitmask;
     },
 
-    bitIncrement: function( bit ) {
-      var newCount = ++this[ bit ];
-      if ( newCount === 1 ) {
-        // if the count goes from 0 to 1, it means our combined bit went from 1 to 0 (reversed)
-        this.notifyBitUnset( bit );
-      }
+    /**
+     * @public
+     * Is the renderer compatible with every single painted node under this subtree?
+     * (Can this entire sub-tree be rendered with just this renderer)
+     *
+     * @param {number} renderer - Single bit preferred. If multiple bits set, requires ALL painted nodes are compatible
+     *                            with ALL of the bits.
+     */
+    isSubtreeFullyCompatible: function( renderer ) {
+      return !!( renderer & this.bitmask );
     },
 
-    bitDecrement: function( bit ) {
-      var newCount = --this[ bit ];
-      assert && assert( newCount >= 0, 'bitcount always needs to be above 0' );
-      if ( newCount === 0 ) {
-        // if the count goes from 1 to 0, it means our combined bit went from 0 to 1 (reversed)
-        this.notifyBitSet( bit );
-      }
+    /**
+     * @public
+     * Is the renderer compatible with at least one painted node under this subtree?
+     *
+     * @param {number} renderer - Single bit preferred. If multiple bits set, will return if a single painted node is
+     *                            compatible with at least one of the bits.
+     */
+    isSubtreeContainingCompatible: function( renderer ) {
+      return !( ( renderer << Renderer.bitmaskLacksShift ) & this.bitmask );
     },
 
-    notifyBitSet: function( bit ) {
-      this.bitmask = this.computeBitmask();
-
-      this.node.trigger0( 'rendererSummary' );
-
-      var len = this.node._parents.length;
-      for ( var i = 0; i < len; i++ ) {
-        this.node._parents[ i ]._rendererSummary.bitDecrement( bit );
-      }
+    isSingleCanvasSupported: function() {
+      return !!( Renderer.bitmaskSingleCanvas & this.bitmask );
     },
 
-    notifyBitUnset: function( bit ) {
-      this.bitmask = this.computeBitmask();
-
-      this.node.trigger0( 'rendererSummary' );
-
-      var len = this.node._parents.length;
-      for ( var i = 0; i < len; i++ ) {
-        this.node._parents[ i ]._rendererSummary.bitIncrement( bit );
-      }
+    isSingleSVGSupported: function() {
+      return !!( Renderer.bitmaskSingleSVG & this.bitmask );
     },
 
-    // use a bitmask of all 1s to represent 'does not exist' since we count zeros
-    bitmaskChange: function( oldBitmask, newBitmask ) {
-      var changeBitmask = oldBitmask ^ newBitmask;
+    isNotPainted: function() {
+      return !!( Renderer.bitmaskNotPainted & this.bitmask );
+    },
 
-      for ( var i = 0; i < numBits; i++ ) {
-        var bit = bits[ i ];
-        if ( ( bit & changeBitmask ) !== 0 ) {
-          var currentValue = bit & newBitmask;
+    areBoundsValid: function() {
+      return !!( Renderer.bitmaskBoundsValid & this.bitmask );
+    },
 
-          if ( currentValue !== 0 ) {
-            // we set the bit (used to be 0, now is 1)
-            this.bitDecrement( bit );
-          }
-          else {
-            // we unset the bit (used to be 1, now is 0)
-            this.bitIncrement( bit );
-          }
+    /**
+     * Given a bitmask representing a list of ordered preferred renderers, we check to see if all of our nodes can be
+     * displayed in a single SVG block, AND that given the preferred renderers, that it will actually happen in our
+     * rendering process.
+     */
+    isSubtreeRenderedExclusivelySVG: function( preferredRenderers ) {
+      // Check if we have anything that would PREVENT us from having a single SVG block
+      if ( !this.isSingleSVGSupported() ) {
+        return false;
+      }
+
+      // Check for any renderer preferences that would CAUSE us to choose not to display with a single SVG block
+      for ( var i = 0; i < Renderer.numActiveRenderers; i++ ) {
+        // Grab the next-most preferred renderer
+        var renderer = Renderer.bitmaskOrder( preferredRenderers, i );
+
+        // If it's SVG, congrats! Everything will render in SVG (since SVG is supported, as noted above)
+        if ( Renderer.bitmaskSVG & renderer ) {
+          return true;
+        }
+
+        // Since it's not SVG, if there's a single painted node that supports this renderer (which is preferred over SVG),
+        // then it will be rendered with this renderer, NOT SVG.
+        if ( this.isSubtreeContainingCompatible( renderer ) ) {
+          return false;
         }
       }
+
+      return false; // sanity check
+    },
+
+    // for debugging purposes
+    audit: function() {
+      if ( assert ) {
+        for ( var i = 0; i < numSummaryBits; i++ ) {
+          var bit = summaryBits[ i ];
+          var countIsZero = this._counts[ bit ] === 0;
+          var bitmaskContainsBit = !!( this.bitmask & bit );
+          assert( countIsZero === bitmaskContainsBit, 'Bits should be set if count is zero' );
+        }
+      }
+    },
+
+    // for debugging purposes
+    toString: function() {
+      var result = RendererSummary.bitmaskToString( this.bitmask );
+      for ( var i = 0; i < numSummaryBits; i++ ) {
+        var bit = summaryBits[ i ];
+        var countForBit = this._counts[ bit ];
+        if ( countForBit !== 0 ) {
+          result += ' ' + RendererSummary.bitToString( bit ) + ':' + countForBit;
+        }
+      }
+      return result;
+    }
+  }, {
+    bitmaskAll: bitmaskAll,
+
+    /**
+     * Determines which of the summary bits can be set for a specific Node (ignoring children/ancestors).
+     * For instance, for bitmaskSingleSVG, we only don't include the flag if THIS node prevents its usage
+     * (even though child nodes may prevent it in the renderer summary itself).
+     *
+     * @param {Node} node
+     */
+    summaryBitmaskForNodeSelf: function( node ) {
+      var bitmask = node._rendererBitmask;
+
+      if ( node.isPainted() ) {
+        bitmask |= ( ( node._rendererBitmask & Renderer.bitmaskCurrentRendererArea ) ^ Renderer.bitmaskCurrentRendererArea ) << Renderer.bitmaskLacksShift;
+      }
+      else {
+        bitmask |= Renderer.bitmaskCurrentRendererArea << Renderer.bitmaskLacksShift;
+      }
+
+      // NOTE: If changing, see Instance.updateRenderingState
+      var requiresSplit = node._hints.requireElement || node._hints.cssTransform || node._hints.layerSplit;
+      var mightUseOpacity = node.opacity !== 1 || node._hints.usesOpacity;
+      var mightUseClip = node._clipArea !== null;
+      var rendererHint = node._hints.renderer;
+
+      // Whether this subtree will be able to support a single SVG element
+      // NOTE: If changing, see Instance.updateRenderingState
+      if ( !requiresSplit && // Can't have a single SVG element if we are split
+           Renderer.isSVG( node._rendererBitmask ) && // If our node doesn't support SVG, can't do it
+           ( !rendererHint || Renderer.isSVG( rendererHint ) ) ) { // Can't if a renderer hint is set to something else
+        bitmask |= Renderer.bitmaskSingleSVG;
+      }
+
+      // Whether this subtree will be able to support a single Canvas element
+      // NOTE: If changing, see Instance.updateRenderingState
+      if ( !requiresSplit && // Can't have a single SVG element if we are split
+           !mightUseOpacity && // Opacity not supported for Canvas blocks yet
+           !mightUseClip && // Clipping not supported for Canvas blocks yet
+           Renderer.isCanvas( node._rendererBitmask ) && // If our node doesn't support Canvas, can't do it
+           ( !rendererHint || Renderer.isCanvas( rendererHint ) ) ) { // Can't if a renderer hint is set to something else
+        bitmask |= Renderer.bitmaskSingleCanvas;
+      }
+
+      if ( !node.isPainted() ) {
+        bitmask |= Renderer.bitmaskNotPainted;
+      }
+      if ( node.areSelfBoundsValid() ) {
+        bitmask |= Renderer.bitmaskBoundsValid;
+      }
+
+      return bitmask;
+    },
+
+    // for debugging purposes
+    bitToString: function( bit ) {
+      if ( bit === Renderer.bitmaskCanvas ) { return 'Canvas'; }
+      if ( bit === Renderer.bitmaskSVG ) { return 'SVG'; }
+      if ( bit === Renderer.bitmaskDOM ) { return 'DOM'; }
+      if ( bit === Renderer.bitmaskWebGL ) { return 'WebGL'; }
+      if ( bit === Renderer.bitmaskPixi ) { return 'Pixi'; }
+      if ( bit === Renderer.bitmaskLacksCanvas ) { return '(-Canvas)'; }
+      if ( bit === Renderer.bitmaskLacksSVG ) { return '(-SVG)'; }
+      if ( bit === Renderer.bitmaskLacksDOM ) { return '(-DOM)'; }
+      if ( bit === Renderer.bitmaskLacksWebGL ) { return '(-WebGL)'; }
+      if ( bit === Renderer.bitmaskLacksPixi ) { return '(-Pixi)'; }
+      if ( bit === Renderer.bitmaskSingleCanvas ) { return 'SingleCanvas'; }
+      if ( bit === Renderer.bitmaskSingleSVG ) { return 'SingleSVG'; }
+      if ( bit === Renderer.bitmaskNotPainted ) { return 'NotPainted'; }
+      if ( bit === Renderer.bitmaskBoundsValid ) { return 'BoundsValid'; }
+      return '?';
+    },
+
+    // for debugging purposes
+    bitmaskToString: function( bitmask ) {
+      var result = '';
+      for ( var i = 0; i < numSummaryBits; i++ ) {
+        var bit = summaryBits[ i ];
+        if ( bitmask & bit ) {
+          result += RendererSummary.bitToString( bit ) + ' ';
+        }
+      }
+      return result;
     }
   } );
 
@@ -11934,20 +12397,30 @@ define( 'SCENERY/util/CanvasContextWrapper',['require','PHET_CORE/inherit','SCEN
     },
 
     setFillStyle: function( style ) {
+      // turn {Color}s into strings when necessary
+      if ( style && style.getCanvasStyle ) {
+        style = style.getCanvasStyle();
+      }
+
       if ( this.fillStyle !== style ) {
         this.fillStyle = style;
 
         // allow gradients / patterns
-        this.context.fillStyle = ( style && style.getCanvasStyle ) ? style.getCanvasStyle() : style;
+        this.context.fillStyle = style;
       }
     },
 
     setStrokeStyle: function( style ) {
+      // turn {Color}s into strings when necessary
+      if ( style && style.getCanvasStyle ) {
+        style = style.getCanvasStyle();
+      }
+
       if ( this.strokeStyle !== style ) {
         this.strokeStyle = style;
 
         // allow gradients / patterns
-        this.context.strokeStyle = ( style && style.getCanvasStyle ) ? style.getCanvasStyle() : style;
+        this.context.strokeStyle = style;
       }
     },
 
@@ -12043,7 +12516,7 @@ define( 'SCENERY/util/CanvasContextWrapper',['require','PHET_CORE/inherit','SCEN
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-define( 'SCENERY/nodes/Node',['require','PHET_CORE/inherit','PHET_CORE/extend','AXON/Events','DOT/Bounds2','DOT/Transform3','DOT/Matrix3','DOT/Vector2','DOT/Util','KITE/Shape','SCENERY/scenery','SCENERY/util/RendererSummary','SCENERY/util/CanvasContextWrapper'],function( require ) {
+define( 'SCENERY/nodes/Node',['require','PHET_CORE/inherit','PHET_CORE/extend','AXON/Events','DOT/Bounds2','DOT/Transform3','DOT/Matrix3','DOT/Vector2','DOT/Util','KITE/Shape','SCENERY/scenery','SCENERY/display/Renderer','SCENERY/util/RendererSummary','SCENERY/util/CanvasContextWrapper'],function( require ) {
   
 
   var inherit = require( 'PHET_CORE/inherit' );
@@ -12057,10 +12530,10 @@ define( 'SCENERY/nodes/Node',['require','PHET_CORE/inherit','PHET_CORE/extend','
   var Shape = require( 'KITE/Shape' );
 
   var scenery = require( 'SCENERY/scenery' );
-  require( 'SCENERY/util/RendererSummary' );
+  var Renderer = require( 'SCENERY/display/Renderer' );
+  var RendererSummary = require( 'SCENERY/util/RendererSummary' );
   require( 'SCENERY/util/CanvasContextWrapper' );
   // commented out so Require.js doesn't balk at the circular dependency
-  // require( 'SCENERY/display/Renderer' );
   // require( 'SCENERY/util/Trail' );
   // require( 'SCENERY/util/TrailPointer' );
 
@@ -12187,6 +12660,29 @@ define( 'SCENERY/nodes/Node',['require','PHET_CORE/inherit','PHET_CORE/extend','
     this._transformListener = this.onTransformChange.bind( this );
     this._transform.on( 'change', this._transformListener );
 
+    /*
+     * Maxmimum dimensions for the node's local bounds before a corrective scaling factor is applied to maintain size.
+     * The maximum dimensions are always compared to local bounds, and applied "before" the node's transform.
+     * Whenever the local bounds or maximum dimensions of this Node change and it has at least one maximum dimension
+     * (width or height), an ideal scale is computed (either the smallest scale for our local bounds to fit the
+     * dimension constraints, OR 1, whichever is lower). Then the Node's transform will be scaled (prepended) with
+     * a scale adjustment of ( idealScale / alreadyAppliedScaleFactor ).
+     * In the simpe case where the Node isn't otherwise transformed, this will apply and update the Node's scale so that
+     * the node matches the maximum dimensions, while never scaling over 1. Note that manually applying transforms to
+     * the Node is fine, but may make the node's width greater than the maximum width.
+     * NOTE: If a dimension constraint is null, no resizing will occur due to it. If both maxWidth and maxHeight are null,
+     * no scale adjustment will be applied.
+     *
+     * Also note that setting maxWidth/maxHeight is like adding a local bounds listener (will trigger validation of
+     * bounds during the updateDisplay step). NOTE: this means updates to the transform (on a local bounds change) will
+     * happen when bounds are validated (validateBounds()), which does not happen synchronously on a child's size
+     * change. It does happen at least once in updateDisplay() before rendering, and calling validateBounds() can force
+     * a re-check and transform.
+     */
+    this._maxWidth = null; // {number | null}
+    this._maxHeight = null; // {number | null}
+    this._appliedScaleFactor = 1; // {number} - How much scale has been applied due to the maximum dimension constraints.
+
     this._inputListeners = []; // for user input handling (mouse/touch)
 
     // bounds handling
@@ -12216,31 +12712,54 @@ define( 'SCENERY/nodes/Node',['require','PHET_CORE/inherit','PHET_CORE/extend','
     this._mouseBoundsHadListener = false; // since we only walk the dirty flags up ancestors, we need a way to re-evaluate descendants when the existence of effective listeners changes
     this._touchBoundsHadListener = false; // since we only walk the dirty flags up ancestors, we need a way to re-evaluate descendants when the existence of effective listeners changes
 
-    // where rendering-specific settings are stored
+    // Where rendering-specific settings are stored. They are generally modified internally (@private)
     this._hints = {
-      renderer: 0,          // what type of renderer should be forced for this node.
-      usesOpacity: false,   // whether it is ancitipated that opacity will be switched on
-      layerSplit: false,    // whether layers should be split before and after this node
-      cssTransform: false,  // whether this node and its subtree should handle transforms by using a CSS transform of a div
-      fullResolution: false // when rendered as Canvas, whether we should use full (device) resolution on retina-like devices
+      // {number} What type of renderer should be forced for this node. Uses the internal bitmask structure declared
+      // in scenery.js and Renderer.js.
+      renderer: 0,
+
+      // {boolean} Whether it is ancitipated that opacity will be switched on. If so, having this set to true will make
+      // switching back-and-forth between opacity:1 and other opacities much faster.
+      usesOpacity: false,
+
+      // {boolean} Whether layers should be split before and after this node.
+      layerSplit: false,
+
+      // {boolean} Whether this node and its subtree should handle transforms by using a CSS transform of a div.
+      cssTransform: false,
+
+      // {boolean} When rendered as Canvas, whether we should use full (device) resolution on retina-like devices.
+      // TODO: ensure that this is working? 0.2 may have caused a regression.
+      fullResolution: false,
+
+      // {boolean} Whether SVG (or other) content should be excluded from the DOM tree when invisible
+      // (instead of just being hidden)
+      excludeInvisible: false,
+
+      // {number | null} If non-null, a multiplier to the detected pixel-to-pixel scaling of the WebGL Canvas
+      webglScale: null
     };
 
     // the subtree pickable count is #pickable:true + #inputListeners, since we can prune subtrees with a pickable count of 0
     this._subtreePickableCount = 0;
 
     // a bitmask which specifies which renderers this node (and only this node, not its subtree) supports.
-    this._rendererBitmask = scenery.bitmaskNodeDefault;
+    this._rendererBitmask = Renderer.bitmaskNodeDefault;
 
     // a bitmask-like summary of what renderers and options are supported by this node and all of its descendants
-    this._rendererSummary = new scenery.RendererSummary( this );
+    this._rendererSummary = new RendererSummary( this );
 
-    // So we can traverse only the subtrees that require bounds validation for events firing.
-    // This is a sum of the number of events requiring bounds validation on this Node, plus the number of children whose count is non-zero.
-    // NOTE: this means that if A has a child B, and B has a boundsEventCount of 5, it only contributes 1 to A's count. This allows us to
-    // have changes localized (increasing B's count won't change A or any of A's ancestors), and guarantees that we will know whether a subtree
-    // has bounds listeners. Also important: decreasing B's boundsEventCount down to 0 will allow A to decrease its count by 1, without having
-    // to check its other children (if we were just using a boolean value, this operation would require A to check if any OTHER children besides
-    // B had bounds listeners)
+    /*
+     * So we can traverse only the subtrees that require bounds validation for events firing.
+     * This is a sum of the number of events requiring bounds validation on this Node, plus the number of children whose
+     * count is non-zero.
+     * NOTE: this means that if A has a child B, and B has a boundsEventCount of 5, it only contributes 1 to A's count.
+     * This allows us to have changes localized (increasing B's count won't change A or any of A's ancestors), and
+     * guarantees that we will know whether a subtree has bounds listeners. Also important: decreasing B's
+     * boundsEventCount down to 0 will allow A to decrease its count by 1, without having to check its other children
+     * (if we were just using a boolean value, this operation would require A to check if any OTHER children besides
+     * B had bounds listeners)
+     */
     this._boundsEventCount = 0;
     this._boundsEventSelfCount = 0; // this signals that we can validateBounds() on this subtree and we don't have to traverse further
 
@@ -12255,6 +12774,9 @@ define( 'SCENERY/nodes/Node',['require','PHET_CORE/inherit','PHET_CORE/extend','
   inherit( Object, Node, extend( {
     /**
      * Inserts a child node at a specific index, ee http://phetsims.github.io/scenery/doc/#node-insertChild
+     * @public
+     *
+     * NOTE: overridden by Leaf for some subtypes
      *
      * @param {number} index
      * @param {Node} node
@@ -12267,7 +12789,7 @@ define( 'SCENERY/nodes/Node',['require','PHET_CORE/inherit','PHET_CORE/extend','
       // needs to be early to prevent re-entrant children modifications
       this.changePickableCount( node._subtreePickableCount );
       this.changeBoundsEventCount( node._boundsEventCount > 0 ? 1 : 0 );
-      this._rendererSummary.bitmaskChange( scenery.bitmaskAll, node._rendererSummary.bitmask );
+      this._rendererSummary.summaryChange( RendererSummary.bitmaskAll, node._rendererSummary.bitmask );
 
       node._parents.push( this );
       this._children.splice( index, 0, node );
@@ -12280,6 +12802,7 @@ define( 'SCENERY/nodes/Node',['require','PHET_CORE/inherit','PHET_CORE/extend','
 
     /**
      * Appends a child node to our list of children, see http://phetsims.github.io/scenery/doc/#node-addChild
+     * @public
      *
      * @param {Node} node
      */
@@ -12290,6 +12813,7 @@ define( 'SCENERY/nodes/Node',['require','PHET_CORE/inherit','PHET_CORE/extend','
     /**
      * Removes a child node from our list of children, see http://phetsims.github.io/scenery/doc/#node-removeChild
      * Will fail an assertion if the node is not currently one of our children
+     * @public
      *
      * @param {Node} node
      */
@@ -12312,7 +12836,14 @@ define( 'SCENERY/nodes/Node',['require','PHET_CORE/inherit','PHET_CORE/extend','
       this.removeChildWithIndex( node, index );
     },
 
-    // @private
+    /**
+     * @private
+     *
+     * NOTE: overridden by Leaf for some subtypes
+     *
+     * @param {Node} node - The child node to remove from this node (it's parent)
+     * @param {number} indexOfChild - Should satisfy this.children[ indexOfChild ] === node
+     */
     removeChildWithIndex: function( node, indexOfChild ) {
       assert && assert( node && node instanceof Node, 'Need to call node.removeChildWithIndex() with a Node.' );
       assert && assert( this.isChild( node ), 'Attempted to removeChild with a node that was not a child.' );
@@ -12321,7 +12852,7 @@ define( 'SCENERY/nodes/Node',['require','PHET_CORE/inherit','PHET_CORE/extend','
       // needs to be early to prevent re-entrant children modifications
       this.changePickableCount( -node._subtreePickableCount );
       this.changeBoundsEventCount( node._boundsEventCount > 0 ? -1 : 0 );
-      this._rendererSummary.bitmaskChange( node._rendererSummary.bitmask, scenery.bitmaskAll );
+      this._rendererSummary.summaryChange( node._rendererSummary.bitmask, RendererSummary.bitmaskAll );
 
       var indexOfParent = _.indexOf( node._parents, this );
 
@@ -12529,6 +13060,11 @@ define( 'SCENERY/nodes/Node',['require','PHET_CORE/inherit','PHET_CORE/extend','
 
           // sanity check
           this._boundsDirty = true;
+        }
+
+        // adjust our transform to match maximum bounds if necessary on a local bounds change
+        if ( this._maxWidth !== null || this._maxHeight !== null ) {
+          this.updateMaxDimension( this._localBounds );
         }
       }
 
@@ -13127,6 +13663,11 @@ define( 'SCENERY/nodes/Node',['require','PHET_CORE/inherit','PHET_CORE/extend','
       return false;
     },
 
+    // Whether our self bounds are guaranteed to bounds the rendered output of this node.
+    areSelfBoundsValid: function() {
+      return true;
+    },
+
     hasParent: function() {
       return this._parents.length !== 0;
     },
@@ -13178,7 +13719,6 @@ define( 'SCENERY/nodes/Node',['require','PHET_CORE/inherit','PHET_CORE/extend','
       return this._inputListeners.slice( 0 ); // defensive copy
     },
 
-    // TODO: consider renaming to translateBy to match scaleBy
     translate: function( x, y, prependInstead ) {
       if ( typeof x === 'number' ) {
         // translate( x, y, prependInstead )
@@ -13348,6 +13888,13 @@ define( 'SCENERY/nodes/Node',['require','PHET_CORE/inherit','PHET_CORE/extend','
 
     // prepend an x,y translation to our local transform without allocating a matrix for it, see #119
     prependTranslation: function( x, y ) {
+      assert && assert( typeof x === 'number', 'x not a number' );
+      assert && assert( typeof y === 'number', 'y not a number' );
+      assert && assert( isFinite( x ), 'x not finite' );
+      assert && assert( isFinite( y ), 'y not finite' );
+
+      if ( !x && !y ) { return; } // bail out if both are zero
+
       this._transform.prependTranslation( x, y );
     },
 
@@ -13378,6 +13925,95 @@ define( 'SCENERY/nodes/Node',['require','PHET_CORE/inherit','PHET_CORE/extend','
 
       this.trigger0( 'transform' );
     },
+
+    /**
+     * Updates our node's scale and applied scale factor if we need to change our scale to fit within the maximum
+     * dimensions (maxWidth and maxHeight). See documentation in constructor for detailed behavior.
+     */
+    updateMaxDimension: function( localBounds ) {
+      var currentScale = this._appliedScaleFactor;
+      var idealScale = 1;
+
+      if ( this._maxWidth !== null ) {
+        var width = localBounds.width;
+        if ( width > this._maxWidth ) {
+          idealScale = Math.min( idealScale, this._maxWidth / width );
+        }
+      }
+
+      if ( this._maxHeight !== null ) {
+        var height = localBounds.height;
+        if ( height > this._maxHeight ) {
+          idealScale = Math.min( idealScale, this._maxHeight / height );
+        }
+      }
+
+      var scaleAdjustment = idealScale / currentScale;
+      if ( scaleAdjustment !== 1 ) {
+        this.scale( scaleAdjustment );
+
+        this._appliedScaleFactor = idealScale;
+      }
+    },
+
+    /**
+     * Increments/decrements bounds "listener" count based on the values of maxWidth/maxHeight before and after.
+     * null is like no listener, non-null is like having a listener, so we increment for null => non-null, and
+     * decrement for non-null => null.
+     *
+     * @param {null | number} beforeMaxLength
+     * @param {null | number} afterMaxLength
+     */
+    onMaxDimensionChange: function( beforeMaxLength, afterMaxLength ) {
+      if ( beforeMaxLength === null && afterMaxLength !== null ) {
+        this.changeBoundsEventCount( 1 );
+        this._boundsEventSelfCount++;
+      }
+      else if ( beforeMaxLength !== null && afterMaxLength === null ) {
+        this.changeBoundsEventCount( -1 );
+        this._boundsEventSelfCount--;
+      }
+    },
+
+    setMaxWidth: function( maxWidth ) {
+      assert && assert( maxWidth === null || typeof maxWidth === 'number',
+        'maxWidth should be null (no constraint) or a number' );
+
+      if ( this._maxWidth !== maxWidth ) {
+        // update synthetic bounds listener count (to ensure our bounds are validated at the start of updateDisplay)
+        this.onMaxDimensionChange( this._maxWidth, maxWidth );
+
+        this._maxWidth = maxWidth;
+
+        this.updateMaxDimension( this._localBounds );
+      }
+    },
+    set maxWidth( value ) { this.setMaxWidth( value ); },
+
+    getMaxWidth: function() {
+      return this._maxWidth;
+    },
+    get maxWidth() { return this.getMaxWidth(); },
+
+    setMaxHeight: function( maxHeight ) {
+      assert && assert( maxHeight === null || typeof maxHeight === 'number',
+        'maxHeight should be null (no constraint) or a number' );
+
+      if ( this._maxHeight !== maxHeight ) {
+        // update synthetic bounds listener count (to ensure our bounds are validated at the start of updateDisplay)
+        this.onMaxDimensionChange( this._maxHeight, maxHeight );
+
+        this._maxHeight = maxHeight;
+
+        this.updateMaxDimension( this._localBounds );
+      }
+    },
+    set maxHeight( value ) { this.setMaxHeight( value ); },
+
+    getMaxHeight: function() {
+      return this._maxHeight;
+    },
+    get maxHeight() { return this.getMaxHeight(); },
 
     // shifts this node horizontally so that its left bound (in the parent coordinate frame) is 'left'
     setLeft: function( left ) {
@@ -13660,47 +14296,34 @@ define( 'SCENERY/nodes/Node',['require','PHET_CORE/inherit','PHET_CORE/extend','
     get focusOrder() { return this.getFocusOrder(); },
 
     supportsCanvas: function() {
-      return ( this._rendererBitmask & scenery.bitmaskSupportsCanvas ) !== 0;
+      return ( this._rendererBitmask & Renderer.bitmaskCanvas ) !== 0;
     },
 
     supportsSVG: function() {
-      return ( this._rendererBitmask & scenery.bitmaskSupportsSVG ) !== 0;
+      return ( this._rendererBitmask & Renderer.bitmaskSVG ) !== 0;
     },
 
     supportsDOM: function() {
-      return ( this._rendererBitmask & scenery.bitmaskSupportsDOM ) !== 0;
+      return ( this._rendererBitmask & Renderer.bitmaskDOM ) !== 0;
     },
 
     supportsWebGL: function() {
-      return ( this._rendererBitmask & scenery.bitmaskSupportsWebGL ) !== 0;
+      return ( this._rendererBitmask & Renderer.bitmaskWebGL ) !== 0;
     },
 
     supportsPixi: function() {
-      return ( this._rendererBitmask & scenery.bitmaskSupportsPixi) !== 0;
+      return ( this._rendererBitmask & Renderer.bitmaskPixi) !== 0;
     },
 
     supportsRenderer: function( renderer ) {
       return ( this._rendererBitmask & renderer.bitmask ) !== 0;
     },
 
-    // return a supported renderer (fallback case, not called often)
-    pickARenderer: function() {
-      if ( this.supportsCanvas() ) {
-        return scenery.Renderer.Canvas;
-      }
-      else if ( this.supportsSVG() ) {
-        return scenery.Renderer.SVG;
-      }
-      else if ( this.supportsDOM() ) {
-        return scenery.Renderer.DOM;
-      }
-      // oi!
-    },
-
     setRendererBitmask: function( bitmask ) {
       if ( bitmask !== this._rendererBitmask ) {
-        this._rendererSummary.bitmaskChange( this._rendererBitmask, bitmask );
         this._rendererBitmask = bitmask;
+
+        this._rendererSummary.selfChange();
         this.trigger0( 'rendererBitmask' );
       }
     },
@@ -13721,19 +14344,19 @@ define( 'SCENERY/nodes/Node',['require','PHET_CORE/inherit','PHET_CORE/extend','
 
       var newRenderer = 0;
       if ( renderer === 'canvas' ) {
-        newRenderer = scenery.Renderer.bitmaskCanvas;
+        newRenderer = Renderer.bitmaskCanvas;
       }
       else if ( renderer === 'svg' ) {
-        newRenderer = scenery.Renderer.bitmaskSVG;
+        newRenderer = Renderer.bitmaskSVG;
       }
       else if ( renderer === 'dom' ) {
-        newRenderer = scenery.Renderer.bitmaskDOM;
+        newRenderer = Renderer.bitmaskDOM;
       }
       else if ( renderer === 'webgl' ) {
-        newRenderer = scenery.Renderer.bitmaskWebGL;
+        newRenderer = Renderer.bitmaskWebGL;
       }
       else if ( renderer === 'pixi' ) {
-        newRenderer = scenery.Renderer.bitmaskPixi;
+        newRenderer = Renderer.bitmaskPixi;
       }
       assert && assert( ( renderer === null ) === ( newRenderer === 0 ),
         'We should only end up with no actual renderer if renderer is null' );
@@ -13750,19 +14373,19 @@ define( 'SCENERY/nodes/Node',['require','PHET_CORE/inherit','PHET_CORE/extend','
       if ( this._hints.renderer === 0 ) {
         return null;
       }
-      else if ( this._hints.renderer === scenery.Renderer.bitmaskCanvas ) {
+      else if ( this._hints.renderer === Renderer.bitmaskCanvas ) {
         return 'canvas';
       }
-      else if ( this._hints.renderer === scenery.Renderer.bitmaskSVG ) {
+      else if ( this._hints.renderer === Renderer.bitmaskSVG ) {
         return 'svg';
       }
-      else if ( this._hints.renderer === scenery.Renderer.bitmaskDOM ) {
+      else if ( this._hints.renderer === Renderer.bitmaskDOM ) {
         return 'dom';
       }
-      else if ( this._hints.renderer === scenery.Renderer.bitmaskWebGL ) {
+      else if ( this._hints.renderer === Renderer.bitmaskWebGL ) {
         return 'webgl';
       }
-      else if ( this._hints.renderer === scenery.Renderer.bitmaskPixi ) {
+      else if ( this._hints.renderer === Renderer.bitmaskPixi ) {
         return 'pixi';
       }
       assert && assert( false, 'Seems to be an invalid renderer?' );
@@ -13788,10 +14411,6 @@ define( 'SCENERY/nodes/Node',['require','PHET_CORE/inherit','PHET_CORE/extend','
       return this._hints;
     },
     get rendererOptions() { return this.getRendererOptions(); },
-
-    hasRendererOptions: function() {
-      return !!( this._hints.cssTransform || this._hints.fullResolution );
-    },
 
     setLayerSplit: function( split ) {
       assert && assert( typeof split === 'boolean' );
@@ -13822,6 +14441,51 @@ define( 'SCENERY/nodes/Node',['require','PHET_CORE/inherit','PHET_CORE/extend','
       return this._hints.usesOpacity;
     },
     get usesOpacity() { return this.getUsesOpacity(); },
+
+    setCSSTransform: function( cssTransform ) {
+      assert && assert( typeof cssTransform === 'boolean' );
+
+      if ( cssTransform !== this._hints.cssTransform ) {
+        this._hints.cssTransform = cssTransform;
+        this.trigger1( 'hint', 'cssTransform' );
+      }
+    },
+    set cssTransform( value ) { this.setCSSTransform( value ); },
+
+    isCSSTransformed: function() {
+      return this._hints.cssTransform;
+    },
+    get cssTransform() { return this._hints.cssTransform; },
+
+    setExcludeInvisible: function( excludeInvisible ) {
+      assert && assert( typeof excludeInvisible === 'boolean' );
+
+      if ( excludeInvisible !== this._hints.excludeInvisible ) {
+        this._hints.excludeInvisible = excludeInvisible;
+        this.trigger1( 'hint', 'excludeInvisible' );
+      }
+    },
+    set excludeInvisible( value ) { this.setExcludeInvisible( value ); },
+
+    isExcludeInvisible: function() {
+      return this._hints.excludeInvisible;
+    },
+    get excludeInvisible() { return this.isExcludeInvisible(); },
+
+    setWebGLScale: function( webglScale ) {
+      assert && assert( webglScale === null || typeof webglScale === 'number' );
+
+      if ( webglScale !== this._hints.webglScale ) {
+        this._hints.webglScale = webglScale;
+        this.trigger1( 'hint', 'webglScale' );
+      }
+    },
+    set webglScale( value ) { this.setWebGLScale( value ); },
+
+    getWebGLScale: function() {
+      return this._hints.webglScale;
+    },
+    get webglScale() { return this.getWebGLScale(); },
 
     /*---------------------------------------------------------------------------*
      * Trail operations
@@ -14156,7 +14820,7 @@ define( 'SCENERY/nodes/Node',['require','PHET_CORE/inherit','PHET_CORE/extend','
 
     // @public: Render the self into the canvas wrapper with its local coordinates
     renderToCanvasSelf: function( wrapper ) {
-      if ( this.isPainted() && ( this._rendererBitmask & scenery.Renderer.bitmaskCanvas ) ) {
+      if ( this.isPainted() && ( this._rendererBitmask & Renderer.bitmaskCanvas ) ) {
         this.canvasPaintSelf( wrapper );
       }
     },
@@ -14770,15 +15434,4068 @@ define( 'SCENERY/nodes/Node',['require','PHET_CORE/inherit','PHET_CORE/extend','
    * NOTE: left/right/top/bottom/centerX/centerY are at the end, since they rely potentially on rotation / scaling changes of bounds that may happen beforehand
    */
   Node.prototype._mutatorKeys = [
-    'children', 'cursor', 'visible', 'pickable', 'opacity', 'matrix', 'translation', 'x', 'y', 'rotation', 'scale',
+    'children', 'cursor', 'visible', 'pickable', 'opacity', 'matrix', 'translation', 'x', 'y', 'rotation', 'scale', 'maxWidth', 'maxHeight',
     'leftTop', 'centerTop', 'rightTop', 'leftCenter', 'center', 'rightCenter', 'leftBottom', 'centerBottom', 'rightBottom',
     'left', 'right', 'top', 'bottom', 'centerX', 'centerY', 'renderer', 'rendererOptions',
-    'layerSplit', 'usesOpacity', 'mouseArea', 'touchArea', 'clipArea', 'transformBounds', 'focusable', 'focusIndicator',
-    'focusOrder', 'textDescription'
+    'layerSplit', 'usesOpacity', 'cssTransform', 'excludeInvisible', 'webglScale', 'mouseArea', 'touchArea', 'clipArea',
+    'transformBounds', 'focusable', 'focusIndicator', 'focusOrder', 'textDescription'
   ];
 
   return Node;
 } );
+
+// Copyright 2002-2014, University of Colorado Boulder
+
+/**
+ * A color with RGBA values, assuming the sRGB color space is used.
+ *
+ * See http://www.w3.org/TR/css3-color/
+ *
+ * TODO: make a getHue, getSaturation, getLightness. we can then expose them via ES5!
+ *
+ * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ */
+
+define( 'SCENERY/util/Color',['require','PHET_CORE/inherit','SCENERY/scenery','DOT/Util','DOT/Util'],function( require ) {
+  
+
+  var inherit = require( 'PHET_CORE/inherit' );
+  var scenery = require( 'SCENERY/scenery' );
+
+  var clamp = require( 'DOT/Util' ).clamp;
+  var linear = require( 'DOT/Util' ).linear;
+
+  /**
+   * Creates a Color with an initial value. Multiple different types of parameters are supported:
+   * - new Color( color ) is a copy constructor, for a {Color}
+   * - new Color( string ) will parse the string assuming it's a CSS-compatible color, e.g. set( 'red' )
+   * - new Color( r, g, b ) is equivalent to setRGBA( r, g, b, 1 ), e.g. set( 255, 0, 128 )
+   * - new Color( r, g, b, a ) is equivalent to setRGBA( r, g, b, a ), e.g. set( 255, 0, 128, 0.5 )
+   * - new Color( hex ) will set RGB with alpha=1, e.g. set( 0xFF0000 )
+   * - new Color( hex, a ) will set RGBA, e.g. set( 0xFF0000, 1 )
+   *
+   * The 'r', 'g', and 'b' values stand for red, green and blue respectively, and will be clamped to integers in 0-255.
+   * The 'a' value stands for alpha, and will be clamped to 0-1 (floating point)
+   * 'hex' indicates a 6-decimal-digit format hex number, for example 0xFFAA00 is equivalent to r=255, g=170, b=0.
+   */
+  scenery.Color = function Color( r, g, b, a ) {
+
+    // allow listeners to be notified on any changes. called with listener()
+    this.listeners = [];
+
+    this.set( r, g, b, a );
+
+    phetAllocation && phetAllocation( 'Color' );
+  };
+  var Color = scenery.Color;
+
+  // regex utilities
+  var rgbNumber = '(-?\\d{1,3}%?)'; // syntax allows negative integers and percentages
+  var aNumber = '(\\d+|\\d*\\.\\d+)'; // decimal point number. technically we allow for '255', even though this will be clamped to 1.
+  var rawNumber = '(\\d{1,3})'; // a 1-3 digit number
+
+  // handles negative and percentage values
+  function parseRGBNumber( str ) {
+    var multiplier = 1;
+
+    // if it's a percentage, strip it off and handle it that way
+    if ( str.charAt( str.length - 1 ) === '%' ) {
+      multiplier = 2.55;
+      str = str.slice( 0, str.length - 1 );
+    }
+
+    return Math.round( parseInt( str, 10 ) * multiplier );
+  }
+
+  Color.formatParsers = [
+    {
+      // 'transparent'
+      regexp: /^transparent$/,
+      apply: function( color, matches ) {
+        color.setRGBA( 0, 0, 0, 0 );
+      }
+    },
+    {
+      // short hex form, a la '#fff'
+      regexp: /^#(\w{1})(\w{1})(\w{1})$/,
+      apply: function( color, matches ) {
+        color.setRGBA(
+          parseInt( matches[ 1 ] + matches[ 1 ], 16 ),
+          parseInt( matches[ 2 ] + matches[ 2 ], 16 ),
+          parseInt( matches[ 3 ] + matches[ 3 ], 16 ),
+          1 );
+      }
+    },
+    {
+      // long hex form, a la '#ffffff'
+      regexp: /^#(\w{2})(\w{2})(\w{2})$/,
+      apply: function( color, matches ) {
+        color.setRGBA(
+          parseInt( matches[ 1 ], 16 ),
+          parseInt( matches[ 2 ], 16 ),
+          parseInt( matches[ 3 ], 16 ),
+          1 );
+      }
+    },
+    {
+      // rgb(...)
+      regexp: new RegExp( '^rgb\\(' + rgbNumber + ',' + rgbNumber + ',' + rgbNumber + '\\)$' ),
+      apply: function( color, matches ) {
+        color.setRGBA(
+          parseRGBNumber( matches[ 1 ] ),
+          parseRGBNumber( matches[ 2 ] ),
+          parseRGBNumber( matches[ 3 ] ),
+          1 );
+      }
+    },
+    {
+      // rgba(...)
+      regexp: new RegExp( '^rgba\\(' + rgbNumber + ',' + rgbNumber + ',' + rgbNumber + ',' + aNumber + '\\)$' ),
+      apply: function( color, matches ) {
+        color.setRGBA(
+          parseRGBNumber( matches[ 1 ] ),
+          parseRGBNumber( matches[ 2 ] ),
+          parseRGBNumber( matches[ 3 ] ),
+          parseFloat( matches[ 4 ] ) );
+      }
+    },
+    {
+      // hsl(...)
+      regexp: new RegExp( '^hsl\\(' + rawNumber + ',' + rawNumber + '%,' + rawNumber + '%\\)$' ),
+      apply: function( color, matches ) {
+        color.setHSLA(
+          parseInt( matches[ 1 ], 10 ),
+          parseInt( matches[ 2 ], 10 ),
+          parseInt( matches[ 3 ], 10 ),
+          1 );
+      }
+    },
+    {
+      // hsla(...)
+      regexp: new RegExp( '^hsla\\(' + rawNumber + ',' + rawNumber + '%,' + rawNumber + '%,' + aNumber + '\\)$' ),
+      apply: function( color, matches ) {
+        color.setHSLA(
+          parseInt( matches[ 1 ], 10 ),
+          parseInt( matches[ 2 ], 10 ),
+          parseInt( matches[ 3 ], 10 ),
+          parseFloat( matches[ 4 ] ) );
+      }
+    }
+  ];
+
+  // see http://www.w3.org/TR/css3-color/
+  Color.hueToRGB = function( m1, m2, h ) {
+    if ( h < 0 ) {
+      h = h + 1;
+    }
+    if ( h > 1 ) {
+      h = h - 1;
+    }
+    if ( h * 6 < 1 ) {
+      return m1 + ( m2 - m1 ) * h * 6;
+    }
+    if ( h * 2 < 1 ) {
+      return m2;
+    }
+    if ( h * 3 < 2 ) {
+      return m1 + ( m2 - m1 ) * ( 2 / 3 - h ) * 6;
+    }
+    return m1;
+  };
+
+  /**
+   * Convenience function that converts a color spec to a color object if
+   * necessary, or simply returns the color object if not.
+   * @param {String|Color} colorSpec
+   */
+  Color.toColor = function( colorSpec ) {
+    return colorSpec instanceof Color ? colorSpec : new Color( colorSpec );
+  };
+
+  inherit( Object, Color, {
+    copy: function() {
+      return new Color( this.r, this.g, this.b, this.a );
+    },
+
+    /**
+     * Sets the values of this Color. Supported styles:
+     * - set( color ) is a copy constructor
+     * - set( string ) will parse the string assuming it's a CSS-compatible color, e.g. set( 'red' )
+     * - set( r, g, b ) is equivalent to setRGBA( r, g, b, 1 ), e.g. set( 255, 0, 128 )
+     * - set( r, g, b, a ) is equivalent to setRGBA( r, g, b, a ), e.g. set( 255, 0, 128, 0.5 )
+     * - set( hex ) will set RGB with alpha=1, e.g. set( 0xFF0000 )
+     * - set( hex, alpha ) will set RGBA, e.g. set( 0xFF0000, 1 )
+     */
+    set: function( r, g, b, a ) {
+      assert && assert( r !== undefined, 'Can\'t call Color.set( undefined )' );
+
+      // support for set( string )
+      if ( typeof r === 'string' ) {
+        this.setCSS( r );
+      }
+      // support for set( color )
+      else if ( r instanceof Color ) {
+        this.setRGBA( r.r, r.g, r.b, r.a );
+      }
+      // support for set( hex ) and set( hex, alpha )
+      else if ( b === undefined ) {
+        assert && assert( typeof r === 'number' );
+        assert && assert( g === undefined || typeof g === 'number' );
+
+        var red = ( r >> 16 ) & 0xFF;
+        var green = ( r >> 8 ) & 0xFF;
+        var blue = ( r >> 0 ) & 0xFF;
+        var alpha = ( g === undefined ) ? 1 : g;
+        this.setRGBA( red, green, blue, alpha );
+      }
+      // support for set( r, g, b ) and set( r, g, b, a )
+      else {
+        assert && assert( typeof r === 'number' );
+        assert && assert( typeof g === 'number' );
+        assert && assert( typeof b === 'number' );
+        assert && assert( a === undefined || typeof a === 'number' );
+        this.setRGBA( r, g, b, ( a === undefined ) ? 1 : a );
+      }
+    },
+
+    // red, integral 0-255
+    getRed: function() { return this.r; },
+    setRed: function( value ) { return this.setRGBA( value, this.g, this.b, this.a ); },
+    get red() { return this.getRed(); },
+    set red( value ) { return this.setRed( value ); },
+
+    // green, integral 0-255
+    getGreen: function() { return this.g; },
+    setGreen: function( value ) { return this.setRGBA( this.r, value, this.b, this.a ); },
+    get green() { return this.getGreen(); },
+    set green( value ) { return this.setGreen( value ); },
+
+    // blue, integral 0-255
+    getBlue: function() { return this.b; },
+    setBlue: function( value ) { return this.setRGBA( this.r, this.g, value, this.a ); },
+    get blue() { return this.getBlue(); },
+    set blue( value ) { return this.setBlue( value ); },
+
+    // alpha, floating 0-1
+    getAlpha: function() { return this.a; },
+    setAlpha: function( value ) { return this.setRGBA( this.r, this.g, this.b, value ); },
+    get alpha() { return this.getAlpha(); },
+    set alpha( value ) { return this.setAlpha( value ); },
+
+    // RGB integral between 0-255, alpha (float) between 0-1
+    setRGBA: function( red, green, blue, alpha ) {
+      this.r = Math.round( clamp( red, 0, 255 ) );
+      this.g = Math.round( clamp( green, 0, 255 ) );
+      this.b = Math.round( clamp( blue, 0, 255 ) );
+      this.a = clamp( alpha, 0, 1 );
+
+      this.updateColor(); // update the cached value
+
+      return this; // allow chaining
+    },
+
+    computeCSS: function() {
+      if ( this.a === 1 ) {
+        return 'rgb(' + this.r + ',' + this.g + ',' + this.b + ')';
+      }
+      else {
+        // Since SVG doesn't support parsing scientific notation (e.g. 7e5), we need to output fixed decimal-point strings.
+        // Since this needs to be done quickly, and we don't particularly care about slight rounding differences (it's
+        // being used for display purposes only, and is never shown to the user), we use the built-in JS toFixed instead of
+        // Dot's version of toFixed. See https://github.com/phetsims/kite/issues/50
+        var alpha = this.a.toFixed( 20 );
+        while ( alpha.length >= 2 && alpha[alpha.length - 1] === '0' && alpha[alpha.length - 2] !== '.' ) {
+          alpha = alpha.slice( 0, alpha.length - 1 );
+        }
+
+        var alphaString = this.a === 0 || this.a === 1 ? this.a : alpha;
+        return 'rgba(' + this.r + ',' + this.g + ',' + this.b + ',' + alphaString + ')';
+      }
+    },
+
+    toCSS: function() {
+      // verify that the cached value is correct (in debugging builds only, defeats the point of caching otherwise)
+      assert && assert( this._css === this.computeCSS(), 'CSS cached value is ' + this._css + ', but the computed value appears to be ' + this.computeCSS() );
+
+      return this._css;
+    },
+
+    setCSS: function( cssString ) {
+      var str = cssString.replace( / /g, '' ).toLowerCase();
+      var success = false;
+
+      // replace colors based on keywords
+      var keywordMatch = Color.colorKeywords[ str ];
+      if ( keywordMatch ) {
+        str = '#' + keywordMatch;
+      }
+
+      // run through the available text formats
+      for ( var i = 0; i < Color.formatParsers.length; i++ ) {
+        var parser = Color.formatParsers[ i ];
+
+        var matches = parser.regexp.exec( str );
+        if ( matches ) {
+          parser.apply( this, matches );
+          success = true;
+          break;
+        }
+      }
+
+      if ( !success ) {
+        throw new Error( 'scenery.Color unable to parse color string: ' + cssString );
+      }
+
+      this.updateColor(); // update the cached value
+    },
+
+    // e.g. 0xFF00FF
+    toNumber: function() {
+      return ( this.r << 16 ) + ( this.g << 8 ) + this.b;
+    },
+
+    // called to update the internally cached CSS value
+    updateColor: function() {
+      assert && assert( !this.immutable, 'Cannot modify an immutable color' );
+
+      var oldCSS = this._css;
+      this._css = this.computeCSS();
+
+      // notify listeners if it changed
+      if ( oldCSS !== this._css && this.listeners.length ) {
+        var listeners = this.listeners.slice( 0 ); // defensive copy. consider removing if it's a performance bottleneck?
+        var length = listeners.length;
+
+        for ( var i = 0; i < length; i++ ) {
+          listeners[ i ]();
+        }
+      }
+    },
+
+    // allow setting this Color to be immutable when assertions are disabled. any change will throw an error
+    setImmutable: function() {
+      if ( assert ) {
+        this.immutable = true;
+      }
+
+      return this; // allow chaining
+    },
+
+    // to what value a Canvas's context.fillStyle should be set
+    getCanvasStyle: function() {
+      return this.toCSS(); // should be inlined, leave like this for future maintainability
+    },
+
+    // TODO: make a getHue, getSaturation, getLightness. we can then expose them via ES5!
+    setHSLA: function( hue, saturation, lightness, alpha ) {
+      hue = ( hue % 360 ) / 360;                    // integer modulo 360
+      saturation = clamp( saturation / 100, 0, 1 ); // percentage
+      lightness = clamp( lightness / 100, 0, 1 );   // percentage
+
+      // see http://www.w3.org/TR/css3-color/
+      var m1, m2;
+      if ( lightness < 0.5 ) {
+        m2 = lightness * ( saturation + 1 );
+      }
+      else {
+        m2 = lightness + saturation - lightness * saturation;
+      }
+      m1 = lightness * 2 - m2;
+
+      this.r = Math.round( Color.hueToRGB( m1, m2, hue + 1 / 3 ) * 255 );
+      this.g = Math.round( Color.hueToRGB( m1, m2, hue ) * 255 );
+      this.b = Math.round( Color.hueToRGB( m1, m2, hue - 1 / 3 ) * 255 );
+      this.a = clamp( alpha, 0, 1 );
+
+      this.updateColor(); // update the cached value
+
+      return this; // allow chaining
+    },
+
+    equals: function( color ) {
+      return this.r === color.r && this.g === color.g && this.b === color.b && this.a === color.a;
+    },
+
+    withAlpha: function( alpha ) {
+      return new Color( this.r, this.g, this.b, alpha );
+    },
+
+    checkFactor: function( factor ) {
+      if ( factor < 0 || factor > 1 ) {
+        throw new Error( 'factor must be between 0 and 1: ' + factor );
+      }
+      return ( factor === undefined ) ? 0.7 : factor;
+    },
+
+    // matches Java's Color.brighter()
+    brighterColor: function( factor ) {
+      factor = this.checkFactor( factor );
+      var red = Math.min( 255, Math.floor( this.r / factor ) );
+      var green = Math.min( 255, Math.floor( this.g / factor ) );
+      var blue = Math.min( 255, Math.floor( this.b / factor ) );
+      return new Color( red, green, blue, this.a );
+    },
+
+    /**
+     * Brightens a color in RGB space. Useful when creating gradients from a
+     * single base color.
+     *
+     * @param color
+     * @param factor 0 (no change) to 1 (white)
+     * @return lighter (closer to white) version of the original color.
+     */
+    colorUtilsBrighter: function( factor ) {
+      factor = this.checkFactor( factor );
+      var red = Math.min( 255, this.getRed() + Math.floor( factor * ( 255 - this.getRed() ) ) );
+      var green = Math.min( 255, this.getGreen() + Math.floor( factor * ( 255 - this.getGreen() ) ) );
+      var blue = Math.min( 255, this.getBlue() + Math.floor( factor * ( 255 - this.getBlue() ) ) );
+      return new Color( red, green, blue, this.getAlpha() );
+    },
+
+    // matches Java's Color.darker()
+    darkerColor: function( factor ) {
+      factor = this.checkFactor( factor );
+      var red = Math.max( 0, Math.floor( factor * this.r ) );
+      var green = Math.max( 0, Math.floor( factor * this.g ) );
+      var blue = Math.max( 0, Math.floor( factor * this.b ) );
+      return new Color( red, green, blue, this.a );
+    },
+
+    /**
+     * Darken a color in RGB space. Useful when creating gradients from a single
+     * base color.
+     *
+     * @param color  the original color
+     * @param factor 0 (no change) to 1 (black)
+     * @return darker (closer to black) version of the original color.
+     */
+    colorUtilsDarker: function( factor ) {
+      factor = this.checkFactor( factor );
+      var red = Math.max( 0, this.getRed() - Math.floor( factor * this.getRed() ) );
+      var green = Math.max( 0, this.getGreen() - Math.floor( factor * this.getGreen() ) );
+      var blue = Math.max( 0, this.getBlue() - Math.floor( factor * this.getBlue() ) );
+      return new Color( red, green, blue, this.getAlpha() );
+    },
+
+    /*
+     * Like colorUtilsBrighter/Darker, however factor should be in the range -1 to 1, and it will call:
+     *   colorUtilsBrighter( factor )   for factor >  0
+     *   this                           for factor == 0
+     *   colorUtilsDarker( -factor )    for factor <  0
+     * Thus:
+     * @param factor from -1 (black), to 0 (no change), to 1 (white)
+     */
+    colorUtilsBrightness: function( factor ) {
+      if ( factor === 0 ) {
+        return this;
+      }
+      else if ( factor > 0 ) {
+        return this.colorUtilsBrighter( factor );
+      }
+      else {
+        return this.colorUtilsDarker( -factor );
+      }
+    },
+
+    /*---------------------------------------------------------------------------*
+     * listeners TODO: consider mixing in this behavior, it's common
+     *----------------------------------------------------------------------------*/
+
+    // listener should be a callback expecting no arguments, listener() will be called when the color changes
+    addChangeListener: function( listener ) {
+      assert && assert( listener !== undefined && listener !== null, 'Verify that the listener exists' );
+      assert && assert( !_.contains( this.listeners, listener ) );
+      this.listeners.push( listener );
+    },
+
+    removeChangeListener: function( listener ) {
+      assert && assert( _.contains( this.listeners, listener ) );
+      this.listeners.splice( _.indexOf( this.listeners, listener ), 1 );
+    },
+
+    getListenerCount: function() {
+      return this.listeners.length;
+    },
+
+    toString: function() {
+      return this.constructor.name + "[r:" + this.r + " g:" + this.g + " b:" + this.b + " a:" + this.a + "]";
+    },
+
+    toStateObject: function() {
+      return {
+        r: this.r,
+        g: this.g,
+        b: this.b,
+        a: this.a
+      };
+    }
+  } );
+
+  Color.basicColorKeywords = {
+    aqua: '00ffff',
+    black: '000000',
+    blue: '0000ff',
+    fuchsia: 'ff00ff',
+    gray: '808080',
+    green: '008000',
+    lime: '00ff00',
+    maroon: '800000',
+    navy: '000080',
+    olive: '808000',
+    purple: '800080',
+    red: 'ff0000',
+    silver: 'c0c0c0',
+    teal: '008080',
+    white: 'ffffff',
+    yellow: 'ffff00'
+  };
+
+  Color.colorKeywords = {
+    aliceblue: 'f0f8ff',
+    antiquewhite: 'faebd7',
+    aqua: '00ffff',
+    aquamarine: '7fffd4',
+    azure: 'f0ffff',
+    beige: 'f5f5dc',
+    bisque: 'ffe4c4',
+    black: '000000',
+    blanchedalmond: 'ffebcd',
+    blue: '0000ff',
+    blueviolet: '8a2be2',
+    brown: 'a52a2a',
+    burlywood: 'deb887',
+    cadetblue: '5f9ea0',
+    chartreuse: '7fff00',
+    chocolate: 'd2691e',
+    coral: 'ff7f50',
+    cornflowerblue: '6495ed',
+    cornsilk: 'fff8dc',
+    crimson: 'dc143c',
+    cyan: '00ffff',
+    darkblue: '00008b',
+    darkcyan: '008b8b',
+    darkgoldenrod: 'b8860b',
+    darkgray: 'a9a9a9',
+    darkgreen: '006400',
+    darkgrey: 'a9a9a9',
+    darkkhaki: 'bdb76b',
+    darkmagenta: '8b008b',
+    darkolivegreen: '556b2f',
+    darkorange: 'ff8c00',
+    darkorchid: '9932cc',
+    darkred: '8b0000',
+    darksalmon: 'e9967a',
+    darkseagreen: '8fbc8f',
+    darkslateblue: '483d8b',
+    darkslategray: '2f4f4f',
+    darkslategrey: '2f4f4f',
+    darkturquoise: '00ced1',
+    darkviolet: '9400d3',
+    deeppink: 'ff1493',
+    deepskyblue: '00bfff',
+    dimgray: '696969',
+    dimgrey: '696969',
+    dodgerblue: '1e90ff',
+    firebrick: 'b22222',
+    floralwhite: 'fffaf0',
+    forestgreen: '228b22',
+    fuchsia: 'ff00ff',
+    gainsboro: 'dcdcdc',
+    ghostwhite: 'f8f8ff',
+    gold: 'ffd700',
+    goldenrod: 'daa520',
+    gray: '808080',
+    green: '008000',
+    greenyellow: 'adff2f',
+    grey: '808080',
+    honeydew: 'f0fff0',
+    hotpink: 'ff69b4',
+    indianred: 'cd5c5c',
+    indigo: '4b0082',
+    ivory: 'fffff0',
+    khaki: 'f0e68c',
+    lavender: 'e6e6fa',
+    lavenderblush: 'fff0f5',
+    lawngreen: '7cfc00',
+    lemonchiffon: 'fffacd',
+    lightblue: 'add8e6',
+    lightcoral: 'f08080',
+    lightcyan: 'e0ffff',
+    lightgoldenrodyellow: 'fafad2',
+    lightgray: 'd3d3d3',
+    lightgreen: '90ee90',
+    lightgrey: 'd3d3d3',
+    lightpink: 'ffb6c1',
+    lightsalmon: 'ffa07a',
+    lightseagreen: '20b2aa',
+    lightskyblue: '87cefa',
+    lightslategray: '778899',
+    lightslategrey: '778899',
+    lightsteelblue: 'b0c4de',
+    lightyellow: 'ffffe0',
+    lime: '00ff00',
+    limegreen: '32cd32',
+    linen: 'faf0e6',
+    magenta: 'ff00ff',
+    maroon: '800000',
+    mediumaquamarine: '66cdaa',
+    mediumblue: '0000cd',
+    mediumorchid: 'ba55d3',
+    mediumpurple: '9370db',
+    mediumseagreen: '3cb371',
+    mediumslateblue: '7b68ee',
+    mediumspringgreen: '00fa9a',
+    mediumturquoise: '48d1cc',
+    mediumvioletred: 'c71585',
+    midnightblue: '191970',
+    mintcream: 'f5fffa',
+    mistyrose: 'ffe4e1',
+    moccasin: 'ffe4b5',
+    navajowhite: 'ffdead',
+    navy: '000080',
+    oldlace: 'fdf5e6',
+    olive: '808000',
+    olivedrab: '6b8e23',
+    orange: 'ffa500',
+    orangered: 'ff4500',
+    orchid: 'da70d6',
+    palegoldenrod: 'eee8aa',
+    palegreen: '98fb98',
+    paleturquoise: 'afeeee',
+    palevioletred: 'db7093',
+    papayawhip: 'ffefd5',
+    peachpuff: 'ffdab9',
+    peru: 'cd853f',
+    pink: 'ffc0cb',
+    plum: 'dda0dd',
+    powderblue: 'b0e0e6',
+    purple: '800080',
+    red: 'ff0000',
+    rosybrown: 'bc8f8f',
+    royalblue: '4169e1',
+    saddlebrown: '8b4513',
+    salmon: 'fa8072',
+    sandybrown: 'f4a460',
+    seagreen: '2e8b57',
+    seashell: 'fff5ee',
+    sienna: 'a0522d',
+    silver: 'c0c0c0',
+    skyblue: '87ceeb',
+    slateblue: '6a5acd',
+    slategray: '708090',
+    slategrey: '708090',
+    snow: 'fffafa',
+    springgreen: '00ff7f',
+    steelblue: '4682b4',
+    tan: 'd2b48c',
+    teal: '008080',
+    thistle: 'd8bfd8',
+    tomato: 'ff6347',
+    turquoise: '40e0d0',
+    violet: 'ee82ee',
+    wheat: 'f5deb3',
+    white: 'ffffff',
+    whitesmoke: 'f5f5f5',
+    yellow: 'ffff00',
+    yellowgreen: '9acd32'
+  };
+
+  // Java compatibility
+  Color.BLACK = Color.black = new Color( 0, 0, 0 ).setImmutable();
+  Color.BLUE = Color.blue = new Color( 0, 0, 255 ).setImmutable();
+  Color.CYAN = Color.cyan = new Color( 0, 255, 255 ).setImmutable();
+  Color.DARK_GRAY = Color.darkGray = new Color( 64, 64, 64 ).setImmutable();
+  Color.GRAY = Color.gray = new Color( 128, 128, 128 ).setImmutable();
+  Color.GREEN = Color.green = new Color( 0, 255, 0 ).setImmutable();
+  Color.LIGHT_GRAY = Color.lightGray = new Color( 192, 192, 192 ).setImmutable();
+  Color.MAGENTA = Color.magenta = new Color( 255, 0, 255 ).setImmutable();
+  Color.ORANGE = Color.orange = new Color( 255, 200, 0 ).setImmutable();
+  Color.PINK = Color.pink = new Color( 255, 175, 175 ).setImmutable();
+  Color.RED = Color.red = new Color( 255, 0, 0 ).setImmutable();
+  Color.WHITE = Color.white = new Color( 255, 255, 255 ).setImmutable();
+  Color.YELLOW = Color.yellow = new Color( 255, 255, 0 ).setImmutable();
+
+  /**
+   * Interpolates between 2 colors in RGBA space. When distance is 0, color1
+   * is returned. When distance is 1, color2 is returned. Other values of
+   * distance return a color somewhere between color1 and color2. Each color
+   * component is interpolated separately.
+   *
+   * @param {Color} color1
+   * @param {Color} color2
+   * @param {Number} distance distance between color1 and color2, 0 <= distance <= 1
+   * @return {Color}
+   */
+  Color.interpolateRGBA = function( color1, color2, distance ) {
+    if ( distance < 0 || distance > 1 ) {
+      throw new Error( 'distance must be between 0 and 1: ' + distance );
+    }
+    var r = Math.floor( linear( 0, 1, color1.r, color2.r, distance ) );
+    var g = Math.floor( linear( 0, 1, color1.g, color2.g, distance ) );
+    var b = Math.floor( linear( 0, 1, color1.b, color2.b, distance ) );
+    var a = linear( 0, 1, color1.a, color2.a, distance );
+    return new Color( r, g, b, a );
+  };
+
+  Color.fromStateObject = function( json ) {
+    return new Color( json.r, json.g, json.b, json.a );
+  };
+
+  return Color;
+} );
+
+// Copyright 2002-2014, University of Colorado Boulder
+
+/**
+ * Code for testing which platform is running.  Use sparingly, if at all!
+ *
+ * Sample usage:
+ * if (platform.firefox) {node.renderer = 'canvas';}
+ *
+ * @author Sam Reid
+ */
+define( 'PHET_CORE/platform',['require','PHET_CORE/phetCore'],function( require ) {
+  
+
+  var phetCore = require( 'PHET_CORE/phetCore' );
+
+  var ua = navigator.userAgent;
+
+  // Checks to see whether we are IE, and if so whether the version matches.
+  function isIE( version ) {
+    return getInternetExplorerVersion() === version;
+  }
+
+  //IE11 no longer reports MSIE in the user agent string, see https://github.com/phetsims/phet-core/issues/12
+  //This code is adapted from http://stackoverflow.com/questions/17907445/how-to-detect-ie11
+  function getInternetExplorerVersion() {
+    var rv = -1;
+    var re = null;
+    if ( navigator.appName === 'Microsoft Internet Explorer' ) {
+      re = new RegExp( 'MSIE ([0-9]{1,}[.0-9]{0,})' );
+      if ( re.exec( ua ) !== null ) {
+        rv = parseFloat( RegExp.$1 );
+      }
+    }
+    else if ( navigator.appName === 'Netscape' ) {
+      re = new RegExp( 'Trident/.*rv:([0-9]{1,}[.0-9]{0,})' );
+      if ( re.exec( ua ) !== null ) {
+        rv = parseFloat( RegExp.$1 );
+      }
+    }
+    return rv;
+  }
+
+  phetCore.platform = {
+    // Whether the browser is most likely Firefox
+    get firefox() { return ua.toLowerCase().indexOf( 'firefox' ) > -1; },
+
+    // Whether the browser is most likely Safari running on iOS
+    // See http://stackoverflow.com/questions/3007480/determine-if-user-navigated-from-mobile-safari
+    get mobileSafari() { return !!( ua.match( /(iPod|iPhone|iPad)/ ) && ua.match( /AppleWebKit/ ) ); },
+
+    // Whether the browser is a matching version of Safari running on OS X
+    get safari5() { return !!( ua.match( /Version\/5\./ ) && ua.match( /Safari\// ) && ua.match( /AppleWebKit/ ) ); },
+    get safari6() { return !!( ua.match( /Version\/6\./ ) && ua.match( /Safari\// ) && ua.match( /AppleWebKit/ ) ); },
+    get safari7() { return !!( ua.match( /Version\/7\./ ) && ua.match( /Safari\// ) && ua.match( /AppleWebKit/ ) ); },
+
+    // Whether the browser is some type of IE (Internet Explorer)
+    get ie() { return getInternetExplorerVersion() !== -1; },
+
+    // Whether the browser is a specific version of IE (Internet Explorer)
+    get ie9() { return isIE( 9 ); },
+    get ie10() { return isIE( 10 ); },
+    get ie11() { return isIE( 11 ); },
+
+    // Whether the browser has Android in its user agent
+    get android() { return ua.indexOf( 'Android' ) > 0; },
+
+    // Whether the browser is Microsoft Edge
+    get edge() { return !!ua.match( /Edge\// ); },
+
+    // Whether the browser is Chromium-based (usually Chrome)
+    get chromium() { return (/chrom(e|ium)/).test( ua.toLowerCase() ) && !ua.match( /Edge\// ); }
+  };
+
+  return phetCore.platform;
+} );
+// Copyright 2002-2014, University of Colorado Boulder
+
+/**
+ * Removes a single (the first) matching object from an Array.
+ *
+ * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ */
+
+define( 'PHET_CORE/arrayRemove',['require','PHET_CORE/phetCore'],function( require ) {
+  
+
+  var phetCore = require( 'PHET_CORE/phetCore' );
+
+  /*
+   * @param {Array} arr
+   * @param {*} item - The item to remove from the array
+   */
+  phetCore.arrayRemove = function arrayRemove( arr, item ) {
+    assert && assert( arr instanceof Array, 'arrayRemove either takes an Array' );
+
+    var index = _.indexOf( arr, item );
+    assert && assert( index >= 0, 'item not found in Array' );
+
+    arr.splice( index, 1 );
+  };
+
+  return phetCore.arrayRemove;
+} );
+// Copyright 2002-2014, University of Colorado Boulder
+
+/**
+ * Mix-in for nodes that support a standard fill and/or stroke.
+ *
+ * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ */
+
+define( 'SCENERY/nodes/Paintable',['require','SCENERY/scenery','SCENERY/util/Color','KITE/util/LineStyles','SCENERY/display/Renderer','PHET_CORE/inherit','PHET_CORE/extend','PHET_CORE/platform','PHET_CORE/arrayRemove'],function( require ) {
+  
+
+  var scenery = require( 'SCENERY/scenery' );
+  var Color = require( 'SCENERY/util/Color' );
+  var LineStyles = require( 'KITE/util/LineStyles' );
+  var Renderer = require( 'SCENERY/display/Renderer' );
+
+  var inherit = require( 'PHET_CORE/inherit' );
+  var extend = require( 'PHET_CORE/extend' );
+  var platform = require( 'PHET_CORE/platform' );
+  var arrayRemove = require( 'PHET_CORE/arrayRemove' );
+
+  var isSafari5 = platform.safari5;
+  var isIE9 = platform.ie9;
+
+  /*
+   * Applies the mix-in to a subtype of Node.
+   *
+   * @param {constructor} type - A constructor that inherits from Node
+   */
+  scenery.Paintable = {
+    mixin: function( type ) {
+      var proto = type.prototype;
+
+      extend( proto, {
+        // this should be called in the constructor to initialize
+        initializePaintable: function() {
+          this._fill = null;
+          this._fillPickable = true;
+
+          this._stroke = null;
+          this._strokePickable = false;
+
+          this._cachedPaints = [];
+          this._lineDrawingStyles = new LineStyles();
+
+          this._fillColor = null;
+          this._fillColorDirty = true;
+          this._strokeColor = null;
+          this._strokeColorDirty = true;
+
+          var that = this;
+          this._fillListener = function() {
+            that.invalidateFill();
+          };
+          this._strokeListener = function() {
+            that.invalidateStroke();
+          };
+        },
+
+        hasFill: function() {
+          return this._fill !== null;
+        },
+
+        getFill: function() {
+          return this._fill;
+        },
+
+        validateFillColor: function() {
+          if ( this._fillColorDirty ) {
+            this._fillColorDirty = false;
+
+            if ( typeof this._fill === 'string' || this._fill instanceof Color ) {
+              if ( this._fillColor ) {
+                this._fillColor.set( this._fill );
+              }
+              // lazily create a Color when necessary, instead of pre-allocating
+              else {
+                this._fillColor = new Color( this._fill );
+              }
+            }
+          }
+        },
+
+        /**
+         * If the current fill is a solid color (string or scenery.Color), getFillColor() will return a scenery.Color
+         * reference. This reference should be considered immutable (should not be modified)
+         *
+         * @returns {Color | null} [read-only]
+         */
+        getFillColor: function() {
+          this.validateFillColor();
+
+          // types of fills where we can return a single color
+          if ( typeof this._fill === 'string' || this._fill instanceof Color ) {
+            return this._fillColor;
+          }
+          // no fill, or a pattern/gradient (we can't return a single fill)
+          else {
+            return null;
+          }
+        },
+
+        /**
+         * Sets the fill color for the node.
+         *
+         * Please use null for indicating "no fill" (that is the default).
+         *
+         * @param {string | Color | LinearGradient | RadialGradient | Pattern | null} fill
+         */
+        setFill: function( fill ) {
+          // Instance equality used here since it would be more expensive to parse all CSS
+          // colors and compare every time the fill changes. Right now, usually we don't have
+          // to parse CSS colors. See https://github.com/phetsims/scenery/issues/255
+          if ( this._fill !== fill ) {
+            this._fillColorDirty = true;
+
+            //OHTWO TODO: we probably shouldn't be checking this here?
+            var hasInstances = this._instances.length > 0;
+
+            if ( hasInstances && this._fill && this._fill.removeChangeListener ) {
+              this._fill.removeChangeListener( this._fillListener );
+            }
+
+            this._fill = fill;
+
+            if ( hasInstances && this._fill && this._fill.addChangeListener ) {
+              this._fill.addChangeListener( this._fillListener );
+            }
+
+            this.invalidateFill();
+          }
+          return this;
+        },
+
+        isFillPickable: function() {
+          return this._fillPickable;
+        },
+
+        setFillPickable: function( pickable ) {
+          assert && assert( typeof pickable === 'boolean' );
+          if ( this._fillPickable !== pickable ) {
+            this._fillPickable = pickable;
+
+            // TODO: better way of indicating that only the node under pointers could have changed, but no paint change is needed?
+            this.invalidateFill();
+          }
+          return this;
+        },
+
+        hasStroke: function() {
+          return this._stroke !== null;
+        },
+
+        // TODO: setting these properties looks like a good candidate for refactoring to lessen file size
+        getLineWidth: function() {
+          return this._lineDrawingStyles.lineWidth;
+        },
+
+        setLineWidth: function( lineWidth ) {
+          assert && assert( typeof lineWidth === 'number', 'lineWidth should be a number, not ' + lineWidth );
+          assert && assert( lineWidth >= 0, 'lineWidth should be non-negative instead of ' + lineWidth );
+
+          if ( this.getLineWidth() !== lineWidth ) {
+            this._lineDrawingStyles.lineWidth = lineWidth;
+            this.invalidateStroke();
+
+            var stateLen = this._drawables.length;
+            for ( var i = 0; i < stateLen; i++ ) {
+              this._drawables[ i ].markDirtyLineWidth();
+            }
+          }
+          return this;
+        },
+
+        getLineCap: function() {
+          return this._lineDrawingStyles.lineCap;
+        },
+
+        setLineCap: function( lineCap ) {
+          assert && assert( lineCap === 'butt' || lineCap === 'round' || lineCap === 'square',
+            'lineCap should be one of "butt", "round" or "square", not ' + lineCap );
+
+          if ( this._lineDrawingStyles.lineCap !== lineCap ) {
+            this._lineDrawingStyles.lineCap = lineCap;
+            this.invalidateStroke();
+
+            var stateLen = this._drawables.length;
+            for ( var i = 0; i < stateLen; i++ ) {
+              this._drawables[ i ].markDirtyLineOptions();
+            }
+          }
+          return this;
+        },
+
+        getLineJoin: function() {
+          return this._lineDrawingStyles.lineJoin;
+        },
+
+        setLineJoin: function( lineJoin ) {
+          assert && assert( lineJoin === 'miter' || lineJoin === 'round' || lineJoin === 'bevel',
+            'lineJoin should be one of "miter", "round" or "bevel", not ' + lineJoin );
+
+          if ( this._lineDrawingStyles.lineJoin !== lineJoin ) {
+            this._lineDrawingStyles.lineJoin = lineJoin;
+            this.invalidateStroke();
+
+            var stateLen = this._drawables.length;
+            for ( var i = 0; i < stateLen; i++ ) {
+              this._drawables[ i ].markDirtyLineOptions();
+            }
+          }
+          return this;
+        },
+
+        getMiterLimit: function() {
+          return this._lineDrawingStyles.miterLimit;
+        },
+
+        setMiterLimit: function( miterLimit ) {
+          assert && assert( typeof miterLimit === 'number' );
+
+          if ( this._lineDrawingStyles.miterLimit !== miterLimit ) {
+            this._lineDrawingStyles.miterLimit = miterLimit;
+            this.invalidateStroke();
+
+            var stateLen = this._drawables.length;
+            for ( var i = 0; i < stateLen; i++ ) {
+              this._drawables[ i ].markDirtyLineOptions();
+            }
+          }
+          return this;
+        },
+
+        getLineDash: function() {
+          return this._lineDrawingStyles.lineDash;
+        },
+
+        hasLineDash: function() {
+          return !!this._lineDrawingStyles.lineDash.length;
+        },
+
+        setLineDash: function( lineDash ) {
+          if ( this._lineDrawingStyles.lineDash !== lineDash ) {
+            this._lineDrawingStyles.lineDash = lineDash || [];
+            this.invalidateStroke();
+
+            var stateLen = this._drawables.length;
+            for ( var i = 0; i < stateLen; i++ ) {
+              this._drawables[ i ].markDirtyLineOptions();
+            }
+          }
+          return this;
+        },
+
+        getLineDashOffset: function() {
+          return this._lineDrawingStyles.lineDashOffset;
+        },
+
+        setLineDashOffset: function( lineDashOffset ) {
+          assert && assert( typeof lineDashOffset === 'number', 'lineDashOffset should be a number, not ' + lineDashOffset );
+
+          if ( this._lineDrawingStyles.lineDashOffset !== lineDashOffset ) {
+            this._lineDrawingStyles.lineDashOffset = lineDashOffset;
+            this.invalidateStroke();
+
+            var stateLen = this._drawables.length;
+            for ( var i = 0; i < stateLen; i++ ) {
+              this._drawables[ i ].markDirtyLineOptions();
+            }
+          }
+          return this;
+        },
+
+        isStrokePickable: function() {
+          return this._strokePickable;
+        },
+
+        setStrokePickable: function( pickable ) {
+          assert && assert( typeof pickable === 'boolean', 'strokePickable should be a boolean, not ' + pickable );
+
+          if ( this._strokePickable !== pickable ) {
+            this._strokePickable = pickable;
+
+            // TODO: better way of indicating that only the node under pointers could have changed, but no paint change is needed?
+            this.invalidateStroke();
+          }
+          return this;
+        },
+
+        setLineStyles: function( lineStyles ) {
+
+          this._lineDrawingStyles = lineStyles;
+          this.invalidateStroke();
+          return this;
+        },
+
+        getLineStyles: function() {
+          return this._lineDrawingStyles;
+        },
+
+        getStroke: function() {
+          return this._stroke;
+        },
+
+        validateStrokeColor: function() {
+          if ( this._strokeColorDirty ) {
+            this._strokeColorDirty = false;
+
+            if ( typeof this._stroke === 'string' || this._stroke instanceof Color ) {
+              if ( this._strokeColor ) {
+                this._strokeColor.set( this._stroke );
+              }
+              // lazily create a Color when necessary, instead of pre-allocating
+              else {
+                this._strokeColor = new Color( this._stroke );
+              }
+            }
+          }
+        },
+
+        /**
+         * If the current stroke is a solid color (string or scenery.Color), getStrokeColor() will return a scenery.Color
+         * reference. This reference should be considered immutable (should not be modified)
+         *
+         * @returns {Color | null} [read-only]
+         */
+        getStrokeColor: function() {
+          this.validateStrokeColor();
+
+          // types of strokes where we can return a single color
+          if ( typeof this._stroke === 'string' || this._stroke instanceof Color ) {
+            return this._strokeColor;
+          }
+          // no stroke, or a pattern/gradient (we can't return a single stroke)
+          else {
+            return null;
+          }
+        },
+
+        /**
+         * Sets the fill color for the node.
+         *
+         * Please use null for indicating "no fill" (that is the default).
+         *
+         * @param {string | Color | LinearGradient | RadialGradient | Pattern | null} fill
+         */
+        setStroke: function( stroke ) {
+          if ( this._stroke !== stroke ) {
+            this._strokeColorDirty = true;
+
+            //OHTWO TODO: probably shouldn't have a reference here
+            var hasInstances = this._instances.length > 0;
+
+            if ( hasInstances && this._stroke && this._stroke.removeChangeListener ) {
+              this._stroke.removeChangeListener( this._strokeListener );
+            }
+
+            this._stroke = stroke;
+
+            if ( hasInstances && this._stroke && this._stroke.addChangeListener ) {
+              this._stroke.addChangeListener( this._strokeListener );
+            }
+
+            this.invalidateStroke();
+          }
+          return this;
+        },
+
+        getCachedPaints: function() {
+          return this._cachedPaints;
+        },
+
+        /**
+         * Sets the cached paints to the input array (a defensive copy). Note that it also filters out fills that are
+         * not considered paints (e.g. strings, Colors, etc.).
+         *
+         * When this node is displayed in SVG, it will force the presence of the cached paint to be stored in the SVG's
+         * <defs> element, so that we can switch quickly to use the given paint (instead of having to create it on the
+         * SVG-side whenever the switch is made).
+         *
+         * Also note that duplicate paints are acceptible, and don't need to be filtered out before-hand.
+         *
+         * @param {Array.<string | Color | LinearGradient | RadialGradient | Pattern | null>} paints
+         */
+        setCachedPaints: function( paints ) {
+          this._cachedPaints = paints.filter( function( paint ) { return paint && paint.isPaint; } );
+
+          var stateLen = this._drawables.length;
+          for ( var i = 0; i < stateLen; i++ ) {
+            this._drawables[ i ].markDirtyCachedPaints();
+          }
+
+          return this;
+        },
+
+        /**
+         * Adds a cached paint. Does nothing if paint is just a normal fill (string, Color), but for gradients and
+         * patterns, it will be made faster to switch to.
+         *
+         * When this node is displayed in SVG, it will force the presence of the cached paint to be stored in the SVG's
+         * <defs> element, so that we can switch quickly to use the given paint (instead of having to create it on the
+         * SVG-side whenever the switch is made).
+         *
+         * Also note that duplicate paints are acceptible, and don't need to be filtered out before-hand.
+         *
+         * @param {string | Color | LinearGradient | RadialGradient | Pattern | null} paint
+         */
+        addCachedPaint: function( paint ) {
+          if ( paint && paint.isPaint ) {
+            this._cachedPaints.push( paint );
+
+            var stateLen = this._drawables.length;
+            for ( var i = 0; i < stateLen; i++ ) {
+              this._drawables[ i ].markDirtyCachedPaints();
+            }
+          }
+        },
+
+        /**
+         * Removes a cached paint. Does nothing if paint is just a normal fill (string, Color), but for gradients and
+         * patterns it will remove any existing cached paint. If it was added more than once, it will need to be removed
+         * more than once.
+         *
+         * When this node is displayed in SVG, it will force the presence of the cached paint to be stored in the SVG's
+         * <defs> element, so that we can switch quickly to use the given paint (instead of having to create it on the
+         * SVG-side whenever the switch is made).
+         *
+         * @param {string | Color | LinearGradient | RadialGradient | Pattern | null} paint
+         */
+        removeCachedPaint: function( paint ) {
+          if ( paint && paint.isPaint ) {
+            assert && assert( _.contains( this._cachedPaints, paint ) );
+
+            arrayRemove( this._cachedPaints, paint );
+
+            var stateLen = this._drawables.length;
+            for ( var i = 0; i < stateLen; i++ ) {
+              this._drawables[ i ].markDirtyCachedPaints();
+            }
+          }
+        },
+
+        firstInstanceAdded: function() {
+          if ( this._fill && this._fill.addChangeListener ) {
+            this._fill.addChangeListener( this._fillListener );
+          }
+          if ( this._stroke && this._stroke.addChangeListener ) {
+            this._stroke.addChangeListener( this._strokeListener );
+          }
+        },
+
+        lastInstanceRemoved: function() {
+          if ( this._fill && this._fill.removeChangeListener ) {
+            this._fill.removeChangeListener( this._fillListener );
+          }
+          if ( this._stroke && this._stroke.removeChangeListener ) {
+            this._stroke.removeChangeListener( this._strokeListener );
+          }
+        },
+
+        beforeCanvasFill: function( wrapper ) {
+          wrapper.setFillStyle( this._fill );
+          if ( this._fill.transformMatrix ) {
+            wrapper.context.save();
+            this._fill.transformMatrix.canvasAppendTransform( wrapper.context );
+          }
+        },
+
+        afterCanvasFill: function( wrapper ) {
+          if ( this._fill.transformMatrix ) {
+            wrapper.context.restore();
+          }
+        },
+
+        beforeCanvasStroke: function( wrapper ) {
+          // TODO: is there a better way of not calling so many things on each stroke?
+          wrapper.setStrokeStyle( this._stroke );
+          wrapper.setLineWidth( this.getLineWidth() );
+          wrapper.setLineCap( this.getLineCap() );
+          wrapper.setLineJoin( this.getLineJoin() );
+          wrapper.setMiterLimit( this.getMiterLimit() );
+          wrapper.setLineDash( this.getLineDash() );
+          wrapper.setLineDashOffset( this.getLineDashOffset() );
+          if ( this._stroke.transformMatrix ) {
+            wrapper.context.save();
+            this._stroke.transformMatrix.canvasAppendTransform( wrapper.context );
+          }
+        },
+
+        afterCanvasStroke: function( wrapper ) {
+          if ( this._stroke.transformMatrix ) {
+            wrapper.context.restore();
+          }
+        },
+
+        getCSSFill: function() {
+          // if it's a Color object, get the corresponding CSS
+          // 'transparent' will make us invisible if the fill is null
+          return this._fill ? ( this._fill.toCSS ? this._fill.toCSS() : this._fill ) : 'transparent';
+        },
+
+        getSimpleCSSStroke: function() {
+          // if it's a Color object, get the corresponding CSS
+          // 'transparent' will make us invisible if the fill is null
+          return this._stroke ? ( this._stroke.toCSS ? this._stroke.toCSS() : this._stroke ) : 'transparent';
+        },
+
+        appendFillablePropString: function( spaces, result ) {
+          if ( this._fill ) {
+            if ( result ) {
+              result += ',\n';
+            }
+            if ( typeof this._fill === 'string' ) {
+              result += spaces + 'fill: \'' + this._fill + '\'';
+            }
+            else {
+              result += spaces + 'fill: ' + this._fill.toString();
+            }
+          }
+
+          return result;
+        },
+
+        appendStrokablePropString: function( spaces, result ) {
+          var self = this;
+
+          function addProp( key, value, nowrap ) {
+            if ( result ) {
+              result += ',\n';
+            }
+            if ( !nowrap && typeof value === 'string' ) {
+              result += spaces + key + ': \'' + value + '\'';
+            }
+            else {
+              result += spaces + key + ': ' + value;
+            }
+          }
+
+          if ( this._stroke ) {
+            var defaultStyles = new LineStyles();
+            if ( typeof this._stroke === 'string' ) {
+              addProp( 'stroke', this._stroke );
+            }
+            else {
+              addProp( 'stroke', this._stroke.toString(), true );
+            }
+
+            _.each( [ 'lineWidth', 'lineCap', 'miterLimit', 'lineJoin', 'lineDashOffset' ], function( prop ) {
+              if ( self[ prop ] !== defaultStyles[ prop ] ) {
+                addProp( prop, self[ prop ] );
+              }
+            } );
+
+            if ( this.lineDash.length ) {
+              addProp( 'lineDash', JSON.stringify( this.lineDash ), true );
+            }
+          }
+
+          return result;
+        },
+
+        getFillRendererBitmask: function() {
+          var bitmask = 0;
+
+          // Safari 5 has buggy issues with SVG gradients
+          if ( !( isSafari5 && this._fill && this._fill.isGradient ) ) {
+            bitmask |= Renderer.bitmaskSVG;
+          }
+
+          // we always have Canvas support?
+          bitmask |= Renderer.bitmaskCanvas;
+
+          if ( !this._fill ) {
+            // if there is no fill, it is supported by DOM and WebGL
+            bitmask |= Renderer.bitmaskDOM;
+            bitmask |= Renderer.bitmaskWebGL;
+          }
+          else if ( this._fill.isPattern ) {
+            // no pattern support for DOM or WebGL (for now!)
+          }
+          else if ( this._fill.isGradient ) {
+            // no gradient support for DOM or WebGL (for now!)
+          }
+          else {
+            // solid fills always supported for DOM, WebGL and Pixi
+            bitmask |= Renderer.bitmaskDOM;
+          }
+          bitmask |= Renderer.bitmaskPixi;
+
+          return bitmask;
+        },
+
+        getStrokeRendererBitmask: function() {
+          var bitmask = 0;
+
+          if ( !( isIE9 && this.hasStroke() && this.hasLineDash() ) ) {
+            bitmask |= Renderer.bitmaskCanvas;
+          }
+
+          // always have SVG support (for now?)
+          bitmask |= Renderer.bitmaskSVG;
+
+          if ( !this.hasStroke() ) {
+            // allow DOM support if there is no stroke
+            bitmask |= Renderer.bitmaskDOM;
+          }
+
+          bitmask |= Renderer.bitmaskPixi;
+
+          return bitmask;
+        }
+      } );
+
+      // on mutation, set the stroke parameters first since they may affect the bounds (and thus later operations)
+      proto._mutatorKeys = [
+        'fill', 'fillPickable', 'stroke', 'lineWidth', 'lineCap', 'lineJoin', 'miterLimit', 'lineDash',
+        'lineDashOffset', 'strokePickable', 'cachedPaints'
+      ].concat( proto._mutatorKeys );
+
+      Object.defineProperty( proto, 'fill', { set: proto.setFill, get: proto.getFill } );
+      Object.defineProperty( proto, 'fillColor', { set: proto.setFill, get: proto.getFillColor } );
+      Object.defineProperty( proto, 'fillPickable', { set: proto.setFillPickable, get: proto.isFillPickable } );
+      Object.defineProperty( proto, 'stroke', { set: proto.setStroke, get: proto.getStroke } );
+      Object.defineProperty( proto, 'strokeColor', { set: proto.setStroke, get: proto.getStrokeColor } );
+      Object.defineProperty( proto, 'lineWidth', { set: proto.setLineWidth, get: proto.getLineWidth } );
+      Object.defineProperty( proto, 'lineCap', { set: proto.setLineCap, get: proto.getLineCap } );
+      Object.defineProperty( proto, 'lineJoin', { set: proto.setLineJoin, get: proto.getLineJoin } );
+      Object.defineProperty( proto, 'miterLimit', { set: proto.setMiterLimit, get: proto.getMiterLimit } );
+      Object.defineProperty( proto, 'lineDash', { set: proto.setLineDash, get: proto.getLineDash } );
+      Object.defineProperty( proto, 'lineDashOffset', { set: proto.setLineDashOffset, get: proto.getLineDashOffset } );
+      Object.defineProperty( proto, 'strokePickable', { set: proto.setStrokePickable, get: proto.isStrokePickable } );
+      Object.defineProperty( proto, 'cachedPaints', { set: proto.setCachedPaints, get: proto.getCachedPaints } );
+
+      // Paintable's version of invalidateFill()
+      function invalidateFill() {
+        /*jshint -W040 */
+        this.invalidateSupportedRenderers();
+
+        var stateLen = this._drawables.length;
+        for ( var i = 0; i < stateLen; i++ ) {
+          this._drawables[ i ].markDirtyFill();
+        }
+        /*jshint +W040 */
+      }
+      // Patch in a sub-type call if it already exists on the prototype
+      if ( proto.invalidateFill ) {
+        var subtypeInvalidateFill = proto.invalidateFill;
+        proto.invalidateFill = function() {
+          subtypeInvalidateFill.call( this );
+          invalidateFill.call( this );
+        };
+      }
+      else {
+        proto.invalidateFill = invalidateFill;
+      }
+
+      // Paintable's version of invalidateStroke()
+      function invalidateStroke() {
+        /*jshint -W040 */
+        this.invalidateSupportedRenderers();
+
+        var stateLen = this._drawables.length;
+        for ( var i = 0; i < stateLen; i++ ) {
+          this._drawables[ i ].markDirtyStroke();
+        }
+        /*jshint +W040 */
+      }
+      if ( proto.invalidateStroke ) {
+        var subtypeInvalidateStroke = proto.invalidateStroke;
+        proto.invalidateStroke = function() {
+          subtypeInvalidateStroke.call( this );
+          invalidateStroke.call( this );
+        };
+      }
+      else {
+        proto.invalidateStroke = invalidateStroke;
+      }
+    }
+  };
+  var Paintable = scenery.Paintable;
+
+  // mix-in base for DOM and SVG drawables
+  // NOTE: requires state.node to be defined
+  Paintable.PaintableStatefulDrawable = {
+    mixin: function PaintableStatefulDrawable( drawableType ) {
+      var proto = drawableType.prototype;
+
+      proto.initializePaintableState = function() {
+        this.lastFill = undefined;
+        this.dirtyFill = true;
+
+        this.lastStroke = undefined;
+        this.dirtyStroke = true;
+        this.dirtyLineWidth = true;
+        this.dirtyLineOptions = true; // e.g. cap, join, dash, dashoffset, miterlimit
+        this.dirtyCachedPaints = true;
+        this.lastCachedPaints = [];
+      };
+
+      proto.cleanPaintableState = function() {
+        this.dirtyFill = false;
+        this.lastFill = this.node.getFill();
+
+        this.dirtyStroke = false;
+        this.dirtyLineWidth = false;
+        this.dirtyLineOptions = false;
+        this.dirtyCachedPaints = false;
+        this.lastStroke = this.node.getStroke();
+      };
+
+      proto.markDirtyFill = function() {
+        this.dirtyFill = true;
+        this.markPaintDirty();
+      };
+
+      proto.markDirtyStroke = function() {
+        this.dirtyStroke = true;
+        this.markPaintDirty();
+      };
+
+      proto.markDirtyLineWidth = function() {
+        this.dirtyLineWidth = true;
+        this.markPaintDirty();
+      };
+
+      proto.markDirtyLineOptions = function() {
+        this.dirtyLineOptions = true;
+        this.markPaintDirty();
+      };
+
+      proto.markDirtyCachedPaints = function() {
+        this.dirtyCachedPaints = true;
+        this.markPaintDirty();
+      };
+    }
+  };
+
+  // mix-in for Canvas drawables
+  Paintable.PaintableStatelessDrawable = {
+    mixin: function PaintableStatelessDrawable( drawableType ) {
+      var proto = drawableType.prototype;
+
+      proto.markDirtyFill = function() {
+        this.markPaintDirty();
+      };
+
+      proto.markDirtyStroke = function() {
+        this.markPaintDirty();
+      };
+
+      proto.markDirtyLineWidth = function() {
+        this.markPaintDirty();
+      };
+
+      proto.markDirtyLineOptions = function() {
+        this.markPaintDirty();
+      };
+
+      proto.markDirtyCachedPaints = function() {
+        this.markPaintDirty();
+      };
+    }
+  };
+
+  function paintToSVGStyle( paint, svgBlock ) {
+    if ( !paint ) {
+      // no paint
+      return 'none';
+    }
+    else if ( paint.toCSS ) {
+      // Color object paint
+      return paint.toCSS();
+    }
+    else if ( paint.isPaint ) {
+      // reference the SVG definition with a URL
+      return 'url(#' + paint.id + '-' + ( svgBlock ? svgBlock.id : 'noblock' ) + ')';
+    }
+    else {
+      // plain CSS color
+      return paint;
+    }
+  }
+
+  // handles SVG defs and fill/stroke style for SVG elements (by composition, not a mix-in or for inheritance)
+  Paintable.PaintSVGState = function PaintSVGState() {
+    this.initialize();
+  };
+  inherit( Object, Paintable.PaintSVGState, {
+    initialize: function() {
+      this.svgBlock = null; // {SVGBlock | null}
+
+      // {string} fill/stroke style fragments that are currently used
+      this.fillStyle = 'none';
+      this.strokeStyle = 'none';
+
+      // current reference-counted fill/stroke paints (gradients and fills) that will need to be released on changes
+      // or disposal
+      this.fillPaint = null;
+      this.strokePaint = null;
+
+      // these are used by the actual SVG element
+      this.updateBaseStyle(); // the main style CSS
+      this.strokeDetailStyle = ''; // width/dash/cap/join CSS
+    },
+
+    dispose: function() {
+      // be cautious, release references
+      this.releaseFillPaint();
+      this.releaseStrokePaint();
+    },
+
+    releaseFillPaint: function() {
+      if ( this.fillPaint ) {
+        this.svgBlock.decrementPaint( this.fillPaint );
+        this.fillPaint = null;
+      }
+    },
+
+    releaseStrokePaint: function() {
+      if ( this.strokePaint ) {
+        this.svgBlock.decrementPaint( this.strokePaint );
+        this.strokePaint = null;
+      }
+    },
+
+    // called when the fill needs to be updated, with the latest defs SVG block
+    updateFill: function( svgBlock, fill ) {
+      assert && assert( this.svgBlock === svgBlock );
+
+      // NOTE: If fill.isPaint === true, this should be different if we switched to a different SVG block.
+      var fillStyle = paintToSVGStyle( fill, svgBlock );
+
+      // If our fill paint reference changed
+      if ( fill !== this.fillPaint ) {
+        // release the old reference
+        this.releaseFillPaint();
+
+        // only store a new reference if our new fill is a paint
+        if ( fill && fill.isPaint ) {
+          this.fillPaint = fill;
+          svgBlock.incrementPaint( fill );
+        }
+      }
+
+      // If we need to update the SVG style of our fill
+      if ( fillStyle !== this.fillStyle ) {
+        this.fillStyle = fillStyle;
+        this.updateBaseStyle();
+      }
+    },
+
+    updateStroke: function( svgBlock, stroke ) {
+      assert && assert( this.svgBlock === svgBlock );
+
+      // NOTE: If stroke.isPaint === true, this should be different if we switched to a different SVG block.
+      var strokeStyle = paintToSVGStyle( stroke, svgBlock );
+
+      // If our stroke paint reference changed
+      if ( stroke !== this.strokePaint ) {
+        // release the old reference
+        this.releaseStrokePaint();
+
+        // only store a new reference if our new stroke is a paint
+        if ( stroke && stroke.isPaint ) {
+          this.strokePaint = stroke;
+          svgBlock.incrementPaint( stroke );
+        }
+      }
+
+      // If we need to update the SVG style of our stroke
+      if ( strokeStyle !== this.strokeStyle ) {
+        this.strokeStyle = strokeStyle;
+        this.updateBaseStyle();
+      }
+    },
+
+    updateBaseStyle: function() {
+      this.baseStyle = 'fill: ' + this.fillStyle + '; stroke: ' + this.strokeStyle + ';';
+    },
+
+    updateStrokeDetailStyle: function( node ) {
+      var strokeDetailStyle = '';
+
+      var lineWidth = node.getLineWidth();
+      if ( lineWidth !== 1 ) {
+        strokeDetailStyle += 'stroke-width: ' + lineWidth + ';';
+      }
+
+      var lineCap = node.getLineCap();
+      if ( lineCap !== 'butt' ) {
+        strokeDetailStyle += 'stroke-linecap: ' + lineCap + ';';
+      }
+
+      var lineJoin = node.getLineJoin();
+      if ( lineJoin !== 'miter' ) {
+        strokeDetailStyle += 'stroke-linejoin: ' + lineJoin + ';';
+      }
+
+      var miterLimit = node.getMiterLimit();
+      strokeDetailStyle += 'stroke-miterlimit: ' + miterLimit + ';';
+
+      if ( node.hasLineDash() ) {
+        strokeDetailStyle += 'stroke-dasharray: ' + node.getLineDash().join( ',' ) + ';';
+        strokeDetailStyle += 'stroke-dashoffset: ' + node.getLineDashOffset() + ';';
+      }
+
+      this.strokeDetailStyle = strokeDetailStyle;
+    },
+
+    // called when the defs SVG block is switched (our SVG element was moved to another SVG top-level context)
+    updateSVGBlock: function( svgBlock ) {
+      // remove paints from the old svgBlock
+      var oldSvgBlock = this.svgBlock;
+      if ( oldSvgBlock ) {
+        if ( this.fillPaint ) {
+          oldSvgBlock.decrementPaint( this.fillPaint );
+        }
+        if ( this.strokePaint ) {
+          oldSvgBlock.decrementPaint( this.strokePaint );
+        }
+      }
+
+      this.svgBlock = svgBlock;
+
+      // add paints to the new svgBlock
+      if ( this.fillPaint ) {
+        svgBlock.incrementPaint( this.fillPaint );
+      }
+      if ( this.strokePaint ) {
+        svgBlock.incrementPaint( this.strokePaint );
+      }
+    }
+  } );
+
+  return Paintable;
+} );
+// Copyright 2002-2014, University of Colorado Boulder
+
+/**
+ * Something that can be displayed with a specific renderer.
+ * NOTE: Drawables are assumed to be pooled with PoolableMixin, as freeToPool() is called.
+ *
+ * A drawable's life-cycle starts with its initialization (calling initializeDrawable once), and ends with its disposal
+ * (where it is freed to its own pool).
+ *
+ * Drawables are part of an unordered drawable "tree" where each drawable can have a parent references. This is used
+ * for, among other things, propagation of 'dirty' flags and usage during stitching.
+ *
+ * Blocks and backbones (sub-types of Drawable) contain children (creating a tree, although shared caches make it more
+ * like a DAG). Our Scenery Display is built from a root backbone, that contains blocks. This can be Canvas/SVG, but
+ * may also contain a DOM block with another backbone (used for opacity, CSS transforms, etc.).
+ *
+ * Drawables are part of two inherent linked lists: an "old" and a "new" one. Usually they are the same, but during
+ * updates, the "new" linked list is changed to accomodate any changes, and then a stitch process is done to mark which
+ * block (parent) we will belong to.
+ *
+ * As part of stitching or other processes, a Drawable is responsible for recording its pending state changes. Most
+ * notably, we need to determine whether a drawable is being added, moved, or removed in the next frame. This is done
+ * with an idempotent API using notePendingAddition/notePendingRemoval/notePendingMove. Either:
+ *   - One or more notePendingMove() calls are made. When we are updated with updateBlock(), we will move to the
+ *     last block referenced with notePendingMove() (which may be a no-op if it is the same block).
+ *   - Zero or one notePendingAddition() call is made, and zero or one notePendingRemoval() call is made. Our action is:
+ *     - No addition, no removal: nothing done
+ *     - No addition, one removal: We are removed from our last block (and then presumably disposed later)
+ *     - One addition, no removal: We are added to our new (pending) block, without being removed from anything
+ *     - One addition, one removal: We are removed from our last block and added to our new (pending) block.
+ * It is set up so that the order of addition/removal calls doesn't matter, since these can occur from within different
+ * backbone stitches (removed in one, added in another, or with the order reversed). Our updateBlocks() is guaranteed
+ * to be called after all of those have been completed.
+ *
+ * APIs for drawable types:
+ *
+ * DOM: {
+ *   domElement: {HTMLElement}
+ * }
+ * Canvas: {
+ *   paintCanvas: function( {CanvasContextWrapper} wrapper, {Node} node )
+ * }
+ * SVG: {
+ *   svgElement: {SVGElement}
+ * }
+ * WebGL: {
+ *   onAddToBlock: function( {WebGLBlock} block )
+ *   onRemoveFromBlock: function( {WebGLBlock} block )
+ *   render: function( {ShaderProgram} shaderProgram )
+ *   shaderAttributes: {string[]} - names of vertex attributes to be used
+ * }
+ *
+ * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ */
+
+define( 'SCENERY/display/Drawable',['require','PHET_CORE/inherit','AXON/Events','SCENERY/scenery','SCENERY/display/Renderer'],function( require ) {
+  
+
+  var inherit = require( 'PHET_CORE/inherit' );
+  var Events = require( 'AXON/Events' );
+  var scenery = require( 'SCENERY/scenery' );
+  var Renderer = require( 'SCENERY/display/Renderer' );
+
+  var globalId = 1;
+
+  scenery.Drawable = function Drawable( renderer ) {
+    this.initializeDrawable( renderer );
+  };
+  var Drawable = scenery.Drawable;
+
+  inherit( Events, Drawable, {
+    initializeDrawable: function( renderer ) {
+      Events.call( this );
+
+      assert && assert( !this.id || this.disposed, 'If we previously existed, we need to have been disposed' );
+
+      // unique ID for drawables
+      this.id = this.id || globalId++;
+
+      sceneryLog && sceneryLog.Drawable && sceneryLog.Drawable( '[' + this.constructor.name + '*] initialize ' + this.toString() );
+
+      this.cleanDrawable();
+
+      this.renderer = renderer;
+
+      this.dirty = true;
+      this.disposed = false;
+
+      this.linksDirty = false;
+
+      this._visible = true; // {boolean}, ES5 getter/setter provided
+
+      return this;
+    },
+
+    cleanDrawable: function() {
+      // what drawble we are being rendered (or put) into (will be filled in later)
+      this.parentDrawable = null;
+      this.backbone = null; // a backbone reference (if applicable).
+
+      this.pendingParentDrawable = null; // what our parent drawable will be after the stitch is finished
+      this.pendingBackbone = null;       // what our backbone will be after the stitch is finished (if applicable)
+      this.pendingAddition = false;      // whether we are to be added to a block/backbone in our updateBlock() call
+      this.pendingRemoval = false;       // whether we are to be removed from a block/backbone in our updateBlock() call
+
+      assert && assert( !this.previousDrawable && !this.nextDrawable,
+        'By cleaning (disposal or fresh creation), we should have disconnected from the linked list' );
+
+      // linked list handling (will be filled in later)
+      this.previousDrawable = null;
+      this.nextDrawable = null;
+
+      // similar but without recent changes, so that we can traverse both orders at the same time for stitching
+      this.oldPreviousDrawable = null;
+      this.oldNextDrawable = null;
+
+      this.removeAllEventListeners();
+    },
+
+    setVisible: function( visible ) {
+      if ( this._visible !== visible ) {
+        this._visible = visible;
+        this.trigger0( 'visibility' );
+      }
+    },
+    set visible( value ) { this.setVisible( value ); },
+
+    isVisible: function() {
+      return this._visible;
+    },
+    get visible() { return this.isVisible(); },
+
+    // called to add a block (us) as a child of a backbone
+    setBlockBackbone: function( backboneInstance ) {
+      sceneryLog && sceneryLog.Drawable && sceneryLog.Drawable( '[' + this.constructor.name + '*] setBlockBackbone ' +
+                                                                this.toString() + ' with ' + backboneInstance.toString() );
+
+      // if this is being called, Block will be guaranteed to be loaded
+      assert && assert( this instanceof scenery.Block );
+
+      this.parentDrawable = backboneInstance;
+      this.backbone = backboneInstance;
+      this.pendingParentDrawable = backboneInstance;
+      this.pendingBackbone = backboneInstance;
+      this.pendingAddition = false;
+      this.pendingRemoval = false;
+    },
+
+    notePendingAddition: function( display, block, backbone ) {
+      sceneryLog && sceneryLog.Drawable && sceneryLog.Drawable( '[' + this.constructor.name + '*] notePendingAddition ' +
+                                                                this.toString() + ' with ' + block.toString() + ', ' +
+                                                                ( backbone ? backbone.toString() : '-' ) );
+
+      assert && assert( backbone !== undefined, 'backbone can be either null or a backbone' );
+      assert && assert( block instanceof scenery.Block );
+
+      this.pendingParentDrawable = block;
+      this.pendingBackbone = backbone;
+      this.pendingAddition = true;
+
+      // if we weren't already marked for an update, mark us
+      if ( !this.pendingRemoval ) {
+        display.markDrawableChangedBlock( this );
+      }
+    },
+
+    notePendingRemoval: function( display ) {
+      sceneryLog && sceneryLog.Drawable && sceneryLog.Drawable( '[' + this.constructor.name + '*] notePendingRemoval ' +
+                                                                this.toString() );
+
+      this.pendingRemoval = true;
+
+      // if we weren't already marked for an update, mark us
+      if ( !this.pendingAddition ) {
+        display.markDrawableChangedBlock( this );
+      }
+    },
+
+    // moving a drawable that isn't changing backbones, just potentially changing its block.
+    // it should not have notePendingAddition or notePendingRemoval called on it.
+    notePendingMove: function( display, block ) {
+      sceneryLog && sceneryLog.Drawable && sceneryLog.Drawable( '[' + this.constructor.name + '*] notePendingMove ' +
+                                                                this.toString() + ' with ' + block.toString() );
+
+      assert && assert( block instanceof scenery.Block );
+
+      this.pendingParentDrawable = block;
+
+      if ( !this.pendingRemoval || !this.pendingAddition ) {
+        display.markDrawableChangedBlock( this );
+      }
+
+      // set both flags, since we need it to be removed and added
+      this.pendingAddition = true;
+      this.pendingRemoval = true;
+    },
+
+    // returns {Boolean} whether we changed our block
+    updateBlock: function() {
+      sceneryLog && sceneryLog.Drawable && sceneryLog.Drawable( '[' + this.constructor.name + '*] updateBlock ' + this.toString() +
+                                                                ' with add:' + this.pendingAddition +
+                                                                ' remove:' + this.pendingRemoval +
+                                                                ' old:' + ( this.parentDrawable ? this.parentDrawable.toString() : '-' ) +
+                                                                ' new:' + ( this.pendingParentDrawable ? this.pendingParentDrawable.toString() : '-' ) );
+      sceneryLog && sceneryLog.Drawable && sceneryLog.push();
+
+      var changed = false;
+
+      if ( this.pendingRemoval || this.pendingAddition ) {
+        // we are only unchanged if we have an addition AND removal, and the endpoints are identical
+        changed = !this.pendingRemoval || !this.pendingAddition ||
+                  this.parentDrawable !== this.pendingParentDrawable ||
+                  this.backbone !== this.pendingBackbone;
+
+        if ( changed ) {
+          if ( this.pendingRemoval ) {
+            sceneryLog && sceneryLog.Drawable && sceneryLog.Drawable( 'removing from ' + this.parentDrawable.toString() );
+            this.parentDrawable.removeDrawable( this );
+
+            // remove references if we are not being added back in
+            if ( !this.pendingAddition ) {
+              this.pendingParentDrawable = null;
+              this.pendingBackbone = null;
+            }
+          }
+
+          this.parentDrawable = this.pendingParentDrawable;
+          this.backbone = this.pendingBackbone;
+
+          if ( this.pendingAddition ) {
+            sceneryLog && sceneryLog.Drawable && sceneryLog.Drawable( 'adding to ' + this.parentDrawable.toString() );
+            this.parentDrawable.addDrawable( this );
+          }
+        }
+        else {
+          sceneryLog && sceneryLog.Drawable && sceneryLog.Drawable( 'unchanged' );
+
+          if ( this.pendingAddition && Renderer.isCanvas( this.renderer ) ) {
+            this.parentDrawable.onPotentiallyMovedDrawable( this );
+          }
+        }
+
+        this.pendingAddition = false;
+        this.pendingRemoval = false;
+      }
+
+      sceneryLog && sceneryLog.Drawable && sceneryLog.pop();
+
+      return changed;
+    },
+
+    updateLinks: function() {
+      this.oldNextDrawable = this.nextDrawable;
+      this.oldPreviousDrawable = this.previousDrawable;
+      this.linksDirty = false;
+    },
+
+    markDirty: function() {
+      if ( !this.dirty ) {
+        this.dirty = true;
+
+        // TODO: notify what we want to call repaint() later
+        if ( this.parentDrawable ) {
+          this.parentDrawable.markDirtyDrawable( this );
+        }
+      }
+    },
+
+    // will ensure that after syncTree phase is done, we will have updateLinks() called on us
+    markLinksDirty: function( display ) {
+      if ( !this.linksDirty ) {
+        this.linksDirty = true;
+        display.markDrawableForLinksUpdate( this );
+      }
+    },
+
+    // marks us for disposal in the next phase of updateDisplay(), and disconnects from the linked list
+    markForDisposal: function( display ) {
+      // as we are marked for disposal, we disconnect from the linked list (so our disposal setting nulls won't cause issues)
+      Drawable.disconnectBefore( this, display );
+      Drawable.disconnectAfter( this, display );
+
+      display.markDrawableForDisposal( this );
+    },
+
+    // disposes immediately, and makes no guarantees about out linked list's state (disconnects).
+    disposeImmediately: function( display ) {
+      // as we are marked for disposal, we disconnect from the linked list (so our disposal setting nulls won't cause issues)
+      Drawable.disconnectBefore( this, display );
+      Drawable.disconnectAfter( this, display );
+
+      this.dispose();
+    },
+
+    // generally do not call this directly, use markForDisposal (so Display will dispose us), or disposeImmediately.
+    dispose: function() {
+      assert && assert( !this.disposed, 'We should not re-dispose drawables' );
+
+      sceneryLog && sceneryLog.Drawable && sceneryLog.Drawable( '[' + this.constructor.name + '*] dispose ' + this.toString() );
+      sceneryLog && sceneryLog.Drawable && sceneryLog.push();
+
+      this.cleanDrawable();
+      this.disposed = true;
+
+      // for now
+      this.freeToPool();
+
+      sceneryLog && sceneryLog.Drawable && sceneryLog.pop();
+    },
+
+    audit: function( allowPendingBlock, allowPendingList, allowDirty ) {
+      if ( assertSlow ) {
+        assertSlow && assertSlow( !this.disposed,
+          'If we are being audited, we assume we are in the drawable display tree, and we should not be marked as disposed' );
+        assertSlow && assertSlow( this.renderer, 'Should not have a 0 (no) renderer' );
+
+        assertSlow && assertSlow( !this.backbone || this.parentDrawable,
+          'If we have a backbone reference, we must have a parentDrawable (our block)' );
+
+        if ( !allowPendingBlock ) {
+          assertSlow && assertSlow( !this.pendingAddition );
+          assertSlow && assertSlow( !this.pendingRemoval );
+          assertSlow && assertSlow( this.parentDrawable === this.pendingParentDrawable,
+            'Assure our parent and pending parent match, if we have updated blocks' );
+          assertSlow && assertSlow( this.backbone === this.pendingBackbone,
+            'Assure our backbone and pending backbone match, if we have updated blocks' );
+        }
+
+        if ( !allowPendingList ) {
+          assertSlow && assertSlow( this.oldPreviousDrawable === this.previousDrawable,
+            'Pending linked-list references should be cleared by now' );
+          assertSlow && assertSlow( this.oldNextDrawable === this.nextDrawable,
+            'Pending linked-list references should be cleared by now' );
+          assertSlow && assertSlow( !this.linksDirty, 'Links dirty flag should be clean' );
+        }
+
+        if ( !allowDirty ) {
+          assertSlow && assertSlow( !this.dirty,
+            'Should not be dirty at this phase, if we are in the drawable display tree' );
+        }
+      }
+    },
+
+    toString: function() {
+      return this.constructor.name + '#' + this.id;
+    },
+
+    toDetailedString: function() {
+      return this.toString();
+    }
+  } );
+
+  // a,b {Drawable}, connects the two drawables in the linked list, while cutting the previous connection and marking
+  // the links for updates.
+  Drawable.connectDrawables = function( a, b, display ) {
+    // we don't need to do anything if there is no change
+    if ( a.nextDrawable !== b ) {
+      // touch previous neighbors
+      if ( a.nextDrawable ) {
+        a.nextDrawable.markLinksDirty( display );
+        a.nextDrawable.previousDrawable = null;
+      }
+      if ( b.previousDrawable ) {
+        b.previousDrawable.markLinksDirty( display );
+        b.previousDrawable.nextDrawable = null;
+      }
+
+      a.nextDrawable = b;
+      b.previousDrawable = a;
+
+      // mark these as needing updates
+      a.markLinksDirty( display );
+      b.markLinksDirty( display );
+    }
+  };
+
+  Drawable.disconnectBefore = function( a, display ) {
+    // we don't need to do anything if there is no change
+    if ( a.previousDrawable ) {
+      a.markLinksDirty( display );
+      a.previousDrawable.markLinksDirty( display );
+      a.previousDrawable.nextDrawable = null;
+      a.previousDrawable = null;
+    }
+  };
+
+  Drawable.disconnectAfter = function( a, display ) {
+    // we don't need to do anything if there is no change
+    if ( a.nextDrawable ) {
+      a.markLinksDirty( display );
+      a.nextDrawable.markLinksDirty( display );
+      a.nextDrawable.previousDrawable = null;
+      a.nextDrawable = null;
+    }
+  };
+
+  // converts a linked list of drawables to an array (useful for debugging/assertion purposes, should not be used in production code)
+  Drawable.listToArray = function( firstDrawable, lastDrawable ) {
+    var arr = [];
+
+    // assumes we'll hit lastDrawable, otherwise we'll NPE
+    for ( var drawable = firstDrawable; ; drawable = drawable.nextDrawable ) {
+      arr.push( drawable );
+
+      if ( drawable === lastDrawable ) {
+        break;
+      }
+    }
+
+    return arr;
+  };
+
+  // converts an old linked list of drawables to an array (useful for debugging/assertion purposes, should not be used in production code)
+  Drawable.oldListToArray = function( firstDrawable, lastDrawable ) {
+    var arr = [];
+
+    // assumes we'll hit lastDrawable, otherwise we'll NPE
+    for ( var drawable = firstDrawable; ; drawable = drawable.oldNextDrawable ) {
+      arr.push( drawable );
+
+      if ( drawable === lastDrawable ) {
+        break;
+      }
+    }
+
+    return arr;
+  };
+
+  return Drawable;
+} );
+
+// Copyright 2002-2014, University of Colorado Boulder
+
+
+/**
+ * A drawable that will paint a single instance.
+ *
+ * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ */
+
+define( 'SCENERY/display/SelfDrawable',['require','PHET_CORE/inherit','PHET_CORE/Poolable','SCENERY/scenery','SCENERY/display/Drawable'],function( require ) {
+  
+
+  var inherit = require( 'PHET_CORE/inherit' );
+  var Poolable = require( 'PHET_CORE/Poolable' );
+  var scenery = require( 'SCENERY/scenery' );
+  var Drawable = require( 'SCENERY/display/Drawable' );
+
+  scenery.SelfDrawable = function SelfDrawable( renderer, instance ) {
+    this.initializeSelfDrawable( renderer, instance );
+  };
+  var SelfDrawable = scenery.SelfDrawable;
+
+  inherit( scenery.Drawable, SelfDrawable, {
+    initializeSelfDrawable: function( renderer, instance ) {
+      this.drawableVisibilityListener = this.drawableVisibilityListener || this.updateSelfVisibility.bind( this );
+
+      // super initialization
+      this.initializeDrawable( renderer );
+
+      this.instance = instance;
+      this.node = instance.trail.lastNode();
+      this.node.attachDrawable( this );
+
+      this.instance.on( 'selfVisibility', this.drawableVisibilityListener );
+
+      this.updateSelfVisibility();
+
+      return this;
+    },
+
+    // @public
+    dispose: function() {
+      this.instance.off( 'selfVisibility', this.drawableVisibilityListener );
+
+      this.node.detachDrawable( this );
+
+      // free references
+      this.instance = null;
+      this.node = null;
+
+      Drawable.prototype.dispose.call( this );
+    },
+
+    updateSelfVisibility: function() {
+      // hide our drawable if it is not relatively visible
+      this.visible = this.instance.selfVisible;
+    },
+
+    toDetailedString: function() {
+      return this.toString() + ' (' + this.instance.trail.toPathString() + ')';
+    }
+  } );
+
+  SelfDrawable.Poolable = {
+    mixin: function( selfDrawableType ) {
+      // for pooling, allow <SelfDrawableType>.createFromPool( renderer, instance ) and drawable.freeToPool(). Creation will initialize the drawable to an initial state
+      Poolable.mixin( selfDrawableType, {
+        defaultFactory: function() {
+          /* jshint -W055 */
+          return new selfDrawableType();
+        },
+        constructorDuplicateFactory: function( pool ) {
+          return function( renderer, instance ) {
+            if ( pool.length ) {
+              return pool.pop().initialize( renderer, instance );
+            }
+            else {
+              /* jshint -W055 */
+              return new selfDrawableType( renderer, instance );
+            }
+          };
+        }
+      } );
+    }
+  };
+
+  return SelfDrawable;
+} );
+
+// Copyright 2002-2014, University of Colorado Boulder
+
+/**
+ * Represents an SVG visual element, and is responsible for tracking changes to the visual element, and then applying
+ * any changes at a later time.
+ *
+ * Abstract methods to implement for concrete implementations:
+ *   updateSVGSelf() - Update the SVG element's state to what the Node's self should display
+ *   updateDefsSelf( block ) - Update defs on the given block (or if block === null, remove)
+ *
+ * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ */
+
+define( 'SCENERY/display/SVGSelfDrawable',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/display/SelfDrawable','SCENERY/nodes/Paintable'],function( require ) {
+  
+
+  var inherit = require( 'PHET_CORE/inherit' );
+  var scenery = require( 'SCENERY/scenery' );
+  var SelfDrawable = require( 'SCENERY/display/SelfDrawable' );
+  var Paintable = require( 'SCENERY/nodes/Paintable' );
+
+  scenery.SVGSelfDrawable = function SVGSelfDrawable( renderer, instance ) {
+    this.initializeSVGSelfDrawable( renderer, instance );
+
+    throw new Error( 'Should use initialization and pooling' );
+  };
+  var SVGSelfDrawable = scenery.SVGSelfDrawable;
+
+  inherit( SelfDrawable, SVGSelfDrawable, {
+    initializeSVGSelfDrawable: function( renderer, instance, usesPaint, keepElements ) {
+      // super initialization
+      this.initializeSelfDrawable( renderer, instance );
+
+      this.usesPaint = usesPaint;
+      this.keepElements = keepElements;
+
+      this.svgElement = null; // should be filled in by subtype
+      this.svgBlock = null; // will be updated by updateSVGBlock()
+
+      this.initializeState(); // assumes we have a state mixin
+
+      if ( this.usesPaint ) {
+        if ( !this.paintState ) {
+          this.paintState = new Paintable.PaintSVGState();
+        }
+        else {
+          this.paintState.initialize();
+        }
+      }
+
+      return this; // allow chaining
+    },
+
+    // @public: called from elsewhere to update the SVG element
+    update: function() {
+      if ( this.dirty ) {
+        this.dirty = false;
+        this.updateSVG();
+      }
+    },
+
+    // @protected: called to update the visual appearance of our svgElement
+    updateSVG: function() {
+      if ( this.paintDirty ) {
+        this.updateSVGSelf.call( this, this.node, this.svgElement );
+      }
+
+      // sync the differences between the previously-recorded list of cached paints and the new list
+      if ( this.usesPaint && this.dirtyCachedPaints ) {
+        var newCachedPaints = this.node._cachedPaints.slice(); // defensive copy for now
+        var i, j;
+        // scan for new cached paints (not in the old list)
+        for ( i = 0; i < newCachedPaints.length; i++ ) {
+          var newPaint = newCachedPaints[ i ];
+          var isNew = true;
+          for ( j = 0; j < this.lastCachedPaints.length; j++ ) {
+            if ( newPaint === this.lastCachedPaints[ j ] ) {
+              isNew = false;
+              break;
+            }
+          }
+          if ( isNew ) {
+            this.svgBlock.incrementPaint( newPaint );
+          }
+        }
+        // scan for removed cached paints (not in the new list)
+        for ( i = 0; i < this.lastCachedPaints.length; i++ ) {
+          var oldPaint = this.lastCachedPaints[ i ];
+          var isRemoved = true;
+          for ( j = 0; j < newCachedPaints.length; j++ ) {
+            if ( oldPaint === newCachedPaints[ j ] ) {
+              isRemoved = false;
+              break;
+            }
+          }
+          if ( isRemoved ) {
+            this.svgBlock.decrementPaint( oldPaint );
+          }
+        }
+
+        this.lastCachedPaints = newCachedPaints;
+      }
+
+      // clear all of the dirty flags
+      this.setToClean();
+    },
+
+    // to be used by our passed in options.updateSVG
+    updateFillStrokeStyle: function( element ) {
+      if ( !this.usesPaint ) {
+        return;
+      }
+
+      if ( this.dirtyFill ) {
+        this.paintState.updateFill( this.svgBlock, this.node._fill );
+      }
+      if ( this.dirtyStroke ) {
+        this.paintState.updateStroke( this.svgBlock, this.node._stroke );
+      }
+      var strokeDetailDirty = this.dirtyLineWidth || this.dirtyLineOptions;
+      if ( strokeDetailDirty ) {
+        this.paintState.updateStrokeDetailStyle( this.node );
+      }
+      if ( this.dirtyFill || this.dirtyStroke || strokeDetailDirty ) {
+        element.setAttribute( 'style', this.paintState.baseStyle + this.paintState.strokeDetailStyle );
+      }
+    },
+
+    updateSVGBlock: function( svgBlock ) {
+      // remove cached paint references from the old svgBlock
+      var oldSvgBlock = this.svgBlock;
+      if ( this.usesPaint && oldSvgBlock ) {
+        for ( var i = 0; i < this.lastCachedPaints.length; i++ ) {
+          oldSvgBlock.decrementPaint( this.lastCachedPaints[ i ] );
+        }
+      }
+
+      this.svgBlock = svgBlock;
+
+      // add cached paint references from the new svgBlock
+      if ( this.usesPaint ) {
+        for ( var j = 0; j < this.lastCachedPaints.length; j++ ) {
+          svgBlock.incrementPaint( this.lastCachedPaints[ j ] );
+        }
+      }
+
+      this.updateDefsSelf && this.updateDefsSelf.call( this, svgBlock );
+
+      this.usesPaint && this.paintState.updateSVGBlock( svgBlock );
+
+      // since fill/stroke IDs may be block-specific, we need to mark them dirty so they will be updated
+      this.usesPaint && this.markDirtyFill();
+      this.usesPaint && this.markDirtyStroke();
+    },
+
+    dispose: function() {
+      if ( !this.keepElements ) {
+        // clear the references
+        this.svgElement = null;
+      }
+
+      // release any defs, and dispose composed state objects
+      this.updateDefsSelf && this.updateDefsSelf.call( this, null );
+      this.usesPaint && this.paintState.dispose();
+
+      this.defs = null;
+
+      this.svgBlock = null;
+
+      SelfDrawable.prototype.dispose.call( this );
+    },
+
+    setToClean: function() {
+      this.setToCleanState();
+    }
+  } );
+
+  return SVGSelfDrawable;
+} );
+
+// Copyright 2002-2014, University of Colorado Boulder
+
+
+/**
+ * TODO docs
+ *
+ * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ */
+
+define( 'SCENERY/display/CanvasSelfDrawable',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/display/SelfDrawable','SCENERY/nodes/Paintable'],function( require ) {
+  
+
+  var inherit = require( 'PHET_CORE/inherit' );
+  var scenery = require( 'SCENERY/scenery' );
+  var SelfDrawable = require( 'SCENERY/display/SelfDrawable' );
+  var Paintable = require( 'SCENERY/nodes/Paintable' );
+
+  scenery.CanvasSelfDrawable = function CanvasSelfDrawable( renderer, instance ) {
+    this.initializeCanvasSelfDrawable( renderer, instance );
+
+    throw new Error( 'Should use initialization and pooling' );
+  };
+  var CanvasSelfDrawable = scenery.CanvasSelfDrawable;
+
+  inherit( SelfDrawable, CanvasSelfDrawable, {
+    initializeCanvasSelfDrawable: function( renderer, instance ) {
+      // super initialization
+      this.initializeSelfDrawable( renderer, instance );
+
+      // this is the same across lifecycles
+      this.transformListener = this.transformListener || this.markTransformDirty.bind( this );
+
+      instance.relativeTransform.addListener( this.transformListener ); // when our relative tranform changes, notify us in the pre-repaint phase
+      instance.relativeTransform.addPrecompute(); // trigger precomputation of the relative transform, since we will always need it when it is updated
+
+      return this;
+    },
+
+    markTransformDirty: function() {
+      this.markDirty();
+    },
+
+    // general flag set on the state, which we forward directly to the drawable's paint flag
+    markPaintDirty: function() {
+      this.markDirty();
+    },
+
+    update: function() {
+      this.dirty = false;
+    },
+
+    // @override
+    updateSelfVisibility: function() {
+      SelfDrawable.prototype.updateSelfVisibility.call( this );
+
+      // mark us as dirty when our self visibility changes
+      this.markDirty();
+    },
+
+    dispose: function() {
+      this.instance.relativeTransform.removeListener( this.transformListener );
+      this.instance.relativeTransform.removePrecompute();
+
+      SelfDrawable.prototype.dispose.call( this );
+    }
+  } );
+
+  // methods for forwarding dirty messages
+  function canvasSelfDirty() {
+    // we pass this method and it is only called with blah.call( ... ), where the 'this' reference is set. ignore jshint
+    /* jshint -W040 */
+    this.markDirty();
+  }
+
+  // options takes: type, paintCanvas( wrapper ), usesPaint, and dirtyMethods (array of string names of methods that make the state dirty)
+  CanvasSelfDrawable.createDrawable = function( options ) {
+    var type = options.type;
+    var paintCanvas = options.paintCanvas;
+    var usesPaint = options.usesPaint;
+
+    assert && assert( typeof type === 'function' );
+    assert && assert( typeof paintCanvas === 'function' );
+    assert && assert( typeof usesPaint === 'boolean' );
+
+    inherit( CanvasSelfDrawable, type, {
+      initialize: function( renderer, instance ) {
+        this.initializeCanvasSelfDrawable( renderer, instance );
+
+        return this; // allow for chaining
+      },
+
+      paintCanvas: paintCanvas,
+
+      update: function() {
+        // no action directly needed for the self-drawable case, as we will be repainted in the block
+        this.dirty = false;
+      }
+    } );
+
+    // include stubs (stateless) for marking dirty stroke and fill (if necessary). we only want one dirty flag, not multiple ones, for Canvas (for now)
+    if ( usesPaint ) {
+      Paintable.PaintableStatelessDrawable.mixin( type );
+    }
+
+    // set up pooling
+    SelfDrawable.Poolable.mixin( type );
+
+    if ( options.dirtyMethods ) {
+      for ( var i = 0; i < options.dirtyMethods.length; i++ ) {
+        type.prototype[ options.dirtyMethods[ i ] ] = canvasSelfDirty;
+      }
+    }
+
+    return type;
+  };
+
+  return CanvasSelfDrawable;
+} );
+
+// Copyright 2002-2014, University of Colorado Boulder
+
+/**
+ * TODO docs
+ *
+ * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Sam Reid
+ */
+
+define( 'SCENERY/display/WebGLSelfDrawable',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/display/SelfDrawable'],function( require ) {
+  
+
+  var inherit = require( 'PHET_CORE/inherit' );
+  var scenery = require( 'SCENERY/scenery' );
+  var SelfDrawable = require( 'SCENERY/display/SelfDrawable' );
+
+  scenery.WebGLSelfDrawable = function WebGLSelfDrawable( renderer, instance ) {
+    this.initializeWebGLSelfDrawable( renderer, instance );
+
+    throw new Error( 'Should use initialization and pooling' );
+  };
+  var WebGLSelfDrawable = scenery.WebGLSelfDrawable;
+
+  inherit( SelfDrawable, WebGLSelfDrawable, {
+    initializeWebGLSelfDrawable: function( renderer, instance ) {
+      // super initialization
+      this.initializeSelfDrawable( renderer, instance );
+
+      // this is the same across lifecycles
+      this.transformListener = this.transformListener || this.markTransformDirty.bind( this );
+
+      // when our relative transform changes, notify us in the pre-repaint phase
+      instance.relativeTransform.addListener( this.transformListener );
+
+      // trigger precomputation of the relative transform, since we will always need it when it is updated
+      instance.relativeTransform.addPrecompute();
+
+      return this;
+    },
+
+    markTransformDirty: function() {
+      this.markDirty();
+    },
+
+    // @override
+    updateSelfVisibility: function() {
+      SelfDrawable.prototype.updateSelfVisibility.call( this );
+
+      // mark us as dirty when our self visibility changes
+      this.markDirty();
+    },
+
+    dispose: function() {
+      this.instance.relativeTransform.removeListener( this.transformListener );
+      this.instance.relativeTransform.removePrecompute();
+
+      SelfDrawable.prototype.dispose.call( this );
+    }
+  } );
+
+  return WebGLSelfDrawable;
+} );
+
+// Copyright 2002-2014, University of Colorado Boulder
+
+
+/**
+ * Represents a Pixi visual element, and is responsible for tracking changes to the visual element, and then applying
+ * any changes at a later time.
+ *
+ * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ */
+
+define( 'SCENERY/display/PixiSelfDrawable',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/display/SelfDrawable'],function( require ) {
+  
+
+  var inherit = require( 'PHET_CORE/inherit' );
+  var scenery = require( 'SCENERY/scenery' );
+  var SelfDrawable = require( 'SCENERY/display/SelfDrawable' );
+
+  scenery.PixiSelfDrawable = function PixiSelfDrawable( renderer, instance ) {
+    this.initializePixiSelfDrawable( renderer, instance );
+
+    throw new Error( 'Should use initialization and pooling' );
+  };
+  var PixiSelfDrawable = scenery.PixiSelfDrawable;
+
+  inherit( SelfDrawable, PixiSelfDrawable, {
+    initializePixiSelfDrawable: function( renderer, instance, keepElements ) {
+      // super initialization
+      this.initializeSelfDrawable( renderer, instance );
+
+      this.keepElements = keepElements;
+
+      this.displayObject = null; // should be filled in by subtype
+      this.paintDirty = true;
+
+      return this;
+    },
+
+    // @public: called from elsewhere to update the SVG element
+    update: function() {
+      if ( this.dirty ) {
+        this.dirty = false;
+
+        this.updatePixiSelf.call( this, this.node, this.displayObject );
+      }
+    },
+
+    // general flag set on the state, which we forward directly to the drawable's paint flag
+    markPaintDirty: function() {
+      this.markDirty();
+    },
+
+    dispose: function() {
+      if ( !this.keepElements ) {
+        // clear the references
+        this.displayObject = null;
+      }
+
+      SelfDrawable.prototype.dispose.call( this );
+    }
+  } );
+
+  return PixiSelfDrawable;
+} );
+
+// Copyright 2002-2014, University of Colorado Boulder
+
+/**
+ *
+ *
+ * @author Sam Reid (PhET Interactive Simulations)
+ */
+define( 'SCENERY/display/webgl/SquareUnstrokedRectangle',['require','PHET_CORE/inherit','SCENERY/util/Color'],function( require ) {
+  
+
+  // modules
+  var inherit = require( 'PHET_CORE/inherit' );
+  var Color = require( 'SCENERY/util/Color' );
+
+  /**
+   *
+   * @constructor
+   */
+  function SquareUnstrokedRectangle( colorTriangleRenderer, rectangle, z ) {
+    assert && assert( z !== undefined );
+    this.z = z;
+    this.rectangle = rectangle;
+    this.colorTriangleBufferData = colorTriangleRenderer.colorTriangleBufferData;
+    this.colorTriangleRenderer = colorTriangleRenderer;
+
+    // Reserve two triangles
+    this.indexObject = this.colorTriangleBufferData.reserveVertices( 6 );
+    this.startIndex = this.indexObject.startIndex;
+    this.endIndex = this.indexObject.endIndex;//exclusive (not included)
+
+    this.update();
+  }
+
+  return inherit( Object, SquareUnstrokedRectangle, {
+    update: function() {
+
+      var x = this.rectangle._rectX;
+      var y = this.rectangle._rectY;
+      var width = this.rectangle._rectWidth;
+      var height = this.rectangle._rectHeight;
+      var z = this.z;
+
+      //TODO: Use this
+      var color = this.rectangle.fillColor;//read only reference
+
+      // Create a random color if the color wasn't found.
+      // TODO: Remove this when this geometry no longer used for debugging
+      color = color || new Color( Math.round( Math.random() * 255 ), Math.round( Math.random() * 255 ), Math.round( Math.random() * 255 ), 1 );
+      
+      // TODO: maybe better to update in fragment shader?  It depends how often we update()
+      var r = color.red / 255;
+      var g = color.green / 255;
+      var b = color.blue / 255;
+      var a = color.alpha;
+
+      var matrix4 = this.rectangle.getLocalToGlobalMatrix().toMatrix4();
+
+      // TODO: Maybe create arrays here every time is creating too much garbage.
+      // TODO: Could just unroll this later once things settle down.
+      var newElements = [
+        // Top left
+        //TODO: Maybe should be m03 for last element, see Matrix3.toAffineMatrix4
+        x, y, z, r, g, b, a, /*               */matrix4.m00(), matrix4.m01(), matrix4.m03(), matrix4.m10(), matrix4.m11(), matrix4.m13(),
+        (x + width), y, z, r, g, b, a, /*     */matrix4.m00(), matrix4.m01(), matrix4.m03(), matrix4.m10(), matrix4.m11(), matrix4.m13(),
+        x, y + height, z, r, g, b, a, /*      */matrix4.m00(), matrix4.m01(), matrix4.m03(), matrix4.m10(), matrix4.m11(), matrix4.m13(),
+
+        // Bottom right
+        (x + width), y + height, z, r, g, b, a, matrix4.m00(), matrix4.m01(), matrix4.m03(), matrix4.m10(), matrix4.m11(), matrix4.m13(),
+        (x + width), y, z, r, g, b, a, /*     */matrix4.m00(), matrix4.m01(), matrix4.m03(), matrix4.m10(), matrix4.m11(), matrix4.m13(),
+        x, y + height, z, r, g, b, a, /*      */matrix4.m00(), matrix4.m01(), matrix4.m03(), matrix4.m10(), matrix4.m11(), matrix4.m13()
+      ];
+      for ( var i = 0; i < newElements.length; i++ ) {
+        this.colorTriangleBufferData.vertexArray[ this.startIndex + i ] = newElements[ i ];
+      }
+      this.colorTriangleRenderer.updateTriangleBuffer( this );
+    }
+  } );
+} );
+// Copyright 2002-2014, University of Colorado Boulder
+
+/**
+ * A Path draws a Shape with a specific type of fill and stroke.
+ *
+ * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ */
+
+define( 'SCENERY/nodes/Path',['require','PHET_CORE/inherit','KITE/Shape','DOT/Bounds2','SCENERY/scenery','SCENERY/nodes/Node','SCENERY/display/Renderer','SCENERY/nodes/Paintable','SCENERY/display/SVGSelfDrawable','SCENERY/display/CanvasSelfDrawable','SCENERY/display/SelfDrawable','SCENERY/display/WebGLSelfDrawable','SCENERY/display/PixiSelfDrawable','SCENERY/display/webgl/SquareUnstrokedRectangle','SCENERY/util/Color'],function( require ) {
+  
+
+  var inherit = require( 'PHET_CORE/inherit' );
+  var Shape = require( 'KITE/Shape' );
+  var Bounds2 = require( 'DOT/Bounds2' );
+
+  var scenery = require( 'SCENERY/scenery' );
+  var Node = require( 'SCENERY/nodes/Node' );
+  var Renderer = require( 'SCENERY/display/Renderer' );
+  var Paintable = require( 'SCENERY/nodes/Paintable' );
+  var SVGSelfDrawable = require( 'SCENERY/display/SVGSelfDrawable' );
+  var CanvasSelfDrawable = require( 'SCENERY/display/CanvasSelfDrawable' );
+  var SelfDrawable = require( 'SCENERY/display/SelfDrawable' );
+  var WebGLSelfDrawable = require( 'SCENERY/display/WebGLSelfDrawable' );
+  var PixiSelfDrawable = require( 'SCENERY/display/PixiSelfDrawable' );
+  var SquareUnstrokedRectangle = require( 'SCENERY/display/webgl/SquareUnstrokedRectangle' );
+  var Color = require( 'SCENERY/util/Color' );
+
+  // TODO: change this based on memory and performance characteristics of the platform
+  var keepSVGPathElements = true; // whether we should pool SVG elements for the SVG rendering states, or whether we should free them when possible for memory
+
+  scenery.Path = function Path( shape, options ) {
+    // TODO: consider directly passing in a shape object (or at least handling that case)
+    // NOTE: _shape can be lazily constructed, in the case of types like Rectangle where they have their own drawing code
+    this._shape = null;
+    this._strokedShape = null; // a stroked copy of the shape, lazily computed
+
+    // boundsMethod determines how our (self) bounds are computed, and can particularly determine how expensive
+    // to compute our bounds are if we are stroked. There are the following options:
+    // 'accurate' - Always uses the most accurate way of getting bounds
+    // 'unstroked' - Ignores any stroke, just gives the filled bounds.
+    //               If there is a stroke, the bounds will be marked as inaccurate
+    // 'tightPadding' - Pads the filled bounds by enough to cover everything except mitered joints.
+    //                   If there is a stroke, the bounds wil be marked as inaccurate.
+    // 'safePadding' - Pads the filled bounds by enough to cover all line joins/caps.
+    // 'none' - Returns Bounds2.NOTHING. The bounds will be marked as inaccurate.
+    this._boundsMethod = 'accurate'; // 'accurate', 'unstroked', 'tightPadding', 'safePadding', 'none'
+
+    // ensure we have a parameter object
+    options = options || {};
+
+    // Used as a listener to Shapes for when they are invalidated
+    this._invalidShapeListener = this.invalidateShape.bind( this );
+
+    this.initializePaintable();
+
+    Node.call( this );
+    this.invalidateSupportedRenderers();
+    this.setShape( shape );
+    this.mutate( options );
+  };
+  var Path = scenery.Path;
+
+  inherit( Node, Path, {
+    // allow more specific path types (Rectangle, Line) to override what restrictions we have
+    getPathRendererBitmask: function() {
+      return Renderer.bitmaskCanvas | Renderer.bitmaskSVG | Renderer.bitmaskPixi;
+    },
+
+    invalidateSupportedRenderers: function() {
+      this.setRendererBitmask( this.getFillRendererBitmask() & this.getStrokeRendererBitmask() & this.getPathRendererBitmask() );
+    },
+
+    // sets the shape drawn, or null to remove the shape
+    setShape: function( shape ) {
+      if ( this._shape !== shape ) {
+        // Remove Shape invalidation listener if applicable
+        if ( this._shape ) {
+          this._shape.offStatic( 'invalidated', this._invalidShapeListener );
+        }
+
+        if ( typeof shape === 'string' ) {
+          // be content with setShape always invalidating the shape?
+          shape = new Shape( shape );
+        }
+        this._shape = shape;
+        this.invalidateShape();
+
+        // Add Shape invalidation listener if applicable
+        if ( this._shape ) {
+          this._shape.onStatic( 'invalidated', this._invalidShapeListener );
+        }
+      }
+      return this;
+    },
+    set shape( value ) { this.setShape( value ); },
+
+    getShape: function() {
+      return this._shape;
+    },
+    get shape() { return this.getShape(); },
+
+    getStrokedShape: function() {
+      if ( !this._strokedShape ) {
+        this._strokedShape = this.getShape().getStrokedShape( this._lineDrawingStyles );
+      }
+      return this._strokedShape;
+    },
+
+    /**
+     * Invalidates the Shape stored itself. Should mainly only be called on Path itself, not subtypes like
+     * Line/Rectangle/Circle/etc. once constructed.
+     */
+    invalidateShape: function() {
+      this.invalidatePath();
+
+      var stateLen = this._drawables.length;
+      for ( var i = 0; i < stateLen; i++ ) {
+        this._drawables[ i ].markDirtyShape(); // subtypes of Path may not have this, but it's called during construction
+      }
+    },
+
+    /**
+     * Invalidates the self-bounds, that could have changed from different things.
+     */
+    invalidatePath: function() {
+      this._strokedShape = null;
+
+      if ( this.hasShape() ) {
+        this.invalidateSelf( this.computeShapeBounds() );
+      }
+    },
+
+    setBoundsMethod: function( boundsMethod ) {
+      assert && assert( boundsMethod === 'accurate' ||
+                        boundsMethod === 'unstroked' ||
+                        boundsMethod === 'tightPadding' ||
+                        boundsMethod === 'safePadding' ||
+                        boundsMethod === 'none' );
+      if ( this._boundsMethod !== boundsMethod ) {
+        this._boundsMethod = boundsMethod;
+        this.invalidatePath();
+
+        this.trigger0( 'boundsMethod' );
+
+        this.trigger0( 'selfBoundsValid' ); // whether our self bounds are valid may have changed
+      }
+      return this;
+    },
+    set boundsMethod( value ) { return this.setBoundsMethod( value ); },
+
+    getBoundsMethod: function() {
+      return this._boundsMethod;
+    },
+    get boundsMethod() { return this.getBoundsMethod(); },
+
+    // separated out, so that we can override this with a faster version in subtypes. includes the Stroke, if any
+    computeShapeBounds: function() {
+      // boundsMethod: 'none' will return no bounds
+      if ( this._boundsMethod === 'none' ) {
+        return Bounds2.NOTHING;
+      }
+      else {
+        // boundsMethod: 'unstroked', or anything without a stroke will then just use the normal shape bounds
+        if ( !this.hasStroke() || this.getLineWidth() === 0 || this._boundsMethod === 'unstroked' ) {
+          return this.getShape().bounds;
+        }
+        else {
+          // 'accurate' will always require computing the full stroked shape, and taking its bounds
+          if ( this._boundsMethod === 'accurate' ) {
+            return this.getStrokedShape().bounds;
+          }
+          // Otherwise we compute bounds based on 'tightPadding' and 'safePadding', the one difference being that
+          // 'safePadding' will include whatever bounds necessary to include miters. Square line-cap requires a
+          // slightly extended bounds in either case.
+          else {
+            var factor;
+            // If miterLength (inside corner to outside corner) exceeds miterLimit * strokeWidth, it will get turned to
+            // a bevel, so our factor will be based just on the miterLimit.
+            if ( this._boundsMethod === 'safePadding' && this.getLineJoin() === 'miter' ) {
+              factor = this.getMiterLimit();
+            }
+            else if ( this.getLineCap() === 'square' ) {
+              factor = Math.SQRT2;
+            }
+            else {
+              factor = 1;
+            }
+            return this.getShape().bounds.dilated( factor * this.getLineWidth() / 2 );
+          }
+        }
+      }
+    },
+
+    // @override
+    areSelfBoundsValid: function() {
+      if ( this._boundsMethod === 'accurate' || this._boundsMethod === 'safePadding' ) {
+        return true;
+      }
+      else if ( this._boundsMethod === 'none' ) {
+        return false;
+      }
+      else {
+        return !this.hasStroke(); // 'tightPadding' and 'unstroked' options
+      }
+    },
+
+    // @override
+    getTransformedSelfBounds: function( matrix ) {
+      return ( this._stroke ? this.getStrokedShape() : this.getShape() ).getBoundsWithTransform( matrix );
+    },
+
+    // hook stroke mixin changes to invalidation
+    invalidateStroke: function() {
+      this.invalidatePath();
+      this.trigger0( 'selfBoundsValid' ); // Stroke changing could have changed our self-bounds-validitity (unstroked/etc)
+    },
+
+    hasShape: function() {
+      return this._shape;
+    },
+
+    canvasPaintSelf: function( wrapper ) {
+      Path.PathCanvasDrawable.prototype.paintCanvas( wrapper, this );
+    },
+
+    createSVGDrawable: function( renderer, instance ) {
+      return Path.PathSVGDrawable.createFromPool( renderer, instance );
+    },
+
+    createCanvasDrawable: function( renderer, instance ) {
+      return Path.PathCanvasDrawable.createFromPool( renderer, instance );
+    },
+
+    createWebGLDrawable: function( renderer, instance ) {
+      return Path.PathWebGLDrawable.createFromPool( renderer, instance );
+    },
+
+    createPixiDrawable: function( renderer, instance ) {
+      return Path.PathPixiDrawable.createFromPool( renderer, instance );
+    },
+
+    isPainted: function() {
+      return true;
+    },
+
+    // override for computation of whether a point is inside the self content
+    // point is considered to be in the local coordinate frame
+    containsPointSelf: function( point ) {
+      var result = false;
+      if ( !this.hasShape() ) {
+        return result;
+      }
+
+      // if this node is fillPickable, we will return true if the point is inside our fill area
+      if ( this._fillPickable ) {
+        result = this.getShape().containsPoint( point );
+      }
+
+      // also include the stroked region in the hit area if strokePickable
+      if ( !result && this._strokePickable ) {
+        result = this.getStrokedShape().containsPoint( point );
+      }
+      return result;
+    },
+
+    // whether this node's self intersects the specified bounds, in the local coordinate frame
+    intersectsBoundsSelf: function( bounds ) {
+      // TODO: should a shape's stroke be included?
+      return this.hasShape() ? this._shape.intersectsBounds( bounds ) : false;
+    },
+
+    // if we have to apply a transform workaround for https://github.com/phetsims/scenery/issues/196 (only when we have a pattern or gradient)
+    requiresSVGBoundsWorkaround: function() {
+      if ( !this._stroke || !this._stroke.getSVGDefinition || !this.hasShape() ) {
+        return false;
+      }
+
+      var bounds = this.computeShapeBounds( false ); // without stroke
+      return bounds.x * bounds.y === 0; // at least one of them was zero, so the bounding box has no area
+    },
+
+    getDebugHTMLExtras: function() {
+      return this._shape ? ' (<span style="color: #88f" onclick="window.open( \'data:text/plain;charset=utf-8,\' + encodeURIComponent( \'' + this._shape.getSVGPath() + '\' ) );">path</span>)' : '';
+    },
+
+    getBasicConstructor: function( propLines ) {
+      return 'new scenery.Path( ' + ( this._shape ? this._shape.toString() : this._shape ) + ', {' + propLines + '} )';
+    },
+
+    getPropString: function( spaces, includeChildren ) {
+      var result = Node.prototype.getPropString.call( this, spaces, includeChildren );
+      result = this.appendFillablePropString( spaces, result );
+      result = this.appendStrokablePropString( spaces, result );
+      return result;
+    }
+  } );
+
+  Path.prototype._mutatorKeys = [ 'shape', 'boundsMethod' ].concat( Node.prototype._mutatorKeys );
+
+  // mix in fill/stroke handling code. for now, this is done after 'shape' is added to the mutatorKeys so that stroke parameters
+  // get set first
+  Paintable.mixin( Path );
+
+  /*---------------------------------------------------------------------------*
+   * Rendering State mixin (DOM/SVG)
+   *----------------------------------------------------------------------------*/
+
+  Path.PathStatefulDrawable = {
+    mixin: function( drawableType ) {
+      var proto = drawableType.prototype;
+
+      // initializes, and resets (so we can support pooled states)
+      proto.initializeState = function() {
+        this.paintDirty = true; // flag that is marked if ANY "paint" dirty flag is set (basically everything except for transforms, so we can accelerated the transform-only case)
+        this.dirtyShape = true;
+
+        // adds fill/stroke-specific flags and state
+        this.initializePaintableState();
+
+        return this; // allow for chaining
+      };
+
+      // catch-all dirty, if anything that isn't a transform is marked as dirty
+      proto.markPaintDirty = function() {
+        this.paintDirty = true;
+        this.markDirty();
+      };
+
+      proto.markDirtyShape = function() {
+        this.dirtyShape = true;
+        this.markPaintDirty();
+      };
+
+      proto.setToCleanState = function() {
+        this.paintDirty = false;
+        this.dirtyShape = false;
+
+        this.cleanPaintableState();
+      };
+
+      Paintable.PaintableStatefulDrawable.mixin( drawableType );
+    }
+  };
+
+  /*---------------------------------------------------------------------------*
+   * SVG Rendering
+   *----------------------------------------------------------------------------*/
+
+  Path.PathSVGDrawable = function PathSVGDrawable( renderer, instance ) {
+    this.initialize( renderer, instance );
+  };
+  inherit( SVGSelfDrawable, Path.PathSVGDrawable, {
+    initialize: function( renderer, instance ) {
+      this.initializeSVGSelfDrawable( renderer, instance, true, keepSVGPathElements ); // usesPaint: true
+
+      if ( !this.svgElement ) {
+        this.svgElement = document.createElementNS( scenery.svgns, 'path' );
+      }
+
+      return this;
+    },
+
+    updateSVGSelf: function() {
+      assert && assert( !this.node.requiresSVGBoundsWorkaround(),
+        'No workaround for https://github.com/phetsims/scenery/issues/196 is provided at this time, please add an epsilon' );
+
+      var path = this.svgElement;
+      if ( this.dirtyShape ) {
+        var svgPath = this.node.hasShape() ? this.node._shape.getSVGPath() : '';
+
+        // temporary workaround for https://bugs.webkit.org/show_bug.cgi?id=78980
+        // and http://code.google.com/p/chromium/issues/detail?id=231626 where even removing
+        // the attribute can cause this bug
+        if ( !svgPath ) { svgPath = 'M0 0'; }
+
+        // only set the SVG path if it's not the empty string
+        path.setAttribute( 'd', svgPath );
+      }
+
+      this.updateFillStrokeStyle( path );
+    }
+  } );
+  Path.PathStatefulDrawable.mixin( Path.PathSVGDrawable );
+  SelfDrawable.Poolable.mixin( Path.PathSVGDrawable );
+
+  /*---------------------------------------------------------------------------*
+   * Canvas rendering
+   *----------------------------------------------------------------------------*/
+
+  Path.PathCanvasDrawable = function PathCanvasDrawable( renderer, instance ) {
+    this.initialize( renderer, instance );
+  };
+  inherit( CanvasSelfDrawable, Path.PathCanvasDrawable, {
+    initialize: function( renderer, instance ) {
+      return this.initializeCanvasSelfDrawable( renderer, instance );
+    },
+
+    paintCanvas: function( wrapper, node ) {
+      var context = wrapper.context;
+
+      if ( node.hasShape() ) {
+        // TODO: fill/stroke delay optimizations?
+        context.beginPath();
+        node._shape.writeToContext( context );
+
+        if ( node._fill ) {
+          node.beforeCanvasFill( wrapper ); // defined in Paintable
+          context.fill();
+          node.afterCanvasFill( wrapper ); // defined in Paintable
+        }
+        if ( node._stroke ) {
+          node.beforeCanvasStroke( wrapper ); // defined in Paintable
+          context.stroke();
+          node.afterCanvasStroke( wrapper ); // defined in Paintable
+        }
+      }
+    },
+
+    // stateless dirty functions
+    markDirtyShape: function() { this.markPaintDirty(); }
+  } );
+  Paintable.PaintableStatelessDrawable.mixin( Path.PathCanvasDrawable );
+  SelfDrawable.Poolable.mixin( Path.PathCanvasDrawable );
+
+  /*---------------------------------------------------------------------------*
+   * WebGL rendering
+   *----------------------------------------------------------------------------*/
+
+  Path.PathWebGLDrawable = inherit( WebGLSelfDrawable, function PathWebGLDrawable( renderer, instance ) {
+    this.initialize( renderer, instance );
+  }, {
+    // called either from the constructor or from pooling
+    initialize: function( renderer, instance ) {
+      this.initializeWebGLSelfDrawable( renderer, instance );
+    },
+
+    onAddToBlock: function( webglBlock ) {
+      this.webglBlock = webglBlock;
+      this.rectangleHandle = new SquareUnstrokedRectangle( webglBlock.webGLRenderer.colorTriangleRenderer, this.node, 0.5 );
+
+      // cleanup old vertexBuffer, if applicable
+      this.disposeWebGLBuffers();
+
+      this.initializePaintableState();
+      this.updatePath();
+
+      //TODO: Update the state in the buffer arrays
+    },
+
+    onRemoveFromBlock: function( webglBlock ) {
+
+    },
+
+    //Nothing necessary since everything currently handled in the uModelViewMatrix below
+    //However, we may switch to dynamic draw, and handle the matrix change only where necessary in the future?
+    updatePath: function() {
+
+      // TODO: a way to update the ColorTriangleBufferData.
+
+      // TODO: move to PaintableWebGLState???
+      if ( this.dirtyFill ) {
+        this.color = Color.toColor( this.node._fill || 'blue' );
+        this.cleanPaintableState();
+      }
+    },
+
+    render: function( shaderProgram ) {
+      // This is handled by the ColorTriangleRenderer
+    },
+
+    dispose: function() {
+      this.disposeWebGLBuffers();
+
+      // super
+      WebGLSelfDrawable.prototype.dispose.call( this );
+    },
+
+    disposeWebGLBuffers: function() {
+      this.webglBlock.webGLRenderer.colorTriangleRenderer.colorTriangleBufferData.dispose( this.rectangleHandle );
+    },
+
+    markDirtyShape: function() {
+      this.markDirty();
+    },
+
+    // general flag set on the state, which we forward directly to the drawable's paint flag
+    markPaintDirty: function() {
+      this.markDirty();
+    },
+
+    //TODO: Make sure all of the dirty flags make sense here.  Should we be using fillDirty, paintDirty, dirty, etc?
+    update: function() {
+      if ( this.dirty ) {
+        this.updatePath();
+        this.dirty = false;
+      }
+    }
+  } );
+  // include stubs (stateless) for marking dirty stroke and fill (if necessary). we only want one dirty flag, not multiple ones, for WebGL (for now)
+  Paintable.PaintableStatefulDrawable.mixin( Path.PathWebGLDrawable );
+  SelfDrawable.Poolable.mixin( Path.PathWebGLDrawable ); // pooling
+
+  /*---------------------------------------------------------------------------*
+   * Pixi Rendering
+   *----------------------------------------------------------------------------*/
+
+  Path.PathPixiDrawable = function PathPixiDrawable( renderer, instance ) {
+    this.initialize( renderer, instance );
+  };
+  inherit( PixiSelfDrawable, Path.PathPixiDrawable, {
+    initialize: function( renderer, instance ) {
+      this.initializePixiSelfDrawable( renderer, instance, false ); // never keep paths
+
+      if ( !this.displayObject ) {
+        this.displayObject = new PIXI.Graphics();
+      }
+
+      return this;
+    },
+
+    updatePixiSelf: function( node, graphics ) {
+      graphics.clear();
+
+      var shape = node.shape;
+      var i = 0;
+      var segment;
+      if ( shape !== null ) {
+        if ( node.getStrokeColor() ) {
+          graphics.lineStyle( 5, node.getStrokeColor().toNumber() );
+        }
+        if ( node.getFillColor() ) {
+          graphics.beginFill( node.getFillColor().toNumber() );
+        }
+        for ( i = 0; i < shape.subpaths.length; i++ ) {
+          var subpath = shape.subpaths[ i ];
+          for ( var k = 0; k < subpath.segments.length; k++ ) {
+            segment = subpath.segments[ k ];
+            if ( i === 0 && k === 0 ) {
+              graphics.moveTo( segment.start.x, segment.start.y );
+            }
+            else {
+              graphics.lineTo( segment.start.x, segment.start.y );
+            }
+
+            if ( k === subpath.segments.length - 1 ) {
+              graphics.lineTo( segment.end.x, segment.end.y );
+            }
+          }
+
+          if ( subpath.isClosed() ) {
+            segment = subpath.segments[ 0 ];
+            graphics.lineTo( segment.start.x, segment.start.y );
+          }
+        }
+
+        graphics.endFill();
+      }
+      // TODO: geometry
+
+      //graphics.moveTo( 0, 0 );
+      //graphics.lineTo( 100, 100 );
+      //graphics.endFill();
+    },
+
+    // stateless dirty methods:
+    markDirtyShape: function() { this.markPaintDirty(); }
+  } );
+  Paintable.PaintableStatelessDrawable.mixin( Path.PathPixiDrawable );
+  SelfDrawable.Poolable.mixin( Path.PathPixiDrawable );
+
+  return Path;
+} );
+
+
+
+// Copyright 2002-2015, University of Colorado Boulder
+
+/**
+ * An observable property, notifies registered observers when the value changes.
+ *
+ * Uses the 'Constructor' pattern for object creation, which has the downside that
+ * all properties are created once for each instance. It would be nice if our functions
+ * were shared. But since the only way to create private fields is in the constructor,
+ * and the functions need access to those private fields, there doesn't seem to be
+ * any choice but to define the functions in the constructor.
+ *
+ * @author Sam Reid
+ * @author Chris Malley (PixelZoom, Inc.)
+ */
+define( 'AXON/Property',['require','AXON/axon','PHET_CORE/inherit','AXON/Events'],function( require ) {
+  
+
+  // modules
+  var axon = require( 'AXON/axon' );
+  var inherit = require( 'PHET_CORE/inherit' );
+  var Events = require( 'AXON/Events' );
+
+  // Also requires Multilink and DerivedProperty, but cannot reference them here or it will create a
+  // circular dependency.  So they are loaded through axon.Multilink and axon.DerivedProperty.
+
+  /**
+   * @param {*} value - the initial value of the property
+   * @param {Object} [options] - options
+   * @constructor
+   */
+  axon.Property = function Property( value, options ) {
+
+    options = _.extend( { tandem: null }, options );
+
+    // Internal Events for sending startedCallbacksForChanged & endedCallbacksForChanged
+    this.events = new Events();
+
+    //Store the internal value and the initial value
+    this.storeValue( value );        // typically sets this._value
+    this.storeInitialValue( value ); // typically sets this._initialValue
+    this._observers = [];
+
+    options.tandem && options.tandem.addInstance( this );
+
+    // @private
+    this.disposeProperty = function() {
+      options.tandem && options.tandem.removeInstance( this );
+      while ( this._observers.length > 0 ) {
+        this.unlink( this._observers[ 0 ] );
+      }
+    };
+  };
+
+  return inherit( Object, axon.Property, {
+
+      /**
+       * Gets the value.  You can also use the es5 getter (property.value) but this means is provided for inner loops or internal code that must be fast.
+       * @return {*}
+       */
+      get: function() {
+        return this._value;
+      },
+
+      /**
+       * Sets the value and notifies registered observers.  You can also use the es5 getter (property.value) but this means is provided for inner loops or internal code that must be fast.
+       * If the value hasn't changed, this is a no-op.
+       *
+       * @param {*} value
+       */
+      set: function( value ) {
+        if ( !this.equalsValue( value ) ) {
+          this._setAndNotifyObservers( value );
+        }
+        return this;
+      },
+
+      // whether this property will not "change" when the passed-in value is set
+      equalsValue: function( value ) {
+        return value === this._value;
+      },
+
+      // store the current (new) value
+      storeValue: function( value ) {
+        this._value = value;
+      },
+
+      // store the initial value
+      storeInitialValue: function( value ) {
+        this._initialValue = value;
+      },
+
+      get initialValue() {
+        return this._initialValue;
+      },
+
+      _setAndNotifyObservers: function( value ) {
+        var oldValue = this.get();
+        this.storeValue( value );
+        this._notifyObservers( oldValue );
+      },
+
+      _notifyObservers: function( oldValue ) {
+
+        // Note the current value, since it will be sent to possibly multiple observers.
+        var value = this.get();
+
+        // TODO: Should Property extend or compose Events?  Would extending Events broaden its interface too much?
+        this.events.trigger2( 'startedCallbacksForChanged', value, oldValue );
+
+        var observersCopy = this._observers.slice(); // make a copy, in case notification results in removeObserver
+        for ( var i = 0; i < observersCopy.length; i++ ) {
+          observersCopy[ i ]( value, oldValue );
+        }
+
+        this.events.trigger0( 'endedCallbacksForChanged' );
+      },
+
+      /**
+       * Use this method when mutating a value (not replacing with a new instance) and you want to send notifications about the change.
+       * This is different from the normal axon strategy, but may be necessary to prevent memory allocations.
+       * This method is unsafe for removing observers because it assumes the observer list not modified, to save another allocation
+       * Only provides the new reference as a callback (no oldvalue)
+       * See https://github.com/phetsims/axon/issues/6
+       */
+      notifyObserversStatic: function() {
+        var value = this.get();
+        for ( var i = 0; i < this._observers.length; i++ ) {
+          this._observers[ i ]( value );
+        }
+      },
+
+      /**
+       * Resets the value to the initial value.
+       */
+      reset: function() {
+        this.set( this._initialValue );
+      },
+
+      /**
+       * This function returns a bound function that sets the specified value.  For use in creating closures e.g. with gui classes.
+       * For instance, to have a button that sets a property to true, instead of using
+       * button.click(function(){property.set(true);});
+       * you could use
+       * button.click(property._set(true));
+       * @param value the value to use when the setter is called.
+       * @return a function that can be used to set the specified value.
+       */
+      _set: function( value ) {
+        return this.set.bind( this, value );
+      },
+
+      get value() { return this.get(); },
+
+      set value( newValue ) { this.set( newValue ); },
+
+      /**
+       * Adds an observer and notifies it immediately.
+       * If observer is already registered, this is a no-op.
+       * The initial notification provides the current value for newValue and null for oldValue.
+       *
+       * @param {function} observer a function of the form observer(newValue,oldValue)
+       */
+      link: function( observer ) {
+        if ( this._observers.indexOf( observer ) === -1 ) {
+          this._observers.push( observer );
+          observer( this.get(), null ); // null should be used when an object is expected but unavailable
+        }
+      },
+
+      /**
+       * Add an observer to the Property, without calling it back right away.  This is used when you need to register a observer without an immediate callback.
+       * @param {function} observer  a function with a single argument, which is the value of the property at the time the function is called.
+       */
+      lazyLink: function( observer ) {
+        if ( this._observers.indexOf( observer ) === -1 ) {
+          this._observers.push( observer );
+        }
+      },
+
+      /**
+       * Removes an observer.
+       * If observer is not registered, this is a no-op.
+       *
+       * @param {function} observer
+       */
+      unlink: function( observer ) {
+        var index = this._observers.indexOf( observer );
+        if ( index !== -1 ) {
+          this._observers.splice( index, 1 );
+        }
+      },
+
+      /**
+       * Links an object's named attribute to this property.  Returns a handle so it can be removed using Property.unlink();
+       * Example: modelVisibleProperty.linkAttribute(view,'visible');
+       *
+       * @param object
+       * @param attributeName
+       */
+      linkAttribute: function( object, attributeName ) {
+        var handle = function( value ) {object[ attributeName ] = value;};
+        this.link( handle );
+        return handle;
+      },
+
+      /**
+       * Unlink an observer added with linkAttribute.  Note: the args of linkAttribute do not match the args of
+       * unlinkAttribute: here, you must pass the observer handle returned by linkAttribute rather than object and attributeName
+       * @param observer
+       */
+      unlinkAttribute: function( observer ) {
+        this.unlink( observer );
+      },
+
+      //Provide toString for console debugging, see http://stackoverflow.com/questions/2485632/valueof-vs-tostring-in-javascript
+      toString: function() {return 'Property{' + this.get() + '}'; },
+      valueOf: function() {return this.toString();},
+
+      /**
+       * Add an observer so that it will only fire once (and not on registration)
+       *
+       * I can see two ways to implement this:
+       * (a) add a field to the observer so after notifications it can be checked and possibly removed. Disadvantage: will make everything slower even if not using 'once'
+       * (b) wrap the observer in a new function which will call the observer and then remove itself.  Disadvantage: cannot remove an observer added using 'once'
+       * To avoid possible performance problems, use a wrapper function, and return it as a handle in case the 'once' observer must be removed before it is called once
+       *
+       * @param observer the observer which should be called back only for one property change (and not on registration)
+       * @returns {function} the wrapper handle in case the wrapped function needs to be removed with 'unlink' before it is called once
+       */
+      once: function( observer ) {
+        var property = this;
+        var wrapper = function( newValue, oldValue ) {
+          property.unlink( wrapper );
+          observer( newValue, oldValue );
+        };
+        this.lazyLink( wrapper );
+        return wrapper;
+      },
+
+      /**
+       * Convenience function for debugging a property values.  It prints the new value on registration and when changed.
+       * @param name debug name to be printed on the console
+       * @returns {function} the handle to the linked observer in case it needs to be removed later
+       */
+      debug: function( name ) {
+        var observer = function( value ) { console.log( name, value ); };
+        this.link( observer );
+        return observer;
+      },
+
+      /**
+       * Returns a function that can be used to toggle the property (using !)
+       * @returns {function}
+       */
+      get toggleFunction() {
+        return this.toggle.bind( this );
+      },
+
+      /**
+       * Modifies the value of this Property with the ! operator.  Works for booleans and non-booleans.
+       */
+      toggle: function() {
+        this.value = !this.value;
+      },
+
+      /**
+       * Adds an observer that is fired when the property takes the specified value.  If the property has the value already,
+       * the observer is called back immediately.  A reference to the observer is returned so that it can be removed.
+       *
+       * @param value the value to match
+       * @param observer the observer that is called when this Property
+       */
+      onValue: function( value, observer ) {
+        var onValueObserver = function( v ) {
+          if ( v === value ) {
+            observer();
+          }
+        };
+        this.link( onValueObserver );
+        return onValueObserver;
+      },
+
+      // Ensures that the Property is eligible for GC
+      dispose: function() {
+        this.disposeProperty();
+      }
+    },
+
+    //statics
+    {
+
+      /**
+       * Registers an observer with multiple properties, then notifies the observer immediately.
+       * @param {Property[]} properties
+       * @param {function} observer no params, returns nothing
+       * @static
+       */
+      multilink: function( properties, observer ) {
+        return new axon.Multilink( properties, observer, false );
+      },
+
+      lazyMultilink: function( properties, observer ) {
+        return new axon.Multilink( properties, observer, true );
+      },
+
+      /**
+       * Removes the multilinked observer from this Property.
+       * Same as calling dispose() on the handle (which happens to be a DerivedProperty instance)
+       * @param {DerivedProperty} derivedProperty
+       */
+      unmultilink: function( derivedProperty ) {
+        derivedProperty.dispose();
+      },
+
+      /**
+       * Set up a PropertySet-like property on any object (see https://github.com/phetsims/axon/issues/42).
+       *
+       * @param {Object} object - The object that the property will be placed on
+       * @param {string} propertyName - Name of the property
+       * @param {*} initialValue - The initial value of the property
+       */
+      addProperty: function( object, propertyName, initialValue ) {
+        // defines the property
+        var property = this[ propertyName + 'Property' ] = new axon.Property( initialValue );
+
+        // defines ES5 getter/setter
+        Object.defineProperty( this, propertyName, {
+          get: function() { return property.get(); },
+          set: function( value ) { property.set( value ); },
+
+          // Make it configurable and enumerable so it's easy to override...
+          configurable: true,
+          enumerable: true
+        } );
+      }
+    } );
+} );
+
+// Copyright 2002-2014, University of Colorado Boulder
+
+/**
+ *
+ *
+ * @author Sam Reid (PhET Interactive Simulations)
+ */
+define( 'SCENERY/accessibility/FocusCursor',['require','PHET_CORE/inherit','SCENERY/nodes/Path','KITE/Shape','AXON/Property'],function( require ) {
+  
+
+  // modules
+  var inherit = require( 'PHET_CORE/inherit' );
+  var Path = require( 'SCENERY/nodes/Path' );
+  var Shape = require( 'KITE/Shape' );
+  var Property = require( 'AXON/Property' );
+
+  // constants
+  var cursorWidth = 20;
+
+  /**
+   *
+   * @constructor
+   */
+  function FocusCursor( focusedBoundsProperty, focusIndicatorProperty ) {
+    var focusCursor = this;
+
+    Path.call( this, new Shape().moveTo( 0, 0 ).lineTo( cursorWidth, 0 ).lineTo( cursorWidth / 2, cursorWidth / 10 * 8 ).close(), {
+      fill: 'blue',
+      stroke: 'black',
+      lineWidth: 1
+    } );
+
+    // TODO: Don't update when invisible
+    focusedBoundsProperty.link( function( focusedBounds ) {
+      if ( focusedBounds ) {
+        focusCursor.bottom = focusedBounds.y;
+        focusCursor.centerX = focusedBounds.x + focusedBounds.width / 2;
+      }
+    } );
+
+    Property.multilink( [ focusedBoundsProperty, focusIndicatorProperty ], function( focusedBounds, focusIndicator ) {
+      var visible = focusedBounds !== null && focusIndicator === 'cursor';
+      focusCursor.visible = visible;
+    } );
+  }
+
+  return inherit( Path, FocusCursor );
+} );
+// Copyright 2002-2014, University of Colorado Boulder
+
+
+/**
+ * Points to a specific node (with a trail), and whether it is conceptually before or after the node.
+ *
+ * There are two orderings:
+ * - rendering order: the order that node selves would be rendered, matching the Trail implicit order
+ * - nesting order:   the order in depth first with entering a node being "before" and exiting a node being "after"
+ *
+ * TODO: more seamless handling of the orders. or just exclusively use the nesting order
+ *
+ * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ */
+
+define( 'SCENERY/util/TrailPointer',['require','PHET_CORE/inherit','SCENERY/scenery'],function( require ) {
+  
+
+  var inherit = require( 'PHET_CORE/inherit' );
+  var scenery = require( 'SCENERY/scenery' );
+
+  /*
+   * isBefore: whether this points to before the node (and its children) have been rendered, or after
+   */
+  //@deprecated
+  scenery.TrailPointer = function TrailPointer( trail, isBefore ) {
+    assert && assert( trail instanceof scenery.Trail, 'trail is not a trail' );
+    this.trail = trail;
+
+    this.setBefore( isBefore );
+
+    phetAllocation && phetAllocation( 'TrailPointer' );
+  };
+  var TrailPointer = scenery.TrailPointer;
+
+  inherit( Object, TrailPointer, {
+    copy: function() {
+      return new TrailPointer( this.trail.copy(), this.isBefore );
+    },
+
+    setBefore: function( isBefore ) {
+      this.isBefore = isBefore;
+      this.isAfter = !isBefore;
+    },
+
+    // return the equivalent pointer that swaps before and after (may return null if it doesn't exist)
+    getRenderSwappedPointer: function() {
+      var newTrail = this.isBefore ? this.trail.previous() : this.trail.next();
+
+      if ( newTrail === null ) {
+        return null;
+      }
+      else {
+        return new TrailPointer( newTrail, !this.isBefore );
+      }
+    },
+
+    getRenderBeforePointer: function() {
+      return this.isBefore ? this : this.getRenderSwappedPointer();
+    },
+
+    getRenderAfterPointer: function() {
+      return this.isAfter ? this : this.getRenderSwappedPointer();
+    },
+
+    /*
+     * In the render order, will return 0 if the pointers are equivalent, -1 if this pointer is before the
+     * other pointer, and 1 if this pointer is after the other pointer.
+     */
+    compareRender: function( other ) {
+      assert && assert( other !== null );
+
+      var a = this.getRenderBeforePointer();
+      var b = other.getRenderBeforePointer();
+
+      if ( a !== null && b !== null ) {
+        // normal (non-degenerate) case
+        return a.trail.compare( b.trail );
+      }
+      else {
+        // null "before" point is equivalent to the "after" pointer on the last rendered node.
+        if ( a === b ) {
+          return 0; // uniqueness guarantees they were the same
+        }
+        else {
+          return a === null ? 1 : -1;
+        }
+      }
+    },
+
+    /*
+     * Like compareRender, but for the nested (depth-first) order
+     *
+     * TODO: optimization?
+     */
+    compareNested: function( other ) {
+      assert && assert( other );
+
+      var comparison = this.trail.compare( other.trail );
+
+      if ( comparison === 0 ) {
+        // if trails are equal, just compare before/after
+        if ( this.isBefore === other.isBefore ) {
+          return 0;
+        }
+        else {
+          return this.isBefore ? -1 : 1;
+        }
+      }
+      else {
+        // if one is an extension of the other, the shorter isBefore flag determines the order completely
+        if ( this.trail.isExtensionOf( other.trail ) ) {
+          return other.isBefore ? 1 : -1;
+        }
+        else if ( other.trail.isExtensionOf( this.trail ) ) {
+          return this.isBefore ? -1 : 1;
+        }
+        else {
+          // neither is a subtrail of the other, so a straight trail comparison should give the answer
+          return comparison;
+        }
+      }
+    },
+
+    equalsRender: function( other ) {
+      return this.compareRender( other ) === 0;
+    },
+
+    equalsNested: function( other ) {
+      return this.compareNested( other ) === 0;
+    },
+
+    // will return false if this pointer has gone off of the beginning or end of the tree (will be marked with isAfter or isBefore though)
+    hasTrail: function() {
+      return !!this.trail;
+    },
+
+    // TODO: refactor with "Side"-like handling
+    // moves this pointer forwards one step in the nested order
+    nestedForwards: function() {
+      if ( this.isBefore ) {
+        if ( this.trail.lastNode()._children.length > 0 ) {
+          // stay as before, just walk to the first child
+          this.trail.addDescendant( this.trail.lastNode()._children[ 0 ], 0 );
+        }
+        else {
+          // stay on the same node, but switch to after
+          this.setBefore( false );
+        }
+      }
+      else {
+        if ( this.trail.indices.length === 0 ) {
+          // nothing else to jump to below, so indicate the lack of existence
+          this.trail = null;
+          // stays isAfter
+          return null;
+        }
+        else {
+          var index = this.trail.indices[ this.trail.indices.length - 1 ];
+          this.trail.removeDescendant();
+
+          if ( this.trail.lastNode()._children.length > index + 1 ) {
+            // more siblings, switch to the beginning of the next one
+            this.trail.addDescendant( this.trail.lastNode()._children[ index + 1 ], index + 1 );
+            this.setBefore( true );
+          }
+          else {
+            // no more siblings. exit on parent. nothing else needed since we're already isAfter
+          }
+        }
+      }
+      return this;
+    },
+
+    // moves this pointer backwards one step in the nested order
+    nestedBackwards: function() {
+      if ( this.isBefore ) {
+        if ( this.trail.indices.length === 0 ) {
+          // jumping off the front
+          this.trail = null;
+          // stays isBefore
+          return null;
+        }
+        else {
+          var index = this.trail.indices[ this.trail.indices.length - 1 ];
+          this.trail.removeDescendant();
+
+          if ( index - 1 >= 0 ) {
+            // more siblings, switch to the beginning of the previous one and switch to isAfter
+            this.trail.addDescendant( this.trail.lastNode()._children[ index - 1 ], index - 1 );
+            this.setBefore( false );
+          }
+          else {
+            // no more siblings. enter on parent. nothing else needed since we're already isBefore
+          }
+        }
+      }
+      else {
+        if ( this.trail.lastNode()._children.length > 0 ) {
+          // stay isAfter, but walk to the last child
+          var children = this.trail.lastNode()._children;
+          this.trail.addDescendant( children[ children.length - 1 ], children.length - 1 );
+        }
+        else {
+          // switch to isBefore, since this is a leaf node
+          this.setBefore( true );
+        }
+      }
+      return this;
+    },
+
+    // treats the pointer as render-ordered (includes the start pointer 'before' if applicable, excludes the end pointer 'before' if applicable
+    eachNodeBetween: function( other, callback ) {
+      this.eachTrailBetween( other, function( trail ) {
+        return callback( trail.lastNode() );
+      } );
+    },
+
+    // treats the pointer as render-ordered (includes the start pointer 'before' if applicable, excludes the end pointer 'before' if applicable
+    eachTrailBetween: function( other, callback ) {
+      // this should trigger on all pointers that have the 'before' flag, except a pointer equal to 'other'.
+
+      // since we exclude endpoints in the depthFirstUntil call, we need to fire this off first
+      if ( this.isBefore ) {
+        callback( this.trail );
+      }
+
+      this.depthFirstUntil( other, function( pointer ) {
+        if ( pointer.isBefore ) {
+          return callback( pointer.trail );
+        }
+      }, true ); // exclude the endpoints so we can ignore the ending 'before' case
+    },
+
+    /*
+     * Recursively (depth-first) iterates over all pointers between this pointer and 'other', calling
+     * callback( pointer ) for each pointer. If excludeEndpoints is truthy, the callback will not be
+     * called if pointer is equivalent to this pointer or 'other'.
+     *
+     * If the callback returns a truthy value, the subtree for the current pointer will be skipped
+     * (applies only to before-pointers)
+     */
+    depthFirstUntil: function( other, callback, excludeEndpoints ) {
+      // make sure this pointer is before the other, but allow start === end if we are not excluding endpoints
+      assert && assert( this.compareNested( other ) <= ( excludeEndpoints ? -1 : 0 ), 'TrailPointer.depthFirstUntil pointers out of order, possibly in both meanings of the phrase!' );
+      assert && assert( this.trail.rootNode() === other.trail.rootNode(), 'TrailPointer.depthFirstUntil takes pointers with the same root' );
+
+      // sanity check TODO: remove later
+      this.trail.reindex();
+      other.trail.reindex();
+
+      var pointer = this.copy();
+      pointer.trail.setMutable(); // this trail will be modified in the iteration, so references to it may be modified
+
+      var first = true;
+
+      while ( !pointer.equalsNested( other ) ) {
+        assert && assert( pointer.compareNested( other ) !== 1, 'skipped in depthFirstUntil' );
+        var skipSubtree = false;
+
+        if ( first ) {
+          // start point
+          if ( !excludeEndpoints ) {
+            skipSubtree = callback( pointer );
+          }
+          first = false;
+        }
+        else {
+          // between point
+          skipSubtree = callback( pointer );
+        }
+
+        if ( skipSubtree && pointer.isBefore ) {
+          // to skip the subtree, we just change to isAfter
+          pointer.setBefore( false );
+
+          // if we skip a subtree, make sure we don't run past the ending pointer
+          if ( pointer.compareNested( other ) === 1 ) {
+            break;
+          }
+        }
+        else {
+          pointer.nestedForwards();
+        }
+      }
+
+      // end point
+      if ( !excludeEndpoints ) {
+        callback( pointer );
+      }
+    },
+
+    toString: function() {
+      return '[' + ( this.isBefore ? 'before' : 'after' ) + ' ' + this.trail.toString().slice( 1 );
+    }
+  } );
+
+  // same as new TrailPointer( trailA, isBeforeA ).compareNested( new TrailPointer( trailB, isBeforeB ) )
+  TrailPointer.compareNested = function( trailA, isBeforeA, trailB, isBeforeB ) {
+    var comparison = trailA.compare( trailB );
+
+    if ( comparison === 0 ) {
+      // if trails are equal, just compare before/after
+      if ( isBeforeA === isBeforeB ) {
+        return 0;
+      }
+      else {
+        return isBeforeA ? -1 : 1;
+      }
+    }
+    else {
+      // if one is an extension of the other, the shorter isBefore flag determines the order completely
+      if ( trailA.isExtensionOf( trailB ) ) {
+        return isBeforeB ? 1 : -1;
+      }
+      else if ( trailB.isExtensionOf( trailA ) ) {
+        return isBeforeA ? -1 : 1;
+      }
+      else {
+        // neither is a subtrail of the other, so a straight trail comparison should give the answer
+        return comparison;
+      }
+    }
+  };
+
+  return TrailPointer;
+} );
+
 
 // Copyright 2002-2014, University of Colorado Boulder
 
@@ -16112,328 +20829,6 @@ define( 'SCENERY/input/BatchedDOMEvent',['require','PHET_CORE/inherit','PHET_COR
   return BatchedDOMEvent;
 } );
 
-// Copyright 2002-2013, University of Colorado Boulder
-
-/**
- * An observable property, notifies registered observers when the value changes.
- *
- * Uses the 'Constructor' pattern for object creation, which has the downside that
- * all properties are created once for each instance. It would be nice if our functions
- * were shared. But since the only way to create private fields is in the constructor,
- * and the functions need access to those private fields, there doesn't seem to be
- * any choice but to define the functions in the constructor.
- *
- * @author Sam Reid
- * @author Chris Malley (PixelZoom, Inc.)
- */
-define( 'AXON/Property',['require','AXON/axon','PHET_CORE/inherit'],function( require ) {
-  
-
-  // modules
-  var axon = require( 'AXON/axon' );
-  var inherit = require( 'PHET_CORE/inherit' );
-  // Also requires Multilink and DerivedProperty, but cannot reference them here or it will create a
-  // circular dependency.  So they are loaded through axon.Multilink and axon.DerivedProperty.
-
-  /**
-   * @param {*} value - the initial value of the property
-   * @param {Object} [options] - optional values for the property, see below
-   * @constructor
-   */
-  axon.Property = function Property( value, options ) {
-
-    //TODO added for potential use in data collection, delete if unused
-    options = _.extend( { elementType: 'Object' }, options );
-
-    // Optional field used for arch data streaming, set by `together` after the application starts up.
-    this._componentID = null;
-
-    //Store the internal value and the initial value
-    this.storeValue( value );        // typically sets this._value
-    this.storeInitialValue( value ); // typically sets this._initialValue
-    this._observers = [];
-
-    //By default, events can be logged for data analysis studies, but setSendPhetEvents can be set to false for events that should not be recorded (such as the passage of time).
-    this.sendPhetEvents = true;
-    this.delay = 0; //Seconds between messages (if throttled).  Zero means no throttling
-  };
-
-  return inherit( Object, axon.Property, {
-
-      /**
-       * Gets the value.  You can also use the es5 getter (property.value) but this means is provided for inner loops or internal code that must be fast.
-       * @return {*}
-       */
-      get: function() {
-        return this._value;
-      },
-
-      /**
-       * Sets the value and notifies registered observers.  You can also use the es5 getter (property.value) but this means is provided for inner loops or internal code that must be fast.
-       * If the value hasn't changed, this is a no-op.
-       *
-       * @param {*} value
-       */
-      set: function( value ) {
-        if ( !this.equalsValue( value ) ) {
-          this._setAndNotifyObservers( value );
-        }
-        return this;
-      },
-
-      // whether this property will not "change" when the passed-in value is set
-      equalsValue: function( value ) {
-        return value === this._value;
-      },
-
-      // store the current (new) value
-      storeValue: function( value ) {
-        this._value = value;
-      },
-
-      // store the initial value
-      storeInitialValue: function( value ) {
-        this._initialValue = value;
-      },
-
-      get initialValue() {
-        return this._initialValue;
-      },
-
-      _setAndNotifyObservers: function( value ) {
-        var oldValue = this.get();
-        this.storeValue( value );
-        this._notifyObservers( oldValue );
-      },
-
-      _notifyObservers: function( oldValue ) {
-
-        // Note the current value, since it will be sent to possibly multiple observers.
-        var value = this.get();
-
-        // If enabled, send a message to phet events.  Avoid as much work as possible if phet.arch is inactive.
-        var archID = arch && this.componentID && this.sendPhetEvents && arch.start( 'model', this.componentID, 'Property', 'changed', { value: value } );
-
-        // TODO: JO: avoid slice() by storing observers array correctly
-        var observersCopy = this._observers.slice(); // make a copy, in case notification results in removeObserver
-        for ( var i = 0; i < observersCopy.length; i++ ) {
-          observersCopy[ i ]( value, oldValue );
-        }
-
-        // Send the end message to phet.arch
-        archID && this.sendPhetEvents && arch.end( archID );
-      },
-
-      /**
-       * Use this method when mutating a value (not replacing with a new instance) and you want to send notifications about the change.
-       * This is different from the normal axon strategy, but may be necessary to prevent memory allocations.
-       * This method is unsafe for removing observers because it assumes the observer list not modified, to save another allocation
-       * Only provides the new reference as a callback (no oldvalue)
-       * See https://github.com/phetsims/axon/issues/6
-       */
-      notifyObserversStatic: function() {
-        var value = this.get();
-        for ( var i = 0; i < this._observers.length; i++ ) {
-          this._observers[ i ]( value );
-        }
-      },
-
-      /**
-       * Resets the value to the initial value.
-       */
-      reset: function() {
-        this.set( this._initialValue );
-      },
-
-      /**
-       * This function returns a bound function that sets the specified value.  For use in creating closures e.g. with gui classes.
-       * For instance, to have a button that sets a property to true, instead of using
-       * button.click(function(){property.set(true);});
-       * you could use
-       * button.click(property._set(true));
-       * @param value the value to use when the setter is called.
-       * @return a function that can be used to set the specified value.
-       */
-      _set: function( value ) {
-        return this.set.bind( this, value );
-      },
-
-      get value() { return this.get(); },
-
-      set value( newValue ) { this.set( newValue ); },
-
-      /**
-       * Adds an observer and notifies it immediately.
-       * If observer is already registered, this is a no-op.
-       * The initial notification provides the current value for newValue and null for oldValue.
-       *
-       * @param {function} observer a function of the form observer(newValue,oldValue)
-       */
-      link: function( observer ) {
-        if ( this._observers.indexOf( observer ) === -1 ) {
-          this._observers.push( observer );
-          observer( this.get(), null ); // null should be used when an object is expected but unavailable
-        }
-      },
-
-      /**
-       * Add an observer to the Property, without calling it back right away.  This is used when you need to register a observer without an immediate callback.
-       * @param {function} observer  a function with a single argument, which is the value of the property at the time the function is called.
-       */
-      lazyLink: function( observer ) {
-        if ( this._observers.indexOf( observer ) === -1 ) {
-          this._observers.push( observer );
-        }
-      },
-
-      /**
-       * Removes an observer.
-       * If observer is not registered, this is a no-op.
-       *
-       * @param {function} observer
-       */
-      unlink: function( observer ) {
-        var index = this._observers.indexOf( observer );
-        if ( index !== -1 ) {
-          this._observers.splice( index, 1 );
-        }
-      },
-
-      /**
-       * Links an object's named attribute to this property.  Returns a handle so it can be removed using Property.unlink();
-       * Example: modelVisibleProperty.linkAttribute(view,'visible');
-       *
-       * @param object
-       * @param attributeName
-       */
-      linkAttribute: function( object, attributeName ) {
-        var handle = function( value ) {object[ attributeName ] = value;};
-        this.link( handle );
-        return handle;
-      },
-
-      /**
-       * Unlink an observer added with linkAttribute.  Note: the args of linkAttribute do not match the args of
-       * unlinkAttribute: here, you must pass the observer handle returned by linkAttribute rather than object and attributeName
-       * @param observer
-       */
-      unlinkAttribute: function( observer ) {
-        this.unlink( observer );
-      },
-
-      //Provide toString for console debugging, see http://stackoverflow.com/questions/2485632/valueof-vs-tostring-in-javascript
-      toString: function() {return 'Property{' + this.get() + '}'; },
-      valueOf: function() {return this.toString();},
-
-      /**
-       * Add an observer so that it will only fire once (and not on registration)
-       *
-       * I can see two ways to implement this:
-       * (a) add a field to the observer so after notifications it can be checked and possibly removed. Disadvantage: will make everything slower even if not using 'once'
-       * (b) wrap the observer in a new function which will call the observer and then remove itself.  Disadvantage: cannot remove an observer added using 'once'
-       * To avoid possible performance problems, use a wrapper function, and return it as a handle in case the 'once' observer must be removed before it is called once
-       *
-       * @param observer the observer which should be called back only for one property change (and not on registration)
-       * @returns {function} the wrapper handle in case the wrapped function needs to be removed with 'unlink' before it is called once
-       */
-      once: function( observer ) {
-        var property = this;
-        var wrapper = function( newValue, oldValue ) {
-          property.unlink( wrapper );
-          observer( newValue, oldValue );
-        };
-        this.lazyLink( wrapper );
-        return wrapper;
-      },
-
-      /**
-       * Convenience function for debugging a property values.  It prints the new value on registration and when changed.
-       * @param name debug name to be printed on the console
-       * @returns {function} the handle to the linked observer in case it needs to be removed later
-       */
-      debug: function( name ) {
-        var observer = function( value ) { console.log( name, value ); };
-        this.link( observer );
-        return observer;
-      },
-
-      /**
-       * Returns a function that can be used to toggle the property (using !)
-       * @returns {function}
-       */
-      get toggleFunction() {
-        return this.toggle.bind( this );
-      },
-
-      /**
-       * Modifies the value of this Property with the ! operator.  Works for booleans and non-booleans.
-       */
-      toggle: function() {
-        this.value = !this.value;
-      },
-
-      /**
-       * Adds an observer that is fired when the property takes the specified value.  If the property has the value already,
-       * the observer is called back immediately.  A reference to the observer is returned so that it can be removed.
-       *
-       * @param value the value to match
-       * @param observer the observer that is called when this Property
-       */
-      onValue: function( value, observer ) {
-        var onValueObserver = function( v ) {
-          if ( v === value ) {
-            observer();
-          }
-        };
-        this.link( onValueObserver );
-        return onValueObserver;
-      },
-
-      setSendPhetEvents: function( sendPhetEvents ) {
-        this.sendPhetEvents = sendPhetEvents;
-        return this;
-      },
-
-      throttle: function( delay ) {
-        this.delay = delay;
-        return this;
-      },
-
-      // Getters and setters not strictly necessary (since no additional logic is included here), but put here as 
-      // warning documentation to avoid collisions with other subclasses that want to add componentID.
-      // This is used for the arch data collection and other API features.
-      set componentID( id ) {this._componentID = id;},
-      get componentID() {return this._componentID;}
-    },
-
-    //statics
-    {
-
-      /**
-       * Registers an observer with multiple properties, then notifies the observer immediately.
-       * @param {Property[]} properties
-       * @param {function} observer no params, returns nothing
-       * @static
-       */
-      multilink: function( properties, observer ) {
-        return new axon.Multilink( properties, observer, false );
-      },
-
-      lazyMultilink: function( properties, observer ) {
-        return new axon.Multilink( properties, observer, true );
-      },
-
-      /**
-       * Removes the multilinked observer from this Property.
-       * Same as calling detach() on the handle (which happens to be a DerivedProperty instance)
-       * @param derivedProperty
-       */
-      unmultilink: function( derivedProperty ) {
-        derivedProperty.detach();
-      }
-    } );
-} );
-
 // Copyright 2002-2014, University of Colorado Boulder
 
 
@@ -16489,6 +20884,8 @@ define( 'SCENERY/input/Input',['require','PHET_CORE/inherit','PHET_CORE/cleanArr
     return -1;
   };
 
+  var globalDisplay = null;
+
   // listenerTarget is the DOM node (window/document/element) to which DOM event listeners will be attached
   scenery.Input = function Input( display, listenerTarget, batchDOMEvents, enablePointerEvents, pointFromEvent ) {
     this.display = display;
@@ -16498,6 +20895,7 @@ define( 'SCENERY/input/Input',['require','PHET_CORE/inherit','PHET_CORE/cleanArr
     this.enablePointerEvents = enablePointerEvents;
     this.pointFromEvent = pointFromEvent;
     this.displayUpdateOnEvent = false;
+    globalDisplay = display;
 
     //OHTWO @deprecated
     this.batchedCallbacks = []; // cleared every frame
@@ -16549,12 +20947,15 @@ define( 'SCENERY/input/Input',['require','PHET_CORE/inherit','PHET_CORE/cleanArr
 
   return inherit( Object, Input, {
       batchEvent: function( domEvent, batchType, callback, triggerImmediate ) {
-        this.batchedEvents.push( BatchedDOMEvent.createFromPool( domEvent, batchType, callback ) );
-        if ( triggerImmediate || !this.batchDOMEvents ) {
-          this.fireBatchedEvents();
-        }
-        if ( this.displayUpdateOnEvent ) {
-          //OHTWO TODO: update the display
+        // If our display is not interactive, do not respond to any events (but still prevent default)
+        if ( this.display.interactive ) {
+          this.batchedEvents.push( BatchedDOMEvent.createFromPool( domEvent, batchType, callback ) );
+          if ( triggerImmediate || !this.batchDOMEvents ) {
+            this.fireBatchedEvents();
+          }
+          if ( this.displayUpdateOnEvent ) {
+            //OHTWO TODO: update the display
+          }
         }
 
         // Don't preventDefault for key events, which often need to be handled by the browser
@@ -16844,8 +21245,13 @@ define( 'SCENERY/input/Input',['require','PHET_CORE/inherit','PHET_CORE/cleanArr
         if ( this.logEvents ) { this.eventLog.push( 'wheel(' + Input.serializeDomEvent( event ) + ');' ); }
         if ( !this.mouse ) { this.initMouse(); }
         this.mouse.wheel( event );
-        var trail = this.rootNode.trailUnderPointer( this.mouse ) || new scenery.Trail( this.rootNode );
-        this.dispatchEvent( trail, 'wheel', this.mouse, event, true );
+
+        // don't send mouse-wheel events if we don't yet have a mouse location!
+        // TODO: Can we set the mouse location based on the wheel event?
+        if ( this.mouse.point ) {
+          var trail = this.rootNode.trailUnderPointer( this.mouse ) || new scenery.Trail( this.rootNode );
+          this.dispatchEvent( trail, 'wheel', this.mouse, event, true );
+        }
       },
 
       // called for each touch point
@@ -17373,7 +21779,7 @@ define( 'SCENERY/input/Input',['require','PHET_CORE/inherit','PHET_CORE/cleanArr
           Input.flattenTrails( Input.focusContexts[ Input.focusContexts.length - 1 ].trail, Input.focusContexts[ Input.focusContexts.length - 1 ].trail, focusableTrails, focusable );
         }
         else {
-          var display = this.display;
+          var display = globalDisplay;
 
           var rootNode = display.rootNode;
           var trails = rootNode.getTrails();
@@ -17482,3457 +21888,6 @@ define( 'SCENERY/input/Input',['require','PHET_CORE/inherit','PHET_CORE/cleanArr
     } );
 } );
 
-//  Copyright 2002-2014, University of Colorado Boulder
-
-/**
- *
- *
- * @author Sam Reid (PhET Interactive Simulations)
- */
-define( 'SCENERY/accessibility/AriaSpeech',['require','PHET_CORE/inherit','SCENERY/input/Input'],function( require ) {
-  
-
-  // modules
-  var inherit = require( 'PHET_CORE/inherit' );
-  var Input = require( 'SCENERY/input/Input' );
-
-  function AriaSpeech() {}
-
-  var ariaSpeechDiv = null;
-  var initialized = false;
-
-  return inherit( Object, AriaSpeech, {}, {
-    init: function() {
-      if ( !initialized ) {
-        ariaSpeechDiv = document.createElement( 'div' );
-        ariaSpeechDiv.id = 'liveText';
-        ariaSpeechDiv.className = 'text';
-        ariaSpeechDiv.setAttribute( 'aria-live', 'assertive' );
-
-        //Display:none and visibility:hidden both cause aria TTS to fail (no text comes out) on VoiceOver
-        document.body.appendChild( ariaSpeechDiv );
-
-        Input.focusedTrailProperty.link( function( focusedTrail ) {
-          if ( focusedTrail && focusedTrail.lastNode().textDescription ) {
-            AriaSpeech.setText( focusedTrail.lastNode().textDescription );
-          }
-        } );
-        initialized = true;
-      }
-    },
-    setText: function( text ) {
-      if ( !initialized ) {
-        AriaSpeech.init();
-      }
-      ariaSpeechDiv.innerHTML = text;
-    }
-  } );
-} );
-// Copyright 2002-2014, University of Colorado Boulder
-
-
-/**
- * An enumeration of different back-end technologies used for rendering. It also essentially represents the API that
- * nodes need to implement to be used with this specified back-end.
- *
- * We use a bitmask to represent renderers currently, in a way that can be logically-ANDed in order to obtain
- * information about "what renderer can support all of these Nodes?"
- *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
- */
-
-define( 'SCENERY/display/Renderer',['require','SCENERY/scenery'],function( require ) {
-  
-
-  var scenery = require( 'SCENERY/scenery' );
-
-  // now it's a namespace
-  scenery.Renderer = {};
-  var Renderer = scenery.Renderer;
-
-  //OHTWO TODO: rename to take advantage of lack of deprecated names? (remove bitmask prefix)
-
-  /*---------------------------------------------------------------------------*
-   * Renderer bitmask flags
-   *----------------------------------------------------------------------------*/
-
-  // ensure that these bitmasks weren't changed in scenery.js
-  assert && assert( scenery.bitmaskSupportsCanvas === 0x0000001 );
-  assert && assert( scenery.bitmaskSupportsSVG === 0x0000002 );
-  assert && assert( scenery.bitmaskSupportsDOM === 0x0000004 );
-  assert && assert( scenery.bitmaskSupportsWebGL === 0x0000008 );
-  assert && assert( scenery.bitmaskSupportsPixi === 0x0000010 );
-
-  // these will need to be updated if another renderer option is given (modify order bitmasks below also)
-  Renderer.bitmaskRendererArea = scenery.bitmaskRendererArea;   // 0x00000FF
-  // one renderer is required
-  Renderer.bitmaskCanvas = scenery.bitmaskSupportsCanvas; // 0x0000001
-  Renderer.bitmaskSVG = scenery.bitmaskSupportsSVG;       // 0x0000002
-  Renderer.bitmaskDOM = scenery.bitmaskSupportsDOM;       // 0x0000004
-  Renderer.bitmaskWebGL = scenery.bitmaskSupportsWebGL;   // 0x0000008
-  Renderer.bitmaskPixi = scenery.bitmaskSupportsPixi;   // 0x0000010
-  // 20, 40, 80 reserved for future renderers
-
-  // fitting group (2 bits)
-  Renderer.bitmaskFitting = 0x0000300;      // bitmask that covers all of the states
-  Renderer.bitmaskFitFullScene = 0x0000000; // fit the full scene (invalid in transformed/single-cached situations (how would that work?), required for boundsless objects)
-  Renderer.bitmaskFitLoose = 0x0000100;     // for now, round out to something like 32 or 128 pixel increments?
-  Renderer.bitmaskFitTight = 0x0000200;     // tight fit, updates whenever it is changed
-  Renderer.bitmaskFitHybrid = 0x0000300;    // custom minimization strategy
-
-  // general options
-  Renderer.bitmaskForceAcceleration = 0x0000400;
-  Renderer.bitmaskSkipBounds = 0x0000800; // forces full scene fitting for SVG/Canvas unless there is a guaranteed bounds, so don't use in transformed/single-cached situations unless there is a bounds guarantee
-
-  // canvas options
-  Renderer.bitmaskCanvasLowResolution = 0x0001000;
-  Renderer.bitmaskCanvasNoPruning = 0x0002000;
-  Renderer.bitmaskCanvasNoDirtyBounds = 0x0004000;
-  Renderer.bitmaskCanvasBeforeAfterBounds = 0x0008000;
-
-  // SVG optimizations group (2 bits)
-  Renderer.bitmaskSVGOptimizations = 0x0030000;
-  Renderer.bitmaskSVGOptimizeAuto = 0x0000000;    // auto for text-rendering/shape-rendering/image-rendering
-  Renderer.bitmaskSVGOptimizeSpeed = 0x0010000;   // optimizeSpeed for text-rendering/shape-rendering/image-rendering
-  Renderer.bitmaskSVGOptimizeQuality = 0x0020000; // optimizeQuality for shape-rendering/image-rendering, geometricPrecision for text-rendering
-  Renderer.bitmaskSVGOptimizeCrisp = 0x0030000;   // optimizeQuality for image-rendering, crispEdges for shape-rendering, optimizeLegibility for text-rendering
-
-  // svg options
-  Renderer.bitmaskSVGCollapse = 0x0040000;
-
-  Renderer.isCanvas = function( bitmask ) {
-    return ( bitmask & Renderer.bitmaskCanvas ) !== 0;
-  };
-  Renderer.isSVG = function( bitmask ) {
-    return ( bitmask & Renderer.bitmaskSVG ) !== 0;
-  };
-  Renderer.isDOM = function( bitmask ) {
-    return ( bitmask & Renderer.bitmaskDOM ) !== 0;
-  };
-  Renderer.isWebGL = function( bitmask ) {
-    return ( bitmask & Renderer.bitmaskWebGL ) !== 0;
-  };
-  Renderer.isPixi = function( bitmask ) {
-    return ( bitmask & Renderer.bitmaskPixi ) !== 0;
-  };
-
-  var rendererMap = {
-    canvas: Renderer.bitmaskCanvas,
-    svg: Renderer.bitmaskSVG,
-    dom: Renderer.bitmaskDOM,
-    webgl: Renderer.bitmaskWebGL,
-    pixi: Renderer.bitmaskPixi
-  };
-  Renderer.fromName = function( name ) {
-    return rendererMap[ name ];
-  };
-
-  // returns the part of the bitmask that should contain only Canvas/SVG/DOM/WebGL flags
-  //OHTWO TODO: use this instead of direct access to bitmaskRendererArea
-  Renderer.getStrippedBitmask = function( bitmask ) {
-    return bitmask & Renderer.bitmaskRendererArea;
-  };
-
-  Renderer.getFitStrategy = function( bitmask ) {
-    return Renderer.fitStrategies[ bitmask & Renderer.bitmaskFitting ];
-  };
-  Renderer.isAccelerationForced = function( bitmask ) {
-    return ( bitmask & Renderer.bitmaskForceAcceleration ) !== 0;
-  };
-  Renderer.isSkipBounds = function( bitmask ) {
-    return ( bitmask & Renderer.bitmaskSkipBounds ) !== 0;
-  };
-  Renderer.isCanvasLowResolution = function( bitmask ) {
-    return ( bitmask & Renderer.bitmaskCanvasLowResolution ) !== 0;
-  };
-  Renderer.isCanvasNoPruning = function( bitmask ) {
-    return ( bitmask & Renderer.bitmaskCanvasNoPruning ) !== 0;
-  };
-  Renderer.isCanvasNoDirtyBounds = function( bitmask ) {
-    return ( bitmask & Renderer.bitmaskCanvasNoDirtyBounds ) !== 0;
-  };
-  Renderer.isCanvasBeforeAfterBounds = function( bitmask ) {
-    return ( bitmask & Renderer.bitmaskCanvasBeforeAfterBounds ) !== 0;
-  };
-  Renderer.getSVGOptimizations = function( bitmask ) {
-    return Renderer.svgOptimizations[ bitmask & Renderer.bitmaskSVGOptimizations ];
-  };
-
-  Renderer.createOrderBitmask = function( firstRenderer, secondRenderer, thirdRenderer, fourthRenderer, fifthRenderer ) {
-    firstRenderer = firstRenderer || 0;
-    secondRenderer = secondRenderer || 0;
-    thirdRenderer = thirdRenderer || 0;
-    fourthRenderer = fourthRenderer || 0;
-    fifthRenderer = fifthRenderer || 0;
-
-    // uses 25 bits now with 5 renderers
-    return firstRenderer |
-           ( secondRenderer << 5 ) |
-           ( thirdRenderer << 10 ) |
-           ( fourthRenderer << 15 ) |
-           ( fifthRenderer << 20 );
-  };
-  Renderer.bitmaskOrderFirst = function( bitmask ) {
-    return bitmask & 0x000001F;
-  };
-  Renderer.bitmaskOrderSecond = function( bitmask ) {
-    return ( bitmask >> 5 ) & 0x000001F;
-  };
-  Renderer.bitmaskOrderThird = function( bitmask ) {
-    return ( bitmask >> 10 ) & 0x000001F;
-  };
-  Renderer.bitmaskOrderFourth = function( bitmask ) {
-    return ( bitmask >> 15 ) & 0x000001F;
-  };
-  Renderer.bitmaskOrderFifth = function( bitmask ) {
-    return ( bitmask >> 20 ) & 0x000001F;
-  };
-  Renderer.pushOrderBitmask = function( bitmask, renderer ) {
-    assert && assert( typeof bitmask === 'number' );
-    assert && assert( typeof renderer === 'number' );
-    var rendererToInsert = renderer;
-    for ( var i = 0; i < 30; i += 5 ) {
-      var currentRenderer = ( bitmask >> i ) & 0x000001F;
-      if ( currentRenderer === rendererToInsert ) {
-        return bitmask;
-      }
-      else if ( currentRenderer === 0 ) {
-        // place the renderer and exit
-        bitmask = bitmask | ( rendererToInsert << i );
-        return bitmask;
-      }
-      else {
-        // clear out that slot
-        bitmask = ( bitmask & ~( 0x000001F << i ) );
-
-        // place in the renderer to insert
-        bitmask = bitmask | ( rendererToInsert << i );
-
-        rendererToInsert = currentRenderer;
-      }
-
-      // don't walk over and re-place our initial renderer
-      if ( rendererToInsert === renderer ) {
-        return bitmask;
-      }
-    }
-
-    throw new Error( 'pushOrderBitmask overflow' );
-  };
-
-  Renderer.createSelfDrawable = function( instance, node, selfRenderer ) {
-    if ( Renderer.isCanvas( selfRenderer ) ) {
-      return node.createCanvasDrawable( selfRenderer, instance );
-    }
-    else if ( Renderer.isSVG( selfRenderer ) ) {
-      return node.createSVGDrawable( selfRenderer, instance );
-    }
-    else if ( Renderer.isDOM( selfRenderer ) ) {
-      return node.createDOMDrawable( selfRenderer, instance );
-    }
-    else if ( Renderer.isWebGL( selfRenderer ) ) {
-      return node.createWebGLDrawable( selfRenderer, instance );
-    }
-    else if ( Renderer.isPixi( selfRenderer ) ) {
-      return node.createPixiDrawable( selfRenderer, instance );
-    }
-    else {
-      throw new Error( 'Unrecognized renderer: ' + selfRenderer );
-    }
-  };
-
-
-  /*---------------------------------------------------------------------------*
-   * Fit strategies
-   *----------------------------------------------------------------------------*/
-
-  // TODO: fill out fit strategies, determine parameters
-  Renderer.fitStrategies = {};
-  Renderer.fitStrategies.bitmaskFitFullScene = function() {};
-  Renderer.fitStrategies.bitmaskFitLoose = function() {};
-  Renderer.fitStrategies.bitmaskFitTight = function() {};
-  Renderer.fitStrategies.bitmaskFitHybrid = function() {};
-
-
-  /*---------------------------------------------------------------------------*
-   * SVG quality settings
-   *----------------------------------------------------------------------------*/
-
-  // SVG qualities for text-rendering, shape-rendering, image-rendering
-  Renderer.svgOptimizations = {};
-  Renderer.svgOptimizations.bitmaskSVGOptimizeAuto = {
-    text: 'auto',
-    shape: 'auto',
-    image: 'auto'
-  };
-  Renderer.svgOptimizations.bitmaskSVGOptimizeSpeed = {
-    text: 'optimizeSpeed',
-    shape: 'optimizeSpeed',
-    image: 'optimizeSpeed'
-  };
-  Renderer.svgOptimizations.bitmaskSVGOptimizeQuality = {
-    text: 'geometricPrecision',
-    shape: 'optimizeQuality',
-    image: 'optimizeQuality'
-  };
-  Renderer.svgOptimizations.bitmaskSVGOptimizeCrisp = {
-    text: 'optimizeLegibility',
-    shape: 'crispEdges',
-    image: 'optimizeQuality'
-  };
-
-  return Renderer;
-} );
-
-// Copyright 2002-2014, University of Colorado Boulder
-
-/**
- * A color with RGBA values, assuming the sRGB color space is used.
- *
- * See http://www.w3.org/TR/css3-color/
- *
- * TODO: make a getHue, getSaturation, getLightness. we can then expose them via ES5!
- *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
- */
-
-define( 'SCENERY/util/Color',['require','PHET_CORE/inherit','SCENERY/scenery','DOT/Util','DOT/Util'],function( require ) {
-  
-
-  var inherit = require( 'PHET_CORE/inherit' );
-  var scenery = require( 'SCENERY/scenery' );
-
-  var clamp = require( 'DOT/Util' ).clamp;
-  var linear = require( 'DOT/Util' ).linear;
-
-  /**
-   * Creates a Color with an initial value. Multiple different types of parameters are supported:
-   * - new Color( color ) is a copy constructor, for a {Color}
-   * - new Color( string ) will parse the string assuming it's a CSS-compatible color, e.g. set( 'red' )
-   * - new Color( r, g, b ) is equivalent to setRGBA( r, g, b, 1 ), e.g. set( 255, 0, 128 )
-   * - new Color( r, g, b, a ) is equivalent to setRGBA( r, g, b, a ), e.g. set( 255, 0, 128, 0.5 )
-   * - new Color( hex ) will set RGB with alpha=1, e.g. set( 0xFF0000 )
-   * - new Color( hex, a ) will set RGBA, e.g. set( 0xFF0000, 1 )
-   *
-   * The 'r', 'g', and 'b' values stand for red, green and blue respectively, and will be clamped to integers in 0-255.
-   * The 'a' value stands for alpha, and will be clamped to 0-1 (floating point)
-   * 'hex' indicates a 6-decimal-digit format hex number, for example 0xFFAA00 is equivalent to r=255, g=170, b=0.
-   */
-  scenery.Color = function Color( r, g, b, a ) {
-
-    // allow listeners to be notified on any changes. called with listener()
-    this.listeners = [];
-
-    this.set( r, g, b, a );
-
-    phetAllocation && phetAllocation( 'Color' );
-  };
-  var Color = scenery.Color;
-
-  // regex utilities
-  var rgbNumber = '(-?\\d{1,3}%?)'; // syntax allows negative integers and percentages
-  var aNumber = '(\\d+|\\d*\\.\\d+)'; // decimal point number. technically we allow for '255', even though this will be clamped to 1.
-  var rawNumber = '(\\d{1,3})'; // a 1-3 digit number
-
-  // handles negative and percentage values
-  function parseRGBNumber( str ) {
-    var multiplier = 1;
-
-    // if it's a percentage, strip it off and handle it that way
-    if ( str.charAt( str.length - 1 ) === '%' ) {
-      multiplier = 2.55;
-      str = str.slice( 0, str.length - 1 );
-    }
-
-    return Math.round( parseInt( str, 10 ) * multiplier );
-  }
-
-  Color.formatParsers = [
-    {
-      // 'transparent'
-      regexp: /^transparent$/,
-      apply: function( color, matches ) {
-        color.setRGBA( 0, 0, 0, 0 );
-      }
-    },
-    {
-      // short hex form, a la '#fff'
-      regexp: /^#(\w{1})(\w{1})(\w{1})$/,
-      apply: function( color, matches ) {
-        color.setRGBA(
-          parseInt( matches[ 1 ] + matches[ 1 ], 16 ),
-          parseInt( matches[ 2 ] + matches[ 2 ], 16 ),
-          parseInt( matches[ 3 ] + matches[ 3 ], 16 ),
-          1 );
-      }
-    },
-    {
-      // long hex form, a la '#ffffff'
-      regexp: /^#(\w{2})(\w{2})(\w{2})$/,
-      apply: function( color, matches ) {
-        color.setRGBA(
-          parseInt( matches[ 1 ], 16 ),
-          parseInt( matches[ 2 ], 16 ),
-          parseInt( matches[ 3 ], 16 ),
-          1 );
-      }
-    },
-    {
-      // rgb(...)
-      regexp: new RegExp( '^rgb\\(' + rgbNumber + ',' + rgbNumber + ',' + rgbNumber + '\\)$' ),
-      apply: function( color, matches ) {
-        color.setRGBA(
-          parseRGBNumber( matches[ 1 ] ),
-          parseRGBNumber( matches[ 2 ] ),
-          parseRGBNumber( matches[ 3 ] ),
-          1 );
-      }
-    },
-    {
-      // rgba(...)
-      regexp: new RegExp( '^rgba\\(' + rgbNumber + ',' + rgbNumber + ',' + rgbNumber + ',' + aNumber + '\\)$' ),
-      apply: function( color, matches ) {
-        color.setRGBA(
-          parseRGBNumber( matches[ 1 ] ),
-          parseRGBNumber( matches[ 2 ] ),
-          parseRGBNumber( matches[ 3 ] ),
-          parseFloat( matches[ 4 ] ) );
-      }
-    },
-    {
-      // hsl(...)
-      regexp: new RegExp( '^hsl\\(' + rawNumber + ',' + rawNumber + '%,' + rawNumber + '%\\)$' ),
-      apply: function( color, matches ) {
-        color.setHSLA(
-          parseInt( matches[ 1 ], 10 ),
-          parseInt( matches[ 2 ], 10 ),
-          parseInt( matches[ 3 ], 10 ),
-          1 );
-      }
-    },
-    {
-      // hsla(...)
-      regexp: new RegExp( '^hsla\\(' + rawNumber + ',' + rawNumber + '%,' + rawNumber + '%,' + aNumber + '\\)$' ),
-      apply: function( color, matches ) {
-        color.setHSLA(
-          parseInt( matches[ 1 ], 10 ),
-          parseInt( matches[ 2 ], 10 ),
-          parseInt( matches[ 3 ], 10 ),
-          parseFloat( matches[ 4 ] ) );
-      }
-    }
-  ];
-
-  // see http://www.w3.org/TR/css3-color/
-  Color.hueToRGB = function( m1, m2, h ) {
-    if ( h < 0 ) {
-      h = h + 1;
-    }
-    if ( h > 1 ) {
-      h = h - 1;
-    }
-    if ( h * 6 < 1 ) {
-      return m1 + ( m2 - m1 ) * h * 6;
-    }
-    if ( h * 2 < 1 ) {
-      return m2;
-    }
-    if ( h * 3 < 2 ) {
-      return m1 + ( m2 - m1 ) * ( 2 / 3 - h ) * 6;
-    }
-    return m1;
-  };
-
-  /**
-   * Convenience function that converts a color spec to a color object if
-   * necessary, or simply returns the color object if not.
-   * @param {String|Color} colorSpec
-   */
-  Color.toColor = function( colorSpec ) {
-    return colorSpec instanceof Color ? colorSpec : new Color( colorSpec );
-  };
-
-  inherit( Object, Color, {
-    copy: function() {
-      return new Color( this.r, this.g, this.b, this.a );
-    },
-
-    /**
-     * Sets the values of this Color. Supported styles:
-     * - set( color ) is a copy constructor
-     * - set( string ) will parse the string assuming it's a CSS-compatible color, e.g. set( 'red' )
-     * - set( r, g, b ) is equivalent to setRGBA( r, g, b, 1 ), e.g. set( 255, 0, 128 )
-     * - set( r, g, b, a ) is equivalent to setRGBA( r, g, b, a ), e.g. set( 255, 0, 128, 0.5 )
-     * - set( hex ) will set RGB with alpha=1, e.g. set( 0xFF0000 )
-     * - set( hex, alpha ) will set RGBA, e.g. set( 0xFF0000, 1 )
-     */
-    set: function( r, g, b, a ) {
-      assert && assert( r !== undefined, 'Can\'t call Color.set( undefined )' );
-
-      // support for set( string )
-      if ( typeof r === 'string' ) {
-        this.setCSS( r );
-      }
-      // support for set( color )
-      else if ( r instanceof Color ) {
-        this.setRGBA( r.r, r.g, r.b, r.a );
-      }
-      // support for set( hex ) and set( hex, alpha )
-      else if ( b === undefined ) {
-        assert && assert( typeof r === 'number' );
-        assert && assert( g === undefined || typeof g === 'number' );
-
-        var red = ( r >> 16 ) & 0xFF;
-        var green = ( r >> 8 ) & 0xFF;
-        var blue = ( r >> 0 ) & 0xFF;
-        var alpha = ( g === undefined ) ? 1 : g;
-        this.setRGBA( red, green, blue, alpha );
-      }
-      // support for set( r, g, b ) and set( r, g, b, a )
-      else {
-        assert && assert( typeof r === 'number' );
-        assert && assert( typeof g === 'number' );
-        assert && assert( typeof b === 'number' );
-        assert && assert( a === undefined || typeof a === 'number' );
-        this.setRGBA( r, g, b, ( a === undefined ) ? 1 : a );
-      }
-    },
-
-    // red, integral 0-255
-    getRed: function() { return this.r; },
-    setRed: function( value ) { return this.setRGBA( value, this.g, this.b, this.a ); },
-    get red() { return this.getRed(); },
-    set red( value ) { return this.setRed( value ); },
-
-    // green, integral 0-255
-    getGreen: function() { return this.g; },
-    setGreen: function( value ) { return this.setRGBA( this.r, value, this.b, this.a ); },
-    get green() { return this.getGreen(); },
-    set green( value ) { return this.setGreen( value ); },
-
-    // blue, integral 0-255
-    getBlue: function() { return this.b; },
-    setBlue: function( value ) { return this.setRGBA( this.r, this.g, value, this.a ); },
-    get blue() { return this.getBlue(); },
-    set blue( value ) { return this.setBlue( value ); },
-
-    // alpha, floating 0-1
-    getAlpha: function() { return this.a; },
-    setAlpha: function( value ) { return this.setRGBA( this.r, this.g, this.b, value ); },
-    get alpha() { return this.getAlpha(); },
-    set alpha( value ) { return this.setAlpha( value ); },
-
-    // RGB integral between 0-255, alpha (float) between 0-1
-    setRGBA: function( red, green, blue, alpha ) {
-      this.r = Math.round( clamp( red, 0, 255 ) );
-      this.g = Math.round( clamp( green, 0, 255 ) );
-      this.b = Math.round( clamp( blue, 0, 255 ) );
-      this.a = clamp( alpha, 0, 1 );
-
-      this.updateColor(); // update the cached value
-
-      return this; // allow chaining
-    },
-
-    computeCSS: function() {
-      if ( this.a === 1 ) {
-        return 'rgb(' + this.r + ',' + this.g + ',' + this.b + ')';
-      }
-      else {
-        // toFixed prevents scientific notation, but we need to strip off the trailing zeros
-        var alpha = this.a.toFixed( 20 );
-        while ( alpha.length >= 2 && alpha[alpha.length - 1] === '0' && alpha[alpha.length - 2] !== '.' ) {
-          alpha = alpha.slice( 0, alpha.length - 1 );
-        }
-
-        var alphaString = this.a === 0 || this.a === 1 ? this.a : alpha;
-        return 'rgba(' + this.r + ',' + this.g + ',' + this.b + ',' + alphaString + ')';
-      }
-    },
-
-    toCSS: function() {
-      // verify that the cached value is correct (in debugging builds only, defeats the point of caching otherwise)
-      assert && assert( this._css === this.computeCSS(), 'CSS cached value is ' + this._css + ', but the computed value appears to be ' + this.computeCSS() );
-
-      return this._css;
-    },
-
-    setCSS: function( cssString ) {
-      var str = cssString.replace( / /g, '' ).toLowerCase();
-      var success = false;
-
-      // replace colors based on keywords
-      var keywordMatch = Color.colorKeywords[ str ];
-      if ( keywordMatch ) {
-        str = '#' + keywordMatch;
-      }
-
-      // run through the available text formats
-      for ( var i = 0; i < Color.formatParsers.length; i++ ) {
-        var parser = Color.formatParsers[ i ];
-
-        var matches = parser.regexp.exec( str );
-        if ( matches ) {
-          parser.apply( this, matches );
-          success = true;
-          break;
-        }
-      }
-
-      if ( !success ) {
-        throw new Error( 'scenery.Color unable to parse color string: ' + cssString );
-      }
-
-      this.updateColor(); // update the cached value
-    },
-
-    // e.g. 0xFF00FF
-    toNumber: function() {
-      return ( this.r << 16 ) + ( this.g << 8 ) + this.b;
-    },
-
-    // called to update the interally cached CSS value
-    updateColor: function() {
-      assert && assert( !this.immutable, 'Cannot modify an immutable color' );
-
-      var oldCSS = this._css;
-      this._css = this.computeCSS();
-
-      // notify listeners if it changed
-      if ( oldCSS !== this._css && this.listeners.length ) {
-        var listeners = this.listeners.slice( 0 ); // defensive copy. consider removing if it's a performance bottleneck?
-        var length = listeners.length;
-
-        for ( var i = 0; i < length; i++ ) {
-          listeners[ i ]();
-        }
-      }
-    },
-
-    // allow setting this Color to be immutable when assertions are disabled. any change will throw an error
-    setImmutable: function() {
-      if ( assert ) {
-        this.immutable = true;
-      }
-
-      return this; // allow chaining
-    },
-
-    // to what value a Canvas's context.fillStyle should be set
-    getCanvasStyle: function() {
-      return this.toCSS(); // should be inlined, leave like this for future maintainability
-    },
-
-    // TODO: make a getHue, getSaturation, getLightness. we can then expose them via ES5!
-    setHSLA: function( hue, saturation, lightness, alpha ) {
-      hue = ( hue % 360 ) / 360;                    // integer modulo 360
-      saturation = clamp( saturation / 100, 0, 1 ); // percentage
-      lightness = clamp( lightness / 100, 0, 1 );   // percentage
-
-      // see http://www.w3.org/TR/css3-color/
-      var m1, m2;
-      if ( lightness < 0.5 ) {
-        m2 = lightness * ( saturation + 1 );
-      }
-      else {
-        m2 = lightness + saturation - lightness * saturation;
-      }
-      m1 = lightness * 2 - m2;
-
-      this.r = Math.round( Color.hueToRGB( m1, m2, hue + 1 / 3 ) * 255 );
-      this.g = Math.round( Color.hueToRGB( m1, m2, hue ) * 255 );
-      this.b = Math.round( Color.hueToRGB( m1, m2, hue - 1 / 3 ) * 255 );
-      this.a = clamp( alpha, 0, 1 );
-
-      this.updateColor(); // update the cached value
-
-      return this; // allow chaining
-    },
-
-    equals: function( color ) {
-      return this.r === color.r && this.g === color.g && this.b === color.b && this.a === color.a;
-    },
-
-    withAlpha: function( alpha ) {
-      return new Color( this.r, this.g, this.b, alpha );
-    },
-
-    checkFactor: function( factor ) {
-      if ( factor < 0 || factor > 1 ) {
-        throw new Error( 'factor must be between 0 and 1: ' + factor );
-      }
-      return ( factor === undefined ) ? 0.7 : factor;
-    },
-
-    // matches Java's Color.brighter()
-    brighterColor: function( factor ) {
-      factor = this.checkFactor( factor );
-      var red = Math.min( 255, Math.floor( this.r / factor ) );
-      var green = Math.min( 255, Math.floor( this.g / factor ) );
-      var blue = Math.min( 255, Math.floor( this.b / factor ) );
-      return new Color( red, green, blue, this.a );
-    },
-
-    /**
-     * Brightens a color in RGB space. Useful when creating gradients from a
-     * single base color.
-     *
-     * @param color
-     * @param factor 0 (no change) to 1 (white)
-     * @return lighter (closer to white) version of the original color.
-     */
-    colorUtilsBrighter: function( factor ) {
-      factor = this.checkFactor( factor );
-      var red = Math.min( 255, this.getRed() + Math.floor( factor * ( 255 - this.getRed() ) ) );
-      var green = Math.min( 255, this.getGreen() + Math.floor( factor * ( 255 - this.getGreen() ) ) );
-      var blue = Math.min( 255, this.getBlue() + Math.floor( factor * ( 255 - this.getBlue() ) ) );
-      return new Color( red, green, blue, this.getAlpha() );
-    },
-
-    // matches Java's Color.darker()
-    darkerColor: function( factor ) {
-      factor = this.checkFactor( factor );
-      var red = Math.max( 0, Math.floor( factor * this.r ) );
-      var green = Math.max( 0, Math.floor( factor * this.g ) );
-      var blue = Math.max( 0, Math.floor( factor * this.b ) );
-      return new Color( red, green, blue, this.a );
-    },
-
-    /**
-     * Darken a color in RGB space. Useful when creating gradients from a single
-     * base color.
-     *
-     * @param color  the original color
-     * @param factor 0 (no change) to 1 (black)
-     * @return darker (closer to black) version of the original color.
-     */
-    colorUtilsDarker: function( factor ) {
-      factor = this.checkFactor( factor );
-      var red = Math.max( 0, this.getRed() - Math.floor( factor * this.getRed() ) );
-      var green = Math.max( 0, this.getGreen() - Math.floor( factor * this.getGreen() ) );
-      var blue = Math.max( 0, this.getBlue() - Math.floor( factor * this.getBlue() ) );
-      return new Color( red, green, blue, this.getAlpha() );
-    },
-
-    /*
-     * Like colorUtilsBrighter/Darker, however factor should be in the range -1 to 1, and it will call:
-     *   colorUtilsBrighter( factor )   for factor >  0
-     *   this                           for factor == 0
-     *   colorUtilsDarker( -factor )    for factor <  0
-     * Thus:
-     * @param factor from -1 (black), to 0 (no change), to 1 (white)
-     */
-    colorUtilsBrightness: function( factor ) {
-      if ( factor === 0 ) {
-        return this;
-      }
-      else if ( factor > 0 ) {
-        return this.colorUtilsBrighter( factor );
-      }
-      else {
-        return this.colorUtilsDarker( -factor );
-      }
-    },
-
-    /*---------------------------------------------------------------------------*
-     * listeners TODO: consider mixing in this behavior, it's common
-     *----------------------------------------------------------------------------*/
-
-    // listener should be a callback expecting no arguments, listener() will be called when the color changes
-    addChangeListener: function( listener ) {
-      assert && assert( listener !== undefined && listener !== null, 'Verify that the listener exists' );
-      assert && assert( !_.contains( this.listeners, listener ) );
-      this.listeners.push( listener );
-    },
-
-    removeChangeListener: function( listener ) {
-      assert && assert( _.contains( this.listeners, listener ) );
-      this.listeners.splice( _.indexOf( this.listeners, listener ), 1 );
-    },
-
-    toString: function() {
-      return this.constructor.name + "[r:" + this.r + " g:" + this.g + " b:" + this.b + " a:" + this.a + "]";
-    }
-  } );
-
-  Color.basicColorKeywords = {
-    aqua: '00ffff',
-    black: '000000',
-    blue: '0000ff',
-    fuchsia: 'ff00ff',
-    gray: '808080',
-    green: '008000',
-    lime: '00ff00',
-    maroon: '800000',
-    navy: '000080',
-    olive: '808000',
-    purple: '800080',
-    red: 'ff0000',
-    silver: 'c0c0c0',
-    teal: '008080',
-    white: 'ffffff',
-    yellow: 'ffff00'
-  };
-
-  Color.colorKeywords = {
-    aliceblue: 'f0f8ff',
-    antiquewhite: 'faebd7',
-    aqua: '00ffff',
-    aquamarine: '7fffd4',
-    azure: 'f0ffff',
-    beige: 'f5f5dc',
-    bisque: 'ffe4c4',
-    black: '000000',
-    blanchedalmond: 'ffebcd',
-    blue: '0000ff',
-    blueviolet: '8a2be2',
-    brown: 'a52a2a',
-    burlywood: 'deb887',
-    cadetblue: '5f9ea0',
-    chartreuse: '7fff00',
-    chocolate: 'd2691e',
-    coral: 'ff7f50',
-    cornflowerblue: '6495ed',
-    cornsilk: 'fff8dc',
-    crimson: 'dc143c',
-    cyan: '00ffff',
-    darkblue: '00008b',
-    darkcyan: '008b8b',
-    darkgoldenrod: 'b8860b',
-    darkgray: 'a9a9a9',
-    darkgreen: '006400',
-    darkgrey: 'a9a9a9',
-    darkkhaki: 'bdb76b',
-    darkmagenta: '8b008b',
-    darkolivegreen: '556b2f',
-    darkorange: 'ff8c00',
-    darkorchid: '9932cc',
-    darkred: '8b0000',
-    darksalmon: 'e9967a',
-    darkseagreen: '8fbc8f',
-    darkslateblue: '483d8b',
-    darkslategray: '2f4f4f',
-    darkslategrey: '2f4f4f',
-    darkturquoise: '00ced1',
-    darkviolet: '9400d3',
-    deeppink: 'ff1493',
-    deepskyblue: '00bfff',
-    dimgray: '696969',
-    dimgrey: '696969',
-    dodgerblue: '1e90ff',
-    firebrick: 'b22222',
-    floralwhite: 'fffaf0',
-    forestgreen: '228b22',
-    fuchsia: 'ff00ff',
-    gainsboro: 'dcdcdc',
-    ghostwhite: 'f8f8ff',
-    gold: 'ffd700',
-    goldenrod: 'daa520',
-    gray: '808080',
-    green: '008000',
-    greenyellow: 'adff2f',
-    grey: '808080',
-    honeydew: 'f0fff0',
-    hotpink: 'ff69b4',
-    indianred: 'cd5c5c',
-    indigo: '4b0082',
-    ivory: 'fffff0',
-    khaki: 'f0e68c',
-    lavender: 'e6e6fa',
-    lavenderblush: 'fff0f5',
-    lawngreen: '7cfc00',
-    lemonchiffon: 'fffacd',
-    lightblue: 'add8e6',
-    lightcoral: 'f08080',
-    lightcyan: 'e0ffff',
-    lightgoldenrodyellow: 'fafad2',
-    lightgray: 'd3d3d3',
-    lightgreen: '90ee90',
-    lightgrey: 'd3d3d3',
-    lightpink: 'ffb6c1',
-    lightsalmon: 'ffa07a',
-    lightseagreen: '20b2aa',
-    lightskyblue: '87cefa',
-    lightslategray: '778899',
-    lightslategrey: '778899',
-    lightsteelblue: 'b0c4de',
-    lightyellow: 'ffffe0',
-    lime: '00ff00',
-    limegreen: '32cd32',
-    linen: 'faf0e6',
-    magenta: 'ff00ff',
-    maroon: '800000',
-    mediumaquamarine: '66cdaa',
-    mediumblue: '0000cd',
-    mediumorchid: 'ba55d3',
-    mediumpurple: '9370db',
-    mediumseagreen: '3cb371',
-    mediumslateblue: '7b68ee',
-    mediumspringgreen: '00fa9a',
-    mediumturquoise: '48d1cc',
-    mediumvioletred: 'c71585',
-    midnightblue: '191970',
-    mintcream: 'f5fffa',
-    mistyrose: 'ffe4e1',
-    moccasin: 'ffe4b5',
-    navajowhite: 'ffdead',
-    navy: '000080',
-    oldlace: 'fdf5e6',
-    olive: '808000',
-    olivedrab: '6b8e23',
-    orange: 'ffa500',
-    orangered: 'ff4500',
-    orchid: 'da70d6',
-    palegoldenrod: 'eee8aa',
-    palegreen: '98fb98',
-    paleturquoise: 'afeeee',
-    palevioletred: 'db7093',
-    papayawhip: 'ffefd5',
-    peachpuff: 'ffdab9',
-    peru: 'cd853f',
-    pink: 'ffc0cb',
-    plum: 'dda0dd',
-    powderblue: 'b0e0e6',
-    purple: '800080',
-    red: 'ff0000',
-    rosybrown: 'bc8f8f',
-    royalblue: '4169e1',
-    saddlebrown: '8b4513',
-    salmon: 'fa8072',
-    sandybrown: 'f4a460',
-    seagreen: '2e8b57',
-    seashell: 'fff5ee',
-    sienna: 'a0522d',
-    silver: 'c0c0c0',
-    skyblue: '87ceeb',
-    slateblue: '6a5acd',
-    slategray: '708090',
-    slategrey: '708090',
-    snow: 'fffafa',
-    springgreen: '00ff7f',
-    steelblue: '4682b4',
-    tan: 'd2b48c',
-    teal: '008080',
-    thistle: 'd8bfd8',
-    tomato: 'ff6347',
-    turquoise: '40e0d0',
-    violet: 'ee82ee',
-    wheat: 'f5deb3',
-    white: 'ffffff',
-    whitesmoke: 'f5f5f5',
-    yellow: 'ffff00',
-    yellowgreen: '9acd32'
-  };
-
-  // Java compatibility
-  Color.BLACK = Color.black = new Color( 0, 0, 0 ).setImmutable();
-  Color.BLUE = Color.blue = new Color( 0, 0, 255 ).setImmutable();
-  Color.CYAN = Color.cyan = new Color( 0, 255, 255 ).setImmutable();
-  Color.DARK_GRAY = Color.darkGray = new Color( 64, 64, 64 ).setImmutable();
-  Color.GRAY = Color.gray = new Color( 128, 128, 128 ).setImmutable();
-  Color.GREEN = Color.green = new Color( 0, 255, 0 ).setImmutable();
-  Color.LIGHT_GRAY = Color.lightGray = new Color( 192, 192, 192 ).setImmutable();
-  Color.MAGENTA = Color.magenta = new Color( 255, 0, 255 ).setImmutable();
-  Color.ORANGE = Color.orange = new Color( 255, 200, 0 ).setImmutable();
-  Color.PINK = Color.pink = new Color( 255, 175, 175 ).setImmutable();
-  Color.RED = Color.red = new Color( 255, 0, 0 ).setImmutable();
-  Color.WHITE = Color.white = new Color( 255, 255, 255 ).setImmutable();
-  Color.YELLOW = Color.yellow = new Color( 255, 255, 0 ).setImmutable();
-
-  /**
-   * Interpolates between 2 colors in RGBA space. When distance is 0, color1
-   * is returned. When distance is 1, color2 is returned. Other values of
-   * distance return a color somewhere between color1 and color2. Each color
-   * component is interpolated separately.
-   *
-   * @param {Color} color1
-   * @param {Color} color2
-   * @param {Number} distance distance between color1 and color2, 0 <= distance <= 1
-   * @return {Color}
-   */
-  Color.interpolateRGBA = function( color1, color2, distance ) {
-    if ( distance < 0 || distance > 1 ) {
-      throw new Error( 'distance must be between 0 and 1: ' + distance );
-    }
-    var r = Math.floor( linear( 0, 1, color1.r, color2.r, distance ) );
-    var g = Math.floor( linear( 0, 1, color1.g, color2.g, distance ) );
-    var b = Math.floor( linear( 0, 1, color1.b, color2.b, distance ) );
-    var a = linear( 0, 1, color1.a, color2.a, distance );
-    return new Color( r, g, b, a );
-  };
-
-  return Color;
-} );
-
-// Copyright 2002-2014, University of Colorado Boulder
-
-/**
- * Code for testing which platform is running.  Use sparingly, if at all!
- *
- * Sample usage:
- * if (platform.firefox) {node.renderer = 'canvas';}
- *
- * @author Sam Reid
- */
-define( 'PHET_CORE/platform',['require','PHET_CORE/core'],function( require ) {
-  
-
-  var core = require( 'PHET_CORE/core' );
-
-  var ua = navigator.userAgent;
-
-  // taken from HomeScreen
-  function isIE( version ) {
-    return getInternetExplorerVersion() === version;
-  }
-
-  //IE11 no longer reports MSIE in the user agent string, see https://github.com/phetsims/phet-core/issues/12
-  //This code is adapted from http://stackoverflow.com/questions/17907445/how-to-detect-ie11
-  function getInternetExplorerVersion() {
-    var rv = -1;
-    var re = null;
-    if ( navigator.appName === 'Microsoft Internet Explorer' ) {
-      re = new RegExp( 'MSIE ([0-9]{1,}[.0-9]{0,})' );
-      if ( re.exec( ua ) !== null ) {
-        rv = parseFloat( RegExp.$1 );
-      }
-    }
-    else if ( navigator.appName === 'Netscape' ) {
-      re = new RegExp( 'Trident/.*rv:([0-9]{1,}[.0-9]{0,})' );
-      if ( re.exec( ua ) !== null ) {
-        rv = parseFloat( RegExp.$1 );
-      }
-    }
-    return rv;
-  }
-
-  core.platform = {
-    get firefox() { return ua.toLowerCase().indexOf( 'firefox' ) > -1; },
-
-    //see http://stackoverflow.com/questions/3007480/determine-if-user-navigated-from-mobile-safari
-    get mobileSafari() { return ua.match( /(iPod|iPhone|iPad)/ ) && ua.match( /AppleWebKit/ ); },
-    get safari5() { return ua.match( /Version\/5\./ ) && ua.match( /Safari\// ) && ua.match( /AppleWebKit/ ); },
-    get safari6() { return ua.match( /Version\/6\./ ) && ua.match( /Safari\// ) && ua.match( /AppleWebKit/ ); },
-    get safari7() { return ua.match( /Version\/7\./ ) && ua.match( /Safari\// ) && ua.match( /AppleWebKit/ ); },
-
-    get ie9() { return isIE( 9 ); },
-    get ie10() { return isIE( 10 ); },
-    get ie11() { return isIE( 11 ); },
-    get ie() { return getInternetExplorerVersion() !== -1; },
-
-    // from HomeScreen
-    get android() { return ua.indexOf( 'Android' ) > 0; },
-
-    get chromium() { return (/chrom(e|ium)/).test( ua.toLowerCase() ); }
-  };
-
-  return core.platform;
-} );
-// Copyright 2002-2014, University of Colorado Boulder
-
-/**
- * Removes a single (the first) matching object from an Array.
- *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
- */
-
-define( 'PHET_CORE/arrayRemove',['require','PHET_CORE/core'],function( require ) {
-  
-
-  var core = require( 'PHET_CORE/core' );
-
-  /*
-   * @param {Array} arr
-   * @param {*} item - The item to remove from the array
-   */
-  core.arrayRemove = function arrayRemove( arr, item ) {
-    assert && assert( arr instanceof Array, 'arrayRemove either takes an Array' );
-
-    var index = _.indexOf( arr, item );
-    assert && assert( index >= 0, 'item not found in Array' );
-
-    arr.splice( index, 1 );
-  };
-
-  return core.arrayRemove;
-} );
-// Copyright 2002-2014, University of Colorado Boulder
-
-/**
- * Mix-in for nodes that support a standard fill and/or stroke.
- *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
- */
-
-define( 'SCENERY/nodes/Paintable',['require','SCENERY/scenery','SCENERY/util/Color','KITE/util/LineStyles','PHET_CORE/inherit','PHET_CORE/extend','PHET_CORE/platform','PHET_CORE/arrayRemove'],function( require ) {
-  
-
-  var scenery = require( 'SCENERY/scenery' );
-  var Color = require( 'SCENERY/util/Color' );
-  var LineStyles = require( 'KITE/util/LineStyles' );
-
-  var inherit = require( 'PHET_CORE/inherit' );
-  var extend = require( 'PHET_CORE/extend' );
-  var platform = require( 'PHET_CORE/platform' );
-  var arrayRemove = require( 'PHET_CORE/arrayRemove' );
-
-  var isSafari5 = platform.safari5;
-  var isIE9 = platform.ie9;
-
-  /*
-   * Applies the mix-in to a subtype of Node.
-   *
-   * @param {constructor} type - A constructor that inherits from Node
-   */
-  scenery.Paintable = {
-    mixin: function( type ) {
-      var proto = type.prototype;
-
-      extend( proto, {
-        // this should be called in the constructor to initialize
-        initializePaintable: function() {
-          this._fill = null;
-          this._fillPickable = true;
-
-          this._stroke = null;
-          this._strokePickable = false;
-
-          this._cachedPaints = [];
-          this._lineDrawingStyles = new LineStyles();
-
-          this._fillColor = null;
-          this._fillColorDirty = true;
-          this._strokeColor = null;
-          this._strokeColorDirty = true;
-
-          var that = this;
-          this._fillListener = function() {
-            that.invalidateFill();
-          };
-          this._strokeListener = function() {
-            that.invalidateStroke();
-          };
-        },
-
-        hasFill: function() {
-          return this._fill !== null;
-        },
-
-        getFill: function() {
-          return this._fill;
-        },
-
-        validateFillColor: function() {
-          if ( this._fillColorDirty ) {
-            this._fillColorDirty = false;
-
-            if ( typeof this._fill === 'string' || this._fill instanceof Color ) {
-              if ( this._fillColor ) {
-                this._fillColor.set( this._fill );
-              }
-              // lazily create a Color when necessary, instead of pre-allocating
-              else {
-                this._fillColor = new Color( this._fill );
-              }
-            }
-          }
-        },
-
-        /**
-         * If the current fill is a solid color (string or scenery.Color), getFillColor() will return a scenery.Color
-         * reference. This reference should be considered immutable (should not be modified)
-         *
-         * @returns {Color | null} [read-only]
-         */
-        getFillColor: function() {
-          this.validateFillColor();
-
-          // types of fills where we can return a single color
-          if ( typeof this._fill === 'string' || this._fill instanceof Color ) {
-            return this._fillColor;
-          }
-          // no fill, or a pattern/gradient (we can't return a single fill)
-          else {
-            return null;
-          }
-        },
-
-        setFill: function( fill ) {
-          if ( this._fill !== fill ) {
-            this._fillColorDirty = true;
-
-            //OHTWO TODO: we probably shouldn't be checking this here?
-            var hasInstances = this._instances.length > 0;
-
-            if ( hasInstances && this._fill && this._fill.removeChangeListener ) {
-              this._fill.removeChangeListener( this._fillListener );
-            }
-
-            this._fill = fill;
-
-            if ( hasInstances && this._fill && this._fill.addChangeListener ) {
-              this._fill.addChangeListener( this._fillListener );
-            }
-
-            this.invalidateFill();
-
-            var stateLen = this._drawables.length;
-            for ( var i = 0; i < stateLen; i++ ) {
-              this._drawables[ i ].markDirtyFill();
-            }
-          }
-          return this;
-        },
-
-        isFillPickable: function() {
-          return this._fillPickable;
-        },
-
-        setFillPickable: function( pickable ) {
-          assert && assert( typeof pickable === 'boolean' );
-          if ( this._fillPickable !== pickable ) {
-            this._fillPickable = pickable;
-
-            // TODO: better way of indicating that only the node under pointers could have changed, but no paint change is needed?
-            this.invalidateFill();
-          }
-          return this;
-        },
-
-        hasStroke: function() {
-          return this._stroke !== null;
-        },
-
-        // TODO: setting these properties looks like a good candidate for refactoring to lessen file size
-        getLineWidth: function() {
-          return this._lineDrawingStyles.lineWidth;
-        },
-
-        setLineWidth: function( lineWidth ) {
-          assert && assert( typeof lineWidth === 'number', 'lineWidth should be a number, not ' + lineWidth );
-
-          if ( this.getLineWidth() !== lineWidth ) {
-            this._lineDrawingStyles.lineWidth = lineWidth;
-            this.invalidateStroke();
-
-            var stateLen = this._drawables.length;
-            for ( var i = 0; i < stateLen; i++ ) {
-              this._drawables[ i ].markDirtyLineWidth();
-            }
-          }
-          return this;
-        },
-
-        getLineCap: function() {
-          return this._lineDrawingStyles.lineCap;
-        },
-
-        setLineCap: function( lineCap ) {
-          assert && assert( lineCap === 'butt' || lineCap === 'round' || lineCap === 'square',
-            'lineCap should be one of "butt", "round" or "square", not ' + lineCap );
-
-          if ( this._lineDrawingStyles.lineCap !== lineCap ) {
-            this._lineDrawingStyles.lineCap = lineCap;
-            this.invalidateStroke();
-
-            var stateLen = this._drawables.length;
-            for ( var i = 0; i < stateLen; i++ ) {
-              this._drawables[ i ].markDirtyLineOptions();
-            }
-          }
-          return this;
-        },
-
-        getLineJoin: function() {
-          return this._lineDrawingStyles.lineJoin;
-        },
-
-        setLineJoin: function( lineJoin ) {
-          assert && assert( lineJoin === 'miter' || lineJoin === 'round' || lineJoin === 'bevel',
-            'lineJoin should be one of "miter", "round" or "bevel", not ' + lineJoin );
-
-          if ( this._lineDrawingStyles.lineJoin !== lineJoin ) {
-            this._lineDrawingStyles.lineJoin = lineJoin;
-            this.invalidateStroke();
-
-            var stateLen = this._drawables.length;
-            for ( var i = 0; i < stateLen; i++ ) {
-              this._drawables[ i ].markDirtyLineOptions();
-            }
-          }
-          return this;
-        },
-
-        getMiterLimit: function() {
-          return this._lineDrawingStyles.miterLimit;
-        },
-
-        setMiterLimit: function( miterLimit ) {
-          assert && assert( typeof miterLimit === 'number' );
-
-          if ( this._lineDrawingStyles.miterLimit !== miterLimit ) {
-            this._lineDrawingStyles.miterLimit = miterLimit;
-            this.invalidateStroke();
-
-            var stateLen = this._drawables.length;
-            for ( var i = 0; i < stateLen; i++ ) {
-              this._drawables[ i ].markDirtyLineOptions();
-            }
-          }
-          return this;
-        },
-
-        getLineDash: function() {
-          return this._lineDrawingStyles.lineDash;
-        },
-
-        hasLineDash: function() {
-          return !!this._lineDrawingStyles.lineDash.length;
-        },
-
-        setLineDash: function( lineDash ) {
-          if ( this._lineDrawingStyles.lineDash !== lineDash ) {
-            this._lineDrawingStyles.lineDash = lineDash || [];
-            this.invalidateStroke();
-
-            var stateLen = this._drawables.length;
-            for ( var i = 0; i < stateLen; i++ ) {
-              this._drawables[ i ].markDirtyLineOptions();
-            }
-          }
-          return this;
-        },
-
-        getLineDashOffset: function() {
-          return this._lineDrawingStyles.lineDashOffset;
-        },
-
-        setLineDashOffset: function( lineDashOffset ) {
-          assert && assert( typeof lineDashOffset === 'number', 'lineDashOffset should be a number, not ' + lineDashOffset );
-
-          if ( this._lineDrawingStyles.lineDashOffset !== lineDashOffset ) {
-            this._lineDrawingStyles.lineDashOffset = lineDashOffset;
-            this.invalidateStroke();
-
-            var stateLen = this._drawables.length;
-            for ( var i = 0; i < stateLen; i++ ) {
-              this._drawables[ i ].markDirtyLineOptions();
-            }
-          }
-          return this;
-        },
-
-        isStrokePickable: function() {
-          return this._strokePickable;
-        },
-
-        setStrokePickable: function( pickable ) {
-          assert && assert( typeof pickable === 'boolean', 'strokePickable should be a boolean, not ' + pickable );
-
-          if ( this._strokePickable !== pickable ) {
-            this._strokePickable = pickable;
-
-            // TODO: better way of indicating that only the node under pointers could have changed, but no paint change is needed?
-            this.invalidateStroke();
-          }
-          return this;
-        },
-
-        setLineStyles: function( lineStyles ) {
-
-          this._lineDrawingStyles = lineStyles;
-          this.invalidateStroke();
-          return this;
-        },
-
-        getLineStyles: function() {
-          return this._lineDrawingStyles;
-        },
-
-        getStroke: function() {
-          return this._stroke;
-        },
-
-        validateStrokeColor: function() {
-          if ( this._strokeColorDirty ) {
-            this._strokeColorDirty = false;
-
-            if ( typeof this._stroke === 'string' || this._stroke instanceof Color ) {
-              if ( this._strokeColor ) {
-                this._strokeColor.set( this._stroke );
-              }
-              // lazily create a Color when necessary, instead of pre-allocating
-              else {
-                this._strokeColor = new Color( this._stroke );
-              }
-            }
-          }
-        },
-
-        /**
-         * If the current stroke is a solid color (string or scenery.Color), getStrokeColor() will return a scenery.Color
-         * reference. This reference should be considered immutable (should not be modified)
-         *
-         * @returns {Color | null} [read-only]
-         */
-        getStrokeColor: function() {
-          this.validateStrokeColor();
-
-          // types of strokes where we can return a single color
-          if ( typeof this._stroke === 'string' || this._stroke instanceof Color ) {
-            return this._strokeColor;
-          }
-          // no stroke, or a pattern/gradient (we can't return a single stroke)
-          else {
-            return null;
-          }
-        },
-
-        setStroke: function( stroke ) {
-          if ( this._stroke !== stroke ) {
-            this._strokeColorDirty = true;
-
-            //OHTWO TODO: probably shouldn't have a reference here
-            var hasInstances = this._instances.length > 0;
-
-            if ( hasInstances && this._stroke && this._stroke.removeChangeListener ) {
-              this._stroke.removeChangeListener( this._strokeListener );
-            }
-
-            this._stroke = stroke;
-
-            if ( hasInstances && this._stroke && this._stroke.addChangeListener ) {
-              this._stroke.addChangeListener( this._strokeListener );
-            }
-
-            this.invalidateStroke();
-
-            var stateLen = this._drawables.length;
-            for ( var i = 0; i < stateLen; i++ ) {
-              this._drawables[ i ].markDirtyStroke();
-            }
-          }
-          return this;
-        },
-
-        getCachedPaints: function() {
-          return this._cachedPaints;
-        },
-
-        /*
-         * Sets the cached paints to the input array (a defensive copy).
-         *
-         * @param {Paint[]} paints
-         */
-        setCachedPaints: function( paints ) {
-          this._cachedPaints = paints.slice();
-
-          var stateLen = this._drawables.length;
-          for ( var i = 0; i < stateLen; i++ ) {
-            this._drawables[ i ].markDirtyCachedPaints();
-          }
-
-          return this;
-        },
-
-        addCachedPaint: function( paint ) {
-          assert && assert( paint.isPaint );
-
-          this._cachedPaints.push( paint );
-
-          var stateLen = this._drawables.length;
-          for ( var i = 0; i < stateLen; i++ ) {
-            this._drawables[ i ].markDirtyCachedPaints();
-          }
-        },
-
-        removeCachedPaint: function( paint ) {
-          assert && assert( paint.isPaint );
-          assert && assert( _.contains( this._cachedPaints, paint ) );
-
-          arrayRemove( this._cachedPaints, paint );
-
-          var stateLen = this._drawables.length;
-          for ( var i = 0; i < stateLen; i++ ) {
-            this._drawables[ i ].markDirtyCachedPaints();
-          }
-        },
-
-        firstInstanceAdded: function() {
-          if ( this._fill && this._fill.addChangeListener ) {
-            this._fill.addChangeListener( this._fillListener );
-          }
-          if ( this._stroke && this._stroke.addChangeListener ) {
-            this._stroke.addChangeListener( this._strokeListener );
-          }
-        },
-
-        lastInstanceRemoved: function() {
-          if ( this._fill && this._fill.removeChangeListener ) {
-            this._fill.removeChangeListener( this._fillListener );
-          }
-          if ( this._stroke && this._stroke.removeChangeListener ) {
-            this._stroke.removeChangeListener( this._strokeListener );
-          }
-        },
-
-        beforeCanvasFill: function( wrapper ) {
-          wrapper.setFillStyle( this._fill );
-          if ( this._fill.transformMatrix ) {
-            wrapper.context.save();
-            this._fill.transformMatrix.canvasAppendTransform( wrapper.context );
-          }
-        },
-
-        afterCanvasFill: function( wrapper ) {
-          if ( this._fill.transformMatrix ) {
-            wrapper.context.restore();
-          }
-        },
-
-        beforeCanvasStroke: function( wrapper ) {
-          // TODO: is there a better way of not calling so many things on each stroke?
-          wrapper.setStrokeStyle( this._stroke );
-          wrapper.setLineWidth( this.getLineWidth() );
-          wrapper.setLineCap( this.getLineCap() );
-          wrapper.setLineJoin( this.getLineJoin() );
-          wrapper.setMiterLimit( this.getMiterLimit() );
-          wrapper.setLineDash( this.getLineDash() );
-          wrapper.setLineDashOffset( this.getLineDashOffset() );
-          if ( this._stroke.transformMatrix ) {
-            wrapper.context.save();
-            this._stroke.transformMatrix.canvasAppendTransform( wrapper.context );
-          }
-        },
-
-        afterCanvasStroke: function( wrapper ) {
-          if ( this._stroke.transformMatrix ) {
-            wrapper.context.restore();
-          }
-        },
-
-        getCSSFill: function() {
-          // if it's a Color object, get the corresponding CSS
-          // 'transparent' will make us invisible if the fill is null
-          return this._fill ? ( this._fill.toCSS ? this._fill.toCSS() : this._fill ) : 'transparent';
-        },
-
-        getSimpleCSSStroke: function() {
-          // if it's a Color object, get the corresponding CSS
-          // 'transparent' will make us invisible if the fill is null
-          return this._stroke ? ( this._stroke.toCSS ? this._stroke.toCSS() : this._stroke ) : 'transparent';
-        },
-
-        appendFillablePropString: function( spaces, result ) {
-          if ( this._fill ) {
-            if ( result ) {
-              result += ',\n';
-            }
-            if ( typeof this._fill === 'string' ) {
-              result += spaces + 'fill: \'' + this._fill + '\'';
-            }
-            else {
-              result += spaces + 'fill: ' + this._fill.toString();
-            }
-          }
-
-          return result;
-        },
-
-        appendStrokablePropString: function( spaces, result ) {
-          var self = this;
-
-          function addProp( key, value, nowrap ) {
-            if ( result ) {
-              result += ',\n';
-            }
-            if ( !nowrap && typeof value === 'string' ) {
-              result += spaces + key + ': \'' + value + '\'';
-            }
-            else {
-              result += spaces + key + ': ' + value;
-            }
-          }
-
-          if ( this._stroke ) {
-            var defaultStyles = new LineStyles();
-            if ( typeof this._stroke === 'string' ) {
-              addProp( 'stroke', this._stroke );
-            }
-            else {
-              addProp( 'stroke', this._stroke.toString(), true );
-            }
-
-            _.each( [ 'lineWidth', 'lineCap', 'miterLimit', 'lineJoin', 'lineDashOffset' ], function( prop ) {
-              if ( self[ prop ] !== defaultStyles[ prop ] ) {
-                addProp( prop, self[ prop ] );
-              }
-            } );
-
-            if ( this.lineDash.length ) {
-              addProp( 'lineDash', JSON.stringify( this.lineDash ), true );
-            }
-          }
-
-          return result;
-        },
-
-        getFillRendererBitmask: function() {
-          var bitmask = 0;
-
-          // Safari 5 has buggy issues with SVG gradients
-          if ( !( isSafari5 && this._fill && this._fill.isGradient ) ) {
-            bitmask |= scenery.bitmaskSupportsSVG;
-          }
-
-          // we always have Canvas support?
-          bitmask |= scenery.bitmaskSupportsCanvas;
-
-          // nothing in the fill can change whether its bounds are valid
-          bitmask |= scenery.bitmaskBoundsValid;
-
-          if ( !this._fill ) {
-            // if there is no fill, it is supported by DOM and WebGL
-            bitmask |= scenery.bitmaskSupportsDOM;
-            bitmask |= scenery.bitmaskWebGL;
-          }
-          else if ( this._fill.isPattern ) {
-            // no pattern support for DOM or WebGL (for now!)
-          }
-          else if ( this._fill.isGradient ) {
-            // no gradient support for DOM or WebGL (for now!)
-          }
-          else {
-            // solid fills always supported for DOM, WebGL and Pixi
-            bitmask |= scenery.bitmaskSupportsDOM;
-          }
-          bitmask |= scenery.bitmaskSupportsWebGL;
-          bitmask |= scenery.bitmaskSupportsPixi;
-
-          return bitmask;
-        },
-
-        getStrokeRendererBitmask: function() {
-          var bitmask = 0;
-
-          if ( !( isIE9 && this.hasStroke() && this.hasLineDash() ) ) {
-            bitmask |= scenery.bitmaskSupportsCanvas;
-          }
-
-          // always have SVG support (for now?)
-          bitmask |= scenery.bitmaskSupportsSVG;
-
-          // for now, nothing about the stroke prevents us from having valid bounds (we compute these offsets)
-          bitmask |= scenery.bitmaskBoundsValid;
-
-          if ( !this.hasStroke() ) {
-            // allow DOM support if there is no stroke
-            bitmask |= scenery.bitmaskSupportsDOM;
-          }
-
-          // WebGL can handle stroked lines.
-          bitmask |= scenery.bitmaskSupportsWebGL;
-
-          bitmask |= scenery.bitmaskSupportsPixi;
-
-          return bitmask;
-        }
-      } );
-
-      // on mutation, set the stroke parameters first since they may affect the bounds (and thus later operations)
-      proto._mutatorKeys = [
-        'fill', 'fillPickable', 'stroke', 'lineWidth', 'lineCap', 'lineJoin', 'miterLimit', 'lineDash',
-        'lineDashOffset', 'strokePickable', 'cachedPaints'
-      ].concat( proto._mutatorKeys );
-
-      Object.defineProperty( proto, 'fill', { set: proto.setFill, get: proto.getFill } );
-      Object.defineProperty( proto, 'fillColor', { set: proto.setFill, get: proto.getFillColor } );
-      Object.defineProperty( proto, 'fillPickable', { set: proto.setFillPickable, get: proto.isFillPickable } );
-      Object.defineProperty( proto, 'stroke', { set: proto.setStroke, get: proto.getStroke } );
-      Object.defineProperty( proto, 'strokeColor', { set: proto.setStroke, get: proto.getStrokeColor } );
-      Object.defineProperty( proto, 'lineWidth', { set: proto.setLineWidth, get: proto.getLineWidth } );
-      Object.defineProperty( proto, 'lineCap', { set: proto.setLineCap, get: proto.getLineCap } );
-      Object.defineProperty( proto, 'lineJoin', { set: proto.setLineJoin, get: proto.getLineJoin } );
-      Object.defineProperty( proto, 'miterLimit', { set: proto.setMiterLimit, get: proto.getMiterLimit } );
-      Object.defineProperty( proto, 'lineDash', { set: proto.setLineDash, get: proto.getLineDash } );
-      Object.defineProperty( proto, 'lineDashOffset', { set: proto.setLineDashOffset, get: proto.getLineDashOffset } );
-      Object.defineProperty( proto, 'strokePickable', { set: proto.setStrokePickable, get: proto.isStrokePickable } );
-      Object.defineProperty( proto, 'cachedPaints', { set: proto.setCachedPaints, get: proto.getCachedPaints } );
-
-      if ( proto.invalidateFill ) {
-        var oldInvalidateFill = proto.invalidateFill;
-        proto.invalidateFill = function() {
-          this.invalidateSupportedRenderers();
-          oldInvalidateFill.call( this );
-        };
-      }
-      else {
-        proto.invalidateFill = function() {
-          this.invalidateSupportedRenderers();
-        };
-      }
-
-      if ( proto.invalidateStroke ) {
-        var oldInvalidateStroke = proto.invalidateStroke;
-        proto.invalidateStroke = function() {
-          this.invalidateSupportedRenderers();
-          oldInvalidateStroke.call( this );
-        };
-      }
-      else {
-        proto.invalidateStroke = function() {
-          this.invalidateSupportedRenderers();
-        };
-      }
-    }
-  };
-  var Paintable = scenery.Paintable;
-
-  // mix-in base for DOM and SVG drawables
-  // NOTE: requires state.node to be defined
-  Paintable.PaintableStatefulDrawable = {
-    mixin: function PaintableStatefulDrawable( drawableType ) {
-      var proto = drawableType.prototype;
-
-      proto.initializePaintableState = function() {
-        this.lastFill = undefined;
-        this.dirtyFill = true;
-
-        this.lastStroke = undefined;
-        this.dirtyStroke = true;
-        this.dirtyLineWidth = true;
-        this.dirtyLineOptions = true; // e.g. cap, join, dash, dashoffset, miterlimit
-        this.dirtyCachedPaints = true;
-        this.lastCachedPaints = [];
-      };
-
-      proto.cleanPaintableState = function() {
-        this.dirtyFill = false;
-        this.lastFill = this.node.getFill();
-
-        this.dirtyStroke = false;
-        this.dirtyLineWidth = false;
-        this.dirtyLineOptions = false;
-        this.dirtyCachedPaints = false;
-        this.lastStroke = this.node.getStroke();
-      };
-
-      proto.markDirtyFill = function() {
-        this.dirtyFill = true;
-        this.markPaintDirty();
-      };
-
-      proto.markDirtyStroke = function() {
-        this.dirtyStroke = true;
-        this.markPaintDirty();
-      };
-
-      proto.markDirtyLineWidth = function() {
-        this.dirtyLineWidth = true;
-        this.markPaintDirty();
-      };
-
-      proto.markDirtyLineOptions = function() {
-        this.dirtyLineOptions = true;
-        this.markPaintDirty();
-      };
-
-      proto.markDirtyCachedPaints = function() {
-        this.dirtyCachedPaints = true;
-        this.markPaintDirty();
-      };
-    }
-  };
-
-  // mix-in for Canvas drawables
-  Paintable.PaintableStatelessDrawable = {
-    mixin: function PaintableStatelessDrawable( drawableType ) {
-      var proto = drawableType.prototype;
-
-      proto.markDirtyFill = function() {
-        this.markPaintDirty();
-      };
-
-      proto.markDirtyStroke = function() {
-        this.markPaintDirty();
-      };
-
-      proto.markDirtyLineWidth = function() {
-        this.markPaintDirty();
-      };
-
-      proto.markDirtyLineOptions = function() {
-        this.markPaintDirty();
-      };
-
-      proto.markDirtyCachedPaints = function() {
-        this.markPaintDirty();
-      };
-    }
-  };
-
-  // handles SVG defs and fill/stroke style for SVG elements (by composition, not a mix-in or for inheritance)
-  Paintable.PaintSVGState = function PaintSVGState() {
-    this.initialize();
-  };
-  inherit( Object, Paintable.PaintSVGState, {
-    initialize: function() {
-      this.svgBlock = null; // {SVGBlock | null}
-      this.blockChanged = true; // if our SVGBlock changes, make sure to update everything whose ID changes based on block
-
-      // copies of the last fill and stroke that were used
-      this.fill = null;
-      this.stroke = null;
-
-      // current reference-counted fill/stroke paints (gradients and fills) that will need to be released on changes
-      // or disposal
-      this.fillPaint = null;
-      this.strokePaint = null;
-
-      // these are used by the actual SVG element
-      this.baseStyle = this.computeStyle(); // the main style CSS
-      this.extraStyle = '';                 // width/dash/cap/join CSS
-    },
-
-    dispose: function() {
-      // be cautious, release references
-      this.fill = null;
-      this.stroke = null;
-      this.releaseFillPaint();
-      this.releaseStrokePaint();
-    },
-
-    releaseFillPaint: function() {
-      if ( this.fillPaint ) {
-        this.svgBlock.decrementPaint( this.fillPaint );
-        this.fillPaint = null;
-      }
-    },
-
-    releaseStrokePaint: function() {
-      if ( this.strokePaint ) {
-        this.svgBlock.decrementPaint( this.strokePaint );
-        this.strokePaint = null;
-      }
-    },
-
-    // called when the fill needs to be updated, with the latest defs SVG block
-    updateFill: function( svgBlock, fill ) {
-      assert && assert( this.svgBlock === svgBlock );
-
-      if ( fill !== this.fill || this.blockChanged ) {
-        this.blockChanged = false;
-        this.releaseFillPaint();
-        this.fill = fill;
-        this.baseStyle = this.computeStyle();
-        if ( this.fill && this.fill.isPaint ) {
-          this.fillPaint = this.fill;
-          svgBlock.incrementPaint( this.fill );
-        }
-      }
-    },
-
-    updateStroke: function( svgBlock, stroke ) {
-      assert && assert( this.svgBlock === svgBlock );
-
-      if ( stroke !== this.stroke || this.blockChanged ) {
-        this.blockChanged = false;
-        this.releaseStrokePaint();
-        this.stroke = stroke;
-        this.baseStyle = this.computeStyle();
-        if ( this.stroke && this.stroke.isPaint ) {
-          this.strokePaint = this.stroke;
-          svgBlock.incrementPaint( this.stroke );
-        }
-      }
-    },
-
-    updateStrokeParameters: function( node ) {
-      var extraStyle = '';
-
-      var lineWidth = node.getLineWidth();
-      if ( lineWidth !== 1 ) {
-        extraStyle += 'stroke-width: ' + lineWidth + ';';
-      }
-
-      var lineCap = node.getLineCap();
-      if ( lineCap !== 'butt' ) {
-        extraStyle += 'stroke-linecap: ' + lineCap + ';';
-      }
-
-      var lineJoin = node.getLineJoin();
-      if ( lineJoin !== 'miter' ) {
-        extraStyle += 'stroke-linejoin: ' + lineJoin + ';';
-      }
-
-      var miterLimit = node.getMiterLimit();
-      extraStyle += 'stroke-miterlimit: ' + miterLimit + ';';
-
-      if ( node.hasLineDash() ) {
-        extraStyle += 'stroke-dasharray: ' + node.getLineDash().join( ',' ) + ';';
-        extraStyle += 'stroke-dashoffset: ' + node.getLineDashOffset() + ';';
-      }
-
-      this.extraStyle = extraStyle;
-    },
-
-    // called when the defs SVG block is switched (our SVG element was moved to another SVG top-level context)
-    updateSVGBlock: function( svgBlock ) {
-      // remove paints from the old svgBlock
-      var oldSvgBlock = this.svgBlock;
-      if ( oldSvgBlock ) {
-        if ( this.fillPaint ) {
-          oldSvgBlock.decrementPaint( this.fillPaint );
-        }
-        if ( this.strokePaint ) {
-          oldSvgBlock.decrementPaint( this.strokePaint );
-        }
-      }
-
-      this.svgBlock = svgBlock;
-
-      // add paints to the new svgBlock
-      if ( this.fillPaint ) {
-        svgBlock.incrementPaint( this.fillPaint );
-      }
-      if ( this.strokePaint ) {
-        svgBlock.incrementPaint( this.strokePaint );
-      }
-
-      this.blockChanged = true;
-    },
-
-    computeStyle: function() {
-      var style = 'fill: ';
-      if ( !this.fill ) {
-        // no fill
-        style += 'none;';
-      }
-      else if ( this.fill.toCSS ) {
-        // Color object fill
-        style += this.fill.toCSS() + ';';
-      }
-      else if ( this.fill.isPaint ) {
-        // reference the SVG definition with a URL
-        style += 'url(#' + this.fill.id + '-' + ( this.svgBlock ? this.svgBlock.id : 'noblock' ) + ');';
-      }
-      else {
-        // plain CSS color
-        style += this.fill + ';';
-      }
-
-      if ( !this.stroke ) {
-        // no stroke
-        style += ' stroke: none;';
-      }
-      else {
-        style += ' stroke: ';
-        if ( this.stroke.toCSS ) {
-          // Color object stroke
-          style += this.stroke.toCSS() + ';';
-        }
-        else if ( this.stroke.isPaint ) {
-          // reference the SVG definition with a URL
-          style += 'url(#' + this.stroke.id + '-' + ( this.svgBlock ? this.svgBlock.id : 'noblock' ) + ');';
-        }
-        else {
-          // plain CSS color
-          style += this.stroke + ';';
-        }
-      }
-
-      return style;
-    }
-  } );
-
-  return Paintable;
-} );
-// Copyright 2002-2014, University of Colorado Boulder
-
-
-/**
- * Something that can be displayed with a specific renderer.
- * NOTE: Drawables are assumed to be pooled with PoolableMixin, as freeToPool() is called.
- *
- * A drawable's life-cycle starts with its initialization (calling initializeDrawable once), and ends with its disposal
- * (where it is freed to its own pool).
- *
- * Drawables are part of an unordered drawable "tree" where each drawable can have a parent references. This is used
- * for, among other things, propagation of 'dirty' flags and usage during stitching.
- *
- * Blocks and backbones (sub-types of Drawable) contain children (creating a tree, although shared caches make it more
- * like a DAG). Our Scenery Display is built from a root backbone, that contains blocks. This can be Canvas/SVG, but
- * may also contain a DOM block with another backbone (used for opacity, CSS transforms, etc.).
- *
- * Drawables are part of two inherent linked lists: an "old" and a "new" one. Usually they are the same, but during
- * updates, the "new" linked list is changed to accomodate any changes, and then a stitch process is done to mark which
- * block (parent) we will belong to.
- *
- * As part of stitching or other processes, a Drawable is responsible for recording its pending state changes. Most
- * notably, we need to determine whether a drawable is being added, moved, or removed in the next frame. This is done
- * with an idempotent API using notePendingAddition/notePendingRemoval/notePendingMove. Either:
- *   - One or more notePendingMove() calls are made. When we are updated with updateBlock(), we will move to the
- *     last block referenced with notePendingMove() (which may be a no-op if it is the same block).
- *   - Zero or one notePendingAddition() call is made, and zero or one notePendingRemoval() call is made. Our action is:
- *     - No addition, no removal: nothing done
- *     - No addition, one removal: We are removed from our last block (and then presumably disposed later)
- *     - One addition, no removal: We are added to our new (pending) block, without being removed from anything
- *     - One addition, one removal: We are removed from our last block and added to our new (pending) block.
- * It is set up so that the order of addition/removal calls doesn't matter, since these can occur from within different
- * backbone stitches (removed in one, added in another, or with the order reversed). Our updateBlocks() is guaranteed
- * to be called after all of those have been completed.
- *
- * APIs for drawable types:
- *
- * DOM: {
- *   domElement: {HTMLElement}
- * }
- * Canvas: {
- *   paintCanvas: function( {CanvasContextWrapper} wrapper, {Node} node )
- * }
- * SVG: {
- *   svgElement: {SVGElement}
- * }
- * WebGL: {
- *   initializeContext: function( {WebGLRenderingContext} gl )
- *   render: function( {ShaderProgram} shaderProgram )
- *   shaderAttributes: {string[]} - names of vertex attributes to be used
- * }
- *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
- */
-
-define( 'SCENERY/display/Drawable',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/display/Renderer'],function( require ) {
-  
-
-  var inherit = require( 'PHET_CORE/inherit' );
-  var scenery = require( 'SCENERY/scenery' );
-  var Renderer = require( 'SCENERY/display/Renderer' );
-
-  var globalId = 1;
-
-  scenery.Drawable = function Drawable( renderer ) {
-    this.initializeDrawable( renderer );
-  };
-  var Drawable = scenery.Drawable;
-
-  inherit( Object, Drawable, {
-    initializeDrawable: function( renderer ) {
-      assert && assert( !this.id || this.disposed, 'If we previously existed, we need to have been disposed' );
-
-      // unique ID for drawables
-      this.id = this.id || globalId++;
-
-      sceneryLog && sceneryLog.Drawable && sceneryLog.Drawable( '[' + this.constructor.name + '*] initialize ' + this.toString() );
-
-      this.cleanDrawable();
-
-      this.renderer = renderer;
-
-      this.dirty = true;
-      this.disposed = false;
-
-      this.linksDirty = false;
-
-      return this;
-    },
-
-    cleanDrawable: function() {
-      // what drawble we are being rendered (or put) into (will be filled in later)
-      this.parentDrawable = null;
-      this.backbone = null; // a backbone reference (if applicable).
-
-      this.pendingParentDrawable = null; // what our parent drawable will be after the stitch is finished
-      this.pendingBackbone = null;       // what our backbone will be after the stitch is finished (if applicable)
-      this.pendingAddition = false;      // whether we are to be added to a block/backbone in our updateBlock() call
-      this.pendingRemoval = false;       // whether we are to be removed from a block/backbone in our updateBlock() call
-
-      assert && assert( !this.previousDrawable && !this.nextDrawable,
-        'By cleaning (disposal or fresh creation), we should have disconnected from the linked list' );
-
-      // linked list handling (will be filled in later)
-      this.previousDrawable = null;
-      this.nextDrawable = null;
-
-      // similar but without recent changes, so that we can traverse both orders at the same time for stitching
-      this.oldPreviousDrawable = null;
-      this.oldNextDrawable = null;
-    },
-
-    // called to add a block (us) as a child of a backbone
-    setBlockBackbone: function( backboneInstance ) {
-      sceneryLog && sceneryLog.Drawable && sceneryLog.Drawable( '[' + this.constructor.name + '*] setBlockBackbone ' +
-                                                                this.toString() + ' with ' + backboneInstance.toString() );
-
-      // if this is being called, Block will be guaranteed to be loaded
-      assert && assert( this instanceof scenery.Block );
-
-      this.parentDrawable = backboneInstance;
-      this.backbone = backboneInstance;
-      this.pendingParentDrawable = backboneInstance;
-      this.pendingBackbone = backboneInstance;
-      this.pendingAddition = false;
-      this.pendingRemoval = false;
-    },
-
-    notePendingAddition: function( display, block, backbone ) {
-      sceneryLog && sceneryLog.Drawable && sceneryLog.Drawable( '[' + this.constructor.name + '*] notePendingAddition ' +
-                                                                this.toString() + ' with ' + block.toString() + ', ' +
-                                                                ( backbone ? backbone.toString() : '-' ) );
-
-      assert && assert( backbone !== undefined, 'backbone can be either null or a backbone' );
-      assert && assert( block instanceof scenery.Block );
-
-      this.pendingParentDrawable = block;
-      this.pendingBackbone = backbone;
-      this.pendingAddition = true;
-
-      // if we weren't already marked for an update, mark us
-      if ( !this.pendingRemoval ) {
-        display.markDrawableChangedBlock( this );
-      }
-    },
-
-    notePendingRemoval: function( display ) {
-      sceneryLog && sceneryLog.Drawable && sceneryLog.Drawable( '[' + this.constructor.name + '*] notePendingRemoval ' +
-                                                                this.toString() );
-
-      this.pendingRemoval = true;
-
-      // if we weren't already marked for an update, mark us
-      if ( !this.pendingAddition ) {
-        display.markDrawableChangedBlock( this );
-      }
-    },
-
-    // moving a drawable that isn't changing backbones, just potentially changing its block.
-    // it should not have notePendingAddition or notePendingRemoval called on it.
-    notePendingMove: function( display, block ) {
-      sceneryLog && sceneryLog.Drawable && sceneryLog.Drawable( '[' + this.constructor.name + '*] notePendingMove ' +
-                                                                this.toString() + ' with ' + block.toString() );
-
-      assert && assert( block instanceof scenery.Block );
-
-      this.pendingParentDrawable = block;
-
-      if ( !this.pendingRemoval || !this.pendingAddition ) {
-        display.markDrawableChangedBlock( this );
-      }
-
-      // set both flags, since we need it to be removed and added
-      this.pendingAddition = true;
-      this.pendingRemoval = true;
-    },
-
-    // returns {Boolean} whether we changed our block
-    updateBlock: function() {
-      sceneryLog && sceneryLog.Drawable && sceneryLog.Drawable( '[' + this.constructor.name + '*] updateBlock ' + this.toString() +
-                                                                ' with add:' + this.pendingAddition +
-                                                                ' remove:' + this.pendingRemoval +
-                                                                ' old:' + ( this.parentDrawable ? this.parentDrawable.toString() : '-' ) +
-                                                                ' new:' + ( this.pendingParentDrawable ? this.pendingParentDrawable.toString() : '-' ) );
-      sceneryLog && sceneryLog.Drawable && sceneryLog.push();
-
-      var changed = false;
-
-      if ( this.pendingRemoval || this.pendingAddition ) {
-        // we are only unchanged if we have an addition AND removal, and the endpoints are identical
-        changed = !this.pendingRemoval || !this.pendingAddition ||
-                  this.parentDrawable !== this.pendingParentDrawable ||
-                  this.backbone !== this.pendingBackbone;
-
-        if ( changed ) {
-          if ( this.pendingRemoval ) {
-            sceneryLog && sceneryLog.Drawable && sceneryLog.Drawable( 'removing from ' + this.parentDrawable.toString() );
-            this.parentDrawable.removeDrawable( this );
-
-            // remove references if we are not being added back in
-            if ( !this.pendingAddition ) {
-              this.pendingParentDrawable = null;
-              this.pendingBackbone = null;
-            }
-          }
-
-          this.parentDrawable = this.pendingParentDrawable;
-          this.backbone = this.pendingBackbone;
-
-          if ( this.pendingAddition ) {
-            sceneryLog && sceneryLog.Drawable && sceneryLog.Drawable( 'adding to ' + this.parentDrawable.toString() );
-            this.parentDrawable.addDrawable( this );
-          }
-        }
-        else {
-          sceneryLog && sceneryLog.Drawable && sceneryLog.Drawable( 'unchanged' );
-
-          if ( this.pendingAddition && Renderer.isCanvas( this.renderer ) ) {
-            this.parentDrawable.onPotentiallyMovedDrawable( this );
-          }
-        }
-
-        this.pendingAddition = false;
-        this.pendingRemoval = false;
-      }
-
-      sceneryLog && sceneryLog.Drawable && sceneryLog.pop();
-
-      return changed;
-    },
-
-    updateLinks: function() {
-      this.oldNextDrawable = this.nextDrawable;
-      this.oldPreviousDrawable = this.previousDrawable;
-      this.linksDirty = false;
-    },
-
-    markDirty: function() {
-      if ( !this.dirty ) {
-        this.dirty = true;
-
-        // TODO: notify what we want to call repaint() later
-        if ( this.parentDrawable ) {
-          this.parentDrawable.markDirtyDrawable( this );
-        }
-      }
-    },
-
-    // will ensure that after syncTree phase is done, we will have updateLinks() called on us
-    markLinksDirty: function( display ) {
-      if ( !this.linksDirty ) {
-        this.linksDirty = true;
-        display.markDrawableForLinksUpdate( this );
-      }
-    },
-
-    // marks us for disposal in the next phase of updateDisplay(), and disconnects from the linked list
-    markForDisposal: function( display ) {
-      // as we are marked for disposal, we disconnect from the linked list (so our disposal setting nulls won't cause issues)
-      Drawable.disconnectBefore( this, display );
-      Drawable.disconnectAfter( this, display );
-
-      display.markDrawableForDisposal( this );
-    },
-
-    // disposes immediately, and makes no guarantees about out linked list's state (disconnects).
-    disposeImmediately: function( display ) {
-      // as we are marked for disposal, we disconnect from the linked list (so our disposal setting nulls won't cause issues)
-      Drawable.disconnectBefore( this, display );
-      Drawable.disconnectAfter( this, display );
-
-      this.dispose();
-    },
-
-    // generally do not call this directly, use markForDisposal (so Display will dispose us), or disposeImmediately.
-    dispose: function() {
-      assert && assert( !this.disposed, 'We should not re-dispose drawables' );
-
-      sceneryLog && sceneryLog.Drawable && sceneryLog.Drawable( '[' + this.constructor.name + '*] dispose ' + this.toString() );
-      sceneryLog && sceneryLog.Drawable && sceneryLog.push();
-
-      this.cleanDrawable();
-      this.disposed = true;
-
-      // for now
-      this.freeToPool();
-
-      sceneryLog && sceneryLog.Drawable && sceneryLog.pop();
-    },
-
-    audit: function( allowPendingBlock, allowPendingList, allowDirty ) {
-      if ( assertSlow ) {
-        assertSlow && assertSlow( !this.disposed,
-          'If we are being audited, we assume we are in the drawable display tree, and we should not be marked as disposed' );
-        assertSlow && assertSlow( this.renderer, 'Should not have a 0 (no) renderer' );
-
-        assertSlow && assertSlow( !this.backbone || this.parentDrawable,
-          'If we have a backbone reference, we must have a parentDrawable (our block)' );
-
-        if ( !allowPendingBlock ) {
-          assertSlow && assertSlow( !this.pendingAddition );
-          assertSlow && assertSlow( !this.pendingRemoval );
-          assertSlow && assertSlow( this.parentDrawable === this.pendingParentDrawable,
-            'Assure our parent and pending parent match, if we have updated blocks' );
-          assertSlow && assertSlow( this.backbone === this.pendingBackbone,
-            'Assure our backbone and pending backbone match, if we have updated blocks' );
-        }
-
-        if ( !allowPendingList ) {
-          assertSlow && assertSlow( this.oldPreviousDrawable === this.previousDrawable,
-            'Pending linked-list references should be cleared by now' );
-          assertSlow && assertSlow( this.oldNextDrawable === this.nextDrawable,
-            'Pending linked-list references should be cleared by now' );
-          assertSlow && assertSlow( !this.linksDirty, 'Links dirty flag should be clean' );
-        }
-
-        if ( !allowDirty ) {
-          assertSlow && assertSlow( !this.dirty,
-            'Should not be dirty at this phase, if we are in the drawable display tree' );
-        }
-      }
-    },
-
-    toString: function() {
-      return this.constructor.name + '#' + this.id;
-    },
-
-    toDetailedString: function() {
-      return this.toString();
-    }
-  } );
-
-  // a,b {Drawable}, connects the two drawables in the linked list, while cutting the previous connection and marking
-  // the links for updates.
-  Drawable.connectDrawables = function( a, b, display ) {
-    // we don't need to do anything if there is no change
-    if ( a.nextDrawable !== b ) {
-      // touch previous neighbors
-      if ( a.nextDrawable ) {
-        a.nextDrawable.markLinksDirty( display );
-        a.nextDrawable.previousDrawable = null;
-      }
-      if ( b.previousDrawable ) {
-        b.previousDrawable.markLinksDirty( display );
-        b.previousDrawable.nextDrawable = null;
-      }
-
-      a.nextDrawable = b;
-      b.previousDrawable = a;
-
-      // mark these as needing updates
-      a.markLinksDirty( display );
-      b.markLinksDirty( display );
-    }
-  };
-
-  Drawable.disconnectBefore = function( a, display ) {
-    // we don't need to do anything if there is no change
-    if ( a.previousDrawable ) {
-      a.markLinksDirty( display );
-      a.previousDrawable.markLinksDirty( display );
-      a.previousDrawable.nextDrawable = null;
-      a.previousDrawable = null;
-    }
-  };
-
-  Drawable.disconnectAfter = function( a, display ) {
-    // we don't need to do anything if there is no change
-    if ( a.nextDrawable ) {
-      a.markLinksDirty( display );
-      a.nextDrawable.markLinksDirty( display );
-      a.nextDrawable.previousDrawable = null;
-      a.nextDrawable = null;
-    }
-  };
-
-  // converts a linked list of drawables to an array (useful for debugging/assertion purposes, should not be used in production code)
-  Drawable.listToArray = function( firstDrawable, lastDrawable ) {
-    var arr = [];
-
-    // assumes we'll hit lastDrawable, otherwise we'll NPE
-    for ( var drawable = firstDrawable; ; drawable = drawable.nextDrawable ) {
-      arr.push( drawable );
-
-      if ( drawable === lastDrawable ) {
-        break;
-      }
-    }
-
-    return arr;
-  };
-
-  // converts an old linked list of drawables to an array (useful for debugging/assertion purposes, should not be used in production code)
-  Drawable.oldListToArray = function( firstDrawable, lastDrawable ) {
-    var arr = [];
-
-    // assumes we'll hit lastDrawable, otherwise we'll NPE
-    for ( var drawable = firstDrawable; ; drawable = drawable.oldNextDrawable ) {
-      arr.push( drawable );
-
-      if ( drawable === lastDrawable ) {
-        break;
-      }
-    }
-
-    return arr;
-  };
-
-  return Drawable;
-} );
-
-// Copyright 2002-2014, University of Colorado Boulder
-
-
-/**
- * A drawable that will paint a single instance.
- *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
- */
-
-define( 'SCENERY/display/SelfDrawable',['require','PHET_CORE/inherit','PHET_CORE/Poolable','SCENERY/scenery','SCENERY/display/Drawable'],function( require ) {
-  
-
-  var inherit = require( 'PHET_CORE/inherit' );
-  var Poolable = require( 'PHET_CORE/Poolable' );
-  var scenery = require( 'SCENERY/scenery' );
-  var Drawable = require( 'SCENERY/display/Drawable' );
-
-  scenery.SelfDrawable = function SelfDrawable( renderer, instance ) {
-    this.initializeSelfDrawable( renderer, instance );
-  };
-  var SelfDrawable = scenery.SelfDrawable;
-
-  inherit( scenery.Drawable, SelfDrawable, {
-    initializeSelfDrawable: function( renderer, instance ) {
-      // super initialization
-      this.initializeDrawable( renderer );
-
-      this.instance = instance;
-      this.node = instance.trail.lastNode();
-      this.node.attachDrawable( this );
-
-      return this;
-    },
-
-    // @public
-    dispose: function() {
-      this.node.detachDrawable( this );
-
-      // free references
-      this.instance = null;
-      this.node = null;
-
-      Drawable.prototype.dispose.call( this );
-    },
-
-    toDetailedString: function() {
-      return this.toString() + ' (' + this.instance.trail.toPathString() + ')';
-    }
-  } );
-
-  SelfDrawable.Poolable = {
-    mixin: function( selfDrawableType ) {
-      // for pooling, allow <SelfDrawableType>.createFromPool( renderer, instance ) and drawable.freeToPool(). Creation will initialize the drawable to an initial state
-      Poolable.mixin( selfDrawableType, {
-        defaultFactory: function() {
-          /* jshint -W055 */
-          return new selfDrawableType();
-        },
-        constructorDuplicateFactory: function( pool ) {
-          return function( renderer, instance ) {
-            if ( pool.length ) {
-              return pool.pop().initialize( renderer, instance );
-            }
-            else {
-              /* jshint -W055 */
-              return new selfDrawableType( renderer, instance );
-            }
-          };
-        }
-      } );
-    }
-  };
-
-  return SelfDrawable;
-} );
-
-// Copyright 2002-2014, University of Colorado Boulder
-
-/**
- * Represents an SVG visual element, and is responsible for tracking changes to the visual element, and then applying
- * any changes at a later time.
- *
- * Abstract methods to implement for concrete implementations:
- *   updateSVGSelf() - Update the SVG element's state to what the Node's self should display
- *   updateDefsSelf( block ) - Update defs on the given block (or if block === null, remove)
- *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
- */
-
-define( 'SCENERY/display/SVGSelfDrawable',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/display/SelfDrawable','SCENERY/nodes/Paintable'],function( require ) {
-  
-
-  var inherit = require( 'PHET_CORE/inherit' );
-  var scenery = require( 'SCENERY/scenery' );
-  var SelfDrawable = require( 'SCENERY/display/SelfDrawable' );
-  var Paintable = require( 'SCENERY/nodes/Paintable' );
-
-  scenery.SVGSelfDrawable = function SVGSelfDrawable( renderer, instance ) {
-    this.initializeSVGSelfDrawable( renderer, instance );
-
-    throw new Error( 'Should use initialization and pooling' );
-  };
-  var SVGSelfDrawable = scenery.SVGSelfDrawable;
-
-  inherit( SelfDrawable, SVGSelfDrawable, {
-    initializeSVGSelfDrawable: function( renderer, instance, usesPaint, keepElements ) {
-      // super initialization
-      this.initializeSelfDrawable( renderer, instance );
-
-      this.usesPaint = usesPaint;
-      this.keepElements = keepElements;
-
-      this.svgElement = null; // should be filled in by subtype
-      this.svgBlock = null; // will be updated by updateSVGBlock()
-
-      this.initializeState(); // assumes we have a state mixin
-
-      if ( this.usesPaint ) {
-        if ( !this.paintState ) {
-          this.paintState = new Paintable.PaintSVGState();
-        }
-        else {
-          this.paintState.initialize();
-        }
-      }
-
-      return this; // allow chaining
-    },
-
-    // @public: called from elsewhere to update the SVG element
-    update: function() {
-      if ( this.dirty ) {
-        this.dirty = false;
-        this.updateSVG();
-      }
-    },
-
-    // @protected: called to update the visual appearance of our svgElement
-    updateSVG: function() {
-      if ( this.paintDirty ) {
-        this.updateSVGSelf.call( this, this.node, this.svgElement );
-      }
-
-      // sync the differences between the previously-recorded list of cached paints and the new list
-      if ( this.usesPaint && this.dirtyCachedPaints ) {
-        var newCachedPaints = this.node._cachedPaints.slice(); // defensive copy for now
-        var i, j;
-        // scan for new cached paints (not in the old list)
-        for ( i = 0; i < newCachedPaints.length; i++ ) {
-          var newPaint = newCachedPaints[ i ];
-          var isNew = true;
-          for ( j = 0; j < this.lastCachedPaints.length; j++ ) {
-            if ( newPaint === this.lastCachedPaints[ j ] ) {
-              isNew = false;
-              break;
-            }
-          }
-          if ( isNew ) {
-            this.svgBlock.incrementPaint( newPaint );
-          }
-        }
-        // scan for removed cached paints (not in the new list)
-        for ( i = 0; i < this.lastCachedPaints.length; i++ ) {
-          var oldPaint = this.lastCachedPaints[ i ];
-          var isRemoved = true;
-          for ( j = 0; j < newCachedPaints.length; j++ ) {
-            if ( oldPaint === newCachedPaints[ j ] ) {
-              isRemoved = false;
-              break;
-            }
-          }
-          if ( isRemoved ) {
-            this.svgBlock.decrementPaint( oldPaint );
-          }
-        }
-
-        this.lastCachedPaints = newCachedPaints;
-      }
-
-      // clear all of the dirty flags
-      this.setToClean();
-    },
-
-    // to be used by our passed in options.updateSVG
-    updateFillStrokeStyle: function( element ) {
-      if ( !this.usesPaint ) {
-        return;
-      }
-
-      if ( this.dirtyFill ) {
-        this.paintState.updateFill( this.svgBlock, this.node._fill );
-      }
-      if ( this.dirtyStroke ) {
-        this.paintState.updateStroke( this.svgBlock, this.node._stroke );
-      }
-      var strokeParameterDirty = this.dirtyLineWidth || this.dirtyLineOptions;
-      if ( strokeParameterDirty ) {
-        this.paintState.updateStrokeParameters( this.node );
-      }
-      if ( this.dirtyFill || this.dirtyStroke || strokeParameterDirty ) {
-        element.setAttribute( 'style', this.paintState.baseStyle + this.paintState.extraStyle );
-      }
-    },
-
-    updateSVGBlock: function( svgBlock ) {
-      // remove cached paint references from the old svgBlock
-      var oldSvgBlock = this.svgBlock;
-      if ( this.usesPaint && oldSvgBlock ) {
-        for ( var i = 0; i < this.lastCachedPaints.length; i++ ) {
-          oldSvgBlock.decrementPaint( this.lastCachedPaints[ i ] );
-        }
-      }
-
-      this.svgBlock = svgBlock;
-
-      // add cached paint references from the new svgBlock
-      if ( this.usesPaint ) {
-        for ( var j = 0; j < this.lastCachedPaints.length; j++ ) {
-          svgBlock.incrementPaint( this.lastCachedPaints[ j ] );
-        }
-      }
-
-      this.updateDefsSelf && this.updateDefsSelf.call( this, svgBlock );
-
-      this.usesPaint && this.paintState.updateSVGBlock( svgBlock );
-
-      // since fill/stroke IDs may be block-specific, we need to mark them dirty so they will be updated
-      this.usesPaint && this.markDirtyFill();
-      this.usesPaint && this.markDirtyStroke();
-    },
-
-    dispose: function() {
-      if ( !this.keepElements ) {
-        // clear the references
-        this.svgElement = null;
-      }
-
-      // release any defs, and dispose composed state objects
-      this.updateDefsSelf && this.updateDefsSelf.call( this, null );
-      this.usesPaint && this.paintState.dispose();
-
-      this.defs = null;
-
-      this.svgBlock = null;
-
-      SelfDrawable.prototype.dispose.call( this );
-    },
-
-    setToClean: function() {
-      this.setToCleanState();
-    }
-  } );
-
-  return SVGSelfDrawable;
-} );
-
-// Copyright 2002-2014, University of Colorado Boulder
-
-
-/**
- * TODO docs
- *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
- */
-
-define( 'SCENERY/display/CanvasSelfDrawable',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/display/SelfDrawable','SCENERY/nodes/Paintable'],function( require ) {
-  
-
-  var inherit = require( 'PHET_CORE/inherit' );
-  var scenery = require( 'SCENERY/scenery' );
-  var SelfDrawable = require( 'SCENERY/display/SelfDrawable' );
-  var Paintable = require( 'SCENERY/nodes/Paintable' );
-
-  scenery.CanvasSelfDrawable = function CanvasSelfDrawable( renderer, instance ) {
-    this.initializeCanvasSelfDrawable( renderer, instance );
-
-    throw new Error( 'Should use initialization and pooling' );
-  };
-  var CanvasSelfDrawable = scenery.CanvasSelfDrawable;
-
-  inherit( SelfDrawable, CanvasSelfDrawable, {
-    initializeCanvasSelfDrawable: function( renderer, instance ) {
-      // super initialization
-      this.initializeSelfDrawable( renderer, instance );
-
-      // this is the same across lifecycles
-      this.transformListener = this.transformListener || this.markTransformDirty.bind( this );
-
-      instance.relativeTransform.addListener( this.transformListener ); // when our relative tranform changes, notify us in the pre-repaint phase
-      instance.relativeTransform.addPrecompute(); // trigger precomputation of the relative transform, since we will always need it when it is updated
-
-      return this;
-    },
-
-    markTransformDirty: function() {
-      this.markDirty();
-    },
-
-    // general flag set on the state, which we forward directly to the drawable's paint flag
-    markPaintDirty: function() {
-      this.markDirty();
-    },
-
-    update: function() {
-      this.dirty = false;
-    },
-
-    dispose: function() {
-      this.instance.relativeTransform.removeListener( this.transformListener );
-      this.instance.relativeTransform.removePrecompute();
-
-      SelfDrawable.prototype.dispose.call( this );
-    }
-  } );
-
-  // methods for forwarding dirty messages
-  function canvasSelfDirty() {
-    // we pass this method and it is only called with blah.call( ... ), where the 'this' reference is set. ignore jshint
-    /* jshint -W040 */
-    this.markDirty();
-  }
-
-  // options takes: type, paintCanvas( wrapper ), usesPaint, and dirtyMethods (array of string names of methods that make the state dirty)
-  CanvasSelfDrawable.createDrawable = function( options ) {
-    var type = options.type;
-    var paintCanvas = options.paintCanvas;
-    var usesPaint = options.usesPaint;
-
-    assert && assert( typeof type === 'function' );
-    assert && assert( typeof paintCanvas === 'function' );
-    assert && assert( typeof usesPaint === 'boolean' );
-
-    inherit( CanvasSelfDrawable, type, {
-      initialize: function( renderer, instance ) {
-        this.initializeCanvasSelfDrawable( renderer, instance );
-
-        return this; // allow for chaining
-      },
-
-      paintCanvas: paintCanvas,
-
-      update: function() {
-        // no action directly needed for the self-drawable case, as we will be repainted in the block
-        this.dirty = false;
-      }
-    } );
-
-    // include stubs (stateless) for marking dirty stroke and fill (if necessary). we only want one dirty flag, not multiple ones, for Canvas (for now)
-    if ( usesPaint ) {
-      Paintable.PaintableStatelessDrawable.mixin( type );
-    }
-
-    // set up pooling
-    SelfDrawable.Poolable.mixin( type );
-
-    if ( options.dirtyMethods ) {
-      for ( var i = 0; i < options.dirtyMethods.length; i++ ) {
-        type.prototype[ options.dirtyMethods[ i ] ] = canvasSelfDirty;
-      }
-    }
-
-    return type;
-  };
-
-  return CanvasSelfDrawable;
-} );
-
-// Copyright 2002-2014, University of Colorado Boulder
-
-/**
- * TODO docs
- *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
- * @author Sam Reid
- */
-
-define( 'SCENERY/display/WebGLSelfDrawable',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/display/SelfDrawable'],function( require ) {
-  
-
-  var inherit = require( 'PHET_CORE/inherit' );
-  var scenery = require( 'SCENERY/scenery' );
-  var SelfDrawable = require( 'SCENERY/display/SelfDrawable' );
-
-  scenery.WebGLSelfDrawable = function WebGLSelfDrawable( renderer, instance ) {
-    this.initializeWebGLSelfDrawable( renderer, instance );
-
-    throw new Error( 'Should use initialization and pooling' );
-  };
-  var WebGLSelfDrawable = scenery.WebGLSelfDrawable;
-
-  inherit( SelfDrawable, WebGLSelfDrawable, {
-    initializeWebGLSelfDrawable: function( renderer, instance ) {
-      // super initialization
-      this.initializeSelfDrawable( renderer, instance );
-
-      // this is the same across lifecycles
-      this.transformListener = this.transformListener || this.markTransformDirty.bind( this );
-
-      instance.relativeTransform.addListener( this.transformListener ); // when our relative transform changes, notify us in the pre-repaint phase
-      instance.relativeTransform.addPrecompute(); // trigger precomputation of the relative transform, since we will always need it when it is updated
-
-      return this;
-    },
-
-    markTransformDirty: function() {
-      this.markDirty();
-    },
-
-    dispose: function() {
-      this.instance.relativeTransform.removeListener( this.transformListener );
-      this.instance.relativeTransform.removePrecompute();
-
-      SelfDrawable.prototype.dispose.call( this );
-    }
-  } );
-
-  return WebGLSelfDrawable;
-} );
-
-// Copyright 2002-2014, University of Colorado Boulder
-
-
-/**
- * Represents a Pixi visual element, and is responsible for tracking changes to the visual element, and then applying
- * any changes at a later time.
- *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
- */
-
-define( 'SCENERY/display/PixiSelfDrawable',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/display/SelfDrawable'],function( require ) {
-  
-
-  var inherit = require( 'PHET_CORE/inherit' );
-  var scenery = require( 'SCENERY/scenery' );
-  var SelfDrawable = require( 'SCENERY/display/SelfDrawable' );
-
-  scenery.PixiSelfDrawable = function PixiSelfDrawable( renderer, instance ) {
-    this.initializePixiSelfDrawable( renderer, instance );
-
-    throw new Error( 'Should use initialization and pooling' );
-  };
-  var PixiSelfDrawable = scenery.PixiSelfDrawable;
-
-  inherit( SelfDrawable, PixiSelfDrawable, {
-    initializePixiSelfDrawable: function( renderer, instance, keepElements ) {
-      // super initialization
-      this.initializeSelfDrawable( renderer, instance );
-
-      this.keepElements = keepElements;
-
-      this.displayObject = null; // should be filled in by subtype
-      this.paintDirty = true;
-
-      return this;
-    },
-
-    // @public: called from elsewhere to update the SVG element
-    update: function() {
-      if ( this.dirty ) {
-        this.dirty = false;
-
-        this.updatePixiSelf.call( this, this.node, this.displayObject );
-      }
-    },
-
-    // general flag set on the state, which we forward directly to the drawable's paint flag
-    markPaintDirty: function() {
-      this.markDirty();
-    },
-
-    dispose: function() {
-      if ( !this.keepElements ) {
-        // clear the references
-        this.displayObject = null;
-      }
-
-      SelfDrawable.prototype.dispose.call( this );
-    }
-  } );
-
-  return PixiSelfDrawable;
-} );
-
-//  Copyright 2002-2014, University of Colorado Boulder
-
-/**
- *
- *
- * @author Sam Reid (PhET Interactive Simulations)
- */
-define( 'SCENERY/display/webgl/SquareUnstrokedRectangle',['require','PHET_CORE/inherit','SCENERY/util/Color'],function( require ) {
-  
-
-  // modules
-  var inherit = require( 'PHET_CORE/inherit' );
-  var Color = require( 'SCENERY/util/Color' );
-
-  /**
-   *
-   * @constructor
-   */
-  function SquareUnstrokedRectangle( colorTriangleRenderer, rectangle, z ) {
-    assert && assert( z !== undefined );
-    this.z = z;
-    this.rectangle = rectangle;
-    this.colorTriangleBufferData = colorTriangleRenderer.colorTriangleBufferData;
-    this.colorTriangleRenderer = colorTriangleRenderer;
-
-    // Reserve two triangles
-    this.indexObject = this.colorTriangleBufferData.reserveVertices( 6 );
-    this.startIndex = this.indexObject.startIndex;
-    this.endIndex = this.indexObject.endIndex;//exclusive (not included)
-
-    this.update();
-  }
-
-  return inherit( Object, SquareUnstrokedRectangle, {
-    update: function() {
-
-      var x = this.rectangle._rectX;
-      var y = this.rectangle._rectY;
-      var width = this.rectangle._rectWidth;
-      var height = this.rectangle._rectHeight;
-      var z = this.z;
-
-      //TODO: Use this
-      var color = this.rectangle.fillColor;//read only reference
-
-      // Create a random color if the color wasn't found.
-      // TODO: Remove this when this geometry no longer used for debugging
-      color = color || new Color( Math.round( Math.random() * 255 ), Math.round( Math.random() * 255 ), Math.round( Math.random() * 255 ), 1 );
-      
-      // TODO: maybe better to update in fragment shader?  It depends how often we update()
-      var r = color.red / 255;
-      var g = color.green / 255;
-      var b = color.blue / 255;
-      var a = color.alpha;
-
-      var matrix4 = this.rectangle.getLocalToGlobalMatrix().toMatrix4();
-
-      // TODO: Maybe create arrays here every time is creating too much garbage.
-      // TODO: Could just unroll this later once things settle down.
-      var newElements = [
-        // Top left
-        //TODO: Maybe should be m03 for last element, see Matrix3.toAffineMatrix4
-        x, y, z, r, g, b, a, /*               */matrix4.m00(), matrix4.m01(), matrix4.m03(), matrix4.m10(), matrix4.m11(), matrix4.m13(),
-        (x + width), y, z, r, g, b, a, /*     */matrix4.m00(), matrix4.m01(), matrix4.m03(), matrix4.m10(), matrix4.m11(), matrix4.m13(),
-        x, y + height, z, r, g, b, a, /*      */matrix4.m00(), matrix4.m01(), matrix4.m03(), matrix4.m10(), matrix4.m11(), matrix4.m13(),
-
-        // Bottom right
-        (x + width), y + height, z, r, g, b, a, matrix4.m00(), matrix4.m01(), matrix4.m03(), matrix4.m10(), matrix4.m11(), matrix4.m13(),
-        (x + width), y, z, r, g, b, a, /*     */matrix4.m00(), matrix4.m01(), matrix4.m03(), matrix4.m10(), matrix4.m11(), matrix4.m13(),
-        x, y + height, z, r, g, b, a, /*      */matrix4.m00(), matrix4.m01(), matrix4.m03(), matrix4.m10(), matrix4.m11(), matrix4.m13()
-      ];
-      for ( var i = 0; i < newElements.length; i++ ) {
-        this.colorTriangleBufferData.vertexArray[ this.startIndex + i ] = newElements[ i ];
-      }
-      this.colorTriangleRenderer.updateTriangleBuffer( this );
-    }
-  } );
-} );
-// Copyright 2002-2014, University of Colorado Boulder
-
-/**
- * A Path draws a Shape with a specific type of fill and stroke.
- *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
- */
-
-define( 'SCENERY/nodes/Path',['require','PHET_CORE/inherit','KITE/Shape','SCENERY/scenery','SCENERY/nodes/Node','SCENERY/display/Renderer','SCENERY/nodes/Paintable','SCENERY/display/SVGSelfDrawable','SCENERY/display/CanvasSelfDrawable','SCENERY/display/SelfDrawable','SCENERY/display/WebGLSelfDrawable','SCENERY/display/PixiSelfDrawable','SCENERY/display/webgl/SquareUnstrokedRectangle','SCENERY/util/Color'],function( require ) {
-  
-
-  var inherit = require( 'PHET_CORE/inherit' );
-  var Shape = require( 'KITE/Shape' );
-
-  var scenery = require( 'SCENERY/scenery' );
-  var Node = require( 'SCENERY/nodes/Node' );
-  require( 'SCENERY/display/Renderer' );
-  var Paintable = require( 'SCENERY/nodes/Paintable' );
-  var SVGSelfDrawable = require( 'SCENERY/display/SVGSelfDrawable' );
-  var CanvasSelfDrawable = require( 'SCENERY/display/CanvasSelfDrawable' );
-  var SelfDrawable = require( 'SCENERY/display/SelfDrawable' );
-  var WebGLSelfDrawable = require( 'SCENERY/display/WebGLSelfDrawable' );
-  var PixiSelfDrawable = require( 'SCENERY/display/PixiSelfDrawable' );
-  var SquareUnstrokedRectangle = require( 'SCENERY/display/webgl/SquareUnstrokedRectangle' );
-  var Color = require( 'SCENERY/util/Color' );
-
-  // TODO: change this based on memory and performance characteristics of the platform
-  var keepSVGPathElements = true; // whether we should pool SVG elements for the SVG rendering states, or whether we should free them when possible for memory
-
-  scenery.Path = function Path( shape, options ) {
-    // TODO: consider directly passing in a shape object (or at least handling that case)
-    // NOTE: _shape can be lazily constructed, in the case of types like Rectangle where they have their own drawing code
-    this._shape = null;
-    this._strokedShape = null; // a stroked copy of the shape, lazily computed
-
-    // ensure we have a parameter object
-    options = options || {};
-
-    this.initializePaintable();
-
-    Node.call( this );
-    this.invalidateSupportedRenderers();
-    this.setShape( shape );
-    this.mutate( options );
-  };
-  var Path = scenery.Path;
-
-  inherit( Node, Path, {
-    // allow more specific path types (Rectangle, Line) to override what restrictions we have
-    getPathRendererBitmask: function() {
-      return scenery.bitmaskBoundsValid | scenery.bitmaskSupportsCanvas | scenery.bitmaskSupportsSVG | scenery.bitmaskSupportsWebGL | scenery.bitmaskSupportsPixi;
-    },
-
-    invalidateSupportedRenderers: function() {
-      this.setRendererBitmask( this.getFillRendererBitmask() & this.getStrokeRendererBitmask() & this.getPathRendererBitmask() );
-    },
-
-    // sets the shape drawn, or null to remove the shape
-    setShape: function( shape ) {
-      if ( this._shape !== shape ) {
-        if ( typeof shape === 'string' ) {
-          // be content with setShape always invalidating the shape?
-          shape = new Shape( shape );
-        }
-        this._shape = shape;
-        this.invalidateShape();
-
-        var stateLen = this._drawables.length;
-        for ( var i = 0; i < stateLen; i++ ) {
-          this._drawables[ i ].markDirtyShape();
-        }
-      }
-      return this;
-    },
-
-    getShape: function() {
-      return this._shape;
-    },
-
-    getStrokedShape: function() {
-      if ( !this._strokedShape ) {
-        this._strokedShape = this.getShape().getStrokedShape( this._lineDrawingStyles );
-      }
-      return this._strokedShape;
-    },
-
-    invalidateShape: function() {
-      this._strokedShape = null;
-
-      if ( this.hasShape() ) {
-        this.invalidateSelf( this.computeShapeBounds() );
-      }
-    },
-
-    // separated out, so that we can override this with a faster version in subtypes. includes the Stroke, if any
-    computeShapeBounds: function() {
-      return this._stroke ? this.getStrokedShape().bounds : this.getShape().bounds;
-    },
-
-    // @override
-    getTransformedSelfBounds: function( matrix ) {
-      return ( this._stroke ? this.getStrokedShape() : this.getShape() ).getBoundsWithTransform( matrix );
-    },
-
-    // hook stroke mixin changes to invalidation
-    invalidateStroke: function() {
-      this.invalidateShape();
-    },
-
-    hasShape: function() {
-      return this._shape;
-    },
-
-    canvasPaintSelf: function( wrapper ) {
-      Path.PathCanvasDrawable.prototype.paintCanvas( wrapper, this );
-    },
-
-    createSVGDrawable: function( renderer, instance ) {
-      return Path.PathSVGDrawable.createFromPool( renderer, instance );
-    },
-
-    createCanvasDrawable: function( renderer, instance ) {
-      return Path.PathCanvasDrawable.createFromPool( renderer, instance );
-    },
-
-    createWebGLDrawable: function( renderer, instance ) {
-      return Path.PathWebGLDrawable.createFromPool( renderer, instance );
-    },
-
-    createPixiDrawable: function( renderer, instance ) {
-      return Path.PathPixiDrawable.createFromPool( renderer, instance );
-    },
-
-    isPainted: function() {
-      return true;
-    },
-
-    // override for computation of whether a point is inside the self content
-    // point is considered to be in the local coordinate frame
-    containsPointSelf: function( point ) {
-      var result = false;
-      if ( !this.hasShape() ) {
-        return result;
-      }
-
-      // if this node is fillPickable, we will return true if the point is inside our fill area
-      if ( this._fillPickable ) {
-        result = this.getShape().containsPoint( point );
-      }
-
-      // also include the stroked region in the hit area if strokePickable
-      if ( !result && this._strokePickable ) {
-        result = this.getStrokedShape().containsPoint( point );
-      }
-      return result;
-    },
-
-    // whether this node's self intersects the specified bounds, in the local coordinate frame
-    intersectsBoundsSelf: function( bounds ) {
-      // TODO: should a shape's stroke be included?
-      return this.hasShape() ? this._shape.intersectsBounds( bounds ) : false;
-    },
-
-    set shape( value ) { this.setShape( value ); },
-    get shape() { return this.getShape(); },
-
-    // if we have to apply a transform workaround for https://github.com/phetsims/scenery/issues/196 (only when we have a pattern or gradient)
-    requiresSVGBoundsWorkaround: function() {
-      if ( !this._stroke || !this._stroke.getSVGDefinition || !this.hasShape() ) {
-        return false;
-      }
-
-      var bounds = this.computeShapeBounds( false ); // without stroke
-      return bounds.x * bounds.y === 0; // at least one of them was zero, so the bounding box has no area
-    },
-
-    getDebugHTMLExtras: function() {
-      return this._shape ? ' (<span style="color: #88f" onclick="window.open( \'data:text/plain;charset=utf-8,\' + encodeURIComponent( \'' + this._shape.getSVGPath() + '\' ) );">path</span>)' : '';
-    },
-
-    getBasicConstructor: function( propLines ) {
-      return 'new scenery.Path( ' + ( this._shape ? this._shape.toString() : this._shape ) + ', {' + propLines + '} )';
-    },
-
-    getPropString: function( spaces, includeChildren ) {
-      var result = Node.prototype.getPropString.call( this, spaces, includeChildren );
-      result = this.appendFillablePropString( spaces, result );
-      result = this.appendStrokablePropString( spaces, result );
-      return result;
-    }
-  } );
-
-  Path.prototype._mutatorKeys = [ 'shape' ].concat( Node.prototype._mutatorKeys );
-
-  // mix in fill/stroke handling code. for now, this is done after 'shape' is added to the mutatorKeys so that stroke parameters
-  // get set first
-  Paintable.mixin( Path );
-
-  /*---------------------------------------------------------------------------*
-   * Rendering State mixin (DOM/SVG)
-   *----------------------------------------------------------------------------*/
-
-  Path.PathStatefulDrawable = {
-    mixin: function( drawableType ) {
-      var proto = drawableType.prototype;
-
-      // initializes, and resets (so we can support pooled states)
-      proto.initializeState = function() {
-        this.paintDirty = true; // flag that is marked if ANY "paint" dirty flag is set (basically everything except for transforms, so we can accelerated the transform-only case)
-        this.dirtyShape = true;
-
-        // adds fill/stroke-specific flags and state
-        this.initializePaintableState();
-
-        return this; // allow for chaining
-      };
-
-      // catch-all dirty, if anything that isn't a transform is marked as dirty
-      proto.markPaintDirty = function() {
-        this.paintDirty = true;
-        this.markDirty();
-      };
-
-      proto.markDirtyShape = function() {
-        this.dirtyShape = true;
-        this.markPaintDirty();
-      };
-
-      proto.setToCleanState = function() {
-        this.paintDirty = false;
-        this.dirtyShape = false;
-
-        this.cleanPaintableState();
-      };
-
-      Paintable.PaintableStatefulDrawable.mixin( drawableType );
-    }
-  };
-
-  /*---------------------------------------------------------------------------*
-   * SVG Rendering
-   *----------------------------------------------------------------------------*/
-
-  Path.PathSVGDrawable = function PathSVGDrawable( renderer, instance ) {
-    this.initialize( renderer, instance );
-  };
-  inherit( SVGSelfDrawable, Path.PathSVGDrawable, {
-    initialize: function( renderer, instance ) {
-      this.initializeSVGSelfDrawable( renderer, instance, true, keepSVGPathElements ); // usesPaint: true
-
-      if ( !this.svgElement ) {
-        this.svgElement = document.createElementNS( scenery.svgns, 'path' );
-      }
-
-      return this;
-    },
-
-    updateSVGSelf: function() {
-      assert && assert( !this.node.requiresSVGBoundsWorkaround(),
-        'No workaround for https://github.com/phetsims/scenery/issues/196 is provided at this time, please add an epsilon' );
-
-      var path = this.svgElement;
-      if ( this.dirtyShape ) {
-        var svgPath = this.node.hasShape() ? this.node._shape.getSVGPath() : '';
-
-        // temporary workaround for https://bugs.webkit.org/show_bug.cgi?id=78980
-        // and http://code.google.com/p/chromium/issues/detail?id=231626 where even removing
-        // the attribute can cause this bug
-        if ( !svgPath ) { svgPath = 'M0 0'; }
-
-        // only set the SVG path if it's not the empty string
-        path.setAttribute( 'd', svgPath );
-      }
-
-      this.updateFillStrokeStyle( path );
-    }
-  } );
-  Path.PathStatefulDrawable.mixin( Path.PathSVGDrawable );
-  SelfDrawable.Poolable.mixin( Path.PathSVGDrawable );
-
-  /*---------------------------------------------------------------------------*
-   * Canvas rendering
-   *----------------------------------------------------------------------------*/
-
-  Path.PathCanvasDrawable = function PathCanvasDrawable( renderer, instance ) {
-    this.initialize( renderer, instance );
-  };
-  inherit( CanvasSelfDrawable, Path.PathCanvasDrawable, {
-    initialize: function( renderer, instance ) {
-      return this.initializeCanvasSelfDrawable( renderer, instance );
-    },
-
-    paintCanvas: function( wrapper, node ) {
-      var context = wrapper.context;
-
-      if ( node.hasShape() ) {
-        // TODO: fill/stroke delay optimizations?
-        context.beginPath();
-        node._shape.writeToContext( context );
-
-        if ( node._fill ) {
-          node.beforeCanvasFill( wrapper ); // defined in Paintable
-          context.fill();
-          node.afterCanvasFill( wrapper ); // defined in Paintable
-        }
-        if ( node._stroke ) {
-          node.beforeCanvasStroke( wrapper ); // defined in Paintable
-          context.stroke();
-          node.afterCanvasStroke( wrapper ); // defined in Paintable
-        }
-      }
-    },
-
-    // stateless dirty functions
-    markDirtyShape: function() { this.markPaintDirty(); }
-  } );
-  Paintable.PaintableStatelessDrawable.mixin( Path.PathCanvasDrawable );
-  SelfDrawable.Poolable.mixin( Path.PathCanvasDrawable );
-
-  /*---------------------------------------------------------------------------*
-   * WebGL rendering
-   *----------------------------------------------------------------------------*/
-
-  Path.PathWebGLDrawable = inherit( WebGLSelfDrawable, function PathWebGLDrawable( renderer, instance ) {
-    this.initialize( renderer, instance );
-  }, {
-    // called either from the constructor or from pooling
-    initialize: function( renderer, instance ) {
-      this.initializeWebGLSelfDrawable( renderer, instance );
-    },
-
-    initializeContext: function( webglBlock ) {
-      this.webglBlock = webglBlock;
-      this.rectangleHandle = new SquareUnstrokedRectangle( webglBlock.webGLRenderer.colorTriangleRenderer, this.node, 0.5 );
-
-      // cleanup old vertexBuffer, if applicable
-      this.disposeWebGLBuffers();
-
-      this.initializePaintableState();
-      this.updatePath();
-
-      //TODO: Update the state in the buffer arrays
-    },
-
-    //Nothing necessary since everything currently handled in the uModelViewMatrix below
-    //However, we may switch to dynamic draw, and handle the matrix change only where necessary in the future?
-    updatePath: function() {
-
-      // TODO: a way to update the ColorTriangleBufferData.
-
-      // TODO: move to PaintableWebGLState???
-      if ( this.dirtyFill ) {
-        this.color = Color.toColor( this.node._fill || 'blue' );
-        this.cleanPaintableState();
-      }
-    },
-
-    render: function( shaderProgram ) {
-      // This is handled by the ColorTriangleRenderer
-    },
-
-    dispose: function() {
-      this.disposeWebGLBuffers();
-
-      // super
-      WebGLSelfDrawable.prototype.dispose.call( this );
-    },
-
-    disposeWebGLBuffers: function() {
-      this.webglBlock.webGLRenderer.colorTriangleRenderer.colorTriangleBufferData.dispose( this.rectangleHandle );
-    },
-
-    markDirtyShape: function() {
-      this.markDirty();
-    },
-
-    // general flag set on the state, which we forward directly to the drawable's paint flag
-    markPaintDirty: function() {
-      this.markDirty();
-    },
-
-    //TODO: Make sure all of the dirty flags make sense here.  Should we be using fillDirty, paintDirty, dirty, etc?
-    update: function() {
-      if ( this.dirty ) {
-        this.updatePath();
-        this.dirty = false;
-      }
-    }
-  } );
-  // include stubs (stateless) for marking dirty stroke and fill (if necessary). we only want one dirty flag, not multiple ones, for WebGL (for now)
-  Paintable.PaintableStatefulDrawable.mixin( Path.PathWebGLDrawable );
-  SelfDrawable.Poolable.mixin( Path.PathWebGLDrawable ); // pooling
-
-  /*---------------------------------------------------------------------------*
-   * Pixi Rendering
-   *----------------------------------------------------------------------------*/
-
-  Path.PathPixiDrawable = function PathPixiDrawable( renderer, instance ) {
-    this.initialize( renderer, instance );
-  };
-  inherit( PixiSelfDrawable, Path.PathPixiDrawable, {
-    initialize: function( renderer, instance ) {
-      this.initializePixiSelfDrawable( renderer, instance, false ); // never keep paths
-
-      if ( !this.displayObject ) {
-        this.displayObject = new PIXI.Graphics();
-      }
-
-      return this;
-    },
-
-    updatePixiSelf: function( node, graphics ) {
-      graphics.clear();
-
-      var shape = node.shape;
-      var i = 0;
-      var segment;
-      if ( shape !== null ) {
-        if ( node.getStrokeColor() ) {
-          graphics.lineStyle( 5, node.getStrokeColor().toNumber() );
-        }
-        if ( node.getFillColor() ) {
-          graphics.beginFill( node.getFillColor().toNumber() );
-        }
-        for ( i = 0; i < shape.subpaths.length; i++ ) {
-          var subpath = shape.subpaths[ i ];
-          for ( var k = 0; k < subpath.segments.length; k++ ) {
-            segment = subpath.segments[ k ];
-            if ( i === 0 && k === 0 ) {
-              graphics.moveTo( segment.start.x, segment.start.y );
-            }
-            else {
-              graphics.lineTo( segment.start.x, segment.start.y );
-            }
-
-            if ( k === subpath.segments.length - 1 ) {
-              graphics.lineTo( segment.end.x, segment.end.y );
-            }
-          }
-
-          if ( subpath.isClosed() ) {
-            segment = subpath.segments[ 0 ];
-            graphics.lineTo( segment.start.x, segment.start.y );
-          }
-        }
-
-        graphics.endFill();
-      }
-      // TODO: geometry
-
-      //graphics.moveTo( 0, 0 );
-      //graphics.lineTo( 100, 100 );
-      //graphics.endFill();
-    },
-
-    // stateless dirty methods:
-    markDirtyShape: function() { this.markPaintDirty(); }
-  } );
-  Paintable.PaintableStatelessDrawable.mixin( Path.PathPixiDrawable );
-  SelfDrawable.Poolable.mixin( Path.PathPixiDrawable );
-
-  return Path;
-} );
-
-
-
-//  Copyright 2002-2014, University of Colorado Boulder
-
-/**
- *
- *
- * @author Sam Reid (PhET Interactive Simulations)
- */
-define( 'SCENERY/accessibility/FocusCursor',['require','PHET_CORE/inherit','SCENERY/nodes/Path','KITE/Shape','AXON/Property'],function( require ) {
-  
-
-  // modules
-  var inherit = require( 'PHET_CORE/inherit' );
-  var Path = require( 'SCENERY/nodes/Path' );
-  var Shape = require( 'KITE/Shape' );
-  var Property = require( 'AXON/Property' );
-
-  // constants
-  var cursorWidth = 20;
-
-  /**
-   *
-   * @constructor
-   */
-  function FocusCursor( focusedBoundsProperty, focusIndicatorProperty ) {
-    var focusCursor = this;
-
-    Path.call( this, new Shape().moveTo( 0, 0 ).lineTo( cursorWidth, 0 ).lineTo( cursorWidth / 2, cursorWidth / 10 * 8 ).close(), {
-      fill: 'blue',
-      stroke: 'black',
-      lineWidth: 1
-    } );
-
-    // TODO: Don't update when invisible
-    focusedBoundsProperty.link( function( focusedBounds ) {
-      if ( focusedBounds ) {
-        focusCursor.bottom = focusedBounds.y;
-        focusCursor.centerX = focusedBounds.x + focusedBounds.width / 2;
-      }
-    } );
-
-    Property.multilink( [ focusedBoundsProperty, focusIndicatorProperty ], function( focusedBounds, focusIndicator ) {
-      var visible = focusedBounds !== null && focusIndicator === 'cursor';
-      focusCursor.visible = visible;
-    } );
-  }
-
-  return inherit( Path, FocusCursor );
-} );
 // Copyright 2002-2014, University of Colorado Boulder
 
 /**
@@ -20971,8 +21926,8 @@ define( 'DOT/Dimension2',['require','DOT/dot','DOT/Bounds2'],function( require )
       return this;
     },
 
-    setHeight: function( width ) {
-      this.width = width;
+    setHeight: function( height ) {
+      this.height = height;
       return this;
     },
 
@@ -21005,18 +21960,18 @@ define( 'DOT/Dimension2',['require','DOT/dot','DOT/Bounds2'],function( require )
  * Scans through potential properties on an object to detect prefixed forms, and returns the first match.
  *
  * E.g. currently:
- * core.detectPrefix( document.createElement( 'div' ).style, 'transform' ) === 'webkitTransform'
+ * phetCore.detectPrefix( document.createElement( 'div' ).style, 'transform' ) === 'webkitTransform'
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-define( 'PHET_CORE/detectPrefix',['require','PHET_CORE/core'],function( require ) {
+define( 'PHET_CORE/detectPrefix',['require','PHET_CORE/phetCore'],function( require ) {
   
 
-  var core = require( 'PHET_CORE/core' );
+  var phetCore = require( 'PHET_CORE/phetCore' );
 
   // @returns the best String str where obj[str] !== undefined, or returns undefined if that is not available
-  core.detectPrefix = function detectPrefix( obj, name ) {
+  phetCore.detectPrefix = function detectPrefix( obj, name ) {
     if ( obj[ name ] !== undefined ) { return name; }
 
     // prepare for camelCase
@@ -21031,7 +21986,7 @@ define( 'PHET_CORE/detectPrefix',['require','PHET_CORE/core'],function( require 
     return undefined;
   };
 
-  return core.detectPrefix;
+  return phetCore.detectPrefix;
 } );
 // Copyright 2002-2014, University of Colorado Boulder
 
@@ -21151,6 +22106,11 @@ define( 'SCENERY/util/Features',['require','PHET_CORE/detectPrefix','SCENERY/sce
   Features.userDrag = detectPrefix( div.style, 'userDrag' );
   Features.tapHighlightColor = detectPrefix( div.style, 'tapHighlightColor' );
 
+  Features.fontSmoothing = detectPrefix( div.style, 'fontSmoothing' );
+
+  Features.requestAnimationFrame = detectPrefix( window, 'requestAnimationFrame' );
+  Features.cancelAnimationFrame = detectPrefix( window, 'cancelAnimationFrame' );
+
   // e.g. Features.setStyle( domElement, Features.transform, '...' ), and doesn't set it if no 'transform' attribute (prefixed or no) is found
   Features.setStyle = function( domElement, optionalKey, value ) {
     if ( optionalKey !== undefined ) {
@@ -21193,8 +22153,10 @@ define( 'SCENERY/display/DOMSelfDrawable',['require','PHET_CORE/inherit','SCENER
       // super initialization
       this.initializeSelfDrawable( renderer, instance );
 
-      this.forceAcceleration = ( renderer & scenery.Renderer.bitmaskForceAcceleration ) !== 0;
+      this.forceAcceleration = false; // TODO: for now, check to see if this is used and how to use it
       this.markTransformDirty();
+
+      this.visibilityDirty = true;
 
       // handle transform changes
       instance.relativeTransform.addListener( this.transformListener ); // when our relative tranform changes, notify us in the pre-repaint phase
@@ -21221,12 +22183,28 @@ define( 'SCENERY/display/DOMSelfDrawable',['require','PHET_CORE/inherit','SCENER
       if ( this.dirty ) {
         this.dirty = false;
         this.updateDOM();
+
+        if ( this.visibilityDirty ) {
+          this.visibilityDirty = false;
+
+          this.domElement.style.visibility = this.visible ? '' : 'hidden';
+        }
       }
     },
 
     // @protected: called to update the visual appearance of our domElement
     updateDOM: function() {
       // should generally be overridden by drawable subtypes to implement the update
+    },
+
+    // @override
+    updateSelfVisibility: function() {
+      SelfDrawable.prototype.updateSelfVisibility.call( this );
+
+      if ( !this.visibilityDirty ) {
+        this.visibilityDirty = true;
+        this.markDirty();
+      }
     },
 
     dispose: function() {
@@ -21250,7 +22228,7 @@ define( 'SCENERY/display/DOMSelfDrawable',['require','PHET_CORE/inherit','SCENER
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-define( 'SCENERY/nodes/Rectangle',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/nodes/Path','KITE/Shape','DOT/Bounds2','DOT/Dimension2','DOT/Matrix3','SCENERY/util/Features','SCENERY/util/Color','SCENERY/nodes/Paintable','SCENERY/display/DOMSelfDrawable','SCENERY/display/SVGSelfDrawable','SCENERY/display/CanvasSelfDrawable','SCENERY/display/WebGLSelfDrawable','SCENERY/display/PixiSelfDrawable','SCENERY/display/SelfDrawable','SCENERY/display/webgl/SquareUnstrokedRectangle'],function( require ) {
+define( 'SCENERY/nodes/Rectangle',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/nodes/Path','KITE/Shape','DOT/Bounds2','DOT/Dimension2','DOT/Matrix3','SCENERY/util/Features','SCENERY/util/Color','SCENERY/nodes/Paintable','SCENERY/display/DOMSelfDrawable','SCENERY/display/SVGSelfDrawable','SCENERY/display/CanvasSelfDrawable','SCENERY/display/WebGLSelfDrawable','SCENERY/display/PixiSelfDrawable','SCENERY/display/SelfDrawable','SCENERY/display/Renderer','SCENERY/display/webgl/SquareUnstrokedRectangle'],function( require ) {
   
 
   var inherit = require( 'PHET_CORE/inherit' );
@@ -21270,6 +22248,7 @@ define( 'SCENERY/nodes/Rectangle',['require','PHET_CORE/inherit','SCENERY/scener
   var WebGLSelfDrawable = require( 'SCENERY/display/WebGLSelfDrawable' );
   var PixiSelfDrawable = require( 'SCENERY/display/PixiSelfDrawable' );
   var SelfDrawable = require( 'SCENERY/display/SelfDrawable' );
+  var Renderer = require( 'SCENERY/display/Renderer' );
   var SquareUnstrokedRectangle = require( 'SCENERY/display/webgl/SquareUnstrokedRectangle' );
 
   // TODO: change this based on memory and performance characteristics of the platform
@@ -21366,17 +22345,16 @@ define( 'SCENERY/nodes/Rectangle',['require','PHET_CORE/inherit','SCENERY/scener
       if ( this.hasStroke() && !this.getStroke().isGradient && !this.getStroke().isPattern && !this.hasLineDash() ) {
         // we can't support the bevel line-join with our current DOM rectangle display
         if ( this.getLineJoin() === 'miter' || ( this.getLineJoin() === 'round' && Features.borderRadius ) ) {
-          bitmask |= scenery.bitmaskSupportsDOM;
+          bitmask |= Renderer.bitmaskDOM;
         }
       }
 
-      bitmask |= scenery.bitmaskSupportsWebGL;
-      bitmask |= scenery.bitmaskSupportsPixi;
+      bitmask |= Renderer.bitmaskPixi;
       return bitmask;
     },
 
     getPathRendererBitmask: function() {
-      var bitmask = scenery.bitmaskSupportsCanvas | scenery.bitmaskSupportsSVG | scenery.bitmaskBoundsValid;
+      var bitmask = Renderer.bitmaskCanvas | Renderer.bitmaskSVG;
 
       var maximumArcSize = this.getMaximumArcSize();
 
@@ -21386,11 +22364,10 @@ define( 'SCENERY/nodes/Rectangle',['require','PHET_CORE/inherit','SCENERY/scener
       if ( ( !this.hasStroke() || ( this.getLineWidth() <= this._rectHeight && this.getLineWidth() <= this._rectWidth ) ) &&
            ( !this.isRounded() || ( Features.borderRadius && this._rectArcWidth === this._rectArcHeight ) ) &&
            this._rectArcHeight <= maximumArcSize && this._rectArcWidth <= maximumArcSize ) {
-        bitmask |= scenery.bitmaskSupportsDOM;
+        bitmask |= Renderer.bitmaskDOM;
       }
 
-      bitmask |= scenery.bitmaskSupportsWebGL;
-      bitmask |= scenery.bitmaskSupportsPixi;
+      bitmask |= Renderer.bitmaskPixi;
 
       return bitmask;
     },
@@ -21526,7 +22503,7 @@ define( 'SCENERY/nodes/Rectangle',['require','PHET_CORE/inherit','SCENERY/scener
       this._shape = null;
 
       // should invalidate the path and ensure a redraw
-      this.invalidateShape();
+      this.invalidatePath();
 
       // since we changed the rectangle arc width/height, it could make DOM work or not
       this.invalidateSupportedRenderers();
@@ -21623,7 +22600,7 @@ define( 'SCENERY/nodes/Rectangle',['require','PHET_CORE/inherit','SCENERY/scener
       }
       else {
         // probably called from the Path constructor
-        this.invalidateShape();
+        this.invalidatePath();
       }
     },
 
@@ -22116,7 +23093,7 @@ define( 'SCENERY/nodes/Rectangle',['require','PHET_CORE/inherit','SCENERY/scener
       this.initializeWebGLSelfDrawable( renderer, instance );
     },
 
-    initializeContext: function( webglBlock ) {
+    onAddToBlock: function( webglBlock ) {
       this.webglBlock = webglBlock;
       this.rectangleHandle = new SquareUnstrokedRectangle( webglBlock.webGLRenderer.colorTriangleRenderer, this.node, 0.5 );
 
@@ -22127,6 +23104,10 @@ define( 'SCENERY/nodes/Rectangle',['require','PHET_CORE/inherit','SCENERY/scener
       this.updateRectangle();
 
       //TODO: Update the state in the buffer arrays
+    },
+
+    onRemoveFromBlock: function( webglBlock ) {
+
     },
 
     //Nothing necessary since everything currently handled in the uModelViewMatrix below
@@ -22232,7 +23213,7 @@ define( 'SCENERY/nodes/Rectangle',['require','PHET_CORE/inherit','SCENERY/scener
   return Rectangle;
 } );
 
-//  Copyright 2002-2014, University of Colorado Boulder
+// Copyright 2002-2014, University of Colorado Boulder
 
 /**
  *
@@ -22276,7 +23257,7 @@ define( 'SCENERY/accessibility/FocusRectangle',['require','PHET_CORE/inherit','S
 
   return inherit( Rectangle, FocusRectangle );
 } );
-// Copyright 2002-2013, University of Colorado Boulder
+// Copyright 2002-2015, University of Colorado Boulder
 
 /**
  * A DerivedProperty is computed based on other properties.  This implementation inherits from Property to (a) simplify
@@ -22296,7 +23277,7 @@ define( 'AXON/DerivedProperty',['require','AXON/Property','AXON/axon','PHET_CORE
   /**
    * @param {Property[]} dependencies properties that this property's value is derived from
    * @param {function} derivation function that derives this property's value, expects args in the same order as dependencies
-   * @param {object} [options] - see code 
+   * @param {object} [options] - see Property
    * @constructor
    */
   axon.DerivedProperty = function DerivedProperty( dependencies, derivation, options ) {
@@ -22328,8 +23309,11 @@ define( 'AXON/DerivedProperty',['require','AXON/Property','AXON/axon','PHET_CORE
 
   return inherit( Property, axon.DerivedProperty, {
 
-      // Detaches this derived property from its dependencies.
-      detach: function() {
+      dispose: function() {
+
+        Property.prototype.dispose.call( this );
+
+        // Unlink from dependent properties
         for ( var i = 0; i < this.dependencies.length; i++ ) {
           var dependency = this.dependencies[ i ];
           dependency.unlink( this.dependencyListeners[ i ] );
@@ -22354,7 +23338,7 @@ define( 'AXON/DerivedProperty',['require','AXON/Property','AXON/axon','PHET_CORE
     }
   );
 } );
-//  Copyright 2002-2014, University of Colorado Boulder
+// Copyright 2002-2014, University of Colorado Boulder
 
 /**
  * The FocusLayer contains any focus highlights that are shown *outside* of particular nodes, such as
@@ -22363,11 +23347,12 @@ define( 'AXON/DerivedProperty',['require','AXON/Property','AXON/axon','PHET_CORE
  *
  * @author Sam Reid (PhET Interactive Simulations)
  */
-define( 'SCENERY/accessibility/FocusLayer',['require','PHET_CORE/inherit','SCENERY/nodes/Node','SCENERY/input/Input','SCENERY/accessibility/FocusRectangle','SCENERY/accessibility/FocusCursor','AXON/DerivedProperty','AXON/Property'],function( require ) {
+define( 'SCENERY/accessibility/FocusLayer',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/nodes/Node','SCENERY/input/Input','SCENERY/accessibility/FocusRectangle','SCENERY/accessibility/FocusCursor','AXON/DerivedProperty','AXON/Property'],function( require ) {
   
 
   // modules
   var inherit = require( 'PHET_CORE/inherit' );
+  var scenery = require( 'SCENERY/scenery' );
   var Node = require( 'SCENERY/nodes/Node' );
   var Input = require( 'SCENERY/input/Input' );
   var FocusRectangle = require( 'SCENERY/accessibility/FocusRectangle' );
@@ -22385,7 +23370,7 @@ define( 'SCENERY/accessibility/FocusLayer',['require','PHET_CORE/inherit','SCENE
    * @param {Object} [options] - optional configuration, see constructor
    * @constructor
    */
-  function FocusLayer( options ) {
+  scenery.FocusLayer = function FocusLayer( options ) {
 
     options = _.extend( {
 
@@ -22507,9 +23492,9 @@ define( 'SCENERY/accessibility/FocusLayer',['require','PHET_CORE/inherit','SCENE
     this.focusCursor = new FocusCursor( focusedBoundsProperty, focusIndicatorProperty );
 
     Node.call( this, { children: [ this.focusRectangle, this.focusCursor ] } );
-  }
+  };
 
-  return inherit( Node, FocusLayer, {}, {
+  return inherit( Node, scenery.FocusLayer, {}, {
 
     // An implementation of the tween factory interface that shows instantly-moving focus regions without TWEEN.js support
     INSTANT_TWEEN_FACTORY: {
@@ -23233,7 +24218,7 @@ define( 'SCENERY/display/Block',['require','PHET_CORE/inherit','PHET_CORE/cleanA
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-define( 'SCENERY/display/FittedBlock',['require','PHET_CORE/inherit','DOT/Bounds2','DOT/Vector2','SCENERY/scenery','SCENERY/display/Block','SCENERY/display/Renderer'],function( require ) {
+define( 'SCENERY/display/FittedBlock',['require','PHET_CORE/inherit','DOT/Bounds2','DOT/Vector2','SCENERY/scenery','SCENERY/display/Block'],function( require ) {
   
 
   var inherit = require( 'PHET_CORE/inherit' );
@@ -23241,7 +24226,6 @@ define( 'SCENERY/display/FittedBlock',['require','PHET_CORE/inherit','DOT/Bounds
   var Vector2 = require( 'DOT/Vector2' );
   var scenery = require( 'SCENERY/scenery' );
   var Block = require( 'SCENERY/display/Block' );
-  var Renderer = require( 'SCENERY/display/Renderer' );
 
   var scratchBounds2 = Bounds2.NOTHING.copy();
 
@@ -23272,8 +24256,8 @@ define( 'SCENERY/display/FittedBlock',['require','PHET_CORE/inherit','DOT/Bounds
       this.oldFitBounds = Bounds2.NOTHING.copy(); // copy for storage
       this.fitOffset = new Vector2();
 
-      // TODO: I can't find documentation about forceAcceleration anywhere.  How is this used?  What is it for?  How does it work?
-      this.forceAcceleration = ( renderer & Renderer.bitmaskForceAcceleration ) !== 0;
+      // TODO: improve how we handle graphical acceleration with transforms
+      this.forceAcceleration = false;
 
       // now we always add a listener to the display size to invalidate our fit
       this.display.onStatic( 'displaySize', this.dirtyFitListener );
@@ -23526,33 +24510,28 @@ define( 'SCENERY/util/Util',['require','SCENERY/scenery','DOT/Matrix3','DOT/Tran
       return 'assert.slow: ' + ( assertSlow ? 'true' : 'false' );
     },
 
-    /*---------------------------------------------------------------------------*
-     * window.requestAnimationFrame polyfill, by Erik Moller (http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating)
-     * referenced by initial Paul Irish article at http://paulirish.com/2011/requestanimationframe-for-smart-animating/
-     *----------------------------------------------------------------------------*/
+    /**
+     * Ensures that window.requestAnimationFrame and window.cancelAnimationFrame use a native implementation if possible,
+     * otherwise using a simple setTimeout internally. See https://github.com/phetsims/scenery/issues/426
+     */
     polyfillRequestAnimationFrame: function() {
-      var lastTime = 0;
-      var vendors = [ 'ms', 'moz', 'webkit', 'o' ];
-      for ( var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x ) {
-        window.requestAnimationFrame = window[ vendors[ x ] + 'RequestAnimationFrame' ];
-        window.cancelAnimationFrame = window[ vendors[ x ] + 'CancelAnimationFrame' ] || window[ vendors[ x ] + 'CancelRequestAnimationFrame' ];
-      }
+      if ( !window.requestAnimationFrame || !window.cancelAnimationFrame ) {
+        // Fallback implementation if no prefixed version is available
+        if ( !Features.requestAnimationFrame || !Features.cancelAnimationFrame ) {
+          window.requestAnimationFrame = function( callback ) {
+            var timeAtStart = Date.now();
 
-      if ( !window.requestAnimationFrame ) {
-        window.requestAnimationFrame = function( callback ) {
-          var currTime = new Date().getTime();
-          var timeToCall = Math.max( 0, 16 - (currTime - lastTime) );
-          var id = window.setTimeout( function() { callback( currTime + timeToCall ); },
-            timeToCall );
-          lastTime = currTime + timeToCall;
-          return id;
-        };
-      }
-
-      if ( !window.cancelAnimationFrame ) {
-        window.cancelAnimationFrame = function( id ) {
-          clearTimeout( id );
-        };
+            return window.setTimeout( function() {
+              callback( Date.now() - timeAtStart );
+            }, 16 );
+          };
+          window.cancelAnimationFrame = clearTimeout;
+        }
+        // Fill in the non-prefixed names with the prefixed versions
+        else {
+          window.requestAnimationFrame = window[ Features.requestAnimationFrame ];
+          window.cancelAnimationFrame = window[ Features.cancelAnimationFrame ];
+        }
       }
     },
 
@@ -23858,9 +24837,8 @@ define( 'SCENERY/util/Util',['require','SCENERY/scenery','DOT/Matrix3','DOT/Tran
 
       var args = { failIfMajorPerformanceCaveat: true };
       try {
-        var gl =
-          !!window.WebGLRenderingContext &&
-          (canvas.getContext( 'webgl', args ) || canvas.getContext( 'experimental-webgl', args ));
+        var gl = !!window.WebGLRenderingContext &&
+                 ( canvas.getContext( 'webgl', args ) || canvas.getContext( 'experimental-webgl', args ) );
 
         if ( !gl ) {
           return false;
@@ -23936,6 +24914,8 @@ define( 'SCENERY/display/CanvasBlock',['require','PHET_CORE/inherit','PHET_CORE/
         this.canvas.style.left = '0';
         this.canvas.style.top = '0';
         this.canvas.style.pointerEvents = 'none';
+
+        // unique ID so that we can support rasterization with Display.foreignObjectRasterization
         this.canvasId = this.canvas.id = 'scenery-canvas' + this.id;
 
         this.context = this.canvas.getContext( '2d' );
@@ -24044,6 +25024,11 @@ define( 'SCENERY/display/CanvasBlock',['require','PHET_CORE/inherit','PHET_CORE/
     },
 
     renderDrawable: function( drawable ) {
+      // do not paint invisible drawables
+      if ( !drawable.visible ) {
+        return;
+      }
+
       // we're directly accessing the relative transform below, so we need to ensure that it is up-to-date
       assert && assert( drawable.instance.relativeTransform.isValidationNotNeeded() );
 
@@ -24141,7 +25126,6 @@ define( 'SCENERY/display/CanvasBlock',['require','PHET_CORE/inherit','PHET_CORE/
 
 // Copyright 2002-2014, University of Colorado Boulder
 
-
 /**
  * PoolableMixin wrapper for SVG <group> elements. We store state and add listeners directly to the corresponding Node, so that we can set dirty flags and
  * smartly update only things that have changed. This takes a load off of SVGBlock.
@@ -24204,9 +25188,9 @@ define( 'SCENERY/display/SVGGroup',['require','PHET_CORE/inherit','PHET_CORE/Poo
       this.opacityDirtyListener = this.opacityDirtyListener || this.markOpacityDirty.bind( this );
       this.visibilityDirtyListener = this.visibilityDirtyListener || this.markVisibilityDirty.bind( this );
       this.clipDirtyListener = this.clipDirtyListener || this.markClipDirty.bind( this );
+      this.node.onStatic( 'visibility', this.visibilityDirtyListener );
       if ( this.willApplyFilters ) {
         this.node.onStatic( 'opacity', this.opacityDirtyListener );
-        this.node.onStatic( 'visibility', this.visibilityDirtyListener );
       }
       //OHTWO TODO: remove clip workaround
       this.node.onStatic( 'clip', this.clipDirtyListener );
@@ -24351,7 +25335,7 @@ define( 'SCENERY/display/SVGGroup',['require','PHET_CORE/inherit','PHET_CORE/Poo
 
         sceneryLog && sceneryLog.SVGGroup && sceneryLog.SVGGroup( 'visibility update: ' + this.toString() );
 
-        svgGroup.style.display = ( this.willApplyFilters && !this.node.isVisible() ) ? 'none' : '';
+        svgGroup.style.display = this.node.isVisible() ? '' : 'none';
       }
 
 
@@ -24376,8 +25360,7 @@ define( 'SCENERY/display/SVGGroup',['require','PHET_CORE/inherit','PHET_CORE/Poo
         sceneryLog && sceneryLog.SVGGroup && sceneryLog.SVGGroup( 'clip update: ' + this.toString() );
 
         //OHTWO TODO: remove clip workaround (use this.willApplyFilters)
-        var willApplyClip = this.block.filterRootInstance.trail.nodes.length >= this.instance.trail.nodes.length;
-        if ( willApplyClip && this.node._clipArea ) {
+        if ( this.node._clipArea ) {
           if ( !this.clipDefinition ) {
             var clipId = 'clip' + this.node.getId();
 
@@ -24461,9 +25444,9 @@ define( 'SCENERY/display/SVGGroup',['require','PHET_CORE/inherit','PHET_CORE/Poo
       if ( this.willApplyTransforms ) {
         this.node.offStatic( 'transform', this.transformDirtyListener );
       }
+      this.node.offStatic( 'visibility', this.visibilityDirtyListener );
       if ( this.willApplyFilters ) {
         this.node.offStatic( 'opacity', this.opacityDirtyListener );
-        this.node.offStatic( 'visibility', this.visibilityDirtyListener );
       }
       //OHTWO TODO: remove clip workaround
       this.node.offStatic( 'clip', this.clipDirtyListener );
@@ -24652,7 +25635,6 @@ define( 'SCENERY/display/SVGBlock',['require','PHET_CORE/inherit','PHET_CORE/Poo
       // reset what layer fitting can do (this.forceAcceleration set in fitted block initialization)
       Util.prepareForTransform( this.svg, this.forceAcceleration );
 
-      // TODO: Why are there such different ways of clearing the transform for this.svg vs this.baseTransformGroup?
       Util.unsetTransform( this.svg ); // clear out any transforms that could have been previously applied
       this.baseTransformGroup.setAttribute( 'transform', '' ); // no base transform
 
@@ -24952,223 +25934,512 @@ define( 'SCENERY/display/DOMBlock',['require','PHET_CORE/inherit','PHET_CORE/Poo
   return DOMBlock;
 } );
 
-//  Copyright 2002-2014, University of Colorado Boulder
+// Copyright 2002-2014, University of Colorado Boulder
 
 /**
- * This WebGL renderer is used to draw colored triangles.  Vertices are allocated for geometry + colors, and can be updated
- * dynamically.
- * TODO: Can this same pattern be used for interleaved texture coordinates? (Or other interleaved data?)
- * TODO: Work in progress, much to be done here!
- * TODO: Add this file to the list of scenery files (for jshint, etc.)
+ * Given a rectangular containing area, takes care of allocating and deallocating smaller rectangular "bins" that fit
+ * together inside the area and do not overlap.
  *
- * @author Sam Reid (PhET Interactive Simulations)
+ * Inpsired from https://github.com/jakesgordon/bin-packing/blob/master/js/packer.js
+ *
+ * TODO: option for efficiently repacking?
+ *
+ * @author Sharfudeen Ashraf
+ * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
-define( 'SCENERY/display/webgl/ColorTriangleBufferData',['require','PHET_CORE/inherit','SCENERY/util/Color','DOT/Matrix4'],function( require ) {
+define( 'DOT/BinPacker',['require','DOT/dot','PHET_CORE/inherit','DOT/Bounds2'],function( require ) {
   
 
   // modules
+  var dot = require( 'DOT/dot' );
   var inherit = require( 'PHET_CORE/inherit' );
-  var Color = require( 'SCENERY/util/Color' );
-  var Matrix4 = require( 'DOT/Matrix4' );
+  var Bounds2 = require( 'DOT/Bounds2' );
 
   /**
    * @constructor
+   *
+   * @param {Bounds2} bounds - The available bounds to pack bins inside.
    */
-  function ColorTriangleBufferData() {
+  dot.BinPacker = function BinPacker( bounds ) {
+    this.rootBin = new dot.BinPacker.Bin( bounds, null );
+  };
 
-    //TODO: Preallocate a large array so that bufferData only needs to be called once?
-    this.vertexArray = []; //x,y,z,r,g,b,a,m11,m13,m13,m21,m22,m23
-    this.elementsPerVertex = 13;
-  }
-
-  return inherit( Object, ColorTriangleBufferData, {
-    isEmpty: function() {
-      return this.vertexArray.length === 0;
-    },
-    reserveVertices: function( numVertices ) {
-      var startIndex = this.vertexArray.length;
-      for ( var i = 0; i < numVertices; i++ ) {
-        for ( var k = 0; k < this.elementsPerVertex; k++ ) {
-          this.vertexArray.push( 0 );
-        }
-      }
-      var endIndex = this.vertexArray.length;
-      return { startIndex: startIndex, endIndex: endIndex };
-    },
+  inherit( Object, dot.BinPacker, {
     /**
-     * Add geometry and color for a scenery path using sampling + triangulation.
-     * Uses poly2tri for triangulation
-     * @param path
+     * Allocates a bin with the specified width and height if possible (returning a {Bin}), otherwise returns null.
+     *
+     * @param {number} width
+     * @param {number} height
+     *
+     * @returns {Bin | null}
      */
-    createFromPath: function( path, z ) {
-      assert && assert( z !== undefined );
+    allocate: function( width, height ) {
+      // find a leaf bin that has available room (or null)
+      var bin = this.rootBin.findAvailableBin( width, height );
 
-      var matrix4 = path.getLocalToGlobalMatrix().toMatrix4();
-      var shape = path.shape;
-      var color = new Color( path.fill );
-      var linear = shape.toPiecewiseLinear( {} );
-      var subpaths = linear.subpaths;
+      if ( bin ) {
+        // split it into a sized sub-bin for our purpose that we will use, and other bins for future allocations
+        var sizedBin = bin.split( width, height );
 
-      // Output to a string for ease of debugging within http://r3mi.github.io/poly2tri.js/
-      var string = '';
+        // mark our bin as used
+        sizedBin.use();
 
-      // Output the contour to an array of poly2tri.Point
-      var contour = [];
-
-      var k;
-      for ( var i = 0; i < subpaths.length; i++ ) {
-        var subpath = subpaths[ i ];
-        for ( k = 0; k < subpath.points.length; k++ ) {
-
-          string = string + '' + subpath.points[ k ].x + ' ' + subpath.points[ k ].y + '\n';
-
-          //Add the points into the contour, but don't duplicate the last point.
-          //TODO: how to handle closed vs open shapes
-          if ( k < subpath.points.length - 1 ) {
-            contour.push( new poly2tri.Point( subpath.points[ k ].x, subpath.points[ k ].y ) );
-          }
-        }
+        return sizedBin;
       }
-
-      // Triangulate using poly2tri
-      // Circle linearization is creating some duplicated points, so bail on those for now.
-      var triangles;
-      try {
-        triangles = new poly2tri.SweepContext( contour ).triangulate().getTriangles();
-      }
-      catch( error ) {
-        console.log( 'error in triangulation', error );
-        triangles = [];
-      }
-
-      // Add the triangulated geometry into the array buffer.
-      for ( k = 0; k < triangles.length; k++ ) {
-        var triangle = triangles[ k ];
-        for ( var zz = 0; zz < triangle.points_.length; zz++ ) {
-          var pt = triangle.points_[ zz ];
-
-          // Mutate the vertices a bit to see what is going on.  Or not.
-          var randFactor = 0;
-          this.vertexArray.push( pt.x + Math.random() * randFactor, pt.y + Math.random() * randFactor, z,
-            color.red / 255, color.green / 255, color.blue / 255, color.alpha,
-            matrix4.m00(), matrix4.m01(), matrix4.m03(), matrix4.m10(), matrix4.m11(), matrix4.m13()
-          );
-        }
+      else {
+        return null;
       }
     },
-    createFromTriangle: function( x1, y1, x2, y2, x3, y3, color, z, matrix4 ) {
-      assert && assert( z !== undefined );
 
-      matrix4 = matrix4 || Matrix4.identity();
-      color = new Color( color );
-      var r = color.red / 255;
-      var g = color.green / 255;
-      var b = color.blue / 255;
-      var a = color.alpha;
-
-      var colorTriangleBufferData = this;
-      var index = this.vertexArray.length;
-      colorTriangleBufferData.vertexArray.push(
-        // Top left
-        x1, y1, z, r, g, b, a, matrix4.m00(), matrix4.m01(), matrix4.m03(), matrix4.m10(), matrix4.m11(), matrix4.m13(),
-        x2, y2, z, r, g, b, a, matrix4.m00(), matrix4.m01(), matrix4.m03(), matrix4.m10(), matrix4.m11(), matrix4.m13(),
-        x3, y3, z, r, g, b, a, matrix4.m00(), matrix4.m01(), matrix4.m03(), matrix4.m10(), matrix4.m11(), matrix4.m13()
-      );
-
-      //Track the index so it can delete itself, update itself, etc.
-      //TODO: Move to a separate class.
-      return {
-        startIndex: index,
-        endIndex: colorTriangleBufferData.vertexArray.length,
-        setTriangle: function( x1, y1, x2, y2, x3, y3 ) {
-          colorTriangleBufferData.vertexArray[ index + 0 + 13 * 0 ] = x1;
-          colorTriangleBufferData.vertexArray[ index + 1 + 13 * 0 ] = y1;
-          colorTriangleBufferData.vertexArray[ index + 0 + 13 * 1 ] = x2;
-          colorTriangleBufferData.vertexArray[ index + 1 + 13 * 1 ] = y2;
-          colorTriangleBufferData.vertexArray[ index + 0 + 13 * 2 ] = x3;
-          colorTriangleBufferData.vertexArray[ index + 1 + 13 * 2 ] = y3;
-        },
-        setZ: function( z ) {
-          colorTriangleBufferData.vertexArray[ index + 2 ] = z;
-          colorTriangleBufferData.vertexArray[ index + 5 ] = z;
-          colorTriangleBufferData.vertexArray[ index + 8 ] = z;
-        }
-      };
+    /**
+     * Deallocates a bin, so that its area can be reused by future allocations.
+     *
+     * @param {Bin} bin - The bin that was returned from allocate().
+     */
+    deallocate: function( bin ) {
+      bin.unuse();
     },
 
-    createStar: function( _x, _y, _innerRadius, _outerRadius, _totalAngle, r, g, b, a, z ) {
-      assert && assert( z !== undefined );
+    // @private, for debugging purposes
+    toString: function() {
+      var result = '';
 
-      var colorTriangleBufferData = this;
-      var index = this.vertexArray.length;
-      for ( var i = 0; i < 18; i++ ) {
-        this.vertexArray.push( 0 );
+      var padding = '';
+      function binTree( bin ) {
+        result += padding + bin.toString() + '\n';
+        padding = padding + '  ';
+        _.each( bin.children, binTree );
+        padding = padding.substring( 2 );
       }
+      binTree( this.rootBin );
 
-      // Add the same color for all vertices (solid fill star).
-      // TODO: some way to reduce this amount of elements!
-//      this.colors.push(
-//        r, g, b, a,
-//        r, g, b, a,
-//        r, g, b, a,
-//
-//        r, g, b, a,
-//        r, g, b, a,
-//        r, g, b, a,
-//
-//        r, g, b, a,
-//        r, g, b, a,
-//        r, g, b, a
-//      );
-
-      //Track the index so it can delete itself, update itself, etc.
-      var myStar = {
-        startIndex: index,
-        setStar: function( _x, _y, _innerRadius, _outerRadius, _totalAngle ) {
-
-          var points = [];
-          //Create the points for a filled-in star, which will be used to compute the geometry of a partial star.
-          for ( i = 0; i < 10; i++ ) {
-
-            //Start at the top and proceed clockwise
-            var angle = i / 10 * Math.PI * 2 - Math.PI / 2 + _totalAngle;
-            var radius = i % 2 === 0 ? _outerRadius : _innerRadius;
-            var x = radius * Math.cos( angle ) + _x;
-            var y = radius * Math.sin( angle ) + _y;
-            points.push( { x: x, y: y } );
-          }
-
-          var index = this.index;
-          colorTriangleBufferData.vertexArray[ index + 0 ] = points[ 0 ].x;
-          colorTriangleBufferData.vertexArray[ index + 1 ] = points[ 0 ].y;
-          colorTriangleBufferData.vertexArray[ index + 2 ] = points[ 3 ].x;
-          colorTriangleBufferData.vertexArray[ index + 3 ] = points[ 3 ].y;
-          colorTriangleBufferData.vertexArray[ index + 4 ] = points[ 6 ].x;
-          colorTriangleBufferData.vertexArray[ index + 5 ] = points[ 6 ].y;
-
-          colorTriangleBufferData.vertexArray[ index + 6 ] = points[ 8 ].x;
-          colorTriangleBufferData.vertexArray[ index + 7 ] = points[ 8 ].y;
-          colorTriangleBufferData.vertexArray[ index + 8 ] = points[ 2 ].x;
-          colorTriangleBufferData.vertexArray[ index + 9 ] = points[ 2 ].y;
-          colorTriangleBufferData.vertexArray[ index + 10 ] = points[ 5 ].x;
-          colorTriangleBufferData.vertexArray[ index + 11 ] = points[ 5 ].y;
-
-          colorTriangleBufferData.vertexArray[ index + 12 ] = points[ 0 ].x;
-          colorTriangleBufferData.vertexArray[ index + 13 ] = points[ 0 ].y;
-          colorTriangleBufferData.vertexArray[ index + 14 ] = points[ 7 ].x;
-          colorTriangleBufferData.vertexArray[ index + 15 ] = points[ 7 ].y;
-          colorTriangleBufferData.vertexArray[ index + 16 ] = points[ 4 ].x;
-          colorTriangleBufferData.vertexArray[ index + 17 ] = points[ 4 ].y;
-        }
-      };
-      myStar.setStar( _x, _y, _innerRadius, _outerRadius, _totalAngle );
-      return myStar;
-    },
-    dispose: function( handle ) {
-      //TODO: Dispose it!
+      return result;
     }
   } );
+
+  /**
+   * A rectangular bin that can be used itself or split into sub-bins
+   * @constructor
+   *
+   * @param {Bounds2} bounds
+   */
+  dot.BinPacker.Bin = function Bin( bounds, parent ) {
+    this.bounds = bounds; // @public {Bounds2} our containing bounds
+    this.parent = parent; // @private {Bin || null} parent bin, if applicable
+
+    this.isSplit = false; // @private {boolean} whether our children are responsible for our area
+    this.isUsed = false; // @private {boolean} whether we are marked as a bin that is used
+    this.children = []; // @private {Array.<Bin>}
+  };
+  inherit( Object, dot.BinPacker.Bin, {
+
+    /**
+     * @private
+     * Finds an unused bin with open area that is at least width-x-height in size.
+     *
+     * @param {number} width
+     * @param {number} height
+     * @returns {Bin | null}
+     */
+    findAvailableBin: function( width, height ) {
+      assert && assert( width > 0 && height > 0, 'Empty bin requested?' );
+
+      // If we are marked as used ourself, we can't be used
+      if ( this.isUsed ) {
+        return null;
+      }
+      // If our bounds can't fit it, skip this entire sub-tree
+      else if ( this.bounds.width < width || this.bounds.height < height ) {
+        return null;
+      }
+      // If we have been split, check our children
+      else if ( this.isSplit ) {
+        for ( var i = 0; i < this.children.length; i++ ) {
+          var result = this.children[i].findAvailableBin( width, height );
+          if ( result ) {
+            return result;
+          }
+        }
+        // No child can fit the area
+        return null;
+      }
+      // Otherwise we are free and our dimensions are compatible (checked above)
+      else {
+        return this;
+      }
+    },
+
+    /**
+     * @private
+     * Splits this bin into multiple child bins, and returns the child with the dimensions (width,height).
+     *
+     * @param {number} width
+     * @param {number} height
+     */
+    split: function( width, height ) {
+      assert && assert( this.bounds.width >= width && this.bounds.height >= height,
+        'Bin does not have space' );
+      assert && assert( !this.isSplit, 'Bin should not be re-split' );
+      assert && assert( !this.isUsed, 'Bin should not be split when used' );
+      assert && assert( width > 0 && height > 0, 'Empty bin requested?' );
+
+      // if our dimensions match exactly, don't split (return ourself)
+      if ( width === this.bounds.width && height === this.bounds.height ) {
+        return this;
+      }
+
+      // mark as split
+      this.isSplit = true;
+
+      // locations of the split
+      var splitX = this.bounds.minX + width;
+      var splitY = this.bounds.minY + height;
+
+      /*
+       * How an area is split (for now). In the future, splitting more after determining what we need to fit next would
+       * potentially be better, but this preserves the width better (which many times we need).
+       *
+       *   ************************************
+       *   *                  *               *
+       *   *                  *               *
+       *   *       main       *     right     *
+       *   * (width x height) *               *
+       *   *                  *               *
+       *   ************************************
+       *   *                                  *
+       *   *              bottom              *
+       *   *                                  *
+       *   ************************************
+       */
+      var mainBounds = new Bounds2( this.bounds.minX, this.bounds.minY, splitX, splitY );
+      var rightBounds = new Bounds2( splitX, this.bounds.minY, this.bounds.maxX, splitY );
+      var bottomBounds = new Bounds2( this.bounds.minX, splitY, this.bounds.maxX, this.bounds.maxY );
+
+      var mainBin = new dot.BinPacker.Bin( mainBounds, this );
+      this.children.push( mainBin );
+
+      // only add right/bottom if they take up area
+      if ( rightBounds.hasNonzeroArea() ) {
+        this.children.push( new dot.BinPacker.Bin( rightBounds, this ) );
+      }
+      if ( bottomBounds.hasNonzeroArea() ) {
+        this.children.push( new dot.BinPacker.Bin( bottomBounds, this ) );
+      }
+
+      return mainBin;
+    },
+
+    /**
+     * @private
+     * Mark this bin as used.
+     */
+    use: function() {
+      assert && assert( !this.isSplit, 'Should not mark a split bin as used' );
+      assert && assert( !this.isUsed, 'Should not mark a used bin as used' );
+
+      this.isUsed = true;
+    },
+
+    /**
+     * @private
+     * Mark this bin as not used, and attempt to collapse split parents if all children are unused.
+     */
+    unuse: function() {
+      assert && assert( this.isUsed, 'Can only unuse a used instance' );
+
+      this.isUsed = false;
+
+      this.parent && this.parent.attemptToCollapse();
+    },
+
+    /**
+     * @private
+     * If our bin can be collapsed (it is split and has children that are not used AND not split), then we will become
+     * not split, and will remove our children. If successful, it will also call this on our parent, fully attempting
+     * to clean up unused data structures.
+     */
+    attemptToCollapse: function() {
+      assert && assert( this.isSplit, 'Should only attempt to collapse split bins' );
+
+      // Bail out if a single child isn't able to be collapsed. If it is not split or used, it won't have any children
+      // or needs.
+      for ( var i = 0; i < this.children.length; i++ ) {
+        var child = this.children[i];
+
+        if ( child.isSplit || child.isUsed ) {
+          return;
+        }
+      }
+
+      // We can now collapse ourselves neatly
+      this.children = [];
+      this.isSplit = false;
+
+      // And attempt to collapse our parent
+      this.parent && this.parent.attemptToCollapse();
+    },
+
+    // @private for debugging purposes
+    toString: function() {
+      return this.bounds.toString() + ( this.isUsed ? ' used' : '' );
+    }
+  } );
+
+  return dot.BinPacker;
 } );
+
+//  Copyright 2002-2014, University of Colorado Boulder
+
+/**
+ * A single Canvas/texture with multiple different images (sprites) drawn internally. During rendering, this texture
+ * can be used in one draw call to render multiple different images by providing UV coordinates to each quad for each
+ * image to be drawn.
+ *
+ * Note that the WebGL texture part is not required to be run - the Canvas-only part can be used functionally without
+ * any WebGL dependencies.
+ *
+ * TODO: Add padding around sprites, otherwise interpolation could cause issues!
+ * TODO: How to use custom mipmap levels?
+ *
+ * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Sam Reid (PhET Interactive Simulations)
+ */
+define( 'SCENERY/util/SpriteSheet',['require','SCENERY/scenery','PHET_CORE/inherit','DOT/BinPacker','DOT/Bounds2'],function( require ) {
+  
+
+  // modules
+  var scenery = require( 'SCENERY/scenery' );
+  var inherit = require( 'PHET_CORE/inherit' );
+  var BinPacker = require( 'DOT/BinPacker' );
+  var Bounds2 = require( 'DOT/Bounds2' );
+
+  /**
+   * @constructor
+   *
+   * @param {boolean} useMipmaps - Whether built-in WebGL mipmapping should be used. Higher quality, but may be slower
+   *                               to add images (since mipmaps need to be updated).
+   */
+  scenery.SpriteSheet = function SpriteSheet( useMipmaps ) {
+    this.useMipmaps = useMipmaps;
+
+    this.gl = null; // assume later creation of context for now
+
+    // Use the max supported texture size (according to http://codeflow.org/entries/2013/feb/22/how-to-write-portable-webgl/ )
+    // TODO: potentially support larger texture sizes based on reported capabilities (could cause fewer draw calls?)
+    this.bounds = new Bounds2( 0, 0, 2048, 2048 );
+    assert && assert( this.bounds.minX === 0 && this.bounds.minY === 0, 'Assumed constraint later on for transforms' );
+    this.width = this.bounds.width;
+    this.height = this.bounds.height;
+
+    this.canvas = document.createElement( 'canvas' );
+    this.canvas.width = this.width;
+    this.canvas.height = this.height;
+    this.context = this.canvas.getContext( '2d' );
+
+    this.binPacker = new BinPacker( this.bounds );
+
+    this.dirty = true; // @public [read-only] - Used to check if we need to updateTexture()
+
+    this.usedSprites = [];
+    this.unusedSprites = []; // works as a LRU cache for removing items when we need to allocate new space
+  };
+
+  inherit( Object, scenery.SpriteSheet, {
+    /**
+     * Initialize (or reinitialize) ourself with a new GL context. Should be called at least once before updateTexture()
+     */
+    initializeContext: function( gl ) {
+      this.gl = gl;
+
+      this.createTexture();
+    },
+
+    /**
+     * Allocates and creates a GL texture, configures it, and initializes it with our current Canvas.
+     */
+    createTexture: function() {
+      var gl = this.gl;
+
+      this.texture = gl.createTexture();
+      gl.bindTexture( gl.TEXTURE_2D, this.texture );
+      gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE );
+      gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE );
+      gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, this.useMipmaps ? gl.LINEAR_MIPMAP_LINEAR : gl.LINEAR );
+      gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR );
+      gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, false );
+      gl.pixelStorei( gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true ); // work with premultiplied numbers
+      gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.canvas );
+      if ( this.useMipmaps ) {
+        gl.hint( gl.GENERATE_MIPMAP_HINT, gl.NICEST );
+        gl.generateMipmap( gl.TEXTURE_2D );
+      }
+      gl.bindTexture( gl.TEXTURE_2D, null );
+
+      this.dirty = false;
+    },
+
+    /**
+     * Updates a pre-existing texture with our current Canvas.
+     */
+    updateTexture: function() {
+      assert && assert( this.gl, 'SpriteSheet needs context to updateTexture()' );
+
+      if ( this.dirty ) {
+        this.dirty = false;
+
+        var gl = this.gl;
+
+        gl.bindTexture( gl.TEXTURE_2D, this.texture );
+        gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.canvas );
+        if ( this.useMipmaps ) {
+          gl.generateMipmap( gl.TEXTURE_2D );
+        }
+        gl.bindTexture( gl.TEXTURE_2D, null );
+      }
+    },
+
+    /**
+     * Adds an image (if possible) to our sprite sheet. If successful, will return a {Sprite}, otherwise null.
+     *
+     * @param {HTMLCanvasElement | HTMLImageElement} image
+     * @param {number} width
+     * @param {number} height
+     *
+     * @returns {Sprite | null}
+     */
+    addImage: function( image, width, height ) {
+      var i;
+
+      // check used cache
+      for ( i = 0; i < this.usedSprites.length; i++ ) {
+        var usedSprite = this.usedSprites[i];
+        if ( usedSprite.image === image ) {
+          usedSprite.count++;
+          return usedSprite;
+        }
+      }
+
+      // check unused cache
+      for ( i = 0; i < this.unusedSprites.length; i++ ) {
+        var unusedSprite = this.unusedSprites[i];
+        if ( unusedSprite.image === image ) {
+          unusedSprite.count++;
+          assert && assert( unusedSprite.count === 1, 'Count should be exactly 1 after coming back from being unused' );
+          this.unusedSprites.splice( i, 1 ); // remove it from the unused array
+          this.usedSprites.push( unusedSprite ); // add it to the used array
+          return unusedSprite;
+        }
+      }
+
+      // Not in any caches, let's try to find space. If we can't find space at first, we start removing unused sprites
+      // one-by-one.
+      var bin;
+      // Enters 'while' loop only if allocate() returns null and we have unused sprites (i.e. conditions where we will
+      // want to deallocate the least recently used (LRU) unused sprite and then check for allocation again).
+      while ( !( bin = this.binPacker.allocate( width, height ) ) && this.unusedSprites.length ) {
+        var ejectedSprite = this.unusedSprites.shift(); // LRU policy by taking first item
+
+        // clear its space in the Canvas
+        this.dirty = true;
+        var ejectedBounds = ejectedSprite.bin.bounds;
+        this.context.clearRect( ejectedBounds.x, ejectedBounds.y, ejectedBounds.width, ejectedBounds.height );
+
+        // deallocate its area in the bin packer
+        this.binPacker.deallocate( ejectedSprite.bin );
+      }
+
+      if ( bin ) {
+        // WebGL will want UV coordinates in the [0,1] range
+        var uvBounds = new Bounds2( bin.bounds.minX / this.width, bin.bounds.minY / this.height,
+                                    bin.bounds.maxX / this.width, bin.bounds.maxY / this.height );
+        var sprite = new scenery.SpriteSheet.Sprite( this, bin, uvBounds, image, 1 );
+        this.context.drawImage( image, bin.bounds.x, bin.bounds.y );
+        this.dirty = true;
+        this.usedSprites.push( sprite );
+        return sprite;
+      }
+      // no space, even after clearing out our unused sprites
+      else {
+        return null;
+      }
+    },
+
+    removeImage: function( image ) {
+      // find the used sprite (and its index)
+      var usedSprite;
+      var i;
+      for ( i = 0; i < this.usedSprites.length; i++ ) {
+        if ( this.usedSprites[i].image === image ) {
+          usedSprite = this.usedSprites[i];
+          break;
+        }
+      }
+      assert && assert( usedSprite, 'Sprite not found for removeImage' );
+
+      // if we have no more references to the image/sprite
+      if ( --usedSprite.count <= 0 ) {
+        this.usedSprites.splice( i, 1 ); // remove it from the used list
+        this.unusedSprites.push( usedSprite ); // add it to the unused list
+      }
+
+      // NOTE: no modification to the Canvas/texture is made, since we can leave it drawn there and unreferenced.
+      // If addImage( image ) is called for the same image, we can 'resurrect' it without any further Canvas/texture
+      // changes being made.
+    },
+
+    /**
+     * Whether the sprite for the specified image is handled by this spritesheet. It can be either used or unused, but
+     * addImage() calls with the specified image should be extremely fast (no need to modify the Canvas or texture).
+     *
+     * @returns {boolean}
+     */
+    containsImage: function( image ) {
+      var i;
+
+      // check used cache
+      for ( i = 0; i < this.usedSprites.length; i++ ) {
+        if ( this.usedSprites[i].image === image ) {
+          return true;
+        }
+      }
+
+      // check unused cache
+      for ( i = 0; i < this.unusedSprites.length; i++ ) {
+        if ( this.unusedSprites[i].image === image ) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+  } );
+
+  /**
+   * A reference to a specific part of the texture that can be used.
+   *
+   * @constructor
+   */
+  scenery.SpriteSheet.Sprite = function( spriteSheet, bin, uvBounds, image, initialCount ) {
+    // @public [read-only] {SpriteSheet} - The containing SpriteSheet
+    this.spriteSheet = spriteSheet;
+
+    // @private [read-only] {BinPacker.Bin} - Contains the actual image bounds in our Canvas, and is used to deallocate.
+    this.bin = bin;
+
+    // @public [read-only] {Bounds2} - Normalized bounds between [0,1] for the full texture (for GLSL texture lookups).
+    this.uvBounds = uvBounds;
+
+    // @private [read-only] {HTMLCanvasElement | HTMLImageElement} - Image element used.
+    this.image = image;
+
+    // @private [read-write] {number} - Reference count for number of addChild() calls minus removeChild() calls. If
+    // the count is 0, it should be in the 'unusedSprites' array, otherwise it should be in the 'usedSprites' array.
+    this.count = initialCount;
+  };
+
+  return scenery.SpriteSheet;
+} );
+
 // Copyright 2002-2014, University of Colorado
 
 /**
@@ -25316,1298 +26587,29 @@ define( 'SCENERY/util/ShaderProgram',['require','PHET_CORE/inherit','SCENERY/sce
   } );
 } );
 
-/**
- * @license RequireJS text 2.0.12 Copyright (c) 2010-2014, The Dojo Foundation All Rights Reserved.
- * Available via the MIT or new BSD license.
- * see: http://github.com/requirejs/text for details
- */
-/*jslint regexp: true */
-/*global require, XMLHttpRequest, ActiveXObject,
- define, window, process, Packages,
- java, location, Components, FileUtils */
-
-define('text',['module'], function (module) {
-  
-
-  var text, fs, Cc, Ci, xpcIsWindows,
-    progIds = ['Msxml2.XMLHTTP', 'Microsoft.XMLHTTP', 'Msxml2.XMLHTTP.4.0'],
-    xmlRegExp = /^\s*<\?xml(\s)+version=[\'\"](\d)*.(\d)*[\'\"](\s)*\?>/im,
-    bodyRegExp = /<body[^>]*>\s*([\s\S]+)\s*<\/body>/im,
-    hasLocation = typeof location !== 'undefined' && location.href,
-    defaultProtocol = hasLocation && location.protocol && location.protocol.replace(/\:/, ''),
-    defaultHostName = hasLocation && location.hostname,
-    defaultPort = hasLocation && (location.port || undefined),
-    buildMap = {},
-    masterConfig = (module.config && module.config()) || {};
-
-  text = {
-    version: '2.0.12',
-
-    strip: function (content) {
-      //Strips <?xml ...?> declarations so that external SVG and XML
-      //documents can be added to a document without worry. Also, if the string
-      //is an HTML document, only the part inside the body tag is returned.
-      if (content) {
-        content = content.replace(xmlRegExp, "");
-        var matches = content.match(bodyRegExp);
-        if (matches) {
-          content = matches[1];
-        }
-      } else {
-        content = "";
-      }
-      return content;
-    },
-
-    jsEscape: function (content) {
-      return content.replace(/(['\\])/g, '\\$1')
-        .replace(/[\f]/g, "\\f")
-        .replace(/[\b]/g, "\\b")
-        .replace(/[\n]/g, "\\n")
-        .replace(/[\t]/g, "\\t")
-        .replace(/[\r]/g, "\\r")
-        .replace(/[\u2028]/g, "\\u2028")
-        .replace(/[\u2029]/g, "\\u2029");
-    },
-
-    createXhr: masterConfig.createXhr || function () {
-      //Would love to dump the ActiveX crap in here. Need IE 6 to die first.
-      var xhr, i, progId;
-      if (typeof XMLHttpRequest !== "undefined") {
-        return new XMLHttpRequest();
-      } else if (typeof ActiveXObject !== "undefined") {
-        for (i = 0; i < 3; i += 1) {
-          progId = progIds[i];
-          try {
-            xhr = new ActiveXObject(progId);
-          } catch (e) {}
-
-          if (xhr) {
-            progIds = [progId];  // so faster next time
-            break;
-          }
-        }
-      }
-
-      return xhr;
-    },
-
-    /**
-     * Parses a resource name into its component parts. Resource names
-     * look like: module/name.ext!strip, where the !strip part is
-     * optional.
-     * @param {String} name the resource name
-     * @returns {Object} with properties "moduleName", "ext" and "strip"
-     * where strip is a boolean.
-     */
-    parseName: function (name) {
-      var modName, ext, temp,
-        strip = false,
-        index = name.indexOf("."),
-        isRelative = name.indexOf('./') === 0 ||
-                     name.indexOf('../') === 0;
-
-      if (index !== -1 && (!isRelative || index > 1)) {
-        modName = name.substring(0, index);
-        ext = name.substring(index + 1, name.length);
-      } else {
-        modName = name;
-      }
-
-      temp = ext || modName;
-      index = temp.indexOf("!");
-      if (index !== -1) {
-        //Pull off the strip arg.
-        strip = temp.substring(index + 1) === "strip";
-        temp = temp.substring(0, index);
-        if (ext) {
-          ext = temp;
-        } else {
-          modName = temp;
-        }
-      }
-
-      return {
-        moduleName: modName,
-        ext: ext,
-        strip: strip
-      };
-    },
-
-    xdRegExp: /^((\w+)\:)?\/\/([^\/\\]+)/,
-
-    /**
-     * Is an URL on another domain. Only works for browser use, returns
-     * false in non-browser environments. Only used to know if an
-     * optimized .js version of a text resource should be loaded
-     * instead.
-     * @param {String} url
-     * @returns Boolean
-     */
-    useXhr: function (url, protocol, hostname, port) {
-      var uProtocol, uHostName, uPort,
-        match = text.xdRegExp.exec(url);
-      if (!match) {
-        return true;
-      }
-      uProtocol = match[2];
-      uHostName = match[3];
-
-      uHostName = uHostName.split(':');
-      uPort = uHostName[1];
-      uHostName = uHostName[0];
-
-      return (!uProtocol || uProtocol === protocol) &&
-             (!uHostName || uHostName.toLowerCase() === hostname.toLowerCase()) &&
-             ((!uPort && !uHostName) || uPort === port);
-    },
-
-    finishLoad: function (name, strip, content, onLoad) {
-      content = strip ? text.strip(content) : content;
-      if (masterConfig.isBuild) {
-        buildMap[name] = content;
-      }
-      onLoad(content);
-    },
-
-    load: function (name, req, onLoad, config) {
-      //Name has format: some.module.filext!strip
-      //The strip part is optional.
-      //if strip is present, then that means only get the string contents
-      //inside a body tag in an HTML string. For XML/SVG content it means
-      //removing the <?xml ...?> declarations so the content can be inserted
-      //into the current doc without problems.
-
-      // Do not bother with the work if a build and text will
-      // not be inlined.
-      if (config && config.isBuild && !config.inlineText) {
-        onLoad();
-        return;
-      }
-
-      masterConfig.isBuild = config && config.isBuild;
-
-      var parsed = text.parseName(name),
-        nonStripName = parsed.moduleName +
-                       (parsed.ext ? '.' + parsed.ext : ''),
-        url = req.toUrl(nonStripName),
-        useXhr = (masterConfig.useXhr) ||
-                 text.useXhr;
-
-      // Do not load if it is an empty: url
-      if (url.indexOf('empty:') === 0) {
-        onLoad();
-        return;
-      }
-
-      //Load the text. Use XHR if possible and in a browser.
-      if (!hasLocation || useXhr(url, defaultProtocol, defaultHostName, defaultPort)) {
-        text.get(url, function (content) {
-          text.finishLoad(name, parsed.strip, content, onLoad);
-        }, function (err) {
-          if (onLoad.error) {
-            onLoad.error(err);
-          }
-        });
-      } else {
-        //Need to fetch the resource across domains. Assume
-        //the resource has been optimized into a JS module. Fetch
-        //by the module name + extension, but do not include the
-        //!strip part to avoid file system issues.
-        req([nonStripName], function (content) {
-          text.finishLoad(parsed.moduleName + '.' + parsed.ext,
-            parsed.strip, content, onLoad);
-        });
-      }
-    },
-
-    write: function (pluginName, moduleName, write, config) {
-      if (buildMap.hasOwnProperty(moduleName)) {
-        var content = text.jsEscape(buildMap[moduleName]);
-        write.asModule(pluginName + "!" + moduleName,
-            "define(function () { return '" +
-            content +
-            "';});\n");
-      }
-    },
-
-    writeFile: function (pluginName, moduleName, req, write, config) {
-      var parsed = text.parseName(moduleName),
-        extPart = parsed.ext ? '.' + parsed.ext : '',
-        nonStripName = parsed.moduleName + extPart,
-      //Use a '.js' file name so that it indicates it is a
-      //script that can be loaded across domains.
-        fileName = req.toUrl(parsed.moduleName + extPart) + '.js';
-
-      //Leverage own load() method to load plugin value, but only
-      //write out values that do not have the strip argument,
-      //to avoid any potential issues with ! in file names.
-      text.load(nonStripName, req, function (value) {
-        //Use own write() method to construct full module value.
-        //But need to create shell that translates writeFile's
-        //write() to the right interface.
-        var textWrite = function (contents) {
-          return write(fileName, contents);
-        };
-        textWrite.asModule = function (moduleName, contents) {
-          return write.asModule(moduleName, fileName, contents);
-        };
-
-        text.write(pluginName, nonStripName, textWrite, config);
-      }, config);
-    }
-  };
-
-  if (masterConfig.env === 'node' || (!masterConfig.env &&
-                                      typeof process !== "undefined" &&
-                                      process.versions &&
-                                      !!process.versions.node &&
-                                      !process.versions['node-webkit'])) {
-    //Using special require.nodeRequire, something added by r.js.
-    fs = require.nodeRequire('fs');
-
-    text.get = function (url, callback, errback) {
-      try {
-        var file = fs.readFileSync(url, 'utf8');
-        //Remove BOM (Byte Mark Order) from utf8 files if it is there.
-        if (file.indexOf('\uFEFF') === 0) {
-          file = file.substring(1);
-        }
-        callback(file);
-      } catch (e) {
-        if (errback) {
-          errback(e);
-        }
-      }
-    };
-  } else if (masterConfig.env === 'xhr' || (!masterConfig.env &&
-                                            text.createXhr())) {
-    text.get = function (url, callback, errback, headers) {
-      var xhr = text.createXhr(), header;
-      xhr.open('GET', url, true);
-
-      //Allow plugins direct access to xhr headers
-      if (headers) {
-        for (header in headers) {
-          if (headers.hasOwnProperty(header)) {
-            xhr.setRequestHeader(header.toLowerCase(), headers[header]);
-          }
-        }
-      }
-
-      //Allow overrides specified in config
-      if (masterConfig.onXhr) {
-        masterConfig.onXhr(xhr, url);
-      }
-
-      xhr.onreadystatechange = function (evt) {
-        var status, err;
-        //Do not explicitly handle errors, those should be
-        //visible via console output in the browser.
-        if (xhr.readyState === 4) {
-          status = xhr.status || 0;
-          if (status > 399 && status < 600) {
-            //An http 4xx or 5xx error. Signal an error.
-            err = new Error(url + ' HTTP status: ' + status);
-            err.xhr = xhr;
-            if (errback) {
-              errback(err);
-            }
-          } else {
-            callback(xhr.responseText);
-          }
-
-          if (masterConfig.onXhrComplete) {
-            masterConfig.onXhrComplete(xhr, url);
-          }
-        }
-      };
-      xhr.send(null);
-    };
-  } else if (masterConfig.env === 'rhino' || (!masterConfig.env &&
-                                              typeof Packages !== 'undefined' && typeof java !== 'undefined')) {
-    //Why Java, why is this so awkward?
-    text.get = function (url, callback) {
-      var stringBuffer, line,
-        encoding = "utf-8",
-        file = new java.io.File(url),
-        lineSeparator = java.lang.System.getProperty("line.separator"),
-        input = new java.io.BufferedReader(new java.io.InputStreamReader(new java.io.FileInputStream(file), encoding)),
-        content = '';
-      try {
-        stringBuffer = new java.lang.StringBuffer();
-        line = input.readLine();
-
-        // Byte Order Mark (BOM) - The Unicode Standard, version 3.0, page 324
-        // http://www.unicode.org/faq/utf_bom.html
-
-        // Note that when we use utf-8, the BOM should appear as "EF BB BF", but it doesn't due to this bug in the JDK:
-        // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4508058
-        if (line && line.length() && line.charAt(0) === 0xfeff) {
-          // Eat the BOM, since we've already found the encoding on this file,
-          // and we plan to concatenating this buffer with others; the BOM should
-          // only appear at the top of a file.
-          line = line.substring(1);
-        }
-
-        if (line !== null) {
-          stringBuffer.append(line);
-        }
-
-        while ((line = input.readLine()) !== null) {
-          stringBuffer.append(lineSeparator);
-          stringBuffer.append(line);
-        }
-        //Make sure we return a JavaScript string and not a Java string.
-        content = String(stringBuffer.toString()); //String
-      } finally {
-        input.close();
-      }
-      callback(content);
-    };
-  } else if (masterConfig.env === 'xpconnect' || (!masterConfig.env &&
-                                                  typeof Components !== 'undefined' && Components.classes &&
-                                                  Components.interfaces)) {
-    //Avert your gaze!
-    Cc = Components.classes;
-    Ci = Components.interfaces;
-    Components.utils['import']('resource://gre/modules/FileUtils.jsm');
-    xpcIsWindows = ('@mozilla.org/windows-registry-key;1' in Cc);
-
-    text.get = function (url, callback) {
-      var inStream, convertStream, fileObj,
-        readData = {};
-
-      if (xpcIsWindows) {
-        url = url.replace(/\//g, '\\');
-      }
-
-      fileObj = new FileUtils.File(url);
-
-      //XPCOM, you so crazy
-      try {
-        inStream = Cc['@mozilla.org/network/file-input-stream;1']
-          .createInstance(Ci.nsIFileInputStream);
-        inStream.init(fileObj, 1, 0, false);
-
-        convertStream = Cc['@mozilla.org/intl/converter-input-stream;1']
-          .createInstance(Ci.nsIConverterInputStream);
-        convertStream.init(inStream, "utf-8", inStream.available(),
-          Ci.nsIConverterInputStream.DEFAULT_REPLACEMENT_CHARACTER);
-
-        convertStream.readString(inStream.available(), readData);
-        convertStream.close();
-        inStream.close();
-        callback(readData.value);
-      } catch (e) {
-        throw new Error((fileObj && fileObj.path || '') + ': ' + e);
-      }
-    };
-  }
-  return text;
-});
-
-define('text!SCENERY/display/webgl/colorTriangle.vert',[],function () { return '//This shader assumes 2d vertices that have a specified color.\n\n// Position\nattribute vec3 aPosition;\n\n// Color for the vertex\nattribute vec4 aVertexColor;\n\n// Output to the fragment shader\nvarying vec4 vColor;\n\n// (x,y) size of the viewport\nuniform vec2 uResolution;\n\n// Components of the affine transform matrix.  6 float elements, so specified as two vec3\nattribute vec3 aTransform1;\nattribute vec3 aTransform2;\n\nvoid main(void) {\n\n  //This transform code is based on http://www.html5rocks.com/en/tutorials/webgl/webgl_fundamentals/\n  //TODO: Should be converted to matrix multiply, probably faster.\n\n  // Just do the affine transform ourselves.\n  // see http://cs.iupui.edu/~sfang/cs550/cs550-note3.pdf\n  vec2 transformed = vec2( aTransform1.x * aPosition.x + aTransform1.y * aPosition.y + aTransform1.z,\n                           aTransform2.x * aPosition.x + aTransform2.y * aPosition.y + aTransform2.z );\n\n  // convert the rectangle from pixels to 0.0 to 1.0\n  vec2 zeroToOne = vec2( transformed.x / uResolution.x , transformed.y / uResolution.y );\n\n  // convert from 0->1 to 0->2\n  vec2 zeroToTwo = zeroToOne * 2.0;\n\n  // convert from 0->2 to -1->+1 (clipspace)\n  vec2 clipSpace = zeroToTwo - 1.0;\n\n  gl_Position = vec4(clipSpace * vec2(1, -1), aPosition.z, 1.0); //0. is the z, and 1 is w\n  vColor = aVertexColor;\n}';});
-
-
-define('text!SCENERY/display/webgl/colorTriangle.frag',[],function () { return '// Simple fragment shader that simply uses the color provided by the vertex shader\nprecision mediump float;\n\n// Color from the vertex shader\nvarying vec4 vColor;\n\n// Returns the color from the vertex shader\nvoid main(void) {\n  gl_FragColor = vColor;\n}';});
-
-//  Copyright 2002-2014, University of Colorado Boulder
-
-/**
- * ColorTriangleRenderer manages the program & attributes & drawing for rendering indepdent triangles.  Geometry +data provided
- * by colorTriangleBufferData.
- *
- * @author Sam Reid (PhET Interactive Simulations)
- */
-define( 'SCENERY/display/webgl/ColorTriangleRenderer',['require','PHET_CORE/inherit','SCENERY/display/webgl/ColorTriangleBufferData','SCENERY/util/ShaderProgram','text!SCENERY/display/webgl/colorTriangle.vert','text!SCENERY/display/webgl/colorTriangle.frag'],function( require ) {
-  
-
-  // modules
-  var inherit = require( 'PHET_CORE/inherit' );
-  var ColorTriangleBufferData = require( 'SCENERY/display/webgl/ColorTriangleBufferData' );
-  var ShaderProgram = require( 'SCENERY/util/ShaderProgram' );
-
-  // shaders
-  var colorVertexShaderSource = require( 'text!SCENERY/display/webgl/colorTriangle.vert' );
-  var colorFragmentShaderSource = require( 'text!SCENERY/display/webgl/colorTriangle.frag' );
-
-  /**
-   *
-   * @constructor
-   */
-  function ColorTriangleRenderer( gl, backingScale, canvas ) {
-    this.gl = gl;
-    this.canvas = canvas;
-    this.backingScale = backingScale;
-
-    // Manages the indices within a single array, so that disjoint geometries can be represented easily here.
-    // TODO: Compare this same idea to triangle strips
-    this.colorTriangleBufferData = new ColorTriangleBufferData();
-
-    this.shaderProgram = new ShaderProgram( gl, colorVertexShaderSource, colorFragmentShaderSource, {
-      attributes: [ 'aPosition', 'aVertexColor', 'aTransform1', 'aTransform2' ],
-      uniforms: [ 'uResolution' ]
-    } );
-
-    this.vertexBuffer = gl.createBuffer();
-    this.bindVertexBuffer();
-  }
-
-  return inherit( Object, ColorTriangleRenderer, {
-
-    draw: function() {
-
-      if ( this.colorTriangleBufferData.isEmpty() ) {
-        return;
-      }
-      var gl = this.gl;
-
-      var step = Float32Array.BYTES_PER_ELEMENT;
-      var total = 3 + 4 + 3 + 3;
-      var stride = step * total;
-
-      this.shaderProgram.use();
-
-      //TODO: Only call this when the canvas changes size
-      //TODO: This backing scale multiply seems very buggy and contradicts everything we know!
-      // Still, it gives the right behavior on iPad3 and OSX (non-retina).  Should be discussed and investigated.
-      gl.uniform2f( this.shaderProgram.uniformLocations.uResolution, this.canvas.width / this.backingScale, this.canvas.height / this.backingScale );
-
-      gl.bindBuffer( gl.ARRAY_BUFFER, this.vertexBuffer );
-      gl.vertexAttribPointer( this.shaderProgram.attributeLocations.aPosition, 3, gl.FLOAT, false, stride, 0 );
-      gl.vertexAttribPointer( this.shaderProgram.attributeLocations.aVertexColor, 4, gl.FLOAT, false, stride, step * (3) );
-      gl.vertexAttribPointer( this.shaderProgram.attributeLocations.aTransform1, 3, gl.FLOAT, false, stride, step * (3 + 4) );
-      gl.vertexAttribPointer( this.shaderProgram.attributeLocations.aTransform2, 3, gl.FLOAT, false, stride, step * (3 + 4 + 3) );
-
-      gl.drawArrays( gl.TRIANGLES, 0, this.colorTriangleBufferData.vertexArray.length / 13 );
-
-      this.shaderProgram.unuse();
-    },
-
-    bindVertexBuffer: function() {
-      var gl = this.gl;
-      gl.bindBuffer( gl.ARRAY_BUFFER, this.vertexBuffer );
-
-      // Keep track of the vertexArray for updating sublists of it
-      this.vertexArray = new Float32Array( this.colorTriangleBufferData.vertexArray );
-      gl.bufferData( gl.ARRAY_BUFFER, this.vertexArray, gl.DYNAMIC_DRAW );
-    },
-
-    /**
-     * Alternative to calling bufferSubData--just send the entire vertex buffer again.
-     * Not clear when this may be a better alternative than using bufferSubData.
-     */
-    reBufferData: function() {
-      var gl = this.gl;
-      gl.bindBuffer( gl.ARRAY_BUFFER, this.vertexBuffer );
-
-      // Keep track of the vertexArray for updating sublists of it
-      gl.bufferData( gl.ARRAY_BUFFER, this.vertexArray, gl.DYNAMIC_DRAW );
-    },
-
-    updateTriangleBuffer: function( geometry ) {
-      var gl = this.gl;
-
-      // Update the vertex locations
-      // Use a buffer view to only update the changed vertices
-      // like //see http://stackoverflow.com/questions/19892022/webgl-optimizing-a-vertex-buffer-that-changes-values-vertex-count-every-frame
-      // See also http://stackoverflow.com/questions/5497722/how-can-i-animate-an-object-in-webgl-modify-specific-vertices-not-full-transfor
-      gl.bindBuffer( gl.ARRAY_BUFFER, this.vertexBuffer );
-
-      //Update the Float32Array values
-      for ( var i = geometry.startIndex; i < geometry.endIndex; i++ ) {
-        this.vertexArray[ i ] = this.colorTriangleBufferData.vertexArray[ i ];
-      }
-
-      // Isolate the subarray of changed values
-      var subArray = this.vertexArray.subarray( geometry.startIndex, geometry.endIndex );
-
-      // Send new values to the GPU
-      // See https://www.khronos.org/webgl/public-mailing-list/archives/1201/msg00110.html
-      // The the offset is the index times the bytes per value
-      gl.bufferSubData( gl.ARRAY_BUFFER, geometry.startIndex * 4, subArray );
-    }
-  } );
-} );
-//  Copyright 2002-2014, University of Colorado Boulder
-
-/**
- *
- * Data Structure used in  bin-packing algorithm. see Packer
- *
- * @author Sharfudeen Ashraf
- */
-define( 'SCENERY/display/webgl/BlockItem',['require','PHET_CORE/inherit'],function( require ) {
-  
-
-  // modules
-  var inherit = require( 'PHET_CORE/inherit' );
-
-
-  /**
-   *
-   * @param x
-   * @param y
-   * @constructor
-   */
-  function BlockItem( x, y, width, height ) {
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
-    this.used = false;
-    this.position = null; //the starting position of this block within a spriteSheet
-    this.right = null;//the BlockItem right to "this" item
-    this.down = null;//the BlockItem down to "this" item
-  }
-
-  return inherit( Object, BlockItem );
-
-} );
-
-//  Copyright 2002-2014, University of Colorado Boulder
-
-/**
- * Modified version of https://github.com/jakesgordon/bin-packing/blob/master/js/packer.js
- *
- * @author Sharfudeen Ashraf
- */
-define( 'SCENERY/display/webgl/Packer',['require','PHET_CORE/inherit','SCENERY/display/webgl/BlockItem','DOT/Vector2'],function( require ) {
-  
-
-  // modules
-  var inherit = require( 'PHET_CORE/inherit' );
-  var BlockItem = require( 'SCENERY/display/webgl/BlockItem' );
-  var Vector2 = require( 'DOT/Vector2' );
-
-
-  /**
-   * @param {number} width // overall width of the spriteSheet
-   * @param {number} height
-   * @constructor
-   */
-  function Packer( width, height ) {
-    this.root = new BlockItem( 0, 0, width, height );
-  }
-  return inherit( Object, Packer, {
-
-    /**
-     * returns the starting position (x,y) within SpriteSheet where s space for a  given width, height can be reserved or
-     * returns 'null' if the given width, height  cannot be accommodated.
-     * @param {number} width
-     * @param {number} height
-     */
-    reserveSpace: function( width, height ) {
-      var position = null;
-      var node = this.findBlock( this.root, width, height );
-      if ( node ) {
-        position = new Vector2( node.x, node.y );
-
-        //Mark the block as "used" and split the remaining space into two available portions (right and down)
-        this.splitBlock( node, width, height );
-      }
-      return position;
-    },
-
-    /**
-     * @private
-     * @param parent
-     * @param {number} w
-     * @param {number} h
-     * @returns {*}
-     */
-    findBlock: function( parent, w, h ) {
-      if ( parent.used ) {
-        return this.findBlock( parent.right, w, h ) || this.findBlock( parent.down, w, h );
-      }
-      else if ( (w <= parent.width) && (h <= parent.height) ) {
-        return parent;
-      }
-      else {
-        return null;
-      }
-    },
-
-    /**
-     * @private
-     * @param {BlockItem} block
-     * @param w
-     * @param h
-     */
-    splitBlock: function( block, w, h ) {
-      block.used = true;
-      //the dimension of the space available to the right of the "node"
-      block.right = new BlockItem( block.x + w, block.y, block.width - w, h );
-      block.down = new BlockItem( block.x, block.y + h, block.width, block.height - h );
-    }
-
-  } );
-
-} );
-
-//  Copyright 2002-2014, University of Colorado Boulder
-
-/**
- * A single image with different regions within the image representing different distinct textures to be drawn in WebGL.
- * The TextureRenderer will normally use more than one SpriteSheet for rendering.
- *
- *
- * @author Sam Reid (PhET Interactive Simulations)
- */
-define( 'SCENERY/display/webgl/SpriteSheet',['require','PHET_CORE/inherit','SCENERY/display/webgl/Packer','DOT/Bounds2'],function( require ) {
-  
-
-  // modules
-  var inherit = require( 'PHET_CORE/inherit' );
-  var Packer = require( 'SCENERY/display/webgl/Packer' );
-  var Bounds2 = require( 'DOT/Bounds2' );
-
-  /**
-   *
-   * @constructor
-   */
-  function SpriteSheet() {
-    this.image = document.createElement( 'canvas' );
-
-    // Use the max supported texture size (according to http://codeflow.org/entries/2013/feb/22/how-to-write-portable-webgl/ )
-    this.image.width = 2048;
-    this.image.height = 2048;
-    this.context = this.image.getContext( '2d' );
-
-    this.packer = new Packer( this.image.width, this.image.height );
-
-    // Flag as dirty initially because it has not yet been registered with the GPU as a texture unit.
-    // @public, settable
-    this.dirty = true;
-  }
-
-  return inherit( Object, SpriteSheet, {
-    /**
-     * Draws the given image at a position calculated by the packer and returns the normalized bounded region
-     * reserved for the image within this SpriteSheet. returns null if the image cannot be drawn, upon which a
-     * new SpriteSheet will be created by SpriteBatch. see 'reserveImage' on SpriteBatch
-     *
-     * @param image
-     * @returns {Bounds2} // in normalized coordinates
-     */
-    reserveImageSpace: function( image ) {
-      var startPosition = this.packer.reserveSpace( image.width, image.height );
-      var normalizedBounds = null;
-      this.dirty = true;
-      if ( startPosition ) {
-        //Draw Image at specific position
-        this.context.drawImage( image, startPosition.x, startPosition.y );
-        normalizedBounds = Bounds2.rect( startPosition.x / this.image.width, startPosition.y / this.image.height,
-          image.width / this.image.width, image.height / this.image.height );
-      }
-      return normalizedBounds;
-    }
-  } );
-} );
-//  Copyright 2002-2014, University of Colorado Boulder
-
-/**
- * Specifies the bounds region and the spriteSheetIndex,the frame belongs to.
- * @author Sharfudeen Ashraf
- */
-define( 'SCENERY/display/webgl/FrameRange',['require','PHET_CORE/inherit'],function( require ) {
-  
-
-  // modules
-  var inherit = require( 'PHET_CORE/inherit' );
-
-  /**
-   *
-   * @param {Bounds2} bounds
-   * @param {number} spriteSheetIndex
-   * @constructor
-   */
-  function FrameRange( bounds, spriteSheetIndex ) {
-    this.bounds = bounds;
-    //The link between vertexArray,TextureDataArray and Texture
-    this.spriteSheetIndex = spriteSheetIndex;
-  }
-
-  return inherit( Object, FrameRange );
-
-} );
-//  Copyright 2002-2014, University of Colorado Boulder
-
-/**
- * Maintains a collection of SpriteSheets. Different regions are reserved for images based on a simple bin packing algorithm
- * if no space is left for a new Image on the currentSpriteSheet a new spriteSheet will be created on demand
- *
- * @author Sharfudeen Ashraf
- */
-define( 'SCENERY/display/webgl/SpriteSheetCollection',['require','PHET_CORE/inherit','SCENERY/display/webgl/SpriteSheet','SCENERY/display/webgl/FrameRange'],function( require ) {
-  
-
-  // modules
-  var inherit = require( 'PHET_CORE/inherit' );
-  var SpriteSheet = require( 'SCENERY/display/webgl/SpriteSheet' );
-  var FrameRange = require( 'SCENERY/display/webgl/FrameRange' );
-
-  /**
-   * @constructor
-   */
-  function SpriteSheetCollection() {
-    this.spriteSheets = [ new SpriteSheet() ];
-    this.imageFrameRangeCache = {};
-  }
-
-  return inherit( Object, SpriteSheetCollection, {
-    /**
-     * @param {Image} image
-     * @returns {FrameRange}
-     */
-    addImage: function( image ) {
-
-      //Check to see if any of the sprite sheets already contains that image
-      if ( this.imageFrameRangeCache[ image.src ] ) {
-        return this.imageFrameRangeCache[ image.src ];
-      }
-      var bounds = this.spriteSheets[ this.spriteSheets.length - 1 ].reserveImageSpace( image );
-      if ( !bounds ) {
-        var newSpriteSheet = new SpriteSheet();
-        bounds = newSpriteSheet.reserveImageSpace( image );
-        this.spriteSheets.push( newSpriteSheet );
-      }
-      var frameRange = new FrameRange( bounds, this.spriteSheets.length - 1 );
-      this.imageFrameRangeCache[ image.src ] = frameRange;
-      return frameRange;
-    }
-
-  } );
-
-} );
-
-//  Copyright 2002-2014, University of Colorado Boulder
-
-/**
- * This WebGL renderer is used to draw images as textures on rectangles.
- * TODO: Can this same pattern be used for interleaved texture coordinates? (Or other interleaved data?)
- * TODO: Work in progress, much to be done here!
- * TODO: Add this file to the list of scenery files (for jshint, etc.)
- *
- * @author Sam Reid (PhET Interactive Simulations)
- */
-define( 'SCENERY/display/webgl/TextureBufferData',['require','PHET_CORE/inherit'],function( require ) {
-  
-
-  // modules
-  var inherit = require( 'PHET_CORE/inherit' );
-
-  /**
-   *
-   * @constructor
-   */
-  function TextureBufferData() {
-    this.vertexArray = [];
-    this.elementsPerVertex = 11;
-  }
-
-  return inherit( Object, TextureBufferData, {
-    reserveVertices: function( numVertices ) {
-      var startIndex = this.vertexArray.length;
-      for ( var i = 0; i < numVertices; i++ ) {
-        for ( var k = 0; k < this.elementsPerVertex; k++ ) {
-          this.vertexArray.push( 0 );
-        }
-      }
-      var endIndex = this.vertexArray.length;
-      return { startIndex: startIndex, endIndex: endIndex };
-    }
-    //createFromImageNode: function( imageNode, z, frameRange ) {
-    //  return this.createFromImage( imageNode.x, imageNode.y, z,
-    //    imageNode._image.width, imageNode._image.height, imageNode.image, imageNode.getLocalToGlobalMatrix().toMatrix4(), frameRange );
-    //}
-  } );
-} );
-//  Copyright 2002-2014, University of Colorado Boulder
-
-/**
- *
- *
- * @author Sam Reid (PhET Interactive Simulations)
- */
-define( 'SCENERY/display/webgl/ImageHandle',['require','PHET_CORE/inherit','SCENERY/display/webgl/TextureBufferData'],function( require ) {
-  
-
-  // modules
-  var inherit = require( 'PHET_CORE/inherit' );
-  var TextureBufferData = require( 'SCENERY/display/webgl/TextureBufferData' );
-
-  /**
-   *
-   * @constructor
-   */
-  function ImageHandle( textureRenderer, imageNode, z ) {
-    this.imageNode = imageNode;
-    this.z = z;
-    this.textureRenderer = textureRenderer;
-    var frameRange = textureRenderer.spriteSheetCollection.addImage( imageNode.image );
-
-    // If there is no textureBuffer/VertexBuffer/textures entry for this SpriteSheet so create one
-    if ( !textureRenderer.textureBufferDataArray[ frameRange.spriteSheetIndex ] ) {
-
-      textureRenderer.textureBufferDataArray[ frameRange.spriteSheetIndex ] = new TextureBufferData();
-      textureRenderer.vertexBufferArray[ frameRange.spriteSheetIndex ] = textureRenderer.gl.createBuffer();
-      textureRenderer.textureArray[ frameRange.spriteSheetIndex ] = textureRenderer.gl.createTexture();
-    }
-    var textureBufferData = textureRenderer.textureBufferDataArray[ frameRange.spriteSheetIndex ];
-
-    var image = imageNode.image;
-
-    //TODO: Check to see if any of the sprite sheets already contains that image
-    //TODO: If none of the sprite sheets contained that image, then mark the spritesheet as dirty
-    //TODO: and send it to the GPU after updating
-
-    var range = textureBufferData.reserveVertices( 6 );
-    this.startIndex = range.startIndex;
-    this.endIndex = range.endIndex;
-    this.frameRange = frameRange;
-
-    this.image = image;
-
-    this.textureBufferData = textureBufferData;
-    this.update();
-  }
-
-  return inherit( Object, ImageHandle, {
-    update: function() {
-
-      var x = 0;
-      var y = 0;
-      var z = this.z;
-      var imageNode = this.imageNode;
-
-      var frameRange = this.frameRange;
-      var width = imageNode.getImageWidth();
-      var height = imageNode.getImageHeight();
-      var matrix4 = imageNode.getLocalToGlobalMatrix().toAffineMatrix4();
-
-      //TODO: Check to see if any of the sprite sheets already contains that image
-      //TODO: If none of the sprite sheets contained that image, then mark the spritesheet as dirty
-      //TODO: and send it to the GPU after updating
-
-      var x1 = x;
-      var x2 = x + width;
-      var y1 = y;
-      var y2 = y + height;
-
-      var u0 = frameRange.bounds.minX;
-      var u1 = frameRange.bounds.maxX;
-      var v0 = frameRange.bounds.minY;
-      var v1 = frameRange.bounds.maxY;
-
-      //Track the index so it can delete itself, update itself, etc.
-      var newElements = [
-        x1, y1, z, u0, v0, matrix4.m00(), matrix4.m01(), matrix4.m03(), matrix4.m10(), matrix4.m11(), matrix4.m13(),
-        x2, y1, z, u1, v0, matrix4.m00(), matrix4.m01(), matrix4.m03(), matrix4.m10(), matrix4.m11(), matrix4.m13(),
-        x1, y2, z, u0, v1, matrix4.m00(), matrix4.m01(), matrix4.m03(), matrix4.m10(), matrix4.m11(), matrix4.m13(),
-        x1, y2, z, u0, v1, matrix4.m00(), matrix4.m01(), matrix4.m03(), matrix4.m10(), matrix4.m11(), matrix4.m13(),
-        x2, y1, z, u1, v0, matrix4.m00(), matrix4.m01(), matrix4.m03(), matrix4.m10(), matrix4.m11(), matrix4.m13(),
-        x2, y2, z, u1, v1, matrix4.m00(), matrix4.m01(), matrix4.m03(), matrix4.m10(), matrix4.m11(), matrix4.m13()
-      ];
-      for ( var i = 0; i < newElements.length; i++ ) {
-        this.textureBufferData.vertexArray[ this.startIndex + i ] = newElements[ i ];
-      }
-      this.textureRenderer.updateTriangleBuffer( this );
-    }
-  } );
-} );
-
-define('text!SCENERY/display/webgl/texture.vert',[],function () { return '// From http://www.html5rocks.com/en/tutorials/webgl/webgl_fundamentals/\n\nattribute vec3 aPosition;\nattribute vec2 aTextureCoordinate;\n\nuniform vec2 uResolution;\n\nvarying vec2 vTextureCoordinate;\n\n// Components of the affine transform matrix.  6 float elements, so specified as two vec3\nattribute vec3 aTransform1;\nattribute vec3 aTransform2;\n\nvoid main() {\n  // Just do the affine transform ourselves.\n  // see http://cs.iupui.edu/~sfang/cs550/cs550-note3.pdf\n  vec2 transformed = vec2( aTransform1.x * aPosition.x + aTransform1.y * aPosition.y + aTransform1.z,\n                           aTransform2.x * aPosition.x + aTransform2.y * aPosition.y + aTransform2.z );\n\n   // convert the rectangle from pixels to 0.0 to 1.0\n   vec2 zeroToOne = transformed / uResolution;\n\n   // convert from 0->1 to 0->2\n   vec2 zeroToTwo = zeroToOne * 2.0;\n\n   // convert from 0->2 to -1->+1 (clipspace)\n   vec2 clipSpace = zeroToTwo - 1.0;\n\n   gl_Position = vec4(clipSpace * vec2(1, -1), aPosition.z, 1);\n\n   // pass the texCoord to the fragment shader\n   // The GPU will interpolate this value between points.\n   vTextureCoordinate = aTextureCoordinate;\n}';});
-
-
-define('text!SCENERY/display/webgl/texture.frag',[],function () { return '// From http://www.html5rocks.com/en/tutorials/webgl/webgl_fundamentals/\n\nprecision mediump float;\n\n// our texture\nuniform sampler2D uImage;\n\n// the texCoords passed in from the vertex shader.\nvarying vec2 vTextureCoordinate;\n\nvoid main() {\n   gl_FragColor = texture2D(uImage, vTextureCoordinate);\n}';});
-
-//  Copyright 2002-2014, University of Colorado Boulder
-
-/**
- * This renderer shows WebGL textures.  To achieve performance goals, it is important to minimize the number of draw calls.
- * So we try to add as many sprites into each texture as possible, and render all with a small number of draw calls.
- *
- * Adds as many images into a single SpriteSheet using a bin packing algorithm.A new Sprite will be created If a single
- * SpriteSheet cannot accommodate them. If there are 3  SpriteSheets, there would be 3 TriangleBuggerData, 3 VertexBuffers,3 Textures
- * and 3 draw calls.
- * Before each draw call, the appropriate Texture will be activated and the drawTriangles will pick the right TriangleBufferData
- * SpriteSheetIndex property of FrameRange is used to associate textures,TriangleBuggerData and VertexBuffers.
- *
- * Too many distinct Images with bigger dimensions will result in more than one SpriteSheet.
- *
- * @author Sam Reid (PhET Interactive Simulations)
- */
-define( 'SCENERY/display/webgl/TextureRenderer',['require','PHET_CORE/inherit','SCENERY/display/webgl/SpriteSheetCollection','SCENERY/util/ShaderProgram','SCENERY/display/webgl/ImageHandle','text!SCENERY/display/webgl/texture.vert','text!SCENERY/display/webgl/texture.frag'],function( require ) {
-  
-
-  // modules
-  var inherit = require( 'PHET_CORE/inherit' );
-  var SpriteSheetCollection = require( 'SCENERY/display/webgl/SpriteSheetCollection' );
-  var ShaderProgram = require( 'SCENERY/util/ShaderProgram' );
-  var ImageHandle = require( 'SCENERY/display/webgl/ImageHandle' );
-
-  // shaders
-  var textureVertexShaderSource = require( 'text!SCENERY/display/webgl/texture.vert' );
-  var textureFragmentShaderSource = require( 'text!SCENERY/display/webgl/texture.frag' );
-
-  /**
-   * @constructor
-   */
-  function TextureRenderer( gl, backingScale, canvas ) {
-    this.gl = gl;
-    this.canvas = canvas;
-    this.backingScale = backingScale;
-
-    this.shaderProgram = new ShaderProgram( gl, textureVertexShaderSource, textureFragmentShaderSource, {
-      attributes: [ 'aPosition', 'aTextureCoordinate', 'aTransform1', 'aTransform2' ],
-      uniforms: [ 'uResolution' ]
-    } );
-
-    this.spriteSheetCollection = new SpriteSheetCollection();
-
-    // TODO: Compare this same idea to triangle strips
-    //Each textureBufferData manages the indices within a single array, so that disjoint geometries can be represented easily here.
-    this.textureBufferDataArray = [];
-
-    // Create a buffer for the position of the rectangle corners.
-    this.vertexBufferArray = [];
-    this.textureArray = [];
-
-    // List of Vertex Array to Keep for updating sublist
-    this.vertexArrayList = [];
-  }
-
-  return inherit( Object, TextureRenderer, {
-    createFromImageNode: function( imageNode, z ) {
-      return new ImageHandle( this, imageNode, z );
-    },
-
-    draw: function() {
-      for ( var i = 0; i < this.textureArray.length; i++ ) {
-        this.doDraw( i );
-      }
-    },
-
-    /**
-     * @private
-     */
-    doDraw: function( activeTextureIndex ) {
-      var gl = this.gl;
-
-      this.shaderProgram.use();
-
-      // bind and activate the correct texture
-      // TODO: Does this need to be done every frame?
-      gl.bindTexture( gl.TEXTURE_2D, this.textureArray[ activeTextureIndex ] );
-      // Activate the correct texture
-      gl.activeTexture( gl.TEXTURE0 + activeTextureIndex );
-
-      // set the resolution
-      // TODO: This backing scale multiply seems very buggy and contradicts everything we know!
-      // TODO: Does this need to be done every frame?
-      // Still, it gives the right behavior on iPad3 and OSX (non-retina).  Should be discussed and investigated.
-      gl.uniform2f( this.shaderProgram.uniformLocations.uResolution, this.canvas.width / this.backingScale, this.canvas.height / this.backingScale );
-
-      var step = Float32Array.BYTES_PER_ELEMENT;
-      var total = 3 + 2 + 3 + 3;
-      var stride = step * total;
-
-      gl.bindBuffer( gl.ARRAY_BUFFER, this.vertexBufferArray[ activeTextureIndex ] );
-      gl.vertexAttribPointer( this.shaderProgram.attributeLocations.aPosition, 3, gl.FLOAT, false, stride, 0 );
-      gl.vertexAttribPointer( this.shaderProgram.attributeLocations.aTextureCoordinate, 2, gl.FLOAT, false, stride, step * 3 );
-      gl.vertexAttribPointer( this.shaderProgram.attributeLocations.aTransform1, 3, gl.FLOAT, false, stride, step * (3 + 2) );
-      gl.vertexAttribPointer( this.shaderProgram.attributeLocations.aTransform2, 3, gl.FLOAT, false, stride, step * (3 + 2 + 3) );
-
-      // Draw the rectangle.
-      gl.drawArrays( gl.TRIANGLES, 0, this.textureBufferDataArray[ activeTextureIndex ].vertexArray.length / total );
-
-      gl.bindTexture( gl.TEXTURE_2D, null );
-      this.shaderProgram.unuse();
-    },
-
-    getSpriteSheets: function() {
-      return this.spriteSheetCollection.spriteSheets;
-    },
-
-    /**
-     * Iterate through all of the sprite sheets and register the dirty ones with the GPU as texture units.
-     */
-    bindDirtyTextures: function() {
-      var gl = this.gl;
-      var spriteSheets = this.getSpriteSheets();
-      for ( var i = 0; i < spriteSheets.length; i++ ) {
-        var spriteSheet = spriteSheets[ i ];
-        if ( spriteSheet.dirty ) {
-          gl.bindTexture( gl.TEXTURE_2D, this.textureArray[ i ] );
-          gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE );
-          gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE );
-          gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR );
-          gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR );
-          gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, spriteSheet.image );
-          gl.generateMipmap( gl.TEXTURE_2D );
-
-          gl.bindTexture( gl.TEXTURE_2D, null );
-
-          spriteSheet.dirty = false;
-        }
-      }
-    },
-
-    bindVertexBuffer: function() {
-      var gl = this.gl;
-      var spriteSheets = this.getSpriteSheets();
-      for ( var i = 0; i < spriteSheets.length; i++ ) {
-        gl.bindBuffer( gl.ARRAY_BUFFER, this.vertexBufferArray[ i ] );
-        // Keep track of the vertexArray for updating sublists of it
-        this.vertexArrayList[ i ] = new Float32Array( this.textureBufferDataArray[ i ].vertexArray );
-        gl.bufferData( gl.ARRAY_BUFFER, this.vertexArrayList[ i ], gl.DYNAMIC_DRAW );
-      }
-
-    },
-
-    updateTriangleBuffer: function( geometry ) {
-
-      //TODO: This hack will cause problems, we need a more principled way to know when to rebind the buffer.
-      if ( this.vertexArrayList.length === 0 ) {
-        this.bindVertexBuffer();
-      }
-      
-      var gl = this.gl;
-
-      var frameRange = geometry.frameRange;
-      // Update the vertex locations
-      // Use a buffer view to only update the changed vertices
-      // like //see http://stackoverflow.com/questions/19892022/webgl-optimizing-a-vertex-buffer-that-changes-values-vertex-count-every-frame
-      // See also http://stackoverflow.com/questions/5497722/how-can-i-animate-an-object-in-webgl-modify-specific-vertices-not-full-transfor
-      gl.bindBuffer( gl.ARRAY_BUFFER, this.vertexBufferArray[ frameRange.spriteSheetIndex ] );
-
-      var vertexArray = this.vertexArrayList[ frameRange.spriteSheetIndex ];
-      //Update the Float32Array values
-      for ( var i = geometry.startIndex; i < geometry.endIndex; i++ ) {
-        vertexArray[ i ] = this.textureBufferDataArray[ frameRange.spriteSheetIndex ].vertexArray[ i ];
-      }
-      // Isolate the subarray of changed values
-      var subArray = vertexArray.subarray( geometry.startIndex, geometry.endIndex );
-
-      // Send new values to the GPU
-      // See https://www.khronos.org/webgl/public-mailing-list/archives/1201/msg00110.html
-      // The the offset is the index times the bytes per value
-      gl.bufferSubData( gl.ARRAY_BUFFER, geometry.startIndex * 4, subArray );
-    }
-
-  } );
-} );
-//  Copyright 2002-2014, University of Colorado Boulder
-
-/**
- * Simplified isolated test harness for a webgl renderer.
- *
- * TODO: Array of structures for interleaved vertex data (color + texture coordinates)
- *
- * @author Sam Reid (PhET Interactive Simulations)
- */
-define( 'SCENERY/display/webgl/WebGLRenderer',['require','PHET_CORE/inherit','AXON/Events','SCENERY/util/Util','SCENERY/display/webgl/ColorTriangleRenderer','SCENERY/display/webgl/TextureRenderer'],function( require ) {
-  
-
-  // modules
-  var inherit = require( 'PHET_CORE/inherit' );
-  var Events = require( 'AXON/Events' );
-  var Util = require( 'SCENERY/util/Util' );
-  var ColorTriangleRenderer = require( 'SCENERY/display/webgl/ColorTriangleRenderer' );
-  var TextureRenderer = require( 'SCENERY/display/webgl/TextureRenderer' );
-
-  /**
-   *
-   * @constructor
-   */
-  function WebGLRenderer( options ) {
-    // defaults
-    this.options = _.extend( {
-      stats: true,
-      preserveDrawingBuffer: false
-    }, options );
-
-    this.events = new Events();
-
-    // Create the stats and show it, but only for the standalone test cases (not during scenery usage).
-    // TODO: A better design for stats vs no stats
-    if ( this.options.stats ) {
-      this.stats = this.createStats();
-    }
-
-    this.canvas = document.createElement( 'canvas' );
-    this.canvas.style.position = 'absolute';
-    this.canvas.style.left = '0';
-    this.canvas.style.top = '0';
-    this.canvas.style.pointerEvents = 'none';
-
-    document.body.appendChild( this.canvas );
-    if ( this.options.stats ) {
-      document.body.appendChild( this.stats.domElement );
-    }
-
-    // Code inspired by http://www.webglacademy.com/#1
-    var gl;
-    try {
-      // NOTE: If we add preserveDrawingBuffer, please add a clear() every frame
-      gl = this.canvas.getContext( 'experimental-webgl', {
-        antialias: true,
-        preserveDrawingBuffer: this.options.preserveDrawingBuffer // major performance hit if true
-      } );
-    }
-    catch( e ) {
-      return false;
-    }
-    this.gl = gl;
-
-    this.backingScale = Util.backingScale( this.gl );
-
-  // TODO: When used by scenery, use different initial size (hopefully provided in the constructor args as an option)
-    this.setCanvasSize( window.innerWidth, window.innerHeight );
-
-    gl.clearColor( 0, 0, 0, 0 );
-    gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
-    gl.enable( gl.DEPTH_TEST );
-
-    gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
-    gl.enable( gl.BLEND );
-
-    this.colorTriangleRenderer = new ColorTriangleRenderer( gl, this.backingScale, this.canvas );
-    this.textureRenderer = new TextureRenderer( gl, this.backingScale, this.canvas );
-    this.customWebGLRenderers = [];
-
-    this.boundAnimate = this.animate.bind( this );
-  }
-
-  return inherit( Object, WebGLRenderer, {
-    addCustomWebGLRenderer: function( customWebGLRenderer ) {
-      customWebGLRenderer.init( this.gl, this.backingScale, this.canvas );
-      this.customWebGLRenderers.push( customWebGLRenderer );
-    },
-    /**
-     * Create a mrdoob stats instance which can be used to profile the simulation.
-     * @returns {Stats}
-     */
-    createStats: function() {
-      var stats = new Stats();
-      stats.setMode( 0 ); // 0: fps, 1: ms
-
-      // align top-left
-      stats.domElement.style.position = 'absolute';
-      stats.domElement.style.left = '0px';
-      stats.domElement.style.top = '0px';
-
-      return stats;
-    },
-
-    /**
-     * Initialize the simulation and start it animating.
-     */
-    start: function() {
-      window.requestAnimationFrame( this.boundAnimate );
-    },
-
-    animate: function() {
-
-      // Keep track of the time for profiling
-      if ( this.stats ) {
-        this.stats.begin();
-      }
-
-      // Queue the next animation frame
-      window.requestAnimationFrame( this.boundAnimate );
-
-      // Let listeners update their state
-      this.events.trigger( 'step' );
-
-      // Render everything
-      this.draw();
-
-      // Record the timing for @mrdoob stats profiler
-      if ( this.stats ) {
-        this.stats.end();
-      }
-    },
-    draw: function() {
-      var gl = this.gl;
-
-      // clearing the buffer is only needed if we gave the flag to preserve it
-      if ( this.options.preserveDrawingBuffer ) {
-        gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
-      }
-
-      gl.viewport( 0.0, 0.0, this.canvas.width, this.canvas.height );
-
-      //Render program by program.
-      this.colorTriangleRenderer.draw();
-      this.textureRenderer.draw();
-      for ( var i = 0; i < this.customWebGLRenderers.length; i++ ) {
-        this.customWebGLRenderers[ i ].draw();
-      }
-
-      //Flush after rendering complete.
-      gl.flush();
-    },
-    setCanvasSize: function( width, height ) {
-      // Handle retina displays as described in https://www.khronos.org/webgl/wiki/HandlingHighDPI
-      // First, set the display size of the canvas.
-      this.canvas.style.width = width + 'px';
-      this.canvas.style.height = height + 'px';
-
-      // Next, set the size of the drawingBuffer
-      var devicePixelRatio = window.devicePixelRatio || 1;
-      this.canvas.width = width * devicePixelRatio;
-      this.canvas.height = height * devicePixelRatio;
-    },
-    dispose: function() {
-      //TODO: Dispose of more things!
-      this.canvas.width = 0;
-      this.canvas.height = 0;
-    }
-  } );
-} );
 // Copyright 2002-2014, University of Colorado Boulder
 
 /**
- * Handles a visual WebGL layer of drawables.  The WebGL system is designed to be modular, so that testing can
- * easily be done without scenery.  Hence WebGLBlock delegates most of its work to WebGLRenderer.
- *
- * STATUS REPORT
- * March 4 2015
- * WebGLBlock is in bad condition--it is a collection of prototypes and not ready for production code.  The best way to
- * see the status of WebGLBlock is to launch:
- * http://localhost/forces-and-motion-basics/forces-and-motion-basics_en.html?rootRenderer=webgl&screens=1
- *
- * Completed in this version of forces and motion: basics, with pixi
- * 1. Images are rendering, and are in the correct position
- * 2. 60fps while dragging on iPad3 (note that this could go down as we add other features like transparency, clipping, etc)
- * 3. Resizing is handled
- *
- * Issues in this version of forces and motion: basics, with pixi
- * 1. Z-ordering is incorrect
- * 2. Context loss is not handled
- * 3. Path is just rendering as SquareUnstrokedRectangle and not showing up
- * 4. Text is not showing up
- * 5. Alpha transparency is incorrect, see #397
+ * Renders a visual layer of WebGL drawables.
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  * @author Sam Reid (PhET Interactive Simulations)
  * @author Sharfudeen Ashraf (For Ghent University)
  */
-define( 'SCENERY/display/WebGLBlock',['require','PHET_CORE/inherit','PHET_CORE/Poolable','PHET_CORE/cleanArray','PHET_CORE/arrayRemove','SCENERY/scenery','SCENERY/display/FittedBlock','SCENERY/util/Util','SCENERY/display/webgl/WebGLRenderer'],function( require ) {
+define( 'SCENERY/display/WebGLBlock',['require','SCENERY/scenery','PHET_CORE/inherit','PHET_CORE/Poolable','PHET_CORE/cleanArray','DOT/Matrix3','SCENERY/display/FittedBlock','SCENERY/display/Renderer','SCENERY/util/Util','SCENERY/util/SpriteSheet','SCENERY/util/ShaderProgram'],function( require ) {
   
 
   // modules
+  var scenery = require( 'SCENERY/scenery' );
   var inherit = require( 'PHET_CORE/inherit' );
   var Poolable = require( 'PHET_CORE/Poolable' );
   var cleanArray = require( 'PHET_CORE/cleanArray' );
-  var arrayRemove = require( 'PHET_CORE/arrayRemove' );
-  var scenery = require( 'SCENERY/scenery' );
+  var Matrix3 = require( 'DOT/Matrix3' );
   var FittedBlock = require( 'SCENERY/display/FittedBlock' );
+  var Renderer = require( 'SCENERY/display/Renderer' );
   var Util = require( 'SCENERY/util/Util' );
-  var WebGLRenderer = require( 'SCENERY/display/webgl/WebGLRenderer' );
+  var SpriteSheet = require( 'SCENERY/util/SpriteSheet' );
+  var ShaderProgram = require( 'SCENERY/util/ShaderProgram' );
 
   scenery.WebGLBlock = function WebGLBlock( display, renderer, transformRootInstance, filterRootInstance ) {
     this.initialize( display, renderer, transformRootInstance, filterRootInstance );
@@ -26627,78 +26629,117 @@ define( 'SCENERY/display/WebGLBlock',['require','PHET_CORE/inherit','PHET_CORE/P
 
       this.filterRootInstance = filterRootInstance;
 
+      // {boolean} - Whether we pass this flag to the WebGL Context. It will store the contents displayed on the screen,
+      // so that canvas.toDataURL() will work. It also requires clearing the context manually ever frame. Both incur
+      // performance costs, so it should be false by default.
+      // TODO: This block can be shared across displays, so we need to handle preserveDrawingBuffer separately?
+      this.preserveDrawingBuffer = display.options.preserveDrawingBuffer;
+
+      // list of {Drawable}s that need to be updated before we update
       this.dirtyDrawables = cleanArray( this.dirtyDrawables );
 
-      // TODO: Maybe reuse the WebGLRenderer and use an initialize pattern()?
+      // {Array.<SpriteSheet>}, permanent list of spritesheets for this block
+      this.spriteSheets = this.spriteSheets || [];
 
-      // TODO: Maybe pass through Renderer.bitmaskWebGLLowResolution ) ?
-      // Each WebGL block needs its own canvas, and this is created by the WebGLRenderer.
-      this.webGLRenderer = new WebGLRenderer( {
-        stats: false,
-        preserveDrawingBuffer: display.options.preserveDrawingBuffer
-      } );
-      this.domElement = this.webGLRenderer.canvas;
+      if ( !this.domElement ) {
+        this.canvas = document.createElement( 'canvas' );
+        this.canvas.style.position = 'absolute';
+        this.canvas.style.left = '0';
+        this.canvas.style.top = '0';
+        this.canvas.style.pointerEvents = 'none';
 
-      this.domElement.style.position = 'absolute';
-      this.domElement.style.left = '0';
-      this.domElement.style.top = '0';
-      this.domElement.style.pointerEvents = 'none';
-      this.canvasId = this.domElement.id = 'scenery-webgl' + this.id;
+        // unique ID so that we can support rasterization with Display.foreignObjectRasterization
+        this.canvasId = this.canvas.id = 'scenery-webgl' + this.id;
+
+        var contextOptions = {
+          antialias: true,
+          preserveDrawingBuffer: this.preserveDrawingBuffer
+        };
+
+        // we've already committed to using a WebGLBlock, so no use in a try-catch around our context attempt
+        this.gl = this.canvas.getContext( 'webgl', contextOptions ) || this.canvas.getContext( 'experimental-webgl', contextOptions );
+        assert && assert( this.gl, 'We should have a context by now' );
+        var gl = this.gl;
+
+        // {number} - How much larger our Canvas will be compared to the CSS pixel dimensions, so that our Canvas maps
+        // one of its pixels to a physical pixel (for Retina devices, etc.).
+        this.backingScale = this.originalBackingScale = Util.backingScale( gl );
+
+        // What color gets set when we call gl.clear()
+        gl.clearColor( 0, 0, 0, 0 );
+
+        // NOTE: not using gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA ) since that is for non-premultiplied alpha
+        // see http://webglfundamentals.org/webgl/lessons/webgl-and-alpha.html
+        gl.blendFunc( gl.ONE, gl.ONE_MINUS_SRC_ALPHA );
+        gl.enable( gl.BLEND );
+
+        this.domElement = this.canvas;
+
+        // processor for custom WebGL drawables (e.g. WebGLNode)
+        this.customProcessor = new WebGLBlock.CustomProcessor( this );
+
+        // processor for drawing textured triangles (e.g. Image)
+        this.texturedTrianglesProcessor = new WebGLBlock.TexturedTrianglesProcessor( this );
+      }
+
+      // clear buffers when we are reinitialized
+      this.gl.clear( this.gl.COLOR_BUFFER_BIT );
 
       // reset any fit transforms that were applied
-      // TODO: What is force acceleration?
-      Util.prepareForTransform( this.webGLRenderer.canvas, this.forceAcceleration );
-      Util.unsetTransform( this.webGLRenderer.canvas ); // clear out any transforms that could have been previously applied
+      Util.prepareForTransform( this.canvas, false );
+      Util.unsetTransform( this.canvas ); // clear out any transforms that could have been previously applied
 
-      // store our backing scale so we don't have to look it up while fitting
-      // this.backingScale = ( renderer & Renderer.bitmaskWebGLLowResolution ) ? 1 : scenery.Util.backingScale( this.gl );
-
+      // Projection {Matrix3} that maps from Scenery's global coordinate frame to normalized device coordinates,
+      // where x,y are both in the range [-1,1] from one side of the Canvas to the other.
+      this.projectionMatrix = this.projectionMatrix || new Matrix3().setTo32Bit();
       // a column-major 3x3 array specifying our projection matrix for 2D points (homogenized to (x,y,1))
-      this.projectionMatrixArray = new Float32Array( 9 );
-
-      this.initializeWebGLState();
+      this.projectionMatrixArray = this.projectionMatrix.entries;
 
       sceneryLog && sceneryLog.WebGLBlock && sceneryLog.WebGLBlock( 'initialized #' + this.id );
-      // TODO: dirty list of nodes (each should go dirty only once, easier than scanning all?)
 
       return this;
     },
 
-    initializeWebGLState: function() {
-
-      // TODO: Maybe initialize the webGLRenderer, if it is reused during pooling?
-//      this.webGLRenderer.initialize();
-    },
-
     setSizeFullDisplay: function() {
-
-      // TODO: Allow scenery to change the size of the WebGLRenderer.canvas
       var size = this.display.getSize();
-      this.webGLRenderer.setCanvasSize( size.width, size.height );
+      this.canvas.width = Math.ceil( size.width * this.backingScale );
+      this.canvas.height = Math.ceil( size.height * this.backingScale );
+      this.canvas.style.width = size.width + 'px';
+      this.canvas.style.height = size.height + 'px';
     },
 
     setSizeFitBounds: function() {
-      // TODO: Allow scenery to change the size of the WebGLRenderer.canvas
-
-      var x = this.fitBounds.minX;
-      var y = this.fitBounds.minY;
-      //OHTWO TODO PERFORMANCE: see if we can get a speedup by putting the backing scale in our transform instead of with CSS?
-      Util.setTransform( 'matrix(1,0,0,1,' + x + ',' + y + ')', this.canvas, this.forceAcceleration ); // reapply the translation as a CSS transform
-      this.webGLRenderer.setCanvasSize( this.fitBounds.width, this.fitBounds.height );
-
-      //TODO: How to handle this in WebGLRenderer?
-//      this.updateWebGLDimension( -x, -y, this.fitBounds.width, this.fitBounds.height );
+      throw new Error( 'setSizeFitBounds unimplemented for WebGLBlock' );
     },
 
     update: function() {
       sceneryLog && sceneryLog.WebGLBlock && sceneryLog.WebGLBlock( 'update #' + this.id );
       sceneryLog && sceneryLog.WebGLBlock && sceneryLog.push();
 
+      var gl = this.gl;
+
       if ( this.dirty && !this.disposed ) {
         this.dirty = false;
 
+        // update drawables, so that they have vertex arrays up to date, etc.
         while ( this.dirtyDrawables.length ) {
           this.dirtyDrawables.pop().update();
+        }
+
+        // ensure sprite sheet textures are up-to-date
+        var numSpriteSheets = this.spriteSheets.length;
+        for ( var i = 0; i < numSpriteSheets; i++ ) {
+          this.spriteSheets[i].updateTexture();
+        }
+
+        // temporary hack for supporting webglScale
+        if ( this.firstDrawable &&
+             this.firstDrawable === this.lastDrawable &&
+             this.firstDrawable.node &&
+             this.firstDrawable.node._hints.webglScale !== null &&
+             this.backingScale !== this.originalBackingScale * this.firstDrawable.node._hints.webglScale ) {
+          this.backingScale = this.originalBackingScale * this.firstDrawable.node._hints.webglScale;
+          this.dirtyFit = true;
         }
 
         // udpate the fit BEFORE drawing, since it may change our offset
@@ -26707,17 +26748,70 @@ define( 'SCENERY/display/WebGLBlock',['require','PHET_CORE/inherit','PHET_CORE/P
         // finalX = 2 * x / display.width - 1
         // finalY = 1 - 2 * y / display.height
         // result = matrix * ( x, y, 1 )
-        this.projectionMatrixArray[ 0 ] = 2 / this.display.width;
-        this.projectionMatrixArray[ 1 ] = 0;
-        this.projectionMatrixArray[ 2 ] = 0;
-        this.projectionMatrixArray[ 3 ] = 0;
-        this.projectionMatrixArray[ 4 ] = -2 / this.display.height;
-        this.projectionMatrixArray[ 5 ] = 0;
-        this.projectionMatrixArray[ 6 ] = -1;
-        this.projectionMatrixArray[ 7 ] = 1;
-        this.projectionMatrixArray[ 8 ] = 1;
+        this.projectionMatrix.rowMajor( 2 / this.display.width, 0, -1,
+                                        0, -2 / this.display.height, 1,
+                                        0, 0, 1 );
 
-        this.webGLRenderer.draw();
+        // if we created the context with preserveDrawingBuffer, we need to clear before rendering
+        if ( this.preserveDrawingBuffer ) {
+          gl.clear( gl.COLOR_BUFFER_BIT );
+        }
+
+        gl.viewport( 0.0, 0.0, this.canvas.width, this.canvas.height );
+
+        // We switch between processors for drawables based on each drawable's webglRenderer property. Each processor
+        // will be activated, will process a certain number of adjacent drawables with that processor's webglRenderer,
+        // and then will be deactivated. This allows us to switch back-and-forth between different shader programs,
+        // and allows us to trigger draw calls for each grouping of drawables in an efficient way.
+        var currentProcessor = null;
+        // How many draw calls have been executed. If no draw calls are executed while updating, it means nothing should
+        // be drawn, and we'll have to manually clear the Canvas if we are not preserving the drawing buffer.
+        var cumulativeDrawCount = 0;
+        // Iterate through all of our drawables (linked list)
+        //OHTWO TODO: PERFORMANCE: create an array for faster drawable iteration (this is probably a hellish memory access pattern)
+        for ( var drawable = this.firstDrawable; drawable !== null; drawable = drawable.nextDrawable ) {
+          // ignore invisible drawables
+          if ( drawable.visible ) {
+            // select our desired processor
+            var desiredProcessor = null;
+            if ( drawable.webglRenderer === Renderer.webglTexturedTriangles ) {
+              desiredProcessor = this.texturedTrianglesProcessor;
+            }
+            else if ( drawable.webglRenderer === Renderer.webglCustom ) {
+              desiredProcessor = this.customProcessor;
+            }
+            assert && assert( desiredProcessor );
+
+            // swap processors if necessary
+            if ( desiredProcessor !== currentProcessor ) {
+              // deactivate any old processors
+              if ( currentProcessor ) {
+                cumulativeDrawCount += currentProcessor.deactivate();
+              }
+              // activate the new processor
+              currentProcessor = desiredProcessor;
+              currentProcessor.activate();
+            }
+
+            // process our current drawable with the current processor
+            currentProcessor.processDrawable( drawable );
+          }
+
+          // exit loop end case
+          if ( drawable === this.lastDrawable ) { break; }
+        }
+        // deactivate any processor that still has drawables that need to be handled
+        if ( currentProcessor ) {
+          cumulativeDrawCount += currentProcessor.deactivate();
+        }
+
+        // If we executed no draw calls AND we aren't preserving the drawing buffer, we'll need to manually clear the
+        // drawing buffer ourself.
+        if ( cumulativeDrawCount === 0 && !this.preserveDrawingBuffer ) {
+          gl.clear( gl.COLOR_BUFFER_BIT );
+        }
+
+        gl.flush();
       }
 
       sceneryLog && sceneryLog.WebGLBlock && sceneryLog.pop();
@@ -26726,7 +26820,7 @@ define( 'SCENERY/display/WebGLBlock',['require','PHET_CORE/inherit','PHET_CORE/P
     dispose: function() {
       sceneryLog && sceneryLog.WebGLBlock && sceneryLog.WebGLBlock( 'dispose #' + this.id );
 
-      this.webGLRenderer.dispose();
+      // TODO: many things to dispose!?
 
       // clear references
       cleanArray( this.dirtyDrawables );
@@ -26749,30 +26843,70 @@ define( 'SCENERY/display/WebGLBlock',['require','PHET_CORE/inherit','PHET_CORE/P
 
       FittedBlock.prototype.addDrawable.call( this, drawable );
 
-      drawable.initializeContext( this );
-
-      //TODO: Don't call this every frame!  Consider preallocating a large array in the various buffers.
-      this.webGLRenderer.colorTriangleRenderer.bindVertexBuffer();
-
-      if ( drawable.isCustomWebGLRenderer ) {
-        this.webGLRenderer.customWebGLRenderers.push( drawable );
-      }
+      // will trigger changes to the spritesheets for images, or initialization for others
+      drawable.onAddToBlock( this );
     },
 
     removeDrawable: function( drawable ) {
       sceneryLog && sceneryLog.WebGLBlock && sceneryLog.WebGLBlock( '#' + this.id + '.removeDrawable ' + drawable.toString() );
 
-      FittedBlock.prototype.removeDrawable.call( this, drawable );
+      // wil trigger removal from spritesheets
+      drawable.onRemoveFromBlock( this );
 
-      if ( drawable.isCustomWebGLRenderer ) {
-        arrayRemove( this.webGLRenderer.customWebGLRenderers, drawable );
+      FittedBlock.prototype.removeDrawable.call( this, drawable );
+    },
+
+    /**
+     * Ensures we have an allocated part of a SpriteSheet for this image. If a SpriteSheet already contains this image,
+     * we'll just increase the reference count. Otherwise, we'll attempt to add it into one of our SpriteSheets. If
+     * it doesn't fit, we'll add a new SpriteSheet and add the image to it.
+     *
+     * @param {HTMLImageElement | HTMLCanvasElement} image
+     * @param {number} width
+     * @param {number} height
+     *
+     * @returns {Sprite} - Throws an error if we can't accommodate the image
+     */
+    addSpriteSheetImage: function( image, width, height ) {
+      var sprite = null;
+      var numSpriteSheets = this.spriteSheets.length;
+      // TODO: check for SpriteSheet containment first?
+      for ( var i = 0; i < numSpriteSheets; i++ ) {
+        var spriteSheet = this.spriteSheets[i];
+        sprite = spriteSheet.addImage( image, width, height );
+        if ( sprite ) {
+          break;
+        }
       }
+      if ( !sprite ) {
+        var newSpriteSheet = new SpriteSheet( true ); // use mipmaps for now?
+        sprite = newSpriteSheet.addImage( image, width, height );
+        newSpriteSheet.initializeContext( this.gl );
+        newSpriteSheet.createTexture();
+        this.spriteSheets.push( newSpriteSheet );
+        if ( !sprite ) {
+          // TODO: renderer flags should change for very large images
+          throw new Error( 'Attempt to load image that is too large for sprite sheets' );
+        }
+      }
+      return sprite;
+    },
+
+    /**
+     * Removes the reference to the sprite in our spritesheets.
+     *
+     * @param {Sprite} sprite
+     */
+    removeSpriteSheetImage: function( sprite ) {
+      sprite.spriteSheet.removeImage( sprite.image );
     },
 
     onIntervalChange: function( firstDrawable, lastDrawable ) {
       sceneryLog && sceneryLog.WebGLBlock && sceneryLog.WebGLBlock( '#' + this.id + '.onIntervalChange ' + firstDrawable.toString() + ' to ' + lastDrawable.toString() );
 
       FittedBlock.prototype.onIntervalChange.call( this, firstDrawable, lastDrawable );
+
+      this.markDirty();
     },
 
     onPotentiallyMovedDrawable: function( drawable ) {
@@ -26781,10 +26915,7 @@ define( 'SCENERY/display/WebGLBlock',['require','PHET_CORE/inherit','PHET_CORE/P
 
       assert && assert( drawable.parentDrawable === this );
 
-      // For now, mark it as dirty so that we redraw anything containing it. In the future, we could have more advanced
-      // behavior that figures out the intersection-region for what was moved and what it was moved past, but that's
-      // a harder problem.
-      drawable.markDirty();
+      this.markDirty();
 
       sceneryLog && sceneryLog.WebGLBlock && sceneryLog.pop();
     },
@@ -26792,11 +26923,175 @@ define( 'SCENERY/display/WebGLBlock',['require','PHET_CORE/inherit','PHET_CORE/P
     toString: function() {
       return 'WebGLBlock#' + this.id + '-' + FittedBlock.fitString[ this.fit ];
     }
-  }, {
-    // Statics
-    fragmentTypeFill: 0,
-    fragmentTypeTexture: 1
   } );
+
+  /*---------------------------------------------------------------------------*
+  * Processors rely on the following lifecycle:
+  * 1. activate()
+  * 2. processDrawable() - 0 or more times
+  * 3. deactivate()
+  * Once deactivated, they should have executed all of the draw calls they need to make.
+  *----------------------------------------------------------------------------*/
+
+  // TODO: Processor super-type?
+
+  WebGLBlock.CustomProcessor = function( webglBlock ) {
+    this.webglBlock = webglBlock;
+
+    this.drawable = null;
+  };
+  inherit( Object, WebGLBlock.CustomProcessor, {
+    activate: function() {
+      // drawable responsible for shader program
+      this.drawCount = 0;
+    },
+
+    processDrawable: function( drawable ) {
+      assert && assert( drawable.webglRenderer === Renderer.webglCustom );
+
+      this.draw();
+      this.drawable = drawable;
+    },
+
+    deactivate: function() {
+      // drawable responsible for shader program
+
+      this.draw();
+
+      return this.drawCount;
+    },
+
+    // @private
+    draw: function() {
+      if ( this.drawable ) {
+        this.drawable.draw();
+        this.drawCount++;
+      }
+    }
+  } );
+
+  WebGLBlock.TexturedTrianglesProcessor = function( webglBlock ) {
+    this.webglBlock = webglBlock;
+    var gl = this.gl = webglBlock.gl;
+
+    assert && assert( webglBlock.gl );
+    this.shaderProgram = new ShaderProgram( gl, [
+      // vertex shader
+      'attribute vec4 aVertex;',
+      // 'attribute vec2 aTextureCoord;',
+      'varying vec2 vTextureCoord;',
+      'uniform mat3 uProjectionMatrix;',
+
+      'void main() {',
+      '  vTextureCoord = aVertex.zw;',
+      '  vec3 ndc = uProjectionMatrix * vec3( aVertex.xy, 1.0 );', // homogeneous map to to normalized device coordinates
+      '  gl_Position = vec4( ndc.xy, 0.0, 1.0 );',
+      '}'
+    ].join( '\n' ), [
+      // fragment shader
+      'precision mediump float;',
+      'varying vec2 vTextureCoord;',
+      'uniform sampler2D uTexture;',
+
+      'void main() {',
+      '  gl_FragColor = texture2D( uTexture, vTextureCoord, -0.7 );', // mipmap LOD bias of -0.7 (for now)
+      '}'
+    ].join( '\n' ), {
+      // attributes: [ 'aVertex', 'aTextureCoord' ],
+      attributes: [ 'aVertex' ],
+      uniforms: [ 'uTexture', 'uProjectionMatrix' ]
+    } );
+
+    this.vertexBuffer = gl.createBuffer();
+    this.lastArrayLength = 128; // initial vertex buffer array length
+    this.vertexArray = new Float32Array( this.lastArrayLength );
+
+    gl.bindBuffer( gl.ARRAY_BUFFER, this.vertexBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, this.vertexArray, gl.DYNAMIC_DRAW ); // fully buffer at the start
+  };
+  inherit( Object, WebGLBlock.TexturedTrianglesProcessor, {
+    activate: function() {
+      this.shaderProgram.use();
+
+      this.currentSpriteSheet = null;
+      this.vertexArrayIndex = 0;
+      this.drawCount = 0;
+    },
+
+    processDrawable: function( drawable ) {
+      // skip unloaded images or sprites
+      if ( !drawable.sprite ) {
+        return;
+      }
+
+      assert && assert( drawable.webglRenderer === Renderer.webglTexturedTriangles );
+      if ( this.currentSpriteSheet && drawable.sprite.spriteSheet !== this.currentSpriteSheet ) {
+        this.draw();
+      }
+      this.currentSpriteSheet = drawable.sprite.spriteSheet;
+
+      var vertexData = drawable.vertexArray;
+
+      // if our vertex data won't fit, keep doubling the size until it fits
+      while ( vertexData.length + this.vertexArrayIndex > this.vertexArray.length ) {
+        var newVertexArray = new Float32Array( this.vertexArray.length * 2 );
+        newVertexArray.set( this.vertexArray );
+        this.vertexArray = newVertexArray;
+      }
+
+      // copy our vertex data into the main array
+      this.vertexArray.set( vertexData, this.vertexArrayIndex );
+      this.vertexArrayIndex += vertexData.length;
+    },
+
+    deactivate: function() {
+      if ( this.currentSpriteSheet ) {
+        this.draw();
+      }
+
+      this.shaderProgram.unuse();
+
+      return this.drawCount;
+    },
+
+    // @private
+    draw: function() {
+      assert && assert( this.currentSpriteSheet );
+      var gl = this.gl;
+
+      // (uniform) projection transform into normalized device coordinates
+      gl.uniformMatrix3fv( this.shaderProgram.uniformLocations.uProjectionMatrix, false, this.webglBlock.projectionMatrixArray );
+
+      gl.bindBuffer( gl.ARRAY_BUFFER, this.vertexBuffer );
+      // if we increased in length, we need to do a full bufferData to resize it on the GPU side
+      if ( this.vertexArray.length > this.lastArrayLength ) {
+        gl.bufferData( gl.ARRAY_BUFFER, this.vertexArray, gl.DYNAMIC_DRAW ); // fully buffer at the start
+      }
+      // otherwise do a more efficient update that only sends part of the array over
+      else {
+        gl.bufferSubData( gl.ARRAY_BUFFER, 0, this.vertexArray.subarray( 0, this.vertexArrayIndex ) );
+      }
+      gl.vertexAttribPointer( this.shaderProgram.attributeLocations.aVertex, 4, gl.FLOAT, false, 0, 0 );
+      // TODO: test striping
+      // var sizeOfFloat = 4;
+      // gl.vertexAttribPointer( this.shaderProgram.attributeLocations.aVertex, 2, gl.FLOAT, false, 4 * sizeOfFloat, 0 * sizeOfFloat );
+      // gl.vertexAttribPointer( this.shaderProgram.attributeLocations.aTextureCoord, 2, gl.FLOAT, false, 4 * sizeOfFloat, 2 * sizeOfFloat );
+
+      gl.activeTexture( gl.TEXTURE0 );
+      gl.bindTexture( gl.TEXTURE_2D, this.currentSpriteSheet.texture );
+      gl.uniform1i( this.shaderProgram.uniformLocations.uTexture, 0 );
+
+      gl.drawArrays( gl.TRIANGLES, 0, this.vertexArrayIndex / 4 );
+
+      gl.bindTexture( gl.TEXTURE_2D, null );
+
+      this.drawCount++;
+
+      this.currentSpriteSheet = null;
+      this.vertexArrayIndex = 0;
+    }
+  } );
+
 
   Poolable.mixin( WebGLBlock, {
     constructorDuplicateFactory: function( pool ) {
@@ -27007,7 +27302,7 @@ define( 'SCENERY/display/PixiDisplayObject',['require','PHET_CORE/inherit','PHET
             pixiDisplayObject.position.x = matrix.m02();
             pixiDisplayObject.position.y = matrix.m12();
             pixiDisplayObject.rotation = matrix.rotation;
-            pixiDisplayObject.scale = new PIXI.Point( matrix.getScaleVector().x, matrix.getScaleVector().y );//Math.abs(matrix.getScaleVector().x)+0.5;//TODO: y???
+            pixiDisplayObject.scale = new PIXI.math.Point( matrix.getScaleVector().x, matrix.getScaleVector().y );//Math.abs(matrix.getScaleVector().x)+0.5;//TODO: y???
           }
           else if ( this.hasTransform ) {
             this.hasTransform = false;
@@ -28929,7 +29224,7 @@ define( 'SCENERY/display/RebuildStitcher',['require','PHET_CORE/inherit','SCENER
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-define( 'SCENERY/display/BackboneDrawable',['require','PHET_CORE/inherit','PHET_CORE/Poolable','PHET_CORE/cleanArray','SCENERY/scenery','SCENERY/display/Drawable','SCENERY/display/Renderer','SCENERY/display/Stitcher','SCENERY/display/GreedyStitcher','SCENERY/display/RebuildStitcher','SCENERY/util/Util'],function( require ) {
+define( 'SCENERY/display/BackboneDrawable',['require','PHET_CORE/inherit','PHET_CORE/Poolable','PHET_CORE/cleanArray','SCENERY/scenery','SCENERY/display/Drawable','SCENERY/display/Stitcher','SCENERY/display/GreedyStitcher','SCENERY/display/RebuildStitcher','SCENERY/util/Util'],function( require ) {
   
 
   // modules
@@ -28938,7 +29233,6 @@ define( 'SCENERY/display/BackboneDrawable',['require','PHET_CORE/inherit','PHET_
   var cleanArray = require( 'PHET_CORE/cleanArray' );
   var scenery = require( 'SCENERY/scenery' );
   var Drawable = require( 'SCENERY/display/Drawable' );
-  var Renderer = require( 'SCENERY/display/Renderer' );
   var Stitcher = require( 'SCENERY/display/Stitcher' );
   var GreedyStitcher = require( 'SCENERY/display/GreedyStitcher' );
   var RebuildStitcher = require( 'SCENERY/display/RebuildStitcher' );
@@ -28974,7 +29268,7 @@ define( 'SCENERY/display/BackboneDrawable',['require','PHET_CORE/inherit','PHET_
 
       this.display = display;
 
-      this.forceAcceleration = Renderer.isAccelerationForced( this.renderer );
+      this.forceAcceleration = false;
 
       // reference to the instance that controls this backbone
       this.backboneInstance = backboneInstance;
@@ -28997,6 +29291,10 @@ define( 'SCENERY/display/BackboneDrawable',['require','PHET_CORE/inherit','PHET_
         this.backboneInstance.relativeTransform.addPrecompute(); // trigger precomputation of the relative transform, since we will always need it when it is updated
       }
 
+      this.backboneVisibilityListener = this.backboneVisibilityListener || this.updateBackboneVisibility.bind( this );
+      this.backboneInstance.on( 'relativeVisibility', this.backboneVisibilityListener );
+      this.visibilityDirty = true;
+
       this.renderer = renderer;
       this.domElement = isDisplayRoot ? display._domElement : BackboneDrawable.createDivBackbone();
       this.isDisplayRoot = isDisplayRoot;
@@ -29007,10 +29305,8 @@ define( 'SCENERY/display/BackboneDrawable',['require','PHET_CORE/inherit','PHET_
       // if we need to, watch nodes below us (and including us) and apply their filters (opacity/visibility/clip) to the backbone.
       this.watchedFilterNodes = cleanArray( this.watchedFilterNodes );
       this.opacityDirty = true;
-      this.visibilityDirty = true;
       this.clipDirty = true;
       this.opacityDirtyListener = this.opacityDirtyListener || this.markOpacityDirty.bind( this );
-      this.visibilityDirtyListener = this.visibilityDirtyListener || this.markVisibilityDirty.bind( this );
       this.clipDirtyListener = this.clipDirtyListener || this.markClipDirty.bind( this );
       if ( this.willApplyFilters ) {
         assert && assert( this.filterRootAncestorInstance.trail.nodes.length < this.backboneInstance.trail.nodes.length,
@@ -29022,7 +29318,6 @@ define( 'SCENERY/display/BackboneDrawable',['require','PHET_CORE/inherit','PHET_
 
           this.watchedFilterNodes.push( node );
           node.onStatic( 'opacity', this.opacityDirtyListener );
-          node.onStatic( 'visibility', this.visibilityDirtyListener );
           node.onStatic( 'clip', this.clipDirtyListener );
         }
       }
@@ -29050,13 +29345,15 @@ define( 'SCENERY/display/BackboneDrawable',['require','PHET_CORE/inherit','PHET_
       sceneryLog && sceneryLog.BackboneDrawable && sceneryLog.BackboneDrawable( 'dispose ' + this.toString() );
       sceneryLog && sceneryLog.BackboneDrawable && sceneryLog.push();
 
+
       while ( this.watchedFilterNodes.length ) {
         var node = this.watchedFilterNodes.pop();
 
         node.offStatic( 'opacity', this.opacityDirtyListener );
-        node.offStatic( 'visibility', this.visibilityDirtyListener );
         node.offStatic( 'clip', this.clipDirtyListener );
       }
+
+      this.backboneInstance.off( 'relativeVisibility', this.backboneVisibilityListener );
 
       // if we need to remove drawables from the blocks, do so
       if ( !this.removedDrawables ) {
@@ -29102,6 +29399,15 @@ define( 'SCENERY/display/BackboneDrawable',['require','PHET_CORE/inherit','PHET_
       }
     },
 
+    updateBackboneVisibility: function() {
+      this.visible = this.backboneInstance.relativeVisible;
+
+      if ( !this.visibilityDirty ) {
+        this.visibilityDirty = true;
+        this.markDirty();
+      }
+    },
+
     // should be called during syncTree
     markForDisposal: function( display ) {
       for ( var d = this.previousFirstDrawable; d !== null; d = d.oldNextDrawable ) {
@@ -29133,13 +29439,6 @@ define( 'SCENERY/display/BackboneDrawable',['require','PHET_CORE/inherit','PHET_
       }
     },
 
-    markVisibilityDirty: function() {
-      if ( !this.visibilityDirty ) {
-        this.visibilityDirty = true;
-        this.markDirty();
-      }
-    },
-
     markClipDirty: function() {
       if ( !this.clipDirty ) {
         this.clipDirty = true;
@@ -29165,7 +29464,7 @@ define( 'SCENERY/display/BackboneDrawable',['require','PHET_CORE/inherit','PHET_
         if ( this.visibilityDirty ) {
           this.visibilityDirty = false;
 
-          this.domElement.style.display = ( this.willApplyFilters && !this.getFilterVisibility() ) ? 'none' : '';
+          this.domElement.style.display = this.visible ? '' : 'none';
         }
 
         if ( this.clipDirty ) {
@@ -30154,7 +30453,7 @@ define( 'SCENERY/display/RelativeTransform',['require','PHET_CORE/inherit','PHET
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-define( 'SCENERY/display/Instance',['require','PHET_CORE/inherit','PHET_CORE/Poolable','PHET_CORE/cleanArray','SCENERY/scenery','SCENERY/display/ChangeInterval','SCENERY/display/Drawable','SCENERY/display/Renderer','SCENERY/display/RelativeTransform'],function( require ) {
+define( 'SCENERY/display/Instance',['require','PHET_CORE/inherit','PHET_CORE/Poolable','PHET_CORE/cleanArray','SCENERY/scenery','SCENERY/display/ChangeInterval','SCENERY/display/Drawable','SCENERY/display/Renderer','SCENERY/display/RelativeTransform','SCENERY/util/Util','AXON/Events'],function( require ) {
   
 
   var inherit = require( 'PHET_CORE/inherit' );
@@ -30165,10 +30464,12 @@ define( 'SCENERY/display/Instance',['require','PHET_CORE/inherit','PHET_CORE/Poo
   var Drawable = require( 'SCENERY/display/Drawable' );
   var Renderer = require( 'SCENERY/display/Renderer' );
   var RelativeTransform = require( 'SCENERY/display/RelativeTransform' );
+  var Util = require( 'SCENERY/util/Util' );
+  var Events = require( 'AXON/Events' );
 
   var globalIdCounter = 1;
 
-  var emptyHintsObject = {}; // an object with no properties that we can use as an empty "hints" object
+  var isWebGLSupported = Util.isWebGLSupported;
 
   // preferences top to bottom in general
   var defaultPreferredRenderers = Renderer.createOrderBitmask(
@@ -30176,13 +30477,15 @@ define( 'SCENERY/display/Instance',['require','PHET_CORE/inherit','PHET_CORE/Poo
 
   // see initialize() for documentation
   scenery.Instance = function Instance( display, trail, isDisplayRoot, isSharedCanvasCacheRoot ) {
+    Events.call( this );
+
     this.active = false;
 
     this.initialize( display, trail, isDisplayRoot, isSharedCanvasCacheRoot );
   };
   var Instance = scenery.Instance;
 
-  inherit( Object, Instance, {
+  inherit( Events, Instance, {
     /*
      * @param {Display} display - Instances are bound to a single display
      * @param {Trail} trail - The list of ancestors going back up to our root instance (for the display, or for a cache)
@@ -30203,6 +30506,13 @@ define( 'SCENERY/display/Instance',['require','PHET_CORE/inherit','PHET_CORE/Poo
       // transform root), and allows for listening to when our relative transform changes (called during
       // a phase of Display.updateDisplay()).
       this.relativeTransform = ( this.relativeTransform || new RelativeTransform() ).initialize( this, display, trail );
+
+      // Tracking of visibility {boolean} and associated boolean flags.
+      this.visible = true; // global visibility (whether this instance will end up appearing on the display)
+      this.relativeVisible = true; // relative visibility (ignores the closest ancestral visibility root and below)
+      this.selfVisible = true; // like relative visibility, but is always true if we are a visibility root
+      this.visibilityDirty = true; // entire subtree of visibility will need to be updated
+      this.childVisibilityDirty = true; // an ancestor needs its visibility updated
 
       // In the range (-1,0), to help us track insertions and removals of this instance's node to its parent
       // (did we get removed but added back?).
@@ -30256,6 +30566,7 @@ define( 'SCENERY/display/Instance',['require','PHET_CORE/inherit','PHET_CORE/Poo
       // Render state exports for this instance.
       this.isBackbone = false; // {boolean} - Whether we will have a BackboneDrawable group drawable
       this.isTransformed = false;  // {boolean} - Whether this instance creates a new "root" for the relative trail transforms
+      this.isVisibilityApplied = false; // {boolean} - Whether this instance handles visibility with a group drawable
       this.isInstanceCanvasCache = false; // {boolean} - Whether we have a Canvas cache specific to this instance's position
       this.isSharedCanvasCachePlaceholder = false; // {boolean}
       this.isSharedCanvasCacheSelf = isSharedCanvasCacheRoot; // {boolean}
@@ -30364,7 +30675,7 @@ define( 'SCENERY/display/Instance',['require','PHET_CORE/inherit','PHET_CORE/Poo
      * - hints
      * - opacity
      * - clipArea
-     * - _rendererSummary.bitmask
+     * - _rendererSummary
      * - _rendererBitmask
      *
      * State changes that can cause cascading state changes in descendants:
@@ -30381,6 +30692,7 @@ define( 'SCENERY/display/Instance',['require','PHET_CORE/inherit','PHET_CORE/Poo
       // old state information, so we can compare what was changed
       var wasBackbone = this.isBackbone;
       var wasTransformed = this.isTransformed;
+      var wasVisibilityApplied = this.isVisibilityApplied;
       var wasInstanceCanvasCache = this.isInstanceCanvasCache;
       var wasSharedCanvasCacheSelf = this.isSharedCanvasCacheSelf;
       var wasSharedCanvasCachePlaceholder = this.isSharedCanvasCachePlaceholder;
@@ -30393,6 +30705,7 @@ define( 'SCENERY/display/Instance',['require','PHET_CORE/inherit','PHET_CORE/Poo
       // default values to set (makes the logic much simpler)
       this.isBackbone = false;
       this.isTransformed = false;
+      this.isVisibilityApplied = false;
       this.isInstanceCanvasCache = false;
       this.isSharedCanvasCacheSelf = false;
       this.isSharedCanvasCachePlaceholder = false;
@@ -30400,29 +30713,42 @@ define( 'SCENERY/display/Instance',['require','PHET_CORE/inherit','PHET_CORE/Poo
       this.groupRenderer = 0;
       this.sharedCacheRenderer = 0;
 
-      var combinedBitmask = this.node._rendererSummary.bitmask;
-      var hints = this.node._hints || emptyHintsObject;
-
-      //OHTWO TODO: Don't force a backbone for transparency
-      var hasTransparency = this.node._opacity !== 1 || hints.usesOpacity;
-      var hasClip = this.node._clipArea !== null;
+      var hints = this.node._hints;
 
       this.isUnderCanvasCache = this.isSharedCanvasCacheRoot ||
                                 ( this.parent ? ( this.parent.isUnderCanvasCache || this.parent.isInstanceCanvasCache || this.parent.isSharedCanvasCacheSelf ) : false );
 
+      // set up our preferred renderer list (generally based on the parent)
+      this.preferredRenderers = this.parent ? this.parent.preferredRenderers : defaultPreferredRenderers;
+      // allow the node to modify its preferred renderers (and those of its descendants)
+      if ( hints.renderer ) {
+        this.preferredRenderers = Renderer.pushOrderBitmask( this.preferredRenderers, hints.renderer );
+      }
+
+      var hasClip = this.node.hasClipArea();
+      var hasTransparency = this.node._opacity !== 1 || hints.usesOpacity;
+      var requiresSplit = hints.requireElement || hints.cssTransform || hints.layerSplit;
+      var backboneRequired = this.isDisplayRoot || ( !this.isUnderCanvasCache && requiresSplit );
+      var applyTransparencyWithSVG = !backboneRequired &&
+                                     ( hasTransparency || hasClip ) &&
+                                     this.node._rendererSummary.isSubtreeRenderedExclusivelySVG( this.preferredRenderers );
+      var useBackbone = applyTransparencyWithSVG ? false : ( backboneRequired || hasTransparency || hasClip );
 
       // check if we need a backbone or cache
       // if we are under a canvas cache, we will NEVER have a backbone
       // splits are accomplished just by having a backbone
-      if ( this.isDisplayRoot || ( !this.isUnderCanvasCache && ( hasTransparency || hasClip || hints.requireElement || hints.cssTransform || hints.split ) ) ) {
+      // NOTE: If changing, check RendererSummary.summaryBitmaskForNodeSelf
+      //OHTWO TODO: Update this to properly identify when backbones are necessary/and-or when we forward opacity/clipping
+      if ( useBackbone ) {
         this.isBackbone = true;
+        this.isVisibilityApplied = true;
         this.isTransformed = this.isDisplayRoot || !!hints.cssTransform; // for now, only trigger CSS transform if we have the specific hint
         //OHTWO TODO: check whether the force acceleration hint is being used by our DOMBlock
-        this.groupRenderer = Renderer.bitmaskDOM | ( hints.forceAcceleration ? Renderer.bitmaskForceAcceleration : 0 ); // probably won't be used
+        this.groupRenderer = Renderer.bitmaskDOM; // probably won't be used
       }
-      else if ( hasTransparency || hasClip || hints.canvasCache ) {
+      else if ( !applyTransparencyWithSVG && ( hasTransparency || hasClip || hints.canvasCache ) ) {
         // everything underneath needs to be renderable with Canvas, otherwise we cannot cache
-        assert && assert( ( combinedBitmask & Renderer.bitmaskCanvas ) !== 0,
+        assert && assert( this.node._rendererSummary.isSingleCanvasSupported(),
           'hints.canvasCache provided, but not all node contents can be rendered with Canvas under ' +
           this.node.constructor.name );
 
@@ -30431,12 +30757,12 @@ define( 'SCENERY/display/Instance',['require','PHET_CORE/inherit','PHET_CORE/Poo
           if ( this.isSharedCanvasCacheRoot ) {
             this.isSharedCanvasCacheSelf = true;
 
-            this.sharedCacheRenderer = Renderer.bitmaskCanvas;
+            this.sharedCacheRenderer = isWebGLSupported ? Renderer.bitmaskWebGL : Renderer.bitmaskCanvas;
           }
           else {
             // everything underneath needs to guarantee that its bounds are valid
             //OHTWO TODO: We'll probably remove this if we go with the "safe bounds" approach
-            assert && assert( ( combinedBitmask & scenery.bitmaskBoundsValid ) !== 0,
+            assert && assert( this.node._rendererSummary.areBoundsValid(),
               'hints.singleCache provided, but not all node contents have valid bounds under ' +
               this.node.constructor.name );
 
@@ -30446,15 +30772,8 @@ define( 'SCENERY/display/Instance',['require','PHET_CORE/inherit','PHET_CORE/Poo
         else {
           this.isInstanceCanvasCache = true;
           this.isUnderCanvasCache = true;
-          this.groupRenderer = Renderer.bitmaskCanvas; // disallowing SVG here, so we don't have to break up our SVG group structure
+          this.groupRenderer = isWebGLSupported ? Renderer.bitmaskWebGL : Renderer.bitmaskCanvas;
         }
-      }
-
-      // set up our preferred renderer list (generally based on the parent)
-      this.preferredRenderers = this.parent ? this.parent.preferredRenderers : defaultPreferredRenderers;
-      // allow the node to modify its preferred renderers (and those of its descendants)
-      if ( hints.renderer ) {
-        this.preferredRenderers = Renderer.pushOrderBitmask( this.preferredRenderers, hints.renderer );
       }
 
       if ( this.node.isPainted() ) {
@@ -30462,19 +30781,23 @@ define( 'SCENERY/display/Instance',['require','PHET_CORE/inherit','PHET_CORE/Poo
           this.selfRenderer = Renderer.bitmaskCanvas;
         }
         else {
-          var nodeBitmask = this.node._rendererBitmask;
+          var supportedNodeBitmask = this.node._rendererBitmask;
+          if ( !isWebGLSupported ) {
+            var invalidBitmasks = Renderer.bitmaskWebGL | Renderer.bitmaskPixi;
+            supportedNodeBitmask = supportedNodeBitmask ^ ( supportedNodeBitmask & invalidBitmasks );
+          }
 
           // use the preferred rendering order if specified, otherwise use the default
-          this.selfRenderer = ( nodeBitmask & Renderer.bitmaskOrderFirst( this.preferredRenderers ) ) ||
-                              ( nodeBitmask & Renderer.bitmaskOrderSecond( this.preferredRenderers ) ) ||
-                              ( nodeBitmask & Renderer.bitmaskOrderThird( this.preferredRenderers ) ) ||
-                              ( nodeBitmask & Renderer.bitmaskOrderFourth( this.preferredRenderers ) ) ||
-                              ( nodeBitmask & Renderer.bitmaskOrderFifth( this.preferredRenderers ) ) ||
-                              ( nodeBitmask & Renderer.bitmaskSVG ) ||
-                              ( nodeBitmask & Renderer.bitmaskCanvas ) ||
-                              ( nodeBitmask & Renderer.bitmaskDOM ) ||
-                              ( nodeBitmask & Renderer.bitmaskWebGL ) ||
-                              ( nodeBitmask & Renderer.bitmaskPixi ) ||
+          this.selfRenderer = ( supportedNodeBitmask & Renderer.bitmaskOrder( this.preferredRenderers, 0 ) ) ||
+                              ( supportedNodeBitmask & Renderer.bitmaskOrder( this.preferredRenderers, 1 ) ) ||
+                              ( supportedNodeBitmask & Renderer.bitmaskOrder( this.preferredRenderers, 2 ) ) ||
+                              ( supportedNodeBitmask & Renderer.bitmaskOrder( this.preferredRenderers, 3 ) ) ||
+                              ( supportedNodeBitmask & Renderer.bitmaskOrder( this.preferredRenderers, 4 ) ) ||
+                              ( supportedNodeBitmask & Renderer.bitmaskSVG ) ||
+                              ( supportedNodeBitmask & Renderer.bitmaskCanvas ) ||
+                              ( supportedNodeBitmask & Renderer.bitmaskDOM ) ||
+                              ( supportedNodeBitmask & Renderer.bitmaskWebGL ) ||
+                              ( supportedNodeBitmask & Renderer.bitmaskPixi ) ||
                               0;
 
           assert && assert( this.selfRenderer, 'setSelfRenderer failure?' );
@@ -30506,8 +30829,13 @@ define( 'SCENERY/display/Instance',['require','PHET_CORE/inherit','PHET_CORE/Poo
                             ( oldGroupRenderer !== this.groupRenderer ) ||
                             ( oldSharedCacheRenderer !== this.sharedCacheRenderer );
 
-      sceneryLog && sceneryLog.Instance && sceneryLog.Instance( 'new: ' + this.getStateString() );
+      // if our visibility applications changed, update the entire subtree
+      if ( wasVisibilityApplied !== this.isVisibilityApplied ) {
+        this.visibilityDirty = true;
+        this.parent && this.parent.markChildVisibilityDirty();
+      }
 
+      sceneryLog && sceneryLog.Instance && sceneryLog.Instance( 'new: ' + this.getStateString() );
       sceneryLog && sceneryLog.Instance && sceneryLog.pop();
     },
 
@@ -30522,6 +30850,7 @@ define( 'SCENERY/display/Instance',['require','PHET_CORE/inherit','PHET_CORE/Poo
                    ( this.isSharedCanvasCachePlaceholder ? 'sharedCachePlaceholder ' : '' ) +
                    ( this.isSharedCanvasCacheSelf ? 'sharedCacheSelf ' : '' ) +
                    ( this.isTransformed ? 'TR ' : '' ) +
+                   ( this.isVisibilityApplied ? 'VIS ' : '' ) +
                    ( this.selfRenderer ? this.selfRenderer.toString( 16 ) : '-' ) + ',' +
                    ( this.groupRenderer ? this.groupRenderer.toString( 16 ) : '-' ) + ',' +
                    ( this.sharedCacheRenderer ? this.sharedCacheRenderer.toString( 16 ) : '-' ) + ' ';
@@ -30679,10 +31008,12 @@ define( 'SCENERY/display/Instance',['require','PHET_CORE/inherit','PHET_CORE/Poo
           childInstance.syncTree();
         }
 
+        var includeChildDrawables = childInstance.shouldIncludeInParentDrawables();
+
         //OHTWO TODO: only strip out invisible Canvas drawables, while leaving SVG (since we can more efficiently hide
         // SVG trees, memory-wise)
         // here we strip out invisible drawable sections out of the drawable linked list
-        if ( childInstance.node.isVisible() ) {
+        if ( includeChildDrawables ) {
           // if there are any drawables for that child, link them up in our linked list
           if ( childInstance.firstDrawable ) {
             if ( currentDrawable ) {
@@ -30707,7 +31038,7 @@ define( 'SCENERY/display/Instance',['require','PHET_CORE/inherit','PHET_CORE/Poo
         sceneryLog && sceneryLog.ChangeInterval && sceneryLog.push();
 
         var wasIncluded = childInstance.stitchChangeIncluded;
-        var isIncluded = childInstance.node.isVisible();
+        var isIncluded = includeChildDrawables;
         childInstance.stitchChangeIncluded = isIncluded;
 
         sceneryLog && sceneryLog.ChangeInterval && sceneryLog.ChangeInterval( 'included: ' + wasIncluded + ' => ' + isIncluded );
@@ -30840,11 +31171,11 @@ define( 'SCENERY/display/Instance',['require','PHET_CORE/inherit','PHET_CORE/Poo
       this.firstDrawable = this.firstInnerDrawable = firstDrawable;
       this.lastDrawable = this.lastInnerDrawable = currentDrawable; // either null, or the drawable itself
 
-      // drawable range checks
+      // ensure that our firstDrawable and lastDrawable are correct
       if ( assertSlow ) {
         var firstDrawableCheck = null;
         for ( var j = 0; j < this.children.length; j++ ) {
-          if ( this.children[ j ].node.isVisible() && this.children[ j ].firstDrawable ) {
+          if ( this.children[ j ].shouldIncludeInParentDrawables() && this.children[ j ].firstDrawable ) {
             firstDrawableCheck = this.children[ j ].firstDrawable;
             break;
           }
@@ -30855,7 +31186,7 @@ define( 'SCENERY/display/Instance',['require','PHET_CORE/inherit','PHET_CORE/Poo
 
         var lastDrawableCheck = this.selfDrawable;
         for ( var k = this.children.length - 1; k >= 0; k-- ) {
-          if ( this.children[ k ].node.isVisible() && this.children[ k ].lastDrawable ) {
+          if ( this.children[ k ].shouldIncludeInParentDrawables() && this.children[ k ].lastDrawable ) {
             lastDrawableCheck = this.children[ k ].lastDrawable;
             break;
           }
@@ -30889,6 +31220,7 @@ define( 'SCENERY/display/Instance',['require','PHET_CORE/inherit','PHET_CORE/Poo
           }
 
           this.selfDrawable = Renderer.createSelfDrawable( this, this.node, selfRenderer );
+          assert && assert( this.selfDrawable );
 
           return true;
         }
@@ -31072,6 +31404,11 @@ define( 'SCENERY/display/Instance',['require','PHET_CORE/inherit','PHET_CORE/Poo
           this.display.markTransformRootDirty( this, true );
         }
       }
+    },
+
+    // @private, whether out drawables (from firstDrawable to lastDrawable) should be included in our parent's drawables
+    shouldIncludeInParentDrawables: function() {
+      return this.node.isVisible() || !this.node.isExcludeInvisible();
     },
 
     // @private, finds the closest drawable (not including the child instance at childIndex) using lastDrawable, or null
@@ -31274,6 +31611,10 @@ define( 'SCENERY/display/Instance',['require','PHET_CORE/inherit','PHET_CORE/Poo
 
       // make sure we aren't pruned in the next syncTree()
       this.parent && this.parent.markSkipPruning();
+
+      // mark visibility changes
+      this.visibilityDirty = true;
+      this.parent && this.parent.markChildVisibilityDirty();
     },
 
     // event callback for Node's 'opacity' change event
@@ -31281,6 +31622,60 @@ define( 'SCENERY/display/Instance',['require','PHET_CORE/inherit','PHET_CORE/Poo
       assert && assert( !this.stateless, 'If we are stateless, we should not receive these notifications' );
 
       this.markRenderStateDirty();
+    },
+
+    markChildVisibilityDirty: function() {
+      if ( !this.childVisibilityDirty ) {
+        this.childVisibilityDirty = true;
+        this.parent && this.parent.markChildVisibilityDirty();
+      }
+    },
+
+    /**
+     * Updates the visible/relativeVisible flags on the Instance and its entire subtree.
+     *
+     * @param {boolean} parentGloballyVisible - Whether our parent (if any) is globally visible
+     * @param {boolean} parentRelativelyVisible - Whether our parent (if any) is relatively visible
+     * @param {boolean} updateFullSubtree - If true, we will visit the entire subtree to ensure visibility is correct.
+     */
+    updateVisibility: function( parentGloballyVisible, parentRelativelyVisible, updateFullSubtree ) {
+      // If our visibility flag for ourself is dirty, we need to update our entire subtree
+      if ( this.visibilityDirty ) {
+        updateFullSubtree = true;
+      }
+
+      // calculate our visibilities
+      var nodeVisible = this.node.isVisible();
+      var wasVisible = this.visible;
+      var wasRelativeVisible = this.relativeVisible;
+      var wasSelfVisible = this.selfVisible;
+      this.visible = parentGloballyVisible && nodeVisible;
+      this.relativeVisible = parentRelativelyVisible && nodeVisible;
+      this.selfVisible = this.isVisibilityApplied ? true : this.relativeVisible;
+
+      var len = this.children.length;
+      for ( var i = 0; i < len; i++ ) {
+        var child = this.children[i];
+
+        if ( updateFullSubtree || child.visibilityDirty || child.childVisibilityDirty ) {
+          // if we are a visibility root (isVisibilityApplied===true), disregard ancestor visibility
+          child.updateVisibility( this.visible, this.isVisibilityApplied ? true : this.relativeVisible, updateFullSubtree );
+        }
+      }
+
+      this.visibilityDirty = false;
+      this.childVisibilityDirty = false;
+
+      // trigger changes after we do the full visibility update
+      if ( this.visible !== wasVisible ) {
+        this.trigger0( 'visibility' );
+      }
+      if ( this.relativeVisible !== wasRelativeVisible ) {
+        this.trigger0( 'relativeVisibility' );
+      }
+      if ( this.selfVisible !== wasSelfVisible ) {
+        this.trigger0( 'selfVisibility' );
+      }
     },
 
     getDescendantCount: function() {
@@ -31362,6 +31757,15 @@ define( 'SCENERY/display/Instance',['require','PHET_CORE/inherit','PHET_CORE/Poo
       }
       else {
         return this.parent.getTransformRootInstance();
+      }
+    },
+
+    getVisibilityRootInstance: function() {
+      if ( this.isVisibilityApplied || !this.parent ) {
+        return this;
+      }
+      else {
+        return this.parent.getVisibilityRootInstance();
       }
     },
 
@@ -31463,6 +31867,8 @@ define( 'SCENERY/display/Instance',['require','PHET_CORE/inherit','PHET_CORE/Poo
       // clean our variables out to release memory
       this.cleanInstance( null, null );
 
+      this.removeAllEventListeners();
+
       this.freeToPool();
 
       sceneryLog && sceneryLog.Instance && sceneryLog.pop();
@@ -31491,9 +31897,6 @@ define( 'SCENERY/display/Instance',['require','PHET_CORE/inherit','PHET_CORE/Poo
 
         assertSlow( !this.isSharedCanvasCachePlaceholder || this.sharedCacheDrawable,
           'We need to have a sharedCacheDrawable if we are a shared cache' );
-
-        assertSlow( this.isTransformed === this.isTransformed,
-          'isTransformed should match' );
 
         assertSlow( this.addRemoveCounter === 0,
           'Our addRemoveCounter should always be 0 at the end of syncTree' );
@@ -31708,7 +32111,7 @@ define( 'SCENERY/overlays/PointerAreaOverlay',['require','PHET_CORE/inherit','KI
 
     var svg = this.svg = document.createElementNS( scenery.svgns, 'svg' );
     svg.style.position = 'absolute';
-    svg.className = 'mouseTouchAreaOverlay';
+    svg.setAttribute( 'class', 'mouseTouchAreaOverlay' );
     svg.style.top = 0;
     svg.style.left = 0;
     svg.style[ 'pointer-events' ] = 'none';
@@ -31935,7 +32338,7 @@ define( 'SCENERY/overlays/CanvasNodeBoundsOverlay',['require','PHET_CORE/inherit
 
     var svg = this.svg = document.createElementNS( scenery.svgns, 'svg' );
     svg.style.position = 'absolute';
-    svg.className = 'canvasNodeBoundsOverlay';
+    svg.setAttribute( 'class', 'canvasNodeBoundsOverlay' );
     svg.style.top = 0;
     svg.style.left = 0;
     svg.style[ 'pointer-events' ] = 'none';
@@ -32069,7 +32472,7 @@ define( 'SCENERY/display/Display',['require','PHET_CORE/inherit','PHET_CORE/exte
   var Drawable = require( 'SCENERY/display/Drawable' );
   var Instance = require( 'SCENERY/display/Instance' );
   require( 'SCENERY/display/InlineCanvasCacheDrawable' );
-  require( 'SCENERY/display/Renderer' );
+  var Renderer = require( 'SCENERY/display/Renderer' );
   require( 'SCENERY/display/SharedCanvasCacheDrawable' );
   require( 'SCENERY/display/SVGSelfDrawable' );
   require( 'SCENERY/input/Input' );
@@ -32098,6 +32501,7 @@ define( 'SCENERY/display/Display',['require','PHET_CORE/inherit','PHET_CORE/exte
    *   allowWebGL: true,                    // Boolean flag that indicates whether scenery is allowed to use WebGL for rendering
    *                                        // Makes it possible to disable WebGL for ease of testing on non-WebGL platforms, see #289
    *   accessibility: true                  // Whether accessibility enhancements is enabled
+   *   interactive: true                    // Whether mouse/touch/keyboard inputs are enabled (if input has been added)
    */
   scenery.Display = function Display( rootNode, options ) {
 
@@ -32120,7 +32524,8 @@ define( 'SCENERY/display/Display',['require','PHET_CORE/inherit','PHET_CORE/exte
       backgroundColor: null,      // initial background color
       preserveDrawingBuffer: false,
       allowWebGL: true,
-      accessibility: true
+      accessibility: true,
+      interactive: true
     }, options );
 
     // The (integral, > 0) dimensions of the Display's DOM element (only updates the DOM element on updateDisplay())
@@ -32172,6 +32577,7 @@ define( 'SCENERY/display/Display',['require','PHET_CORE/inherit','PHET_CORE/exte
 
     // will be filled in with a scenery.Input if event handling is enabled
     this._input = null;
+    this._interactive = this.options.interactive;
 
     // overlays currently being displayed.
     // API expected:
@@ -32278,6 +32684,8 @@ define( 'SCENERY/display/Display',['require','PHET_CORE/inherit','PHET_CORE/exte
 
       // pre-repaint phase: update relative transform information for listeners (notification) and precomputation where desired
       this.updateDirtyTransformRoots();
+      // pre-repaint phase update visibility information on instances
+      this._baseInstance.updateVisibility( true, true, false );
 
       if ( assertSlow ) { this._baseInstance.audit( this._frameId, true ); }
 
@@ -32469,6 +32877,14 @@ define( 'SCENERY/display/Display',['require','PHET_CORE/inherit','PHET_CORE/exte
     },
     get backgroundColor() { return this.getBackgroundColor(); },
 
+    get interactive() { return this._interactive; },
+    set interactive( value ) {
+      this._interactive = value;
+      if ( !this._interactive && this._input ) {
+        this._input.clearBatchedEvents();
+      }
+    },
+
     addOverlay: function( overlay ) {
       this._overlays.push( overlay );
       this._domElement.appendChild( overlay.domElement );
@@ -32498,7 +32914,7 @@ define( 'SCENERY/display/Display',['require','PHET_CORE/inherit','PHET_CORE/exte
       }
 
       // only return the renderer-specific portion (no other hints, etc)
-      return renderersUnderBackbone( this._rootBackbone ) & scenery.Renderer.bitmaskRendererArea;
+      return renderersUnderBackbone( this._rootBackbone ) & Renderer.bitmaskRendererArea;
     },
 
     /*
@@ -32629,6 +33045,9 @@ define( 'SCENERY/display/Display',['require','PHET_CORE/inherit','PHET_CORE/exte
 
       // forward all pointer events
       this._domElement.style.msTouchAction = 'none';
+
+      // don't allow browser to switch between font smoothing methods for text (see https://github.com/phetsims/scenery/issues/431)
+      Features.setStyle( this._domElement, Features.fontSmoothing, 'antialiased' );
 
       if ( this.options.allowCSSHacks ) {
         // some css hacks (inspired from https://github.com/EightMedia/hammer.js/blob/master/hammer.js).
@@ -32941,6 +33360,41 @@ define( 'SCENERY/display/Display',['require','PHET_CORE/inherit','PHET_CORE/exte
       }
       result += this._rootBackbone ? ( 'Drawables: ' + drawableCount( this._rootBackbone ) + '<br>' ) : '';
 
+      var drawableCountMap = {}; // {string} drawable constructor name => {number} count of seen
+      // increment the count in our map
+      function countRetainedDrawable( drawable ) {
+        var name = drawable.constructor.name;
+        if ( drawableCountMap[ name ] ) {
+          drawableCountMap[ name ]++;
+        }
+        else {
+          drawableCountMap[ name ] = 1;
+        }
+      }
+      function retainedDrawableCount( instance ) {
+        var count = 0;
+        if ( instance.selfDrawable ) {
+          countRetainedDrawable( instance.selfDrawable );
+          count++;
+        }
+        if ( instance.groupDrawable ) {
+          countRetainedDrawable( instance.groupDrawable );
+          count++;
+        }
+        if ( instance.sharedCacheDrawable ) {
+          countRetainedDrawable( instance.sharedCacheDrawable );
+          count++;
+        }
+        for ( var i = 0; i < instance.children.length; i++ ) {
+          count += retainedDrawableCount( instance.children[i] );
+        }
+        return count;
+      }
+      result += this._baseInstance ? ( 'Retained Drawables: ' + retainedDrawableCount( this._baseInstance ) + '<br>' ) : '';
+      for ( var drawableName in drawableCountMap ) {
+        result += '&nbsp;&nbsp;&nbsp;&nbsp;' + drawableName + ': ' + drawableCountMap[ drawableName ] + '<br>';
+      }
+
       function blockSummary( block ) {
         // ensure we are a block
         if ( !block.firstDrawable || !block.lastDrawable ) {
@@ -33047,7 +33501,7 @@ define( 'SCENERY/display/Display',['require','PHET_CORE/inherit','PHET_CORE/exte
 
         iSummary += ' <span style="color: #888">[Trail ' + instance.trail.indices.join( '.' ) + ']</span>';
         iSummary += ' <span style="color: #c88">' + str( instance.state ) + '</span>';
-        iSummary += ' <span style="color: #8c8">' + node._rendererSummary.bitmask.toString( 16 ) + ( node._rendererBitmask !== scenery.bitmaskNodeDefault ? ' (' + node._rendererBitmask.toString( 16 ) + ')' : '' ) + '</span>';
+        iSummary += ' <span style="color: #8c8">' + node._rendererSummary.bitmask.toString( 16 ) + ( node._rendererBitmask !== Renderer.bitmaskNodeDefault ? ' (' + node._rendererBitmask.toString( 16 ) + ')' : '' ) + '</span>';
 
         return iSummary;
       }
@@ -33229,6 +33683,7 @@ define( 'SCENERY/display/Display',['require','PHET_CORE/inherit','PHET_CORE/exte
 
       // Replace each <canvas> with an <img> that has src=canvas.toDataURL() and the same style
       var displayCanvases = doc.documentElement.getElementsByTagName( 'canvas' );
+      displayCanvases = Array.prototype.slice.call( displayCanvases ); // don't use a live HTMLCollection copy!
       for ( var i = 0; i < displayCanvases.length; i++ ) {
         var displayCanvas = displayCanvases[i];
 
@@ -33304,93 +33759,6 @@ define( 'SCENERY/display/Display',['require','PHET_CORE/inherit','PHET_CORE/exte
   return Display;
 } );
 
-//  Copyright 2002-2014, University of Colorado Boulder
-
-/**
- * A scenery Rectangle can actually take many structurally different forms: stroked/unstroked,
- * rounded/squared and these would change how it is handled by the WebGL shaders & buffer data.
- * This class watches a scenery Rectangle and decides which shader implementation to use.
- *
- * @author Sam Reid (PhET Interactive Simulations)
- */
-define( 'SCENERY/display/webgl/WebGLRectangle',['require','PHET_CORE/inherit','SCENERY/display/webgl/SquareUnstrokedRectangle'],function( require ) {
-  
-
-  // modules
-  var inherit = require( 'PHET_CORE/inherit' );
-  var SquareUnstrokedRectangle = require( 'SCENERY/display/webgl/SquareUnstrokedRectangle' );
-
-  /**
-   *
-   * @constructor
-   */
-  function WebGLRectangle( webGLRenderer, rectangle ) {
-    this.webGLRenderer = webGLRenderer;
-    this.rectangle = rectangle;
-    this.update( rectangle );
-  }
-
-  return inherit( Object, WebGLRectangle, {
-    create: function() {
-      this.rectangleHandle = (!this.rectangle.isRounded() && this.rectangle.stroke === null) ?
-                             new SquareUnstrokedRectangle() :
-                             (this.rectangle.isRounded()) ?
-                             null :
-                             null;
-//                             new RoundedRectangle() :
-//                             new RoundedStrokedRectangle();
-    },
-    update: function() {
-
-      if ( this.rectangleHandle === null ) {
-        this.create();
-      }
-      else if ( this.rectangleHandle.supports( this.rectangle ) ) {
-        this.rectangleHandle.update( this.rectangle );
-      }
-      else {
-        this.rectangleHandle.dispose();
-        this.create();
-      }
-    }
-  } );
-} );
-//  Copyright 2002-2014, University of Colorado Boulder
-
-/**
- * Auxiliary functions designed to be used like a library rather than a framework, to simplify building
- * WebGL renderers.  (Used as a library means it should be very easy to skip using portions of this library where
- * necessary).
- *
- * @author Sam Reid (PhET Interactive Simulations)
- */
-define( 'SCENERY/display/webgl/WebGLUtil',['require','PHET_CORE/inherit'],function( require ) {
-  
-
-  // modules
-  var inherit = require( 'PHET_CORE/inherit' );
-
-  /**
-   *
-   * @constructor
-   */
-  function WebGLUtil() {
-  }
-
-  return inherit( Object, WebGLUtil, {}, {
-
-    toShader: function( gl, source, type, typeString ) {
-      var shader = gl.createShader( type );
-      gl.shaderSource( shader, source );
-      gl.compileShader( shader );
-      if ( !gl.getShaderParameter( shader, gl.COMPILE_STATUS ) ) {
-        console.log( 'ERROR IN ' + typeString + ' SHADER : ' + gl.getShaderInfoLog( shader ) );
-        return false;
-      }
-      return shader;
-    }
-  } );
-} );
 // Copyright 2002-2014, University of Colorado Boulder
 
 
@@ -33555,7 +33923,7 @@ define( 'SCENERY/input/DownUpListener',['require','PHET_CORE/inherit','SCENERY/s
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-define( 'SCENERY/input/ButtonListener',['require','SCENERY/scenery','SCENERY/util/Trail','PHET_CORE/inherit','SCENERY/input/DownUpListener','SCENERY/input/Input'],function( require ) {
+define( 'SCENERY/input/ButtonListener',['require','SCENERY/scenery','SCENERY/util/Trail','PHET_CORE/inherit','SCENERY/input/DownUpListener'],function( require ) {
   
 
   var scenery = require( 'SCENERY/scenery' );
@@ -33563,7 +33931,6 @@ define( 'SCENERY/input/ButtonListener',['require','SCENERY/scenery','SCENERY/uti
   var inherit = require( 'PHET_CORE/inherit' );
 
   var DownUpListener = require( 'SCENERY/input/DownUpListener' );
-  var Input = require( 'SCENERY/input/Input' );
 
   /**
    * Options for the ButtonListener:
@@ -33577,11 +33944,11 @@ define( 'SCENERY/input/ButtonListener',['require','SCENERY/scenery','SCENERY/uti
    * fire: null        // Called on a state change to/from 'down' (depending on fireOnDown), as fire( event ). Called after the triggering up/over/down event.
    */
   scenery.ButtonListener = function ButtonListener( options ) {
+    var self = this;
 
     this.buttonState = 'up'; // public: 'up', 'over', 'down' or 'out'
 
     this._overCount = 0; // how many pointers are over us (track a count, so we can handle multiple pointers gracefully)
-    this._enterOrSpaceKeyDown = false; // If an action key has pressed the button
 
     this._buttonOptions = options; // store the options object so we can call the callbacks
 
@@ -33590,12 +33957,20 @@ define( 'SCENERY/input/ButtonListener',['require','SCENERY/scenery','SCENERY/uti
 
       mouseButton: options.mouseButton || 0, // forward the mouse button, default to 0 (LMB)
 
+      // parameter to DownUpListener, NOT an input listener itself
       down: function( event, trail ) {
+        if ( event.pointer.isKey ) {
+          self.enter( event );
+        }
         buttonListener.setButtonState( event, 'down' );
       },
 
+      // parameter to DownUpListener, NOT an input listener itself
       up: function( event, trail ) {
         buttonListener.setButtonState( event, buttonListener._overCount > 0 ? 'over' : 'up' );
+        if ( event.pointer.isKey ) {
+          self.exit( event );
+        }
       }
     } );
   };
@@ -33637,36 +34012,6 @@ define( 'SCENERY/input/ButtonListener',['require','SCENERY/scenery','SCENERY/uti
       this._overCount--;
       if ( this._overCount === 0 ) {
         this.setButtonState( event, this.isDown ? 'out' : 'up' );
-      }
-    },
-    /**
-     * When enter or space is pressed, make a note of it and increment the over count.
-     * @param event
-     */
-    keydown: function( event ) {
-      DownUpListener.prototype.keydown.call( this, event );
-      var keyCode = event.domEvent.keyCode;
-      if ( keyCode === Input.KEY_ENTER || keyCode === Input.KEY_SPACE ) {
-        if ( !this._enterOrSpaceKeyDown ) {
-          this._overCount++;
-          this._enterOrSpaceKeyDown = true;
-        }
-      }
-    },
-
-    /**
-     * When the enter or space key comes up, decrement the over count.
-     * TODO: What if the enter key went down and the space key went up???
-     * @param event
-     */
-    keyup: function( event ) {
-      this.downListener.keyup( event );
-      var keyCode = event.domEvent.keyCode;
-      if ( keyCode === Input.KEY_ENTER || keyCode === Input.KEY_SPACE ) {
-        if ( this._enterOrSpaceKeyDown ) {
-          this._overCount--;
-          this._enterOrSpaceKeyDown = false;
-        }
       }
     }
   } );
@@ -33905,14 +34250,14 @@ define( 'SCENERY/nodes/CanvasNode',['require','PHET_CORE/inherit','SCENERY/scene
   var scenery = require( 'SCENERY/scenery' );
 
   var Node = require( 'SCENERY/nodes/Node' );
-  require( 'SCENERY/display/Renderer' );
+  var Renderer = require( 'SCENERY/display/Renderer' );
   var CanvasSelfDrawable = require( 'SCENERY/display/CanvasSelfDrawable' );
   var SelfDrawable = require( 'SCENERY/display/SelfDrawable' );
 
   // pass a canvasBounds option if you want to specify the self bounds
   scenery.CanvasNode = function CanvasNode( options ) {
     Node.call( this, options );
-    this.setRendererBitmask( scenery.bitmaskBoundsValid | scenery.bitmaskSupportsCanvas );
+    this.setRendererBitmask( Renderer.bitmaskCanvas );
   };
   var CanvasNode = scenery.CanvasNode;
 
@@ -34009,7 +34354,7 @@ define( 'SCENERY/nodes/CanvasNode',['require','PHET_CORE/inherit','SCENERY/scene
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-define( 'SCENERY/nodes/Circle',['require','PHET_CORE/inherit','SCENERY/scenery','DOT/Bounds2','DOT/Matrix3','SCENERY/util/Color','SCENERY/nodes/Path','KITE/Shape','SCENERY/util/Features','SCENERY/nodes/Paintable','SCENERY/display/DOMSelfDrawable','SCENERY/display/SVGSelfDrawable','SCENERY/display/CanvasSelfDrawable','SCENERY/display/SelfDrawable','SCENERY/util/Util','SCENERY/display/WebGLSelfDrawable','SCENERY/display/PixiSelfDrawable','SCENERY/display/webgl/SquareUnstrokedRectangle'],function( require ) {
+define( 'SCENERY/nodes/Circle',['require','PHET_CORE/inherit','SCENERY/scenery','DOT/Bounds2','DOT/Matrix3','SCENERY/util/Color','SCENERY/nodes/Path','KITE/Shape','SCENERY/util/Features','SCENERY/nodes/Paintable','SCENERY/display/DOMSelfDrawable','SCENERY/display/SVGSelfDrawable','SCENERY/display/CanvasSelfDrawable','SCENERY/display/SelfDrawable','SCENERY/display/Renderer','SCENERY/util/Util','SCENERY/display/WebGLSelfDrawable','SCENERY/display/PixiSelfDrawable','SCENERY/display/webgl/SquareUnstrokedRectangle'],function( require ) {
   
 
   var inherit = require( 'PHET_CORE/inherit' );
@@ -34026,6 +34371,7 @@ define( 'SCENERY/nodes/Circle',['require','PHET_CORE/inherit','SCENERY/scenery',
   var SVGSelfDrawable = require( 'SCENERY/display/SVGSelfDrawable' );
   var CanvasSelfDrawable = require( 'SCENERY/display/CanvasSelfDrawable' );
   var SelfDrawable = require( 'SCENERY/display/SelfDrawable' );
+  var Renderer = require( 'SCENERY/display/Renderer' );
   require( 'SCENERY/util/Util' );
   var WebGLSelfDrawable = require( 'SCENERY/display/WebGLSelfDrawable' );
   var PixiSelfDrawable = require( 'SCENERY/display/PixiSelfDrawable' );
@@ -34060,15 +34406,14 @@ define( 'SCENERY/nodes/Circle',['require','PHET_CORE/inherit','SCENERY/scenery',
     getStrokeRendererBitmask: function() {
       var bitmask = Path.prototype.getStrokeRendererBitmask.call( this );
       if ( this.hasStroke() && !this.getStroke().isGradient && !this.getStroke().isPattern && this.getLineWidth() <= this.getRadius() ) {
-        bitmask |= scenery.bitmaskSupportsDOM;
+        bitmask |= Renderer.bitmaskDOM;
       }
-      bitmask |= scenery.bitmaskSupportsPixi;
-      bitmask |= scenery.bitmaskSupportsWebGL;
+      bitmask |= Renderer.bitmaskPixi;
       return bitmask;
     },
 
     getPathRendererBitmask: function() {
-      return scenery.bitmaskSupportsCanvas | scenery.bitmaskSupportsSVG | scenery.bitmaskBoundsValid | scenery.bitmaskSupportsWebGL | scenery.bitmaskSupportsPixi | ( Features.borderRadius ? scenery.bitmaskSupportsDOM : 0 );
+      return Renderer.bitmaskCanvas | Renderer.bitmaskSVG | Renderer.bitmaskPixi | ( Features.borderRadius ? Renderer.bitmaskDOM : 0 );
     },
 
     invalidateCircle: function() {
@@ -34078,7 +34423,7 @@ define( 'SCENERY/nodes/Circle',['require','PHET_CORE/inherit','SCENERY/scenery',
       this._shape = null;
 
       // should invalidate the path and ensure a redraw
-      this.invalidateShape();
+      this.invalidatePath();
     },
 
     createCircleShape: function() {
@@ -34199,7 +34544,7 @@ define( 'SCENERY/nodes/Circle',['require','PHET_CORE/inherit','SCENERY/scenery',
       }
       else {
         // probably called from the Path constructor
-        this.invalidateShape();
+        this.invalidatePath();
       }
     },
 
@@ -34460,7 +34805,7 @@ define( 'SCENERY/nodes/Circle',['require','PHET_CORE/inherit','SCENERY/scenery',
       this.initializeWebGLSelfDrawable( renderer, instance );
     },
 
-    initializeContext: function( webglBlock ) {
+    onAddToBlock: function( webglBlock ) {
       this.webglBlock = webglBlock;
       this.rectangleHandle = new SquareUnstrokedRectangle( webglBlock.webGLRenderer.colorTriangleRenderer, this.node, 0.5 );
 
@@ -34573,12 +34918,12 @@ define( 'SCENERY/nodes/Circle',['require','PHET_CORE/inherit','SCENERY/scenery',
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
-define( 'PHET_CORE/escapeHTML',['require','PHET_CORE/core'],function( require ) {
+define( 'PHET_CORE/escapeHTML',['require','PHET_CORE/phetCore'],function( require ) {
   
 
-  var core = require( 'PHET_CORE/core' );
+  var phetCore = require( 'PHET_CORE/phetCore' );
 
-  core.escapeHTML = function escapeHTML( str ) {
+  phetCore.escapeHTML = function escapeHTML( str ) {
     // see https://www.owasp.org/index.php/XSS_(Cross_Site_Scripting)_Prevention_Cheat_Sheet
     // HTML Entity Encoding
     return str
@@ -34589,7 +34934,7 @@ define( 'PHET_CORE/escapeHTML',['require','PHET_CORE/core'],function( require ) 
       .replace( /\'/g, '&#x27;' )
       .replace( /\//g, '&#x2F;' );
   };
-  return core.escapeHTML;
+  return phetCore.escapeHTML;
 } );
 // Copyright 2002-2014, University of Colorado Boulder
 
@@ -34609,7 +34954,7 @@ define( 'SCENERY/nodes/DOM',['require','PHET_CORE/inherit','PHET_CORE/escapeHTML
   var scenery = require( 'SCENERY/scenery' );
 
   var Node = require( 'SCENERY/nodes/Node' ); // DOM inherits from Node
-  require( 'SCENERY/display/Renderer' );
+  var Renderer = require( 'SCENERY/display/Renderer' );
   require( 'SCENERY/util/Util' );
 
   var DOMSelfDrawable = require( 'SCENERY/display/DOMSelfDrawable' );
@@ -34641,7 +34986,7 @@ define( 'SCENERY/nodes/DOM',['require','PHET_CORE/inherit','PHET_CORE/escapeHTML
 
     // will set the element after initializing
     Node.call( this, options );
-    this.setRendererBitmask( scenery.bitmaskBoundsValid | scenery.bitmaskSupportsDOM );
+    this.setRendererBitmask( Renderer.bitmaskDOM );
   };
   var DOM = scenery.DOM;
 
@@ -34835,43 +35180,45 @@ define( 'SCENERY/nodes/DOM',['require','PHET_CORE/inherit','PHET_CORE/escapeHTML
 
 
 
-//  Copyright 2002-2014, University of Colorado Boulder
+// Copyright 2002-2014, University of Colorado Boulder
 
 /**
  * LayoutBox lays out its children in a row, either horizontally or vertically (based on an optional parameter).
- * This approach is preferable to using VBox and HBox (which still exist for backward compatibility)
+ * VBox and HBox are convenience subtypes that specify the orientation.
  * See https://github.com/phetsims/scenery/issues/281
  *
  * @author Sam Reid
  * @author Aaron Davis
+ * @author Chris Malley (PixelZoom, Inc.)
  */
 define( 'SCENERY/nodes/LayoutBox',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/nodes/Node'],function( require ) {
   
 
+  // modules
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
   var Node = require( 'SCENERY/nodes/Node' );
 
+  // constants
+  var DEFAULT_SPACING = 0;
+
   /**
-   * Main constructor for LayoutBox.
    * @param {Object} [options] Same as Node.constructor.options with the following additions:
    * @constructor
    */
   scenery.LayoutBox = function LayoutBox( options ) {
 
-    Node.call( this );
+    if ( options && options.spacing ) {
+      assert && assert( typeof options.spacing === 'number', 'LayoutBox requires spacing to be a number, if it is provided' );
+    }
 
-    this.boundsListener = this.updateLayout.bind( this ); // @private
-
-    // ensure we have a parameter object
-    this.options = _.extend( {
+    options = _.extend( {
 
       //The default orientation, chosen by popular vote.  At the moment there are around 436 VBox references and 338 HBox references
       orientation: 'vertical',
 
-      // The spacing can be a number or a function.  If a number, then it will be the spacing between each object.
-      // If a function, then the function will have the signature function(a,b){} which returns the spacing between adjacent pairs of items.
-      spacing: function() { return 0; },
+      // The spacing between each Node (a number)
+      spacing: DEFAULT_SPACING,
 
       //How to line up the items
       align: 'center',
@@ -34880,29 +35227,30 @@ define( 'SCENERY/nodes/LayoutBox',['require','PHET_CORE/inherit','SCENERY/scener
       resize: true
     }, options ); // @private
 
-    // Make sure the orientation is legal.  It's better to check this on the this.options instead of the passed in options
-    // to keep it closer to the check for the alignment option.
-    assert && assert( this.options.orientation === 'vertical' || this.options.orientation === 'horizontal' );
-
-    // Make sure the alignment is allowed, given the orientation.  The check is done here after the final orientation is
-    // decided, to reduce logic before the alignment check.
-    if ( this.options.orientation === 'vertical' ) {
-      assert && assert( this.options.align === 'center' || this.options.align === 'left' || this.options.align === 'right', 'illegal alignment: ' + this.options.align );
+    // validate options
+    assert && assert( options.orientation === 'vertical' || options.orientation === 'horizontal' );
+    if ( options.orientation === 'vertical' ) {
+      assert && assert( options.align === 'center' || options.align === 'left' || options.align === 'right', 'illegal alignment: ' + options.align );
     }
     else {
-      assert && assert( this.options.align === 'center' || this.options.align === 'top' || this.options.align === 'bottom', 'illegal alignment: ' + this.options.align );
+      assert && assert( options.align === 'center' || options.align === 'top' || options.align === 'bottom', 'illegal alignment: ' + options.align );
     }
 
-    if ( typeof this.options.spacing === 'number' ) {
-      var spacingConstant = this.options.spacing;
-      this.options.spacing = function() { return spacingConstant; };
-    }
+    this.orientation = options.orientation; // @private
+    this.align = options.align; // @private
+    this.resize = options.resize; // @private
+    this._spacing = options.spacing; // @private {number}
+
+    Node.call( this );
+
+    this.boundsListener = this.updateLayout.bind( this ); // @private
+    this.updatingLayout = false; // @private flag used to short-circuit updateLayout and prevent stackoverflow
 
     // Apply the supplied options, including children.
     // The layout calls are triggered if (a) options.resize is set to true or (b) during initialization
     // When true, the this.inited flag signifies that the initial layout is being done.
     this.inited = false; // @private
-    this.mutate( this.options );
+    this.mutate( options );
     this.inited = true;
   };
   var LayoutBox = scenery.LayoutBox;
@@ -34912,71 +35260,73 @@ define( 'SCENERY/nodes/LayoutBox',['require','PHET_CORE/inherit','SCENERY/scener
     // Lay out the child components on startup, or when the children sizes change or when requested by a call to updateLayout
     // @private, do not call directly, use updateLayout
     layout: function() {
+
+      var children = this.getChildren(); // call this once, since it returns a copy
       var i = 0;
       var child;
 
       //Logic for layout out the components.
       //Aaron and Sam looked at factoring this out, but the result looked less readable since each attribute
       //would have to be abstracted over.
-      if ( this.options.orientation === 'vertical' ) {
-        var minX = _.min( _.map( this._children, function( child ) {return child.left;} ) );
-        var maxX = _.max( _.map( this._children, function( child ) {return child.left + child.width;} ) );
+      if ( this.orientation === 'vertical' ) {
+        var minX = _.min( _.map( children, function( child ) {return child.left;} ) );
+        var maxX = _.max( _.map( children, function( child ) {return child.left + child.width;} ) );
         var centerX = (maxX + minX) / 2;
 
         //Start at y=0 in the coordinate frame of this node.  Not possible to set this through the spacing option, instead just set it with the {y:number} option.
         var y = 0;
-        for ( i = 0; i < this._children.length; i++ ) {
-          child = this._children[ i ];
+        for ( i = 0; i < children.length; i++ ) {
+          child = children[ i ];
           child.top = y;
 
           //Set the position horizontally
-          if ( this.options.align === 'left' ) {
+          if ( this.align === 'left' ) {
             child.left = minX;
           }
-          else if ( this.options.align === 'right' ) {
+          else if ( this.align === 'right' ) {
             child.right = maxX;
           }
-          else {//default to center
+          else { // 'center'
             child.centerX = centerX;
           }
 
           //Move to the next vertical position.
-          y += child.height + this.options.spacing( child, this._children[ i + 1 ] );
+          y += child.height + this._spacing;
         }
       }
       else {
-        var minY = _.min( _.map( this._children, function( child ) {return child.top;} ) );
-        var maxY = _.max( _.map( this._children, function( child ) {return child.top + child.height;} ) );
+        var minY = _.min( _.map( children, function( child ) {return child.top;} ) );
+        var maxY = _.max( _.map( children, function( child ) {return child.top + child.height;} ) );
         var centerY = (maxY + minY) / 2;
 
         //Start at x=0 in the coordinate frame of this node.  Not possible to set this through the spacing option, instead just set it with the {x:number} option.
         var x = 0;
-        for ( i = 0; i < this._children.length; i++ ) {
-          child = this._children[ i ];
+        for ( i = 0; i < children.length; i++ ) {
+          child = children[ i ];
           child.left = x;
 
           //Set the position horizontally
-          if ( this.options.align === 'top' ) {
+          if ( this.align === 'top' ) {
             child.top = minY;
           }
-          else if ( this.options.align === 'bottom' ) {
+          else if ( this.align === 'bottom' ) {
             child.bottom = maxY;
           }
-          else {//default to center
+          else { // 'center'
             child.centerY = centerY;
           }
 
-          //Move to the next vertical position.
-          x += child.width + this.options.spacing( child, this._children[ i + 1 ] );
+          //Move to the next horizontal position.
+          x += child.width + this._spacing;
         }
       }
     },
 
-    // Update the layout of this VBox. Called automatically during initialization, when children change (if resize is true)
+    // Update the layout of this LayoutBox. Called automatically during initialization, when children change (if resize is true)
     // or when client wants to call this public method for any reason.
     updateLayout: function() {
+      //Bounds of children are changed in updateLayout, we don't want to stackoverflow, so bail if already updating layout
       if ( !this.updatingLayout ) {
-        //Bounds of children are changed in updateLayout, we don't want to stackoverflow so bail if already updating layout
         this.updatingLayout = true;
         this.layout();
         this.updatingLayout = false;
@@ -34992,8 +35342,8 @@ define( 'SCENERY/nodes/LayoutBox',['require','PHET_CORE/inherit','SCENERY/scener
 
       //Remove event listeners from any nodes (will be added back later if the node was not removed)
       var layoutBox = this;
-      if ( this.options.resize ) {
-        this._children.forEach( function( child ) {
+      if ( this.resize ) {
+        this.getChildren().forEach( function( child ) {
           if ( child.containsEventListener( 'bounds', layoutBox.boundsListener ) ) {
             child.removeEventListener( 'bounds', layoutBox.boundsListener );
           }
@@ -35004,13 +35354,13 @@ define( 'SCENERY/nodes/LayoutBox',['require','PHET_CORE/inherit','SCENERY/scener
       Node.prototype.insertChild.call( this, index, node );
 
       // Update the layout (a) if it should be dynamic or (b) during initialization
-      if ( this.options.resize || !this.inited ) {
+      if ( this.resize || !this.inited ) {
         this.updateLayout();
       }
 
       //Add event listeners for any current children (if it should be dynamic)
-      if ( this.options.resize ) {
-        this._children.forEach( function( child ) {
+      if ( this.resize ) {
+        this.getChildren().forEach( function( child ) {
           if ( !child.containsEventListener( 'bounds', layoutBox.boundsListener ) ) {
             child.addEventListener( 'bounds', layoutBox.boundsListener );
           }
@@ -35024,8 +35374,8 @@ define( 'SCENERY/nodes/LayoutBox',['require','PHET_CORE/inherit','SCENERY/scener
 
       //Remove event listeners from any nodes (will be added back later if the node was not removed)
       var layoutBox = this;
-      if ( this.options.resize ) {
-        this._children.forEach( function( child ) {
+      if ( this.resize ) {
+        this.getChildren().forEach( function( child ) {
           if ( child.containsEventListener( 'bounds', layoutBox.boundsListener ) ) {
             child.removeEventListener( 'bounds', layoutBox.boundsListener );
           }
@@ -35036,18 +35386,49 @@ define( 'SCENERY/nodes/LayoutBox',['require','PHET_CORE/inherit','SCENERY/scener
       Node.prototype.removeChildWithIndex.call( this, node, indexOfChild );
 
       // Update the layout (a) if it should be dynamic or (b) during initialization
-      if ( this.options.resize || !this.inited ) {
+      if ( this.resize || !this.inited ) {
         this.updateLayout();
       }
 
       //Add event listeners for any current children (if it should be dynamic)
-      if ( this.options.resize ) {
-        this._children.forEach( function( child ) {
+      if ( this.resize ) {
+        this.getChildren().forEach( function( child ) {
           if ( !child.containsEventListener( 'bounds', layoutBox.boundsListener ) ) {
             child.addEventListener( 'bounds', layoutBox.boundsListener );
           }
         } );
       }
+    },
+
+    /**
+     * Sets spacing between items in the box.
+     *
+     * @param {number} spacing
+     */
+    setSpacing: function( spacing ) {
+
+      // Make sure the provided spacing is a number (since we previously allowed number | function here
+      assert && assert( typeof spacing === 'number', 'spacing must be a number' );
+
+      if ( this._spacing !== spacing ) {
+        this._spacing = spacing;
+        this.updateLayout();
+      }
+    },
+    set spacing( value ) {
+      this.setSpacing( value );
+    },
+
+    /**
+     * Gets the spacing between items in the box.
+     *
+     * @returns {number}
+     */
+    getSpacing: function() {
+      return this._spacing;
+    },
+    get spacing() {
+      return this.getSpacing();
     }
   } );
 } );
@@ -35307,7 +35688,7 @@ define( 'SCENERY/nodes/Text',['require','PHET_CORE/inherit','PHET_CORE/escapeHTM
   var scenery = require( 'SCENERY/scenery' );
 
   var Node = require( 'SCENERY/nodes/Node' ); // inherits from Node
-  require( 'SCENERY/display/Renderer' );
+  var Renderer = require( 'SCENERY/display/Renderer' );
   var Paintable = require( 'SCENERY/nodes/Paintable' );
   require( 'SCENERY/util/Font' );
   require( 'SCENERY/util/Util' ); // for canvasAccurateBounds and CSS transforms
@@ -35318,7 +35699,7 @@ define( 'SCENERY/nodes/Text',['require','PHET_CORE/inherit','PHET_CORE/escapeHTM
   var SelfDrawable = require( 'SCENERY/display/SelfDrawable' );
   var WebGLSelfDrawable = require( 'SCENERY/display/WebGLSelfDrawable' );
   var PixiSelfDrawable = require( 'SCENERY/display/PixiSelfDrawable' );
-  
+
 
   // TODO: change this based on memory and performance characteristics of the platform
   var keepDOMTextElements = true; // whether we should pool DOM elements for the DOM rendering states, or whether we should free them when possible for memory
@@ -35415,6 +35796,10 @@ define( 'SCENERY/nodes/Text',['require','PHET_CORE/inherit','PHET_CORE/escapeHTM
         }
 
         this.invalidateText();
+
+        this.trigger0( 'boundsMethod' );
+
+        this.trigger0( 'selfBoundsValid' ); // whether our self bounds are valid may have changed
       }
       return this;
     },
@@ -35428,19 +35813,15 @@ define( 'SCENERY/nodes/Text',['require','PHET_CORE/inherit','PHET_CORE/escapeHTM
 
       // canvas support (fast bounds may leak out of dirty rectangles)
       if ( this._boundsMethod !== 'fast' && !this._isHTML ) {
-        bitmask |= scenery.bitmaskSupportsCanvas;
+        bitmask |= Renderer.bitmaskCanvas;
       }
       if ( !this._isHTML ) {
-        bitmask |= scenery.bitmaskSupportsSVG;
-      }
-      if ( this._boundsMethod === 'accurate' ) {
-        bitmask |= scenery.bitmaskBoundsValid;
+        bitmask |= Renderer.bitmaskSVG;
       }
 
       // fill and stroke will determine whether we have DOM text support
-      bitmask |= scenery.bitmaskSupportsDOM;
-      bitmask |= scenery.bitmaskSupportsWebGL;
-      bitmask |= scenery.bitmaskSupportsPixi;
+      bitmask |= Renderer.bitmaskDOM;
+      bitmask |= Renderer.bitmaskPixi;
 
       return bitmask;
     },
@@ -35712,6 +36093,11 @@ define( 'SCENERY/nodes/Text',['require','PHET_CORE/inherit','PHET_CORE/escapeHTM
 
     isPainted: function() {
       return true;
+    },
+
+    // @override
+    areSelfBoundsValid: function() {
+      return this._boundsMethod === 'accurate';
     },
 
     getDebugHTMLExtras: function() {
@@ -36067,9 +36453,7 @@ define( 'SCENERY/nodes/Text',['require','PHET_CORE/inherit','PHET_CORE/escapeHTM
       this.initializeWebGLSelfDrawable( renderer, instance );
     },
 
-    initializeContext: function( webglBlock ) {
-
-
+    onAddToBlock: function( webglBlock ) {
       var self = this;
       this.node.toImageNodeAsynchronous( function( imageNodeContainer ) {
         //toImageNode returns a containerNode with its first child set as ImageNode
@@ -36082,8 +36466,11 @@ define( 'SCENERY/nodes/Text',['require','PHET_CORE/inherit','PHET_CORE/escapeHTM
         self.updateText();
       } );
 
-
       //TODO: Update the state in the buffer arrays
+    },
+
+    onRemoveFromBlock: function( webglBlock ) {
+
     },
 
     //Nothing necessary since everything currently handled in the uModelViewMatrix below
@@ -36207,7 +36594,7 @@ define( 'SCENERY/nodes/Text',['require','PHET_CORE/inherit','PHET_CORE/escapeHTM
     svgTextSizeContainer.setAttribute( 'width', '2' );
     svgTextSizeContainer.setAttribute( 'height', '2' );
     svgTextSizeContainer.setAttribute( 'id', textSizeContainerId );
-    svgTextSizeContainer.setAttribute( 'style', 'visibility: hidden; pointer-events: none; position: absolute; left: -65535; right: -65535;' ); // so we don't flash it in a visible way to the user
+    svgTextSizeContainer.setAttribute( 'style', 'visibility: hidden; pointer-events: none; position: absolute; left: -65535px; right: -65535px;' ); // so we don't flash it in a visible way to the user
   }
   // NOTE! copies createSVGElement
   if ( !svgTextSizeElement ) {
@@ -36262,6 +36649,102 @@ define( 'SCENERY/nodes/HTMLText',['require','PHET_CORE/inherit','SCENERY/scenery
 // Copyright 2002-2014, University of Colorado Boulder
 
 /**
+ * A mixin for subtypes of Node, used to prevent children being added/removed to that subtype of Node.
+ *
+ * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ */
+
+define( 'SCENERY/nodes/Leaf',['require','SCENERY/scenery'],function( require ) {
+  
+
+  var scenery = require( 'SCENERY/scenery' );
+
+  scenery.Leaf = {
+    mixin: function( type ) {
+      var proto = type.prototype;
+
+      proto.insertChild = function( index, node ) {
+        throw new Error( 'Attempt to insert child into Leaf' );
+      };
+
+      proto.removeChildWithIndex = function( node, indexOfChild ) {
+        throw new Error( 'Attempt to remove child from Leaf' );
+      };
+    }
+  };
+
+  return scenery.Leaf;
+} );
+
+// Copyright 2002-2014, University of Colorado Boulder
+
+/**
+ * A Node meant to just take up certain bounds. It is never displayed, and cannot have children.
+ *
+ * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ */
+
+define( 'SCENERY/nodes/Spacer',['require','PHET_CORE/inherit','SCENERY/scenery','DOT/Bounds2','SCENERY/nodes/Node','SCENERY/nodes/Leaf'],function( require ) {
+  
+
+  var inherit = require( 'PHET_CORE/inherit' );
+  var scenery = require( 'SCENERY/scenery' );
+
+  var Bounds2 = require( 'DOT/Bounds2' );
+  var Node = require( 'SCENERY/nodes/Node' );
+  var Leaf = require( 'SCENERY/nodes/Leaf' );
+
+  /**
+   * Creates a spacer taking up a rectangular area from x: [0,width] and y: [0,height]. Use x/y in options to control
+   * its position.
+   */
+  scenery.Spacer = function Spacer( width, height, options ) {
+    Node.call( this );
+
+    // override the local bounds to our area
+    this.localBounds = new Bounds2( 0, 0, width, height );
+
+    this.mutate( options );
+  };
+  var Spacer = scenery.Spacer;
+
+  inherit( Node, Spacer );
+  Leaf.mixin( Spacer ); // prevent children from being added, since we're overriding local bounds
+
+  return Spacer;
+} );
+
+// Copyright 2002-2014, University of Colorado Boulder
+
+/**
+ * A Node meant to just take up horizontal space (usually for layout purposes).
+ * It is never displayed, and cannot have children.
+ *
+ * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ */
+
+define( 'SCENERY/nodes/HStrut',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/nodes/Spacer'],function( require ) {
+  
+
+  var inherit = require( 'PHET_CORE/inherit' );
+  var scenery = require( 'SCENERY/scenery' );
+
+  var Spacer = require( 'SCENERY/nodes/Spacer' );
+
+  /**
+   * Creates a strut with x in the range [0,width] and y=0.
+   */
+  scenery.HStrut = function HStrut( width, options ) {
+    Spacer.call( this, width, 0, options );
+  };
+  var HStrut = scenery.HStrut;
+
+  return inherit( Spacer, HStrut );
+} );
+
+// Copyright 2002-2014, University of Colorado Boulder
+
+/**
  * Images
  *
  * TODO: allow multiple DOM instances (create new HTMLImageElement elements)
@@ -36269,18 +36752,19 @@ define( 'SCENERY/nodes/HTMLText',['require','PHET_CORE/inherit','SCENERY/scenery
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-define( 'SCENERY/nodes/Image',['require','PHET_CORE/inherit','PHET_CORE/cleanArray','PHET_CORE/platform','DOT/Bounds2','SCENERY/scenery','SCENERY/nodes/Node','SCENERY/display/Renderer','SCENERY/util/Util','SCENERY/display/DOMSelfDrawable','SCENERY/display/SVGSelfDrawable','SCENERY/display/CanvasSelfDrawable','SCENERY/display/SelfDrawable','SCENERY/display/WebGLSelfDrawable','SCENERY/display/PixiSelfDrawable'],function( require ) {
+define( 'SCENERY/nodes/Image',['require','PHET_CORE/inherit','PHET_CORE/cleanArray','PHET_CORE/platform','DOT/Bounds2','DOT/Vector2','SCENERY/scenery','SCENERY/nodes/Node','SCENERY/display/Renderer','SCENERY/util/Util','SCENERY/display/DOMSelfDrawable','SCENERY/display/SVGSelfDrawable','SCENERY/display/CanvasSelfDrawable','SCENERY/display/SelfDrawable','SCENERY/display/WebGLSelfDrawable','SCENERY/display/PixiSelfDrawable'],function( require ) {
   
 
   var inherit = require( 'PHET_CORE/inherit' );
   var cleanArray = require( 'PHET_CORE/cleanArray' );
   var platform = require( 'PHET_CORE/platform' );
   var Bounds2 = require( 'DOT/Bounds2' );
+  var Vector2 = require( 'DOT/Vector2' );
 
   var scenery = require( 'SCENERY/scenery' );
 
   var Node = require( 'SCENERY/nodes/Node' ); // Image inherits from Node
-  require( 'SCENERY/display/Renderer' ); // we need to specify the Renderer in the prototype
+  var Renderer = require( 'SCENERY/display/Renderer' ); // we need to specify the Renderer in the prototype
   require( 'SCENERY/util/Util' );
 
   var DOMSelfDrawable = require( 'SCENERY/display/DOMSelfDrawable' );
@@ -36315,6 +36799,15 @@ define( 'SCENERY/nodes/Image',['require','PHET_CORE/inherit','PHET_CORE/cleanArr
    * SVG renderer supports the following as 'image':
    *     URL (string)
    *     HTMLImageElement
+   *
+   * Also available is the mipmap form, where 'image' will be an array of objects of the form:
+   * {
+   *   img: {HTMLImageElement},
+   *   url: {string}, // data URL for the image level
+   *   width: {number},
+   *   height: {number}
+   * }
+   * where image[ 0 ] will be the most detailed mipmap level.
    */
   scenery.Image = function Image( image, options ) {
     assert && assert( image, "image should be available" );
@@ -36386,21 +36879,19 @@ define( 'SCENERY/nodes/Image',['require','PHET_CORE/inherit','PHET_CORE/cleanArr
     invalidateSupportedRenderers: function() {
       if ( this._image instanceof HTMLCanvasElement ) {
         this.setRendererBitmask(
-          scenery.bitmaskBoundsValid |
-          scenery.bitmaskSupportsCanvas |
-          scenery.bitmaskSupportsWebGL |
-          scenery.bitmaskSupportsPixi
+          Renderer.bitmaskCanvas |
+          Renderer.bitmaskWebGL |
+          Renderer.bitmaskPixi
         );
       }
       else {
         // assumes HTMLImageElement
         this.setRendererBitmask(
-          scenery.bitmaskBoundsValid |
-          scenery.bitmaskSupportsCanvas |
-          scenery.bitmaskSupportsSVG |
-          scenery.bitmaskSupportsDOM |
-          scenery.bitmaskSupportsWebGL |
-          scenery.bitmaskSupportsPixi
+          Renderer.bitmaskCanvas |
+          Renderer.bitmaskSVG |
+          Renderer.bitmaskDOM |
+          Renderer.bitmaskWebGL |
+          Renderer.bitmaskPixi
         );
       }
     },
@@ -36431,7 +36922,7 @@ define( 'SCENERY/nodes/Image',['require','PHET_CORE/inherit','PHET_CORE/cleanArr
         else if ( image instanceof Array ) {
           // mipmap data!
           this._mipmapData = image;
-          image = image[0].img; // presumes we are already loaded
+          image = image[ 0 ].img; // presumes we are already loaded
 
           // force initialization of mipmapping parameters, since invalidateMipmaps() is guaranteed to run below
           this._mipmapInitialLevel = this._mipmapMaxLevel = this._mipmapData.length;
@@ -36482,7 +36973,7 @@ define( 'SCENERY/nodes/Image',['require','PHET_CORE/inherit','PHET_CORE/cleanArr
       assert && assert( typeof mipmap === 'boolean' );
 
       if ( this._mipmap !== mipmap ) {
-        this._mipmap =  mipmap;
+        this._mipmap = mipmap;
 
         this.invalidateMipmaps();
       }
@@ -36540,7 +37031,7 @@ define( 'SCENERY/nodes/Image',['require','PHET_CORE/inherit','PHET_CORE/cleanArr
     // @private
     constructNextMipmap: function() {
       var level = this._mipmapCanvases.length;
-      var biggerCanvas = this._mipmapCanvases[level-1];
+      var biggerCanvas = this._mipmapCanvases[ level - 1 ];
 
       // ignore any 1x1 canvases (or smaller?!?)
       if ( biggerCanvas.width * biggerCanvas.height > 2 ) {
@@ -36568,14 +37059,14 @@ define( 'SCENERY/nodes/Image',['require','PHET_CORE/inherit','PHET_CORE/cleanArr
       if ( this._image && this._mipmap ) {
         if ( this._mipmapData ) {
           for ( var k = 0; k < this._mipmapData.length; k++ ) {
-            var url = this._mipmapData[k].url;
+            var url = this._mipmapData[ k ].url;
             this._mipmapURLs.push( url );
             // TODO: baseCanvas only upon demand?
             var canvas = document.createElement( 'canvas' );
-            canvas.width = this._mipmapData[k].width;
-            canvas.height = this._mipmapData[k].height;
+            canvas.width = this._mipmapData[ k ].width;
+            canvas.height = this._mipmapData[ k ].height;
             var context = canvas.getContext( '2d' );
-            context.drawImage( this._mipmapData[k].img, 0, 0 );
+            context.drawImage( this._mipmapData[ k ].img, 0, 0 );
             this._mipmapCanvases.push( canvas );
           }
         }
@@ -36593,7 +37084,7 @@ define( 'SCENERY/nodes/Image',['require','PHET_CORE/inherit','PHET_CORE/cleanArr
             this._mipmapURLs.push( baseCanvas.toDataURL() );
 
             var level = 0;
-            while( ++level < this._mipmapInitialLevel ) {
+            while ( ++level < this._mipmapInitialLevel ) {
               this.constructNextMipmap();
             }
           }
@@ -36632,7 +37123,7 @@ define( 'SCENERY/nodes/Image',['require','PHET_CORE/inherit','PHET_CORE/cleanArr
       }
 
       // If necessary, do lazy construction of the mipmap level
-      if ( this.mipmap && !this._mipmapCanvases[level] ) {
+      if ( this.mipmap && !this._mipmapCanvases[ level ] ) {
         var currentLevel = this._mipmapCanvases.length - 1;
         while ( ++currentLevel <= level ) {
           this.constructNextMipmap();
@@ -36652,7 +37143,7 @@ define( 'SCENERY/nodes/Image',['require','PHET_CORE/inherit','PHET_CORE/cleanArr
     getMipmapCanvas: function( level ) {
       assert && assert( level >= 0 && level < this._mipmapCanvases.length && ( level % 1 ) === 0 );
 
-      return this._mipmapCanvases[level];
+      return this._mipmapCanvases[ level ];
     },
 
     /**
@@ -36661,7 +37152,7 @@ define( 'SCENERY/nodes/Image',['require','PHET_CORE/inherit','PHET_CORE/cleanArr
     getMipmapURL: function( level ) {
       assert && assert( level >= 0 && level < this._mipmapCanvases.length && ( level % 1 ) === 0 );
 
-      return this._mipmapURLs[level];
+      return this._mipmapURLs[ level ];
     },
 
     hasMipmaps: function() {
@@ -36744,6 +37235,47 @@ define( 'SCENERY/nodes/Image',['require','PHET_CORE/inherit','PHET_CORE/cleanArr
     element.setAttributeNS( scenery.xlinkns, 'xlink:href', url );
 
     return element;
+  };
+
+  // Creates an {object} suitable to be passed to Image as a mipmap (from a Canvas)
+  Image.createFastMipmapFromCanvas = function( baseCanvas ) {
+    var mipmaps = [];
+
+    var baseURL = baseCanvas.toDataURL();
+    var baseImage = new window.Image();
+    baseImage.src = baseURL;
+
+    // base level
+    mipmaps.push( {
+      img: baseImage,
+      url: baseURL,
+      width: baseCanvas.width,
+      height: baseCanvas.height
+    } );
+
+    var largeCanvas = baseCanvas;
+    while ( largeCanvas.width >= 2 && largeCanvas.height >= 2 ) {
+      // smaller level
+      var mipmap = {};
+
+      // draw half-size
+      var canvas = document.createElement( 'canvas' );
+      canvas.width = mipmap.width = Math.ceil( largeCanvas.width / 2 );
+      canvas.height = mipmap.height = Math.ceil( largeCanvas.height / 2 );
+      var context = canvas.getContext( '2d' );
+      context.setTransform( 0.5, 0, 0, 0.5, 0, 0 );
+      context.drawImage( largeCanvas, 0, 0 );
+
+      // set up the image and url
+      mipmap.url = canvas.toDataURL();
+      mipmap.img = new window.Image();
+      mipmap.img.src = mipmap.url;
+      largeCanvas = canvas;
+
+      mipmaps.push( mipmap );
+    }
+
+    return mipmaps;
   };
 
   /*---------------------------------------------------------------------------*
@@ -36943,7 +37475,11 @@ define( 'SCENERY/nodes/Image',['require','PHET_CORE/inherit','PHET_CORE/cleanArr
         var canvas = this.node.getMipmapCanvas( level );
         image.setAttribute( 'width', canvas.width + 'px' );
         image.setAttribute( 'height', canvas.height + 'px' );
-        image.setAttribute( 'transform', 'scale(' + Math.pow( 2, level ).toFixed() + ')' );
+        // Since SVG doesn't support parsing scientific notation (e.g. 7e5), we need to output fixed decimal-point strings.
+        // Since this needs to be done quickly, and we don't particularly care about slight rounding differences (it's
+        // being used for display purposes only, and is never shown to the user), we use the built-in JS toFixed instead of
+        // Dot's version of toFixed. See https://github.com/phetsims/kite/issues/50
+        image.setAttribute( 'transform', 'scale(' + Math.pow( 2, level ).toFixed( 20 ) + ')' );
         image.setAttributeNS( scenery.xlinkns, 'xlink:href', url );
       }
       else {
@@ -37018,63 +37554,161 @@ define( 'SCENERY/nodes/Image',['require','PHET_CORE/inherit','PHET_CORE/cleanArr
   Image.ImageWebGLDrawable = inherit( WebGLSelfDrawable, function ImageWebGLDrawable( renderer, instance ) {
     this.initialize( renderer, instance );
   }, {
+    webglRenderer: Renderer.webglTexturedTriangles,
+
     // called either from the constructor or from pooling
     initialize: function( renderer, instance ) {
       this.initializeWebGLSelfDrawable( renderer, instance );
+
+      if ( !this.vertexArray ) {
+        // format [X Y U V] for 6 vertices
+        this.vertexArray = new Float32Array( 4 * 6 ); // 4-length components for 6 vertices (2 tris).
+      }
+
+      // corner vertices in the relative transform root coordinate space
+      this.upperLeft = new Vector2();
+      this.lowerLeft = new Vector2();
+      this.upperRight = new Vector2();
+      this.lowerRight = new Vector2();
+
+      this.xyDirty = true; // is our vertex position information out of date?
+      this.uvDirty = true; // is our UV information out of date?
+
+      // {SpriteSheet.Sprite} exported for WebGLBlock's rendering loop
+      this.sprite = null;
+
+      return this;
     },
 
-    initializeContext: function( webglBlock ) {
-      this.webglBlock = webglBlock;
-      this.imageHandle = webglBlock.webGLRenderer.textureRenderer.createFromImageNode( this.node, 0.4 );
+    onAddToBlock: function( webglBlock ) {
+      this.webglBlock = webglBlock; // TODO: do we need this reference?
+      this.markDirty();
 
-      // TODO: Don't call this each time a new item is added.
-      webglBlock.webGLRenderer.textureRenderer.bindVertexBuffer();
-      webglBlock.webGLRenderer.textureRenderer.bindDirtyTextures();
-      // cleanup old vertexBuffer, if applicable
-//      this.disposeWebGLBuffers();
-
-      this.updateRectangle();
-
-      //TODO: Update the state in the buffer arrays
+      this.reserveSprite();
     },
 
-    //Nothing necessary since everything currently handled in the uModelViewMatrix below
-    //However, we may switch to dynamic draw, and handle the matrix change only where necessary in the future?
-    updateRectangle: function() {
-      this.imageHandle.update();
+    onRemoveFromBlock: function( webglBlock ) {
+      this.unreserveSprite();
     },
 
-    render: function( shaderProgram ) {
-      // This is handled by the ColorTriangleRenderer
+    reserveSprite: function() {
+      if ( this.sprite ) {
+        // if we already reserved a sprite for the image, bail out
+        if ( this.sprite.image === this.node._image ) {
+          return;
+        }
+        // otherwise we need to ditch our last reservation before reserving a new sprite
+        else {
+          this.unreserveSprite();
+        }
+      }
+
+      // if the width/height isn't loaded yet, we can still use the desired value
+      var width = this.node._image.naturalWidth;
+      var height = this.node._image.naturalHeight;
+
+      // if we have a width/height, we'll load a sprite
+      this.sprite = ( width > 0 && height > 0 ) ? this.webglBlock.addSpriteSheetImage( this.node._image, width, height ) : null;
+
+      // full updates on everything if our sprite changes
+      this.xyDirty = true;
+      this.uvDirty = true;
+    },
+
+    unreserveSprite: function() {
+      if ( this.sprite ) {
+        this.webglBlock.removeSpriteSheetImage( this.sprite );
+      }
+      this.sprite = null;
+    },
+
+    // @override
+    markTransformDirty: function() {
+      this.xyDirty = true;
+
+      WebGLSelfDrawable.prototype.markTransformDirty.call( this );
+    },
+
+    // called when something about the Image's image itself changes (not transform, etc.)
+    markPaintDirty: function() {
+      this.xyDirty = true; // vertex positions can depend on image width/height
+      this.uvDirty = true;
+
+      this.markDirty();
+    },
+
+    update: function() {
+      if ( this.dirty ) {
+        this.dirty = false;
+
+        // ensure that we have a reserved sprite (part of the spritesheet)
+        this.reserveSprite();
+
+        // if we don't have a sprite (we don't have a loaded image yet), just bail
+        if ( !this.sprite ) {
+          return;
+        }
+
+        if ( this.uvDirty ) {
+          this.uvDirty = false;
+
+          var uvBounds = this.sprite.uvBounds;
+
+          // TODO: consider reversal of minY and maxY usage here for vertical inverse
+
+          // first triangle UVs
+          this.vertexArray[2] = uvBounds.minX; // upper left U
+          this.vertexArray[3] = uvBounds.minY; // upper left V
+          this.vertexArray[6] = uvBounds.minX; // lower left U
+          this.vertexArray[7] = uvBounds.maxY; // lower left V
+          this.vertexArray[10] = uvBounds.maxX; // upper right U
+          this.vertexArray[11] = uvBounds.minY; // upper right V
+
+          // second triangle UVs
+          this.vertexArray[14] = uvBounds.maxX; // upper right U
+          this.vertexArray[15] = uvBounds.minY; // upper right V
+          this.vertexArray[18] = uvBounds.minX; // lower left U
+          this.vertexArray[19] = uvBounds.maxY; // lower left V
+          this.vertexArray[22] = uvBounds.maxX; // lower right U
+          this.vertexArray[23] = uvBounds.maxY; // lower right V
+        }
+
+        if ( this.xyDirty ) {
+          this.xyDirty = false;
+
+          var width = this.node.getImageWidth();
+          var height = this.node.getImageHeight();
+
+          var transformMatrix = this.instance.relativeTransform.matrix; // with compute need, should always be accurate
+          transformMatrix.multiplyVector2( this.upperLeft.setXY( 0, 0 ) );
+          transformMatrix.multiplyVector2( this.lowerLeft.setXY( 0, height ) );
+          transformMatrix.multiplyVector2( this.upperRight.setXY( width, 0 ) );
+          transformMatrix.multiplyVector2( this.lowerRight.setXY( width, height ) );
+
+          // first triangle XYs
+          this.vertexArray[0] = this.upperLeft.x;
+          this.vertexArray[1] = this.upperLeft.y;
+          this.vertexArray[4] = this.lowerLeft.x;
+          this.vertexArray[5] = this.lowerLeft.y;
+          this.vertexArray[8] = this.upperRight.x;
+          this.vertexArray[9] = this.upperRight.y;
+
+          // second triangle XYs
+          this.vertexArray[12] = this.upperRight.x;
+          this.vertexArray[13] = this.upperRight.y;
+          this.vertexArray[16] = this.lowerLeft.x;
+          this.vertexArray[17] = this.lowerLeft.y;
+          this.vertexArray[20] = this.lowerRight.x;
+          this.vertexArray[21] = this.lowerRight.y;
+        }
+      }
     },
 
     dispose: function() {
-      this.disposeWebGLBuffers();
+      // TODO: disposal of buffers?
 
       // super
       WebGLSelfDrawable.prototype.dispose.call( this );
-    },
-
-    disposeWebGLBuffers: function() {
-      this.webglBlock.webGLRenderer.colorTriangleRenderer.colorTriangleBufferData.dispose( this.imageHandle );
-    },
-
-    // TODO: JO: Why is markDirtyRectangle in our Image drawable?!?
-    markDirtyRectangle: function() {
-      this.markDirty();
-    },
-
-    // general flag set on the state, which we forward directly to the drawable's paint flag
-    markPaintDirty: function() {
-      this.markDirty();
-    },
-
-    //TODO: Make sure all of the dirty flags make sense here.  Should we be using fillDirty, paintDirty, dirty, etc?
-    update: function() {
-      if ( this.dirty ) {
-        this.updateRectangle();
-        this.dirty = false;
-      }
     }
   } );
   Image.ImageStatefulDrawable.mixin( Image.ImageWebGLDrawable );
@@ -37092,7 +37726,7 @@ define( 'SCENERY/nodes/Image',['require','PHET_CORE/inherit','PHET_CORE/cleanArr
       this.initializePixiSelfDrawable( renderer, instance, keepPixiImageElements );
 
       if ( !this.displayObject ) {
-        var baseTexture = new PIXI.BaseTexture( this.node._image, PIXI.scaleModes.DEFAULT );
+        var baseTexture = new PIXI.BaseTexture( this.node._image );
         var texture = new PIXI.Texture( baseTexture );
         this.displayObject = new PIXI.Sprite( texture );
       }
@@ -37102,7 +37736,7 @@ define( 'SCENERY/nodes/Image',['require','PHET_CORE/inherit','PHET_CORE/cleanArr
 
     updatePixiSelf: function( node, image ) {
       if ( node._image ) {
-        var baseTexture = new PIXI.BaseTexture( this.node._image, PIXI.scaleModes.DEFAULT );
+        var baseTexture = new PIXI.BaseTexture( this.node._image );
         var texture = new PIXI.Texture( baseTexture );
         this.displayObject.setTexture( texture );
       }
@@ -37418,7 +38052,7 @@ define( 'SCENERY/nodes/LayoutNode',['require','PHET_CORE/inherit','PHET_CORE/ext
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-define( 'SCENERY/nodes/Line',['require','PHET_CORE/inherit','SCENERY/scenery','KITE/segments/Line','SCENERY/nodes/Path','KITE/Shape','DOT/Vector2','SCENERY/nodes/Paintable','SCENERY/display/SVGSelfDrawable','SCENERY/display/CanvasSelfDrawable','SCENERY/display/WebGLSelfDrawable','SCENERY/display/SelfDrawable','SCENERY/display/PixiSelfDrawable','SCENERY/display/webgl/SquareUnstrokedRectangle','SCENERY/util/Color'],function( require ) {
+define( 'SCENERY/nodes/Line',['require','PHET_CORE/inherit','SCENERY/scenery','KITE/segments/Line','SCENERY/nodes/Path','KITE/Shape','DOT/Bounds2','DOT/Vector2','SCENERY/nodes/Paintable','SCENERY/display/SVGSelfDrawable','SCENERY/display/CanvasSelfDrawable','SCENERY/display/WebGLSelfDrawable','SCENERY/display/SelfDrawable','SCENERY/display/PixiSelfDrawable','SCENERY/display/Renderer','SCENERY/display/webgl/SquareUnstrokedRectangle','SCENERY/util/Color'],function( require ) {
   
 
   var inherit = require( 'PHET_CORE/inherit' );
@@ -37427,6 +38061,7 @@ define( 'SCENERY/nodes/Line',['require','PHET_CORE/inherit','SCENERY/scenery','K
 
   var Path = require( 'SCENERY/nodes/Path' );
   var Shape = require( 'KITE/Shape' );
+  var Bounds2 = require( 'DOT/Bounds2' );
   var Vector2 = require( 'DOT/Vector2' );
 
   var Paintable = require( 'SCENERY/nodes/Paintable' );
@@ -37436,6 +38071,7 @@ define( 'SCENERY/nodes/Line',['require','PHET_CORE/inherit','SCENERY/scenery','K
   var WebGLSelfDrawable = require( 'SCENERY/display/WebGLSelfDrawable' );
   var SelfDrawable = require( 'SCENERY/display/SelfDrawable' );
   var PixiSelfDrawable = require( 'SCENERY/display/PixiSelfDrawable' );
+  var Renderer = require( 'SCENERY/display/Renderer' );
   var SquareUnstrokedRectangle = require( 'SCENERY/display/webgl/SquareUnstrokedRectangle' );
   var Color = require( 'SCENERY/util/Color' );
 
@@ -37576,7 +38212,7 @@ define( 'SCENERY/nodes/Line',['require','PHET_CORE/inherit','SCENERY/scenery','K
       this._shape = null;
 
       // should invalidate the path and ensure a redraw
-      this.invalidateShape();
+      this.invalidatePath();
     },
 
     containsPointSelf: function( point ) {
@@ -37598,7 +38234,52 @@ define( 'SCENERY/nodes/Line',['require','PHET_CORE/inherit','SCENERY/scenery','K
     },
 
     computeShapeBounds: function() {
-      return Path.prototype.computeShapeBounds.call( this );
+      // optimized form for a single line segment (no joins, just two caps)
+      if ( this._stroke ) {
+        var lineCap = this.getLineCap();
+        var halfLineWidth = this.getLineWidth() / 2;
+        if ( lineCap === 'round' ) {
+          // we can simply dilate by half the line width
+          return new Bounds2( Math.min( this._x1, this._x2 ) - halfLineWidth, Math.min( this._y1, this._y2 ) - halfLineWidth,
+                              Math.max( this._x1, this._x2 ) + halfLineWidth, Math.max( this._y1, this._y2 ) + halfLineWidth );
+        }
+        else {
+          // (dx,dy) is a vector p2-p1
+          var dx = this._x2 - this._x1;
+          var dy = this._y2 - this._y1;
+          var magnitude = Math.sqrt( dx * dx + dy * dy );
+          if ( magnitude === 0 ) {
+            // if our line is a point, just dilate by halfLineWidth
+            return new Bounds2( this._x1 - halfLineWidth, this._y1 - halfLineWidth, this._x2 + halfLineWidth, this._y2 + halfLineWidth );
+          }
+          // (sx,sy) is a vector with a magnitude of halfLineWidth pointed in the direction of (dx,dy)
+          var sx = halfLineWidth * dx / magnitude;
+          var sy = halfLineWidth * dy / magnitude;
+          var bounds = Bounds2.NOTHING.copy();
+
+          if ( lineCap === 'butt' ) {
+            // four points just using the perpendicular stroked offsets (sy,-sx) and (-sy,sx)
+            bounds.addCoordinates( this._x1 - sy, this._y1 + sx );
+            bounds.addCoordinates( this._x1 + sy, this._y1 - sx );
+            bounds.addCoordinates( this._x2 - sy, this._y2 + sx );
+            bounds.addCoordinates( this._x2 + sy, this._y2 - sx );
+          }
+          else {
+            assert && assert( lineCap === 'square' );
+
+            // four points just using the perpendicular stroked offsets (sy,-sx) and (-sy,sx) and parallel stroked offsets
+            bounds.addCoordinates( this._x1 - sx - sy, this._y1 - sy + sx );
+            bounds.addCoordinates( this._x1 - sx + sy, this._y1 - sy - sx );
+            bounds.addCoordinates( this._x2 + sx - sy, this._y2 + sy + sx );
+            bounds.addCoordinates( this._x2 + sx + sy, this._y2 + sy - sx );
+          }
+          return bounds;
+        }
+      }
+      else {
+        // it might have a fill?
+        return Path.prototype.computeShapeBounds.call( this );
+      }
     },
 
     createSVGDrawable: function( renderer, instance ) {
@@ -37627,7 +38308,7 @@ define( 'SCENERY/nodes/Line',['require','PHET_CORE/inherit','SCENERY/scenery','K
       }
       else {
         // probably called from the Path constructor
-        this.invalidateShape();
+        this.invalidatePath();
       }
     },
 
@@ -37645,7 +38326,7 @@ define( 'SCENERY/nodes/Line',['require','PHET_CORE/inherit','SCENERY/scenery','K
     // A line does not render its fill, so it supports all renderers.  Right?
     // - SR, 2014
     getFillRendererBitmask: function() {
-      return scenery.bitmaskSupportsCanvas | scenery.bitmaskSupportsSVG | scenery.bitmaskSupportsDOM | scenery.bitmaskSupportsWebGL | scenery.bitmaskSupportsPixi;
+      return Renderer.bitmaskCanvas | Renderer.bitmaskSVG | Renderer.bitmaskDOM | Renderer.bitmaskPixi;
     }
 
   } );
@@ -37914,7 +38595,7 @@ define( 'SCENERY/nodes/Line',['require','PHET_CORE/inherit','SCENERY/scenery','K
       this.initializeWebGLSelfDrawable( renderer, instance );
     },
 
-    initializeContext: function( webglBlock ) {
+    onAddToBlock: function( webglBlock ) {
       this.webglBlock = webglBlock;
       this.rectangleHandle = new SquareUnstrokedRectangle( webglBlock.webGLRenderer.colorTriangleRenderer, this.node, 0.5 );
 
@@ -37925,6 +38606,10 @@ define( 'SCENERY/nodes/Line',['require','PHET_CORE/inherit','SCENERY/scenery','K
       this.updateLine();
 
       //TODO: Update the state in the buffer arrays
+    },
+
+    onRemoveFromBlock: function( webglBlock ) {
+
     },
 
     //Nothing necessary since everything currently handled in the uModelViewMatrix below
@@ -38037,7 +38722,7 @@ Paintable.PaintableStatelessDrawable.mixin( Line.LinePixiDrawable );
 
 
 
-//  Copyright 2002-2014, University of Colorado Boulder
+// Copyright 2002-2014, University of Colorado Boulder
 
 /**
  * EXPERIMENTAL Pixi support using a single node that renders to a DOM node
@@ -38149,7 +38834,7 @@ define( 'SCENERY/nodes/PixiNode',['require','PHET_CORE/inherit','SCENERY/nodes/D
    * Iterate over the full dag and turn into pixi displayObjects
    * additionally observe all elements in the dag and update this node when they change.
    * @param sceneryRootNode
-   * @param options
+   * @param {Object} [options]
    * @constructor
    */
   scenery.PixiNode = function PixiNode( sceneryRootNode, options ) {
@@ -38212,7 +38897,7 @@ define( 'SCENERY/nodes/Plane',['require','PHET_CORE/inherit','SCENERY/scenery','
   var Rectangle = require( 'SCENERY/nodes/Rectangle' );
 
   /**
-   * @param options Any options for the plane, typically fill/opacity (many others such as scale, translation, rotation should have no effect)
+   * @param {Object} [options] Any options for the plane, typically fill/opacity (many others such as scale, translation, rotation should have no effect)
    * @constructor
    */
   scenery.Plane = function Plane( options ) {
@@ -38252,6 +38937,34 @@ define( 'SCENERY/nodes/VBox',['require','PHET_CORE/inherit','SCENERY/nodes/Layou
 // Copyright 2002-2014, University of Colorado Boulder
 
 /**
+ * A Node meant to just take up vertical space (usually for layout purposes).
+ * It is never displayed, and cannot have children.
+ *
+ * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ */
+
+define( 'SCENERY/nodes/VStrut',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/nodes/Spacer'],function( require ) {
+  
+
+  var inherit = require( 'PHET_CORE/inherit' );
+  var scenery = require( 'SCENERY/scenery' );
+
+  var Spacer = require( 'SCENERY/nodes/Spacer' );
+
+  /**
+   * Creates a strut with x=0 and y in the range [0,height].
+   */
+  scenery.VStrut = function VStrut( height, options ) {
+    Spacer.call( this, 0, height, options );
+  };
+  var VStrut = scenery.VStrut;
+
+  return inherit( Spacer, VStrut );
+} );
+
+// Copyright 2002-2014, University of Colorado Boulder
+
+/**
  * A node that can be custom-drawn with WebGL calls. Manual handling of dirty region repainting.  Analogous to CanvasNode
  *
  * setCanvasBounds (or the mutator canvasBounds) should be used to set the area that is drawn to (otherwise nothing
@@ -38268,14 +38981,14 @@ define( 'SCENERY/nodes/WebGLNode',['require','PHET_CORE/inherit','SCENERY/scener
   var scenery = require( 'SCENERY/scenery' );
   var Matrix3 = require( 'DOT/Matrix3' );
   var Node = require( 'SCENERY/nodes/Node' );
-  require( 'SCENERY/display/Renderer' );
+  var Renderer = require( 'SCENERY/display/Renderer' );
   var WebGLSelfDrawable = require( 'SCENERY/display/WebGLSelfDrawable' );
   var SelfDrawable = require( 'SCENERY/display/SelfDrawable' );
 
   // pass a canvasBounds option if you want to specify the self bounds
   scenery.WebGLNode = function WebGLNode( options ) {
     Node.call( this, options );
-    this.setRendererBitmask( scenery.bitmaskBoundsValid | scenery.bitmaskSupportsWebGL );
+    this.setRendererBitmask( Renderer.bitmaskWebGL );
   };
   var WebGLNode = scenery.WebGLNode;
 
@@ -38337,19 +39050,23 @@ define( 'SCENERY/nodes/WebGLNode',['require','PHET_CORE/inherit','SCENERY/scener
   WebGLNode.WebGLNodeDrawable = inherit( WebGLSelfDrawable, function WebGLNodeDrawable( renderer, instance ) {
     this.initialize( renderer, instance );
   }, {
-    isCustomWebGLRenderer: true,
+    webglRenderer: Renderer.webglCustom,
 
     // called either from the constructor, or from pooling
     initialize: function( renderer, instance ) {
       this.initializeWebGLSelfDrawable( renderer, instance );
     },
 
-    initializeContext: function( webGLBlock ) {
+    onAddToBlock: function( webGLBlock ) {
       this.webGLBlock = webGLBlock;
-      this.backingScale = this.webGLBlock.webGLRenderer.backingScale;
-      this.gl = this.webGLBlock.webGLRenderer.gl;
+      this.backingScale = this.webGLBlock.backingScale;
+      this.gl = this.webGLBlock.gl;
 
       this.node.initializeWebGLDrawable( this );
+    },
+
+    onRemoveFromBlock: function( webGLBlock ) {
+
     },
 
     draw: function() {
@@ -38442,13 +39159,14 @@ define( 'SCENERY/util/Paint',['require','SCENERY/util/Color','PHET_CORE/inherit'
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-define( 'SCENERY/util/Gradient',['require','SCENERY/util/Color','PHET_CORE/inherit','SCENERY/scenery','SCENERY/util/Paint'],function( require ) {
+define( 'SCENERY/util/Gradient',['require','SCENERY/util/Color','PHET_CORE/inherit','SCENERY/scenery','SCENERY/util/Paint','SCENERY/util/Color'],function( require ) {
   
 
   require( 'SCENERY/util/Color' );
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
   var Paint = require( 'SCENERY/util/Paint' );
+  var Color = require( 'SCENERY/util/Color' );
 
   // TODO: add the ability to specify the color-stops inline. possibly [ [0,color1], [0.5,color2], [1,color3] ]
   scenery.Gradient = function Gradient( canvasGradient ) {
@@ -38470,6 +39188,11 @@ define( 'SCENERY/util/Gradient',['require','SCENERY/util/Color','PHET_CORE/inher
      * @param {Color|String} color  Color for the stop, either a scenery.Color or CSS color string
      */
     addColorStop: function( ratio, color ) {
+      assert && assert( typeof ratio === 'number', 'Ratio needs to be a number' );
+      assert && assert( ratio >= 0 && ratio <= 1, 'Ratio needs to be between 0,1 inclusively' );
+      assert && assert( typeof color === 'string' || color instanceof Color,
+        'Color should be a string or a {Color} object' );
+
       // TODO: invalidate the gradient?
       if ( this.lastStopRatio > ratio ) {
         // fail out, since browser quirks go crazy for this case
@@ -38564,6 +39287,10 @@ define( 'SCENERY/util/LinearGradient',['require','SCENERY/scenery','PHET_CORE/in
       _.each( this.stops, function( stop ) {
         var stopElement = document.createElementNS( scenery.svgns, 'stop' );
         stopElement.setAttribute( 'offset', stop.ratio );
+        // Since SVG doesn't support parsing scientific notation (e.g. 7e5), we need to output fixed decimal-point strings.
+        // Since this needs to be done quickly, and we don't particularly care about slight rounding differences (it's
+        // being used for display purposes only, and is never shown to the user), we use the built-in JS toFixed instead of
+        // Dot's version of toFixed. See https://github.com/phetsims/kite/issues/50
         stopElement.setAttribute( 'style', 'stop-color: ' + stop.color.withAlpha( 1 ).toCSS() + '; stop-opacity: ' + stop.color.a.toFixed( 20 ) + ';' );
         definition.appendChild( stopElement );
       } );
@@ -38781,6 +39508,10 @@ define( 'SCENERY/util/RadialGradient',['require','SCENERY/scenery','PHET_CORE/in
         // TODO: store color in our stops array, so we don't have to create additional objects every time?
         var stopElement = document.createElementNS( scenery.svgns, 'stop' );
         stopElement.setAttribute( 'offset', ratio );
+        // Since SVG doesn't support parsing scientific notation (e.g. 7e5), we need to output fixed decimal-point strings.
+        // Since this needs to be done quickly, and we don't particularly care about slight rounding differences (it's
+        // being used for display purposes only, and is never shown to the user), we use the built-in JS toFixed instead of
+        // Dot's version of toFixed. See https://github.com/phetsims/kite/issues/50
         stopElement.setAttribute( 'style', 'stop-color: ' + stop.color.withAlpha( 1 ).toCSS() + '; stop-opacity: ' + stop.color.a.toFixed( 20 ) + ';' );
         definition.appendChild( stopElement );
       }
@@ -38888,7 +39619,6 @@ define( 'SCENERY/util/SceneryStyle',['require','SCENERY/scenery'],function( requ
 
   var stylesheet = document.styleSheets[ document.styleSheets.length - 1 ];
   assert && assert( stylesheet.disabled === false );
-  assert && assert( stylesheet.cssRules.length === 0 );
 
   return {
     stylesheet: stylesheet,
@@ -38916,7 +39646,6 @@ define( 'SCENERY/util/SceneryStyle',['require','SCENERY/scenery'],function( requ
 define( 'main',[
   'SCENERY/scenery',
 
-  'SCENERY/accessibility/AriaSpeech',
   'SCENERY/accessibility/FocusCursor',
   'SCENERY/accessibility/FocusLayer',
   'SCENERY/accessibility/FocusRectangle',
@@ -38948,15 +39677,12 @@ define( 'main',[
   'SCENERY/display/WebGLBlock',
   'SCENERY/display/WebGLSelfDrawable',
 
-  'SCENERY/display/webgl/ColorTriangleBufferData',
-  'SCENERY/display/webgl/ColorTriangleRenderer',
-  'SCENERY/display/webgl/SpriteSheet',
-  'SCENERY/display/webgl/SquareUnstrokedRectangle',
-  'SCENERY/display/webgl/TextureBufferData',
-  'SCENERY/display/webgl/TextureRenderer',
-  'SCENERY/display/webgl/WebGLRectangle',
-  'SCENERY/display/webgl/WebGLRenderer',
-  'SCENERY/display/webgl/WebGLUtil',
+  // 'SCENERY/display/webgl/ColorTriangleBufferData',
+  // 'SCENERY/display/webgl/ColorTriangleRenderer',
+  // 'SCENERY/display/webgl/SquareUnstrokedRectangle',
+  // 'SCENERY/display/webgl/TextureBufferData',
+  // 'SCENERY/display/webgl/TextureRenderer',
+  // 'SCENERY/display/webgl/WebGLRectangle',
 
   'SCENERY/input/BatchedDOMEvent',
   'SCENERY/input/ButtonListener',
@@ -38974,8 +39700,10 @@ define( 'main',[
   'SCENERY/nodes/DOM',
   'SCENERY/nodes/HBox',
   'SCENERY/nodes/HTMLText',
+  'SCENERY/nodes/HStrut',
   'SCENERY/nodes/Image',
   'SCENERY/nodes/LayoutNode',
+  'SCENERY/nodes/Leaf',
   'SCENERY/nodes/Line',
   'SCENERY/nodes/Node',
   'SCENERY/nodes/Paintable',
@@ -38983,8 +39711,10 @@ define( 'main',[
   'SCENERY/nodes/PixiNode',
   'SCENERY/nodes/Plane',
   'SCENERY/nodes/Rectangle',
+  'SCENERY/nodes/Spacer',
   'SCENERY/nodes/Text',
   'SCENERY/nodes/VBox',
+  'SCENERY/nodes/VStrut',
   'SCENERY/nodes/WebGLNode',
 
   'SCENERY/overlays/CanvasNodeBoundsOverlay',
@@ -39004,6 +39734,7 @@ define( 'main',[
   'SCENERY/util/SceneImage',
   'SCENERY/util/SceneryStyle',
   'SCENERY/util/ShaderProgram',
+  'SCENERY/util/SpriteSheet',
   'SCENERY/util/Trail',
   'SCENERY/util/TrailPointer',
   'SCENERY/util/Util'
@@ -40945,17 +41676,17 @@ define( 'DOT/LUDecomposition',['require','DOT/dot'],function( require ) {
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-define( 'PHET_CORE/isArray',['require','PHET_CORE/core'],function( require ) {
+define( 'PHET_CORE/isArray',['require','PHET_CORE/phetCore'],function( require ) {
   
 
-  var core = require( 'PHET_CORE/core' );
+  var phetCore = require( 'PHET_CORE/phetCore' );
 
-  core.isArray = function isArray( array ) {
+  phetCore.isArray = function isArray( array ) {
     // yes, this is actually how to do this. see http://stackoverflow.com/questions/4775722/javascript-check-if-object-is-array
     return Object.prototype.toString.call( array ) === '[object Array]';
   };
 
-  return core.isArray;
+  return phetCore.isArray;
 } );
 // Copyright 2002-2014, University of Colorado Boulder
 
@@ -43094,6 +43825,55 @@ define( 'DOT/Quaternion',['require','DOT/dot','PHET_CORE/Poolable','DOT/Vector3'
   return Quaternion;
 } );
 
+//  Copyright 2002-2015, University of Colorado Boulder
+/**
+ * @author John Blanco
+ * @author Mohamed Safi
+ * @author Aaron Davis
+ *
+ */
+define( 'DOT/Random',['require','DOT/Util','DOT/dot'],function( require ) {
+  
+
+  // modules
+  var Util = require( 'DOT/Util' );
+  var dot = require( 'DOT/dot' );
+
+  dot.Random = function Random() {
+  };
+  var Random = dot.Random;
+
+  Random.prototype = {
+
+    constructor: Random,
+
+    nextBoolean: function() {
+      return Math.random() >= 0.5;
+    },
+
+    nextInt: function( n ) {
+      var value = Math.random() * n;
+      return value | 0; // convert to int
+    },
+
+    nextDouble: function() {
+      return Math.random();
+    },
+
+    /**
+     * @public
+     * @returns {number}
+     */
+    nextGaussian: function() {
+      // random gaussian with mean = 0 and standard deviation = 1
+      return Util.boxMullerTransform( 0, 1 );
+    }
+
+  };
+
+  return Random;
+
+} );
 // Copyright 2002-2014, University of Colorado Boulder
 
 /**
@@ -43493,6 +44273,7 @@ define( 'DOT/Transform4',['require','DOT/dot','DOT/Matrix4','DOT/Vector3','DOT/R
 
 define( 'DOT/main',[
   'DOT/dot',
+  'DOT/BinPacker',
   'DOT/Bounds2',
   'DOT/Bounds3',
   'DOT/Complex',
@@ -43511,6 +44292,7 @@ define( 'DOT/main',[
   'DOT/Plane3',
   'DOT/QRDecomposition',
   'DOT/Quaternion',
+  'DOT/Random',
   'DOT/Ray2',
   'DOT/Ray3',
   'DOT/Rectangle',
@@ -43527,31 +44309,7 @@ define( 'DOT/main',[
   return dot;
 } );
 
-// Copyright 2002-2013, University of Colorado Boulder
-
-/**
- * Subclass of Property that adds methods specific to boolean values
- *
- * @author Sam Reid
- */
-define( 'AXON/BooleanProperty',['require','AXON/Property','PHET_CORE/inherit','AXON/axon'],function( require ) {
-  
-
-  var Property = require( 'AXON/Property' );
-  var inherit = require( 'PHET_CORE/inherit' );
-  var axon = require( 'AXON/axon' );
-
-  axon.BooleanProperty = function BooleanProperty( value ) {
-    Property.call( this, value );
-  };
-
-  inherit( Property, axon.BooleanProperty, {
-    toggle: function() {this.set( !this.get() );}
-  } );
-
-  return axon.BooleanProperty;
-} );
-// Copyright 2002-2013, University of Colorado Boulder
+// Copyright 2002-2015, University of Colorado Boulder
 
 /**
  * An observable array of items.
@@ -43562,12 +44320,14 @@ define( 'AXON/BooleanProperty',['require','AXON/Property','PHET_CORE/inherit','A
  * @author Sam Reid
  * @author Chris Malley
  */
-define( 'AXON/ObservableArray',['require','AXON/Property','AXON/axon'],function( require ) {
+define( 'AXON/ObservableArray',['require','AXON/Property','AXON/axon','PHET_CORE/inherit','AXON/Events'],function( require ) {
   
 
   // modules
   var Property = require( 'AXON/Property' );
   var axon = require( 'AXON/axon' );
+  var inherit = require( 'PHET_CORE/inherit' );
+  var Events = require( 'AXON/Events' );
 
   axon.ObservableArray = function ObservableArray( array, options ) {
 
@@ -43578,28 +44338,34 @@ define( 'AXON/ObservableArray',['require','AXON/Property','AXON/axon'],function(
     }
 
     this._options = _.extend( {
-      allowDuplicates: false // are duplicate items allowed in the array?
+      allowDuplicates: false, // are duplicate items allowed in the array?
+      tandem: null            // Tandem is supported here.  This line doesn't do anything different than leaving tandem as undefined
+                              // but this entry serves as an indicator that tandem is supported here.
     }, options );
 
     this._array = array || []; // internal, do not access directly
     this._addedListeners = []; // listeners called when an item is added
     this._removedListeners = []; // listeners called when an item is removed
 
-    //By default, events can be logged for data analysis studies, but setSendPhetEvents can be set to false for events
-    //that should not be recorded (such as the passage of time).
-    this.sendPhetEvents = true;
-
     this.lengthProperty = new Property( this._array.length ); // observe this, but don't set it
-    this.lengthProperty.setSendPhetEvents( false );
 
     //Store the initial array, if any, for resetting, see #4
     this.initialArray = array ? array.slice() : [];
 
-    //Model component ID for data studies, regression testing, etc
-    this.observableArrayID = options ? options.observableArrayID : null;
+    // Event stream for signifying begin/end of callbacks
+    this.events = new Events();
+
+    options && options.tandem && options.tandem.addInstance( this );
+    this.disposeObservableArray = function() {
+      options && options.tandem && options.tandem.removeInstance( this );
+    };
   };
 
-  axon.ObservableArray.prototype = {
+  return inherit( Object, axon.ObservableArray, {
+
+    dispose: function() {
+      this.disposeObservableArray();
+    },
 
     //Restore the array back to its initial state
     //Note: if an item is in the current array and original array, it is removed and added back
@@ -43667,33 +44433,29 @@ define( 'AXON/ObservableArray',['require','AXON/Property','AXON/axon'],function(
     // Internal: called when an item is added.
     _fireItemAdded: function( item ) {
 
-      //Signify that an item was added to the list
-      var archID = arch && this.sendPhetEvents && arch.start( 'model', this.observableArrayID, 'ObservableArray', 'itemAdded', { added: item.toString() } );
+      this.events.trigger1( 'startedCallbacksForItemAdded', item );
 
+      //Signify that an item was added to the list
       var copy = this._addedListeners.slice( 0 ); // operate on a copy, firing could result in the listeners changing
       for ( var i = 0; i < copy.length; i++ ) {
         copy[ i ]( item, this );
       }
 
-      //Finish the "itemAdded" event
-      arch && this.sendPhetEvents && arch.end( archID );
+      this.events.trigger0( 'endedCallbacksForItemAdded' );
     },
 
     // Internal: called when an item is removed.
     _fireItemRemoved: function( item ) {
 
+      this.events.trigger1( 'startedCallbacksForItemRemoved', item );
+
       //Signify that an item was removed from the list
-      var archID = arch && this.sendPhetEvents && arch.start( 'model', this.observableArrayID, 'ObservableArray', 'itemAdded', {
-          observableArray: this.observableArrayID,
-          removed: item.toString()
-        } );
       var copy = this._removedListeners.slice( 0 ); // operate on a copy, firing could result in the listeners changing
       for ( var i = 0; i < copy.length; i++ ) {
         copy[ i ]( item, this );
       }
 
-      //Finish the "itemRemoved" event
-      arch && this.sendPhetEvents && arch.end( archID );
+      this.events.trigger1( 'startedCallbacksForItemRemoved', item );
     },
 
     /**
@@ -43711,7 +44473,9 @@ define( 'AXON/ObservableArray',['require','AXON/Property','AXON/axon'],function(
      * @param {Array} items
      */
     addAll: function( items ) {
-      this._array.push.apply( this._array, items );
+      for ( var i = 0; i < items.length; i++ ) {
+        this.add( items[ i ] );
+      }
     },
 
     /**
@@ -43857,16 +44621,15 @@ define( 'AXON/ObservableArray',['require','AXON/Property','AXON/axon'],function(
       return this._array;
     },
 
-    setSendPhetEvents: function( sendPhetEvents ) {
-      this.sendPhetEvents = sendPhetEvents;
-      this.lengthProperty.setSendPhetEvents( sendPhetEvents );
-      return this;
-    }
-  };
+    setElements: function( elements ) {
 
-  return axon.ObservableArray;
+      // TODO: do a better diff here for efficiency
+      this.clear();
+      this.addAll( elements );
+    }
+  } );
 } );
-//  Copyright 2002-2014, University of Colorado Boulder
+// Copyright 2002-2014, University of Colorado Boulder
 
 /**
  * A Multilink is an instance that can be used to link to multiple properties.  It is very similar to a DerivedProperty, but has no value and does not conform to the Property API,
@@ -43884,7 +44647,7 @@ define( 'AXON/Multilink',['require','AXON/axon','PHET_CORE/inherit'],function( r
   /**
    * @param {Property[]} dependencies
    * @param {function} callback function that expects args in the same order as dependencies
-   * @param {boolean} lazy Optional parameter that can be set to true if this should be a lazy multilink (no immediate callback)
+   * @param {boolean} [lazy] Optional parameter that can be set to true if this should be a lazy multilink (no immediate callback)
    * @constructor
    */
   axon.Multilink = function Multilink( dependencies, callback, lazy ) {
@@ -43919,8 +44682,8 @@ define( 'AXON/Multilink',['require','AXON/axon','PHET_CORE/inherit'],function( r
 
   return inherit( Object, axon.Multilink, {
 
-      // Detaches dependencies from listeners.
-      detach: function() {
+      dispose: function() {
+        // Unlink from dependent properties
         for ( var i = 0; i < this.dependencies.length; i++ ) {
           var dependency = this.dependencies[ i ];
           dependency.unlink( this.dependencyListeners[ i ] );
@@ -43932,7 +44695,7 @@ define( 'AXON/Multilink',['require','AXON/axon','PHET_CORE/inherit'],function( r
     }
   );
 } );
-// Copyright 2002-2013, University of Colorado Boulder
+// Copyright 2002-2015, University of Colorado Boulder
 
 /**
  * PropertySet facilitates creation and use of multiple named Property instances.  There are still several API design issues in question, but this
@@ -43962,7 +44725,7 @@ define( 'AXON/Multilink',['require','AXON/axon','PHET_CORE/inherit'],function( r
  * //Normally would be created in a class but that is omitted here for brevity.
  * var p ={name: new Property('larry'), age: new Property('age'), kids: new Property(['alice','bob'])}
  * p.reset = function(){
- *   this.name.reset(); 
+ *   this.name.reset();
  *   this.age.reset();
  *   this.kids.reset();
  * }
@@ -43989,15 +44752,25 @@ define( 'AXON/PropertySet',['require','AXON/Property','AXON/DerivedProperty','AX
   var SUFFIX = 'Property';
 
   /**
-   * @class PropertySet
+   * PropertySet main constructor
+   * @param {Object} values - a hash: keys are the names of properties, values are initial property values. Eg { name: 'Curly', age: 40 }
+   * @param {Object} [options]
    * @constructor
-   * @param values an object hash with the initial values for the properties
-   * @param {object} [options] -
-   *                           - propertySetID: optional identifier used in data collection messages
    */
   axon.PropertySet = function PropertySet( values, options ) {
+
+    options = _.extend( {
+      tandemSet: {} // a hash, keys are a subset of the keys in values, and the value associated with each key is a {Tandem} tandem
+    }, options );
+
+    // Verify that the tandemSet doesn't contain bogus keys. filter should return 0 tandemSet keys that are not in values.
+    assert && assert( _.filter( _.keys( options.tandemSet ), function( key ) {
+      var isBad = !values.hasOwnProperty( key );
+      if ( isBad ) { console.error( 'bad tandem key: ' + key ); }
+      return isBad;
+    } ).length === 0, 'Some tandem keys do not appear in the PropertySet' );
+
     var propertySet = this;
-    this.propertySetID = options ? options.propertySetID : null;
 
     Events.call( this );
 
@@ -44005,7 +44778,7 @@ define( 'AXON/PropertySet',['require','AXON/Property','AXON/DerivedProperty','AX
     this.keys = [];
 
     Object.getOwnPropertyNames( values ).forEach( function( value ) {
-      propertySet.addProperty( value, values[ value ], propertySet.propertySetID );
+      propertySet.addProperty( value, values[ value ], options.tandemSet[ value ] );
     } );
   };
 
@@ -44015,20 +44788,10 @@ define( 'AXON/PropertySet',['require','AXON/Property','AXON/DerivedProperty','AX
      * Adds a new property to this PropertySet
      * @param {string} propertyName
      * @param {*} value the property's initial value
-     * @param {string} [propertySetID] optional identifier for data-collection studies
+     * @param {Tandem} [tandem] - optional support for tandem
      */
-    addProperty: function( propertyName, value, propertySetID ) {
-      if ( propertySetID !== null && typeof( propertySetID ) !== 'undefined' && typeof( propertySetID ) !== 'string' ) {
-        throw new Error( 'If defined, the propertySetID must be a string.' );
-      }
-      var propertyID;
-      if ( typeof( propertySetID ) === 'string' ) {
-        propertyID = propertySetID + '.' + propertyName;
-      }
-      else {
-        propertyID = propertyName;
-      }
-      this[ propertyName + SUFFIX ] = new Property( value, { propertyID: propertyID } );
+    addProperty: function( propertyName, value, tandem ) {
+      this[ propertyName + SUFFIX ] = new Property( value, { tandem: tandem } );
       this.addGetterAndSetter( propertyName );
       this.keys.push( propertyName );
     },
@@ -44044,6 +44807,8 @@ define( 'AXON/PropertySet',['require','AXON/Property','AXON/DerivedProperty','AX
       if ( index !== -1 ) {
         this.keys.splice( index, 1 );
       }
+
+      this[ propertyName + SUFFIX ].dispose();
 
       //Unregister the Property instance from the PropertySet
       delete this[ propertyName + SUFFIX ];
@@ -44102,10 +44867,11 @@ define( 'AXON/PropertySet',['require','AXON/Property','AXON/DerivedProperty','AX
      * Creates a DerivedProperty from the given property property names and derivation.
      * @param {string[]} propertyNames
      * @param {function} derivation
+     * @param {Tandem} [tandem] - optional support for tandem
      * @returns {DerivedProperty}
      */
-    toDerivedProperty: function( propertyNames, derivation ) {
-      return new DerivedProperty( this.getProperties( propertyNames ), derivation );
+    toDerivedProperty: function( propertyNames, derivation, tandem ) {
+      return new DerivedProperty( this.getProperties( propertyNames ), derivation, { tandem: tandem } );
     },
 
     /**
@@ -44113,9 +44879,10 @@ define( 'AXON/PropertySet',['require','AXON/Property','AXON/DerivedProperty','AX
      * @param {string} propertyName name for the derived property
      * @param {string[]} dependencyNames names of the properties that it depends on
      * @param {function} derivation function that expects args in the same order as dependencies
+     * @param {Tandem} [tandem] - optional support for tandem
      */
-    addDerivedProperty: function( propertyName, dependencyNames, derivation ) {
-      this[ propertyName + SUFFIX ] = this.toDerivedProperty( dependencyNames, derivation );
+    addDerivedProperty: function( propertyName, dependencyNames, derivation, tandem ) {
+      this[ propertyName + SUFFIX ] = this.toDerivedProperty( dependencyNames, derivation, tandem );
       this.addGetter( propertyName );
     },
 
@@ -44225,11 +44992,11 @@ define( 'AXON/PropertySet',['require','AXON/Property','AXON/DerivedProperty','AX
 
     /**
      * Removes the multilink from this PropertySet.
-     * Same as calling detach() on the multilink
+     * Same as calling dispose() on the multilink
      * @param {Multilink} multilink
      */
     unmultilink: function( multilink ) {
-      multilink.detach();
+      multilink.dispose();
     },
 
     toString: function() {
@@ -44253,27 +45020,21 @@ define( 'AXON/PropertySet',['require','AXON/Property','AXON/DerivedProperty','AX
       return this[ propertyName + SUFFIX ];
     },
 
-    getAPI: function( route ) {
-      var api = { route: route };
+    /**
+     * When the PropertySet is no longer used by the sim, it can be eliminated.  All Properties are disposed.
+     */
+    dispose: function() {
       for ( var i = 0; i < this.keys.length; i++ ) {
-        var key = this.keys[ i ];
-
-        // TODO: Delegate this to Property itself
-        api[ key ] = {
-          type: 'AXON/Property',
-          route: route + '.' + key + 'Property'
-        };
+        this[ this.keys[ i ] + SUFFIX ].dispose();
       }
-      return api;
     }
   } );
 } );
 
-// Copyright 2002-2013, University of Colorado Boulder
+// Copyright 2002-2015, University of Colorado Boulder
 
 define( 'AXON/main',[
   'AXON/axon',
-  'AXON/BooleanProperty',
   'AXON/Property',
   'AXON/DerivedProperty',
   'AXON/ObservableArray',
@@ -44295,12 +45056,12 @@ define( 'AXON/main',[
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-define( 'PHET_CORE/collect',['require','PHET_CORE/core'],function( require ) {
+define( 'PHET_CORE/collect',['require','PHET_CORE/phetCore'],function( require ) {
   
 
-  var core = require( 'PHET_CORE/core' );
+  var phetCore = require( 'PHET_CORE/phetCore' );
 
-  core.collect = function collect( iterate ) {
+  phetCore.collect = function collect( iterate ) {
     assert && assert( typeof iterate === 'function' );
     var result = [];
     iterate( function( ob ) {
@@ -44308,7 +45069,7 @@ define( 'PHET_CORE/collect',['require','PHET_CORE/core'],function( require ) {
     } );
     return result;
   };
-  return core.collect;
+  return phetCore.collect;
 } );
 // Copyright 2002-2014, University of Colorado Boulder
 
@@ -44316,18 +45077,18 @@ define( 'PHET_CORE/collect',['require','PHET_CORE/core'],function( require ) {
  * Scans through potential event properties on an object to detect prefixed forms, and returns the first match.
  *
  * E.g. currently:
- * core.detectPrefixEvent( document, 'fullscreenchange' ) === 'webkitfullscreenchange'
+ * phetCore.detectPrefixEvent( document, 'fullscreenchange' ) === 'webkitfullscreenchange'
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-define( 'PHET_CORE/detectPrefixEvent',['require','PHET_CORE/core'],function( require ) {
+define( 'PHET_CORE/detectPrefixEvent',['require','PHET_CORE/phetCore'],function( require ) {
   
 
-  var core = require( 'PHET_CORE/core' );
+  var phetCore = require( 'PHET_CORE/phetCore' );
 
   // @returns the best String str where obj['on'+str] !== undefined, or returns undefined if that is not available
-  core.detectPrefixEvent = function detectPrefixEvent( obj, name, isEvent ) {
+  phetCore.detectPrefixEvent = function detectPrefixEvent( obj, name, isEvent ) {
     if ( obj[ 'on' + name ] !== undefined ) { return name; }
 
     // Chrome planning to not introduce prefixes in the future, hopefully we will be safe
@@ -44339,7 +45100,7 @@ define( 'PHET_CORE/detectPrefixEvent',['require','PHET_CORE/core'],function( req
     return undefined;
   };
 
-  return core.detectPrefixEvent;
+  return phetCore.detectPrefixEvent;
 } );
 // Copyright 2002-2014, University of Colorado Boulder
 
@@ -44355,7 +45116,7 @@ define( 'PHET_CORE/detectPrefixEvent',['require','PHET_CORE/core'],function( req
  *
  * For example, create a timer with a constant rate that it will fire events every 1 time units:
  *
- * var timer = new core.EventTimer( new core.EventTimer.ConstantEventModel( 1 ), function( timeElapsed ) {
+ * var timer = new phetCore.EventTimer( new phetCore.EventTimer.ConstantEventModel( 1 ), function( timeElapsed ) {
  *   console.log( 'event with timeElapsed: ' + timeElapsed );
  * } );
  *
@@ -44388,10 +45149,10 @@ define( 'PHET_CORE/detectPrefixEvent',['require','PHET_CORE/core'],function( req
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-define( 'PHET_CORE/EventTimer',['require','PHET_CORE/core','PHET_CORE/inherit'],function( require ) {
+define( 'PHET_CORE/EventTimer',['require','PHET_CORE/phetCore','PHET_CORE/inherit'],function( require ) {
   
 
-  var core = require( 'PHET_CORE/core' );
+  var phetCore = require( 'PHET_CORE/phetCore' );
   var inherit = require( 'PHET_CORE/inherit' );
 
   /*
@@ -44405,7 +45166,7 @@ define( 'PHET_CORE/EventTimer',['require','PHET_CORE/core','PHET_CORE/inherit'],
    *    our event would have occurred 1 second into that step, the timeElapsed will be 4 seconds, since after the end
    *    of the 5 seconds the event would have happened 4 seconds ago.
    */
-  core.EventTimer = function EventTimer( eventModel, eventCallback ) {
+  phetCore.EventTimer = function EventTimer( eventModel, eventCallback ) {
     assert && assert( typeof eventCallback === 'function', 'EventTimer requires a callback' );
 
     this.eventModel = eventModel;
@@ -44414,7 +45175,7 @@ define( 'PHET_CORE/EventTimer',['require','PHET_CORE/core','PHET_CORE/inherit'],
     this.timeBeforeNextEvent = this.eventModel.getPeriodBeforeNextEvent();
   };
 
-  inherit( Object, core.EventTimer, {
+  inherit( Object, phetCore.EventTimer, {
     step: function( dt ) {
       while ( dt >= this.timeBeforeNextEvent ) {
         dt -= this.timeBeforeNextEvent;
@@ -44433,7 +45194,7 @@ define( 'PHET_CORE/EventTimer',['require','PHET_CORE/core','PHET_CORE/inherit'],
    * Event model that will fire events at a constant rate. An event will occur every 1/rate time units.
    * @param {number} rate
    */
-  core.EventTimer.ConstantEventModel = inherit( Object, function ConstantEventRate( rate ) {
+  phetCore.EventTimer.ConstantEventModel = inherit( Object, function ConstantEventRate( rate ) {
     assert && assert( typeof rate === 'number',
       'The rate should be a number' );
     assert && assert( rate > 0,
@@ -44453,7 +45214,7 @@ define( 'PHET_CORE/EventTimer',['require','PHET_CORE/core','PHET_CORE/inherit'],
    * @param {number} rate
    * @param {function} pseudoRandomNumberSource() : Number
    */
-  core.EventTimer.UniformEventModel = inherit( Object, function UniformEventModel( rate, pseudoRandomNumberSource ) {
+  phetCore.EventTimer.UniformEventModel = inherit( Object, function UniformEventModel( rate, pseudoRandomNumberSource ) {
     assert && assert( typeof rate === 'number',
       'The rate should be a number' );
     assert && assert( typeof pseudoRandomNumberSource === 'function',
@@ -44481,7 +45242,7 @@ define( 'PHET_CORE/EventTimer',['require','PHET_CORE/core','PHET_CORE/inherit'],
    * @param {number} rate
    * @param {function} pseudoRandomNumberSource() : number
    */
-  core.EventTimer.PoissonEventModel = inherit( Object, function PoissonEventModel( rate, pseudoRandomNumberSource ) {
+  phetCore.EventTimer.PoissonEventModel = inherit( Object, function PoissonEventModel( rate, pseudoRandomNumberSource ) {
     assert && assert( typeof rate === 'number',
       'The time between events should be a number' );
     assert && assert( typeof pseudoRandomNumberSource === 'function',
@@ -44508,7 +45269,7 @@ define( 'PHET_CORE/EventTimer',['require','PHET_CORE/core','PHET_CORE/inherit'],
     }
   } );
 
-  return core.EventTimer;
+  return phetCore.EventTimer;
 } );
 // Copyright 2002-2014, University of Colorado Boulder
 
@@ -44518,10 +45279,10 @@ define( 'PHET_CORE/EventTimer',['require','PHET_CORE/core','PHET_CORE/inherit'],
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-define( 'PHET_CORE/loadScript',['require','PHET_CORE/core'],function( require ) {
+define( 'PHET_CORE/loadScript',['require','PHET_CORE/phetCore'],function( require ) {
   
 
-  var core = require( 'PHET_CORE/core' );
+  var phetCore = require( 'PHET_CORE/phetCore' );
 
   /*
    * Load a script. The only required argument is src, and can be specified either as
@@ -44533,7 +45294,7 @@ define( 'PHET_CORE/loadScript',['require','PHET_CORE/core'],function( require ) 
    *   async:       Whether the script should be loaded asynchronously. Defaults to true
    *   cacheBuster: Whether the URL should have an appended query string to work around caches
    */
-  core.loadScript = function loadScript( args ) {
+  phetCore.loadScript = function loadScript( args ) {
     // handle a string argument
     if ( typeof args === 'string' ) {
       args = { src: args };
@@ -44571,25 +45332,25 @@ define( 'PHET_CORE/loadScript',['require','PHET_CORE/core'],function( require ) 
     other.parentNode.insertBefore( script, other );
   };
 
-  return core.loadScript;
+  return phetCore.loadScript;
 } );
 // Copyright 2002-2014, University of Colorado Boulder
 
 /**
  * Creates an array of arrays, which consists of pairs of objects from the input array without duplication.
  *
- * For example, core.pairs( [ 'a', 'b', 'c' ] ) will return:
+ * For example, phetCore.pairs( [ 'a', 'b', 'c' ] ) will return:
  * [ [ 'a', 'b' ], [ 'a', 'c' ], [ 'b', 'c' ] ]
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-define( 'PHET_CORE/pairs',['require','PHET_CORE/core'],function( require ) {
+define( 'PHET_CORE/pairs',['require','PHET_CORE/phetCore'],function( require ) {
   
 
-  var core = require( 'PHET_CORE/core' );
+  var phetCore = require( 'PHET_CORE/phetCore' );
 
-  core.pairs = function pairs( array ) {
+  phetCore.pairs = function pairs( array ) {
     var result = [];
     var length = array.length;
     if ( length > 1 ) {
@@ -44602,7 +45363,7 @@ define( 'PHET_CORE/pairs',['require','PHET_CORE/core'],function( require ) {
     }
     return result;
   };
-  return core.pairs;
+  return phetCore.pairs;
 } );
 
 // Copyright 2002-2014, University of Colorado Boulder
@@ -44616,12 +45377,12 @@ define( 'PHET_CORE/pairs',['require','PHET_CORE/core'],function( require ) {
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-define( 'PHET_CORE/partition',['require','PHET_CORE/core'],function( require ) {
+define( 'PHET_CORE/partition',['require','PHET_CORE/phetCore'],function( require ) {
   
 
-  var core = require( 'PHET_CORE/core' );
+  var phetCore = require( 'PHET_CORE/phetCore' );
 
-  core.partition = function partition( array, predicate ) {
+  phetCore.partition = function partition( array, predicate ) {
     assert && assert( array instanceof Array );
     assert && assert( typeof predicate === 'function' );
 
@@ -44639,115 +45400,12 @@ define( 'PHET_CORE/partition',['require','PHET_CORE/core'],function( require ) {
 
     return [ satisfied, unsatisfied ];
   };
-  return core.partition;
+  return phetCore.partition;
 } );
-// Copyright 2002-2014, University of Colorado Boulder
-
-/**
- * Simple profiler which handles nested calls which provides a composite view, to help for micro-optimization.
- * Usage:
- * profiler.start('updateScene');
- * ...
- * profiler.start('moveObjects');
- * ...
- * profiler.stop();
- * ...
- * profiler.stop();
- * See testSelf() for a larger example. This could be used on ipad for instance.
- *
- * @author Sam Reid
- */
-define( 'PHET_CORE/profiler',['require','PHET_CORE/core'],function( require ) {
-  
-
-  var core = require( 'PHET_CORE/core' );
-
-  var stack = [];
-  var results = {};
-  var count = 0;
-  var listeners = [];
-  core.profiler = {
-    displayCount: 1000,
-    start: function( name ) {
-      var time = Date.now();
-      stack.push( { name: name, time: time } );
-    },
-    addListener: function( listener ) {
-      listeners.push( listener );
-    },
-    stop: function() {
-      var end = Date.now();
-      var top = stack.pop();
-      var elapsed = end - top.time;
-      if ( !results[ top.name ] ) {
-        results[ top.name ] = [];
-      }
-      //TODO: this may be a memory problem, consider coalescing (averaging or summing) values here
-      results[ top.name ].push( elapsed );
-      count++;
-      if ( count % this.displayCount === 0 ) {
-        var summary = JSON.stringify( this.toJSON() );
-
-        console.log( summary );
-
-        //Also notify listeners that a new result was obtained
-        for ( var i = 0; i < listeners.length; i++ ) {
-          listeners[ i ]( summary );
-        }
-        results = {};
-      }
-    },
-    toJSON: function() {
-      var summary = {};
-      var sum;
-      for ( var property in results ) {
-        sum = 0;
-        for ( var i = 0; i < results[ property ].length; i++ ) {
-          var time = results[ property ][ i ];
-          sum += time;
-        }
-        var average = sum / results[ property ].length;
-        summary[ property ] = { average: average, count: results[ property ].length };
-      }
-      return summary;
-    },
-
-    //sanity test
-    testSelf: function() {
-      var a, b;
-      var profiler = this;
-      this.displayCount = 10000000;//Only show final result
-      for ( var i = 0; i < 10; i++ ) {
-        profiler.start( 'physics' );
-        for ( var k = 0; k < 10000; k++ ) {
-          profiler.start( 'mloop' );
-          for ( var m = 0; m < 10000; m++ ) {
-            a = 100 * 200;
-          }
-          profiler.stop();
-          profiler.start( 'xloop' );
-          for ( var x = 0; x < 20000; x++ ) {
-            b = 100 * 200;
-          }
-          profiler.stop();
-        }
-        profiler.stop();
-      }
-
-      console.log( 'results: ', a, b );
-      console.log( JSON.stringify( this.toJSON() ) );
-
-      //sample correct output on chrome: {"mloop":{"average":0.01675,"count":100000},"xloop":{"average":0.03254,"count":100000},"physics":{"average":498.9,"count":10}}
-    }
-  };
-//  profiler.testSelf();
-  return core.profiler;
-} );
-
 // Copyright 2002-2014, University of Colorado Boulder
 
 define( 'PHET_CORE/main',[
-  'PHET_CORE/core',
+  'PHET_CORE/phetCore',
   'PHET_CORE/arrayRemove',
   'PHET_CORE/cleanArray',
   'PHET_CORE/collect',
@@ -44763,11 +45421,10 @@ define( 'PHET_CORE/main',[
   'PHET_CORE/partition',
   'PHET_CORE/phetAllocation',
   'PHET_CORE/platform',
-  'PHET_CORE/Poolable',
-  'PHET_CORE/profiler'
-], function( core ) {
+  'PHET_CORE/Poolable'
+], function( phetCore ) {
   
-  return core;
+  return phetCore;
 } );
 
 // Copyright 2002-2014, University of Colorado Boulder
@@ -44786,7 +45443,9 @@ require.config( {
 
     // plugins
     image: '../../chipper/js/requirejs-plugins/image',
-    text: '../../sherpa/text',
+
+    // third-party libs
+    text: '../../sherpa/lib/text-2.0.12',
 
     SCENERY: '.',
     KITE: '../../kite/js',
@@ -44801,4 +45460,4 @@ require.config( {
 
 define("config", function(){});
 
- window.scenery = require( 'main' ); window.kite = require( 'KITE/main' ); window.dot = require( 'DOT/main' ); window.core = require( 'PHET_CORE/main' ); scenery.Util.polyfillRequestAnimationFrame(); }());
+ window.scenery = require( 'main' ); window.kite = require( 'KITE/main' ); window.dot = require( 'DOT/main' ); window.phetCore = require( 'PHET_CORE/main' ); scenery.Util.polyfillRequestAnimationFrame(); }());

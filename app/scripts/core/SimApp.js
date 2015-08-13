@@ -1,5 +1,5 @@
 // modules
-var inherit = core.inherit;
+var inherit = axon.inherit;
 var Shape = kite.Shape;
 var Node = scenery.Node;
 var Display = scenery.Display;
