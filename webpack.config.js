@@ -14,13 +14,21 @@ module.exports.getConfig = function( type ) {
         test: /\.jsx?$/,
         exclude: /node_modules/,
         loader: 'babel-loader'
-      } ]
+      },
+        {
+          test: /\.(jpe?g|png|gif|svg)$/i,
+          loaders: [
+            'file?hash=sha512&digest=hex&name=[hash].[ext]',
+            'image-webpack?bypassOnDebug&optimizationLevel=7&interlaced=false'
+          ]
+        }
+      ]
     },
     externals: {
       // require("jquery") is external and available
       //  on the global var jQuery
       "jquery": "jQuery",
-      "themeMain":"themeMain"
+      "themeMain": "themeMain"
 
     }
   };
