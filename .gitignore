@@ -1,6 +1,6 @@
 node_modules
 app/bower_components
 app/bundles
-app/build
+build
 *.log
 .idea/*
