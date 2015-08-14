@@ -9,7 +9,8 @@ function BaseOrganismModel( initialPosition, options ) {
   var thisModel = this;
   PropertySet.call( thisModel, {
     userControlled: false,
-    position: initialPosition.copy()
+    position: initialPosition.copy(),
+    type: "" // the actual type for example if omnivorous is it a bird or human? We need to choose the icon based on that
 
   } );
 

@@ -7,6 +7,7 @@ var SimpleDragHandler = scenery.SimpleDragHandler;
  * @param {Node} appearanceNode
  * @param {Node} canvas
  * @param organismCreator
+ * @param organismDestroyer
  * @constructor
  */
 function OrganismCreatorNode( appearanceNode, canvas, organismCreator, organismDestroyer, enclosingPanelNode ) {
@@ -24,8 +25,6 @@ function OrganismCreatorNode( appearanceNode, canvas, organismCreator, organismD
 
     allowTouchSnag: true,
     start: function( event ) {
-      thisNode.pickable = false;
-      thisNode.appearanceNode.opacity = 0.3;
 
       var modelPos = thisNode.getModelPosition( event.pointer.point );
       //   thisNode.debugPoint(thisNode.canvas,modelPos); TODO Debug
@@ -43,9 +42,7 @@ function OrganismCreatorNode( appearanceNode, canvas, organismCreator, organismD
           if ( enclosingPanelNode.bounds.containsPoint( thisNode.organism.getPosition() ) ) {
             organismDestroyer( thisNode.organism );
             thisNode.organism.userControlledProperty.unlink( userControlledPropertyObserver );
-            thisNode.appearanceNode.opacity = 1;
-            thisNode.pickable = true;
-          }
+           }
         }
       };
 
@@ -65,7 +62,6 @@ function OrganismCreatorNode( appearanceNode, canvas, organismCreator, organismD
 
   // Add the main node with which the user will interact.
   thisNode.addChild( appearanceNode );
-
 
 }
 

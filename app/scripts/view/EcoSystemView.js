@@ -7,6 +7,7 @@
 var inherit = axon.inherit;
 var Bounds2 = dot.Bounds2;
 var BaseScreenView = require( '../core/BaseScreenView' );
+var GridPanelNode = require( './GridPanelNode' );
 var SimFont = require( '../core/SimFont' );
 var Text = scenery.Text;
 var SimpleDragHandler = scenery.SimpleDragHandler;
@@ -15,6 +16,9 @@ var CheckBox = require( '../controls/CheckBox' );
 var HSlider = require( '../controls/HSlider' );
 var Property = axon.Property;
 
+// private constnats
+var GRID_PANEL_OFFSET_X = 50;
+var GRID_PANEL_OFFSET_Y = 70;
 var CHECK_BOX_OPTIONS = { boxWidth: 40 };
 var TEXT_OPTIONS = { font: new SimFont( 14 ) };
 
@@ -23,9 +27,17 @@ var testString = "Check Me";
 
 function EcoSystemView( model ) {
   var thisView = this;
-  BaseScreenView.call( thisView, { layoutBounds: new Bounds2( 0, 0, 981, 604 ) } );
+  BaseScreenView.call( thisView, { layoutBounds: new Bounds2( 0, 0, 981, 704 ) } );
+
+  var gridPanelNode = new GridPanelNode();
+  thisView.addChild( gridPanelNode );
+
+  gridPanelNode.x = thisView.layoutBounds.x + GRID_PANEL_OFFSET_X;
+  gridPanelNode.y = thisView.layoutBounds.y + GRID_PANEL_OFFSET_Y;
+
+
   var image1 = new scenery.Image( CARNIVORES_IMAGE );
-   thisView.addChild( image1 );
+  thisView.addChild( image1 );
 
   var property = new Property( 130 );
 
