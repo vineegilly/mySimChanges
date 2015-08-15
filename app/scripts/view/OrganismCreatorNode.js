@@ -3,21 +3,22 @@ var Node = scenery.Node;
 var SimpleDragHandler = scenery.SimpleDragHandler;
 
 /**
- *
- * @param {Node} appearanceNode
- * @param {Node} canvas
+ *@param {string} type
+ * @param {Node} gridCanvas
+ * @param {Image} appearanceNode
+ * @param {Node} screenView
  * @param organismCreator
- * @param organismDestroyer
+ * @param {Function} canPlaceShape - A function to determine if the Organism can be placed on the board
  * @constructor
  */
-function OrganismCreatorNode( appearanceNode, canvas, organismCreator, organismDestroyer, enclosingPanelNode ) {
+function OrganismCreatorNode( type, gridCanvas, appearanceImage, screenView, organismCreator, canPlaceShape ) {
   var thisNode = this;
   Node.call( thisNode, { cursor: 'pointer' } );
+
+  var appearanceNode = new scenery.Image( appearanceImage );
+  appearanceNode.scale( 0.15,0.15 );
   thisNode.appearanceNode = appearanceNode;
   thisNode.organism = null;
-  thisNode.canvas = canvas;
-
-  appearanceNode.pickable = false;
   thisNode.mouseArea = appearanceNode.bounds;
   thisNode.touchArea = appearanceNode.bounds;
 
@@ -26,27 +27,13 @@ function OrganismCreatorNode( appearanceNode, canvas, organismCreator, organismD
     allowTouchSnag: true,
     start: function( event ) {
 
-      var modelPos = thisNode.getModelPosition( event.pointer.point );
-      //   thisNode.debugPoint(thisNode.canvas,modelPos); TODO Debug
+      // Determine the initial position of the new element as a function of the event position and this node's bounds.
+      var upperLeftCornerGlobal = thisNode.parentToGlobalPoint( thisNode.leftTop );
+      var initialPositionOffset = upperLeftCornerGlobal.minus( event.pointer.point );
+      var initialPosition = gridCanvas.globalToLocalPoint( event.pointer.point.plus( initialPositionOffset ) );
 
-      thisNode.organism = organismCreator( modelPos );
+      thisNode.organism = organismCreator( type, appearanceImage, initialPosition );
       thisNode.organism.userControlled = true;
-
-      // Add an observer to watch for this model element to be returned.
-
-      var userControlledPropertyObserver = function( userControlled ) {
-        if ( !userControlled ) {
-          // The user has released this biomolecule.  If it  was dropped above the return bounds (which are
-          // generally the bounds of the tool box where this creator node resides),then the model element
-          // should be removed from the model.
-          if ( enclosingPanelNode.bounds.containsPoint( thisNode.organism.getPosition() ) ) {
-            organismDestroyer( thisNode.organism );
-            thisNode.organism.userControlledProperty.unlink( userControlledPropertyObserver );
-           }
-        }
-      };
-
-      thisNode.organism.userControlledProperty.link( userControlledPropertyObserver );
     },
 
     translate: function( translationParams ) {
@@ -54,11 +41,21 @@ function OrganismCreatorNode( appearanceNode, canvas, organismCreator, organismD
     },
 
     end: function( event ) {
-      thisNode.organism.userControlled = false;
+      var droppedPoint = event.pointer.point;
+      var droppedScreenPoint = screenView.globalToLocalPoint( event.pointer.point );
+
+      //check if the user has dropped the number within the panel itself, if "yes" return to origin
+      if ( !canPlaceShape( thisNode.organism, droppedScreenPoint ) ) {
+        thisNode.organism.returnToOrigin( true );
+        thisNode.organism = null;
+        return;
+      }
+
       thisNode.organism = null;
     }
 
   } ) );
+
 
   // Add the main node with which the user will interact.
   thisNode.addChild( appearanceNode );

@@ -8,6 +8,8 @@ var inherit = axon.inherit;
 var Bounds2 = dot.Bounds2;
 var BaseScreenView = require( '../core/BaseScreenView' );
 var GridPanelNode = require( './GridPanelNode' );
+var OrganismNode = require( './OrganismNode' );
+var OrganismPanelNode = require( './OrganismPanelNode' );
 var SimFont = require( '../core/SimFont' );
 var Text = scenery.Text;
 var SimpleDragHandler = scenery.SimpleDragHandler;
@@ -25,50 +27,82 @@ var TEXT_OPTIONS = { font: new SimFont( 14 ) };
 
 var testString = "Check Me";
 
-function EcoSystemView( model ) {
+function EcoSystemView( ecoSystemModel ) {
   var thisView = this;
   BaseScreenView.call( thisView, { layoutBounds: new Bounds2( 0, 0, 981, 704 ) } );
 
   var gridPanelNode = new GridPanelNode();
-  thisView.addChild( gridPanelNode );
+
 
   gridPanelNode.x = thisView.layoutBounds.x + GRID_PANEL_OFFSET_X;
   gridPanelNode.y = thisView.layoutBounds.y + GRID_PANEL_OFFSET_Y;
 
+  function handleOrganismAdded( addedOrganismModel ) {
+    // Add a representation of the number.
+    var organismNode = new OrganismNode( addedOrganismModel );
+    gridPanelNode.addOrganism( organismNode );
 
-  var image1 = new scenery.Image( CARNIVORES_IMAGE );
-  thisView.addChild( image1 );
+    // Move the shape to the front of this layer when grabbed by the user.
+    addedOrganismModel.userControlledProperty.link( function( userControlled ) {
+      if ( userControlled ) {
+        organismNode.moveToFront();
+      }
+    } );
 
-  var property = new Property( 130 );
+    ecoSystemModel.residentOrganismModels.addItemRemovedListener( function removalListener( removedOrganismModel ) {
+      if ( removedOrganismModel === addedOrganismModel ) {
+        gridPanelNode.removeOrganism( organismNode );
+        ecoSystemModel.residentOrganismModels.removeItemRemovedListener( removalListener );
+      }
+    } );
+  }
 
-  var slider = new HSlider( property, { min: 100, max: 150 } );
+  //Initial Organism Creation
+  ecoSystemModel.residentOrganismModels.forEach( handleOrganismAdded );
 
-  var checkBoxControl = new CheckBox( new Text( testString, TEXT_OPTIONS ), property, CHECK_BOX_OPTIONS );
-  thisView.addChild( checkBoxControl );
+  // Observe new items
+  ecoSystemModel.residentOrganismModels.addItemAddedListener( handleOrganismAdded );
 
-  checkBoxControl.x = thisView.layoutBounds.center.x;
-  checkBoxControl.y = thisView.layoutBounds.center.y;
+  var organismPanelNode = new OrganismPanelNode( ecoSystemModel, [], thisView, gridPanelNode.getOrganismLayerNode() );
+  organismPanelNode.x = thisView.layoutBounds.x + GRID_PANEL_OFFSET_X;
+  organismPanelNode.y = thisView.layoutBounds.y + GRID_PANEL_OFFSET_Y + gridPanelNode.bounds.height;
+  thisView.addChild( organismPanelNode );
 
-  // circle
-  thisView.addChild( new scenery.Path( kite.Shape.circle( 50, 50, 40 ), {// center X, center Y, radius
-    fill: '#0ff',
-    stroke: '#000'
-  } ) );
+  thisView.addChild( gridPanelNode );
+
+  /*  var image1 = new scenery.Image( CARNIVORES_IMAGE );
+   thisView.addChild( image1 );
+
+   var property = new Property( 130 );
+
+   var slider = new HSlider( property, { min: 100, max: 150 } );
+
+   var checkBoxControl = new CheckBox( new Text( testString, TEXT_OPTIONS ), property, CHECK_BOX_OPTIONS );
+   thisView.addChild( checkBoxControl );
+
+   checkBoxControl.x = thisView.layoutBounds.center.x;
+   checkBoxControl.y = thisView.layoutBounds.center.y;
+
+   // circle
+   thisView.addChild( new scenery.Path( kite.Shape.circle( 50, 50, 40 ), {// center X, center Y, radius
+   fill: '#0ff',
+   stroke: '#000'
+   } ) );
 
 
-  // add a drag handler to each node
-  image1.addInputListener( new SimpleDragHandler( {
-    // allow moving a pointer (touch) across a node to pick it up
-    allowTouchSnag: true,
+   // add a drag handler to each node
+   image1.addInputListener( new SimpleDragHandler( {
+   // allow moving a pointer (touch) across a node to pick it up
+   allowTouchSnag: true,
 
-    translate: function( translationParams ) {
-      var thisHandler = this;
-      // How far it has moved from the original position
-      var delta = translationParams.delta;
-      image1.leftTop = image1.leftTop.plus( delta );
+   translate: function( translationParams ) {
+   var thisHandler = this;
+   // How far it has moved from the original position
+   var delta = translationParams.delta;
+   image1.leftTop = image1.leftTop.plus( delta );
 
-    }
-  } ) );
+   }
+   } ) ); */
 
 }
 

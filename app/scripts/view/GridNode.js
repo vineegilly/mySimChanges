@@ -34,14 +34,30 @@ function GridNode( gridDimension ) {
   }
 
   thisGrid.addChild( plotGrid );
-  var chartContentNode = new Node();
-  thisGrid.addChild( chartContentNode );
+  thisGrid.organismContentLayerNode = new Node();
+  thisGrid.addChild( thisGrid.organismContentLayerNode );
 
 
 }
 
 
-inherit( Node, GridNode );
+inherit( Node, GridNode, {
+  /**
+   *
+   * @param {Node} organismNode
+   */
+  addOrganism: function( organismNode ) {
+    this.organismContentLayerNode.addChild( organismNode );
+  },
+
+  removeOrganism: function( organismNode ) {
+    this.organismContentLayerNode.removeChild( organismNode );
+  },
+
+  getOrganismLayerNode:function(){
+    return this.organismContentLayerNode;
+  }
+} );
 
 
 module.exports = GridNode;

@@ -11,22 +11,39 @@ var GridNode = require( './GridNode' );
 var GRID_NODE_DIMENSION = new Dimension2( 700, 350 );
 
 function GridPanelNode() {
-
-  var gridNode = new GridNode(GRID_NODE_DIMENSION);
-  var panelChildren = [ gridNode ];
+  var thisPanelNode = this;
+  thisPanelNode.gridNode = new GridNode( GRID_NODE_DIMENSION );
+  var panelChildren = [ thisPanelNode.gridNode ];
   // vertical panel
-  Panel.call( this, new VBox( {
-    children: panelChildren,
-    align: 'left',
-    spacing: 7
-  } ), {
+  Panel.call( this, thisPanelNode.gridNode , {
     // panel options
-    fill: EcoSystemConstants.GRID_BACKGROUND_COLOR
+    fill: EcoSystemConstants.GRID_BACKGROUND_COLOR,
+    resize:false
 
   } );
 }
 
-inherit( Panel, GridPanelNode );
+inherit( Panel, GridPanelNode, {
+
+  /**
+   *
+   * @param {Node} organismNode
+   */
+  addOrganism: function( organismNode ) {
+    this.gridNode.addOrganism( organismNode );
+  },
+
+  removeOrganism: function( organismNode ) {
+    this.gridNode.removeOrganism( organismNode );
+  },
+
+
+  getOrganismLayerNode: function() {
+    return this.gridNode.getOrganismLayerNode();
+  }
+
+
+} );
 
 module.exports = GridPanelNode;
 

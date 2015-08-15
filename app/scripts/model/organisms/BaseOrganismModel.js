@@ -3,16 +3,21 @@ var PropertySet = axon.PropertySet;
 
 /**
  *
+ * @param {string} type
+ * @param {Image} appearanceImage
+ * @param {Vector2} initialPosition
+ * @param options
  * @constructor
  */
-function BaseOrganismModel( initialPosition, options ) {
+function BaseOrganismModel( type, appearanceImage, initialPosition, options ) {
   var thisModel = this;
   PropertySet.call( thisModel, {
     userControlled: false,
     position: initialPosition.copy(),
-    type: "" // the actual type for example if omnivorous is it a bird or human? We need to choose the icon based on that
-
+    type: type // the actual type for example if omnivorous is it a bird or human? We need to choose the icon based on that
   } );
+
+  this.appearanceImage = appearanceImage;
 
 }
 

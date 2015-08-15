@@ -1,9 +1,20 @@
 var inherit = axon.inherit;
 var BaseOrganismModel = require( './BaseOrganismModel' );
+var OrganismImageCollection = require( './OrganismImageCollection' );
 
-function ConsumerModel() {
-  BaseOrganismModel.call( this, {} );
+
+/**
+ *
+ * @param {string} type // ex carniovores
+ * @param {imageNode} icon // a carnivores can be represented by different icons
+ * @param {Vector2} pos // initial Position
+ * @constructor
+ */
+function ConsumerModel( type, icon, pos ) {
+  BaseOrganismModel.call( this, type, icon, pos );
+
 }
 
 inherit( BaseOrganismModel, ConsumerModel, {} );
 
+module.exports = ConsumerModel;
