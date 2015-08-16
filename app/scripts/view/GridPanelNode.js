@@ -8,17 +8,20 @@ var Dimension2 = dot.Dimension2;
 var GridNode = require( './GridNode' );
 
 // private constants
-var GRID_NODE_DIMENSION = new Dimension2( 960, 380 );
+var GRID_NODE_DIMENSION = new Dimension2( 930, 360 );
 
 function GridPanelNode() {
   var thisPanelNode = this;
   thisPanelNode.gridNode = new GridNode( GRID_NODE_DIMENSION );
   var panelChildren = [ thisPanelNode.gridNode ];
   // vertical panel
-  Panel.call( this, thisPanelNode.gridNode , {
+  Panel.call( this, thisPanelNode.gridNode, {
     // panel options
     fill: EcoSystemConstants.GRID_BACKGROUND_COLOR,
-    resize:false
+    resize: false,
+    cornerRadius: 0,
+    xMargin: 0,
+    yMargin: 0
 
   } );
 }

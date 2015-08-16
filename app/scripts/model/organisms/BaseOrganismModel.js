@@ -1,6 +1,7 @@
 var inherit = axon.inherit;
 var PropertySet = axon.PropertySet;
 
+
 /**
  *
  * @param {string} type
@@ -18,11 +19,25 @@ function BaseOrganismModel( type, appearanceImage, initialPosition, options ) {
   } );
 
   this.appearanceImage = appearanceImage;
+  this.organismState = null;
+  this.stateMachine = this.createStateMachine();
 
 }
 
 
 inherit( PropertySet, BaseOrganismModel, {
+
+  step: function( dt ) {
+    if ( !this.userControlled ) {
+      // Update the state of the attachment state machine.
+      this.stateMachine.step( dt );
+    }
+  },
+
+  createStateMachine: function() {
+    throw new Error( "createStateMachine must be implemented in  BaseOrganismModel's descendant class" );
+  },
+
   /**
    *
    * @returns {Vector2}
@@ -31,13 +46,22 @@ inherit( PropertySet, BaseOrganismModel, {
     return this.position;
   },
 
+  moveRandomly: function() {
+    throw new Error( "moveRandomly must be implemented in  BaseOrganismModel's descendant class" );
+  },
+
+
   /**
    *
    * @param {Vector2} position
    */
   setPosition: function( position ) {
     this.position = position;
-  }
+  },
+
+  returnToOrigin:function(){
+
+  },
 
 
 } );

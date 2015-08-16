@@ -25,7 +25,7 @@ var GRID_PANEL_OFFSET_Y = 70;
 var CHECK_BOX_OPTIONS = { boxWidth: 40 };
 var TEXT_OPTIONS = { font: new SimFont( 14 ) };
 
-var PANEL_VERTICAL_PADDING = 15;
+var PANEL_VERTICAL_PADDING = 25;
 var testString = "Check Me";
 
 function EcoSystemView( ecoSystemModel ) {

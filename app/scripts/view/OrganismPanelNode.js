@@ -1,17 +1,21 @@
 var inherit = axon.inherit;
 var Dimension2 = dot.Dimension2;
-var SimFont = require( '../core/SimFont' );
 var Panel = require( '../controls/Panel' );
+var TitleBarNode = require( './TitleBarNode' );
+var EcoSystemConstants = require( '../model/EcoSystemConstants' );
 var Node = scenery.Node;
-var Text = scenery.Text;
 var VBox = scenery.VBox;
 var OrganismModelFactory = require( '../model/organisms/OrganismModelFactory' );
 var OrganismImageCollection = require( '../model/organisms/OrganismImageCollection' );
 var OrganismCreatorNode = require( './OrganismCreatorNode' );
-var EcoSystemConstants = require( '../model/EcoSystemConstants' );
+
 var GridLayout = require( '../util/GridLayout' );
 
-var PANEL_SIZE = new Dimension2( 250, 150 );
+// constants
+var PANEL_SIZE = new Dimension2( 300, 180 );
+var TITLE_SIZE = new Dimension2( 305, 30 );
+var ORGANISMS_STR = "Organisms";
+
 
 /**
  *
@@ -34,13 +38,11 @@ function OrganismPanelNode( ecoSystemModel, screenView, gridNode ) {
     return true;
   };
 
-
   var gridLayout = GridLayout();
   gridLayout
     .size( [ PANEL_SIZE.width, PANEL_SIZE.height ] )
     .bands()
-    .nodeSize( [ 100, 100 ] )
-    .padding( [ 15, 15 ] );
+    .padding( [ 0.1, 0.1 ] );
 
   var organismInfos = ecoSystemModel.selectedOrganisms;
 
@@ -69,13 +71,23 @@ function OrganismPanelNode( ecoSystemModel, screenView, gridNode ) {
     appearanceLayerNode.addChild( creatorNode );
   }
 
+  var titleBarNode = new TitleBarNode( TITLE_SIZE, ORGANISMS_STR );
+  var titleBox = new VBox( {
+    align: 'center',
+    children: [ titleBarNode, appearanceLayerNode ],
+    spacing: 5
+  } );
+
   // vertical panel
-  Panel.call( thisPanel, appearanceLayerNode, {
+  Panel.call( thisPanel, titleBox, {
     // panel options
     fill: EcoSystemConstants.GRID_BACKGROUND_COLOR,
-    resize: false
-
+    resize: false,
+    yMargin: 5,
+    cornerRadius:0
   } );
+
+  console.log( thisPanel.bounds.width );
 
 }
 
