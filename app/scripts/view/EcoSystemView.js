@@ -25,16 +25,14 @@ var GRID_PANEL_OFFSET_Y = 70;
 var CHECK_BOX_OPTIONS = { boxWidth: 40 };
 var TEXT_OPTIONS = { font: new SimFont( 14 ) };
 
-
+var PANEL_VERTICAL_PADDING = 15;
 var testString = "Check Me";
 
 function EcoSystemView( ecoSystemModel ) {
   var thisView = this;
-  BaseScreenView.call( thisView, { layoutBounds: new Bounds2( 0, 0, 981, 704 ) } );
+  BaseScreenView.call( thisView, { layoutBounds: new Bounds2( 0, 0, 1024, 704 ) } );
 
   var gridPanelNode = new GridPanelNode();
-
-
   gridPanelNode.x = thisView.layoutBounds.x + GRID_PANEL_OFFSET_X;
   gridPanelNode.y = thisView.layoutBounds.y + GRID_PANEL_OFFSET_Y;
 
@@ -67,8 +65,8 @@ function EcoSystemView( ecoSystemModel ) {
 
   var organismPanelNode = new OrganismPanelNode( ecoSystemModel,
     thisView, gridPanelNode.getOrganismLayerNode() );
-  organismPanelNode.x = thisView.layoutBounds.x + GRID_PANEL_OFFSET_X;
-  organismPanelNode.y = thisView.layoutBounds.y + GRID_PANEL_OFFSET_Y + gridPanelNode.bounds.height;
+  organismPanelNode.x = gridPanelNode.bounds.left;
+  organismPanelNode.y = gridPanelNode.bounds.bottom + PANEL_VERTICAL_PADDING;
   thisView.addChild( organismPanelNode );
 
   thisView.addChild( gridPanelNode );

@@ -8,7 +8,7 @@ var Dimension2 = dot.Dimension2;
 var GridNode = require( './GridNode' );
 
 // private constants
-var GRID_NODE_DIMENSION = new Dimension2( 700, 350 );
+var GRID_NODE_DIMENSION = new Dimension2( 960, 380 );
 
 function GridPanelNode() {
   var thisPanelNode = this;

@@ -11,13 +11,13 @@ var OrganismCreatorNode = require( './OrganismCreatorNode' );
 var EcoSystemConstants = require( '../model/EcoSystemConstants' );
 var GridLayout = require( '../util/GridLayout' );
 
-var PANEL_SIZE = new Dimension2( 300, 150 );
+var PANEL_SIZE = new Dimension2( 250, 150 );
 
 /**
  *
- * @param ecoSystemModel
+ * @param {EcoSystemModel} ecoSystemModel
  * @param organismModels
- * @param screenView
+ * @param {ScreenView} screenView
  * @param gridNode
  * @constructor
  */
