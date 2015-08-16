@@ -17,6 +17,7 @@ var CARNIVORES_IMAGE = require( "../../assets/images/carnivores.png" );
 var CheckBox = require( '../controls/CheckBox' );
 var HSlider = require( '../controls/HSlider' );
 var Property = axon.Property;
+var OrganismModelFactory = require( '../model/organisms/OrganismModelFactory' );
 
 // private constnats
 var GRID_PANEL_OFFSET_X = 50;
@@ -63,7 +64,9 @@ function EcoSystemView( ecoSystemModel ) {
   // Observe new items
   ecoSystemModel.residentOrganismModels.addItemAddedListener( handleOrganismAdded );
 
-  var organismPanelNode = new OrganismPanelNode( ecoSystemModel, [], thisView, gridPanelNode.getOrganismLayerNode() );
+
+  var organismPanelNode = new OrganismPanelNode( ecoSystemModel,
+    thisView, gridPanelNode.getOrganismLayerNode() );
   organismPanelNode.x = thisView.layoutBounds.x + GRID_PANEL_OFFSET_X;
   organismPanelNode.y = thisView.layoutBounds.y + GRID_PANEL_OFFSET_Y + gridPanelNode.bounds.height;
   thisView.addChild( organismPanelNode );

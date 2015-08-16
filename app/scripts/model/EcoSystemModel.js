@@ -8,6 +8,7 @@
 var inherit = axon.inherit;
 var PropertySet = axon.PropertySet;
 var ObservableArray = axon.ObservableArray;
+var OrganismImageCollection = require( '../model/organisms/OrganismImageCollection' );
 
 function EcoSystemModel( screenBounds ) {
   PropertySet.call( this, {} );
@@ -15,6 +16,15 @@ function EcoSystemModel( screenBounds ) {
 
   // Observable array of the organisms that have been placed on grid
   this.residentOrganismModels = new ObservableArray();
+
+  this.selectedOrganisms = [
+    { type: OrganismImageCollection.CARNIVORES, appearanceImage: OrganismImageCollection.getRepresentation( OrganismImageCollection.CARNIVORES ) },
+    { type: OrganismImageCollection.HERBIVORES, appearanceImage: OrganismImageCollection.getRepresentation( OrganismImageCollection.HERBIVORES ) },
+    { type: OrganismImageCollection.PRODUCERS, appearanceImage: OrganismImageCollection.getRepresentation( OrganismImageCollection.PRODUCERS ) },
+    { type: OrganismImageCollection.DECOMPOSERS, appearanceImage: OrganismImageCollection.getRepresentation( OrganismImageCollection.DECOMPOSERS ) },
+    { type: OrganismImageCollection.OMNIVORES, appearanceImage: OrganismImageCollection.getRepresentation( OrganismImageCollection.OMNIVORES ) },
+  ];
+
 
 }
 

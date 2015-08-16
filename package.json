@@ -1,7 +1,7 @@
 {
-  "name": "Scenery-Starter-App",
+  "name": "EcoSystem",
   "version": "0.0.1",
-  "description": "Scenery-Starter-App",
+  "description": "EcoSystem",
   "main": "index.html",
   "scripts": {
     "start": "gulp",
@@ -33,6 +33,7 @@
     "webpack": "^1.7.3"
   },
   "dependencies": {
+    "d3": "^3.5.6",
     "file-loader": "^0.8.4",
     "url-loader": "^0.5.6"
   },
