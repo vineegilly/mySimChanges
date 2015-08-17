@@ -7,8 +7,6 @@ function OrganismRestingState() {
 
 inherit( BaseOrganismState, OrganismRestingState, {
 
-  /** Do nothing **/
-
   step: function( organismStateMachine, dt ) {
 
   },

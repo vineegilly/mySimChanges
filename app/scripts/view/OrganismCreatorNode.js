@@ -4,19 +4,18 @@ var SimpleDragHandler = scenery.SimpleDragHandler;
 
 /**
  *@param {string} type
- * @param {Node} gridCanvas
+ * @param {GridNode} gridNode
  * @param {Image} appearanceNode
- * @param {Node} screenView
  * @param organismCreator
  * @param {Function} canPlaceShape - A function to determine if the Organism can be placed on the board
  * @constructor
  */
-function OrganismCreatorNode( type, gridCanvas, appearanceImage, screenView, organismCreator, canPlaceShape ) {
+function OrganismCreatorNode( type, gridNode, appearanceImage, organismCreator, canPlaceShape ) {
   var thisNode = this;
   Node.call( thisNode, { cursor: 'pointer' } );
 
   var appearanceNode = new scenery.Image( appearanceImage );
-  appearanceNode.scale( 0.15,0.15 );
+  appearanceNode.scale( 0.15, 0.15 );
   thisNode.appearanceNode = appearanceNode;
   thisNode.organism = null;
   thisNode.mouseArea = appearanceNode.bounds;
@@ -30,7 +29,7 @@ function OrganismCreatorNode( type, gridCanvas, appearanceImage, screenView, org
       // Determine the initial position of the new element as a function of the event position and this node's bounds.
       var upperLeftCornerGlobal = thisNode.parentToGlobalPoint( thisNode.leftTop );
       var initialPositionOffset = upperLeftCornerGlobal.minus( event.pointer.point );
-      var initialPosition = gridCanvas.globalToLocalPoint( event.pointer.point.plus( initialPositionOffset ) );
+      var initialPosition = gridNode.getRefPoint(event.pointer.point.plus( initialPositionOffset ) );
 
       thisNode.organism = organismCreator( type, appearanceImage, initialPosition );
       thisNode.organism.userControlled = true;
@@ -42,13 +41,10 @@ function OrganismCreatorNode( type, gridCanvas, appearanceImage, screenView, org
 
     end: function( event ) {
       var droppedPoint = event.pointer.point;
-      var droppedScreenPoint = screenView.globalToLocalPoint( event.pointer.point );
-
+      thisNode.organism.userControlled = false;
       //check if the user has dropped the number within the panel itself, if "yes" return to origin
-      if ( !canPlaceShape( thisNode.organism, droppedScreenPoint ) ) {
+      if ( !canPlaceShape( thisNode.organism, droppedPoint ) ) {
         thisNode.organism.returnToOrigin( true );
-        thisNode.organism = null;
-        return;
       }
 
       thisNode.organism = null;

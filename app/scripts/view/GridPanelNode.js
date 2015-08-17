@@ -40,11 +40,13 @@ inherit( Panel, GridPanelNode, {
     this.gridNode.removeOrganism( organismNode );
   },
 
+  getRefPoint: function(point) {
+    return this.gridNode.getRefPoint(point);
+  },
 
-  getOrganismLayerNode: function() {
-    return this.gridNode.getOrganismLayerNode();
+  isInside:function(point){
+    return this.gridNode.isInside(point);
   }
-
 
 } );
 

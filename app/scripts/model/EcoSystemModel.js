@@ -35,7 +35,9 @@ inherit( PropertySet, EcoSystemModel, {
    * @param dt
    */
   step: function( dt ) {
-
+    this.residentOrganismModels.forEach( function( organismModel ) {
+      organismModel.step( dt );
+    } );
   },
 
   /**
@@ -43,7 +45,15 @@ inherit( PropertySet, EcoSystemModel, {
    * @param {OrganismModel} organismModel
    */
   addOrganism: function( organismModel ) {
+    var self = this;
     this.residentOrganismModels.add( organismModel );
+
+    organismModel.on( 'returnedToOrigin', function() {
+      if ( !organismModel.userControlled ) {
+        // The shape has been returned to the panel.
+        self.residentOrganismModels.remove( organismModel );
+      }
+    } );
   }
 } );
 

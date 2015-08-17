@@ -2,10 +2,13 @@ var inherit = axon.inherit;
 var Node = scenery.Node;
 var Shape = kite.Shape;
 var Path = scenery.Path;
+var Bounds2 = dot.Bounds2;
 
 // constants
 var NUM_VERTICAL_LINES = 18;
 var NUM_HORIZONTAL_LINES = 9;
+
+var ORGANISM_SIZE = 80;
 
 /**
  *
@@ -17,7 +20,7 @@ function GridNode( gridDimension ) {
   Node.call( thisGrid );
 
   var gridShape = new Shape();
-  var plotGrid = new Path( gridShape, { stroke: 'gray', lineWidth: 0.6 } );
+  thisGrid.plotGrid = new Path( gridShape, { stroke: 'gray', lineWidth: 0.6 } );
 
   //vertical grid lines
   for ( var i = 0; i < NUM_VERTICAL_LINES + 1; i++ ) {
@@ -33,10 +36,9 @@ function GridNode( gridDimension ) {
 
   }
 
-  thisGrid.addChild( plotGrid );
+  thisGrid.addChild( thisGrid.plotGrid );
   thisGrid.organismContentLayerNode = new Node();
   thisGrid.addChild( thisGrid.organismContentLayerNode );
-
 
 }
 
@@ -54,9 +56,16 @@ inherit( Node, GridNode, {
     this.organismContentLayerNode.removeChild( organismNode );
   },
 
-  getOrganismLayerNode:function(){
-    return this.organismContentLayerNode;
+  getRefPoint: function( globalPoint ) {
+    return this.organismContentLayerNode.globalToLocalPoint( globalPoint );
+  },
+
+  isInside: function( point ) {
+    var pointBounds = Bounds2.point( point.x, point.y );
+    pointBounds.dilate( ORGANISM_SIZE );
+    return this.plotGrid.bounds.containsBounds( pointBounds );
   }
+
 } );
 
 

@@ -20,22 +20,24 @@ var ORGANISMS_STR = "Organisms";
 /**
  *
  * @param {EcoSystemModel} ecoSystemModel
- * @param organismModels
- * @param {ScreenView} screenView
- * @param gridNode
+ * @param {GridPanelNode} gridPaneNode
  * @constructor
  */
-function OrganismPanelNode( ecoSystemModel, screenView, gridNode ) {
+function OrganismPanelNode( ecoSystemModel, gridPaneNode ) {
   var thisPanel = this;
 
   var creatorCallBack = function( type, appearanceImage, pos ) {
-    var organismModel = OrganismModelFactory.getOrganism( type, appearanceImage, pos );
+    var organismModel = OrganismModelFactory.getOrganism( ecoSystemModel,type, appearanceImage, pos );
     ecoSystemModel.addOrganism( organismModel );
     return organismModel;
   };
 
-  var canPlaceShapeCallBack = function() {
-    return true;
+
+  var canPlaceShapeCallBack = function( organismModel, droppedPoint ) {
+    if ( gridPaneNode.isInside( organismModel.getPosition() ) ) {
+      return true;
+    }
+    return false;
   };
 
   var gridLayout = GridLayout();
@@ -50,8 +52,8 @@ function OrganismPanelNode( ecoSystemModel, screenView, gridNode ) {
 
   organismInfos.forEach( function( organismInfo ) {
     var organismImage = organismInfo.appearanceImage;
-    var organismCreatorNode = new OrganismCreatorNode( organismInfo.type, gridNode,
-      organismImage, screenView, creatorCallBack, canPlaceShapeCallBack );
+    var organismCreatorNode = new OrganismCreatorNode( organismInfo.type, gridPaneNode,
+      organismImage, creatorCallBack, canPlaceShapeCallBack );
     organismsCreators.push( organismCreatorNode );
   } );
 
@@ -84,10 +86,8 @@ function OrganismPanelNode( ecoSystemModel, screenView, gridNode ) {
     fill: EcoSystemConstants.GRID_BACKGROUND_COLOR,
     resize: false,
     yMargin: 5,
-    cornerRadius:0
+    cornerRadius: 0
   } );
-
-  console.log( thisPanel.bounds.width );
 
 }
 

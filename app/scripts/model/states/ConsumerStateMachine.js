@@ -7,14 +7,11 @@ var OrganismStateMachine = require( './OrganismStateMachine' );
  * @param {OrganismModel} organismModel
  * @constructor
  */
-function DecomposerStateMachine( organismModel ) {
+function ConsumerStateMachine( organismModel ) {
   OrganismStateMachine.call( this, organismModel );
   this.setState( OrganismStateMachine.organismRestingStateInstance );
 }
 
-inherit( OrganismStateMachine, DecomposerStateMachine, {
+inherit( OrganismStateMachine, ConsumerStateMachine, {} );
 
-
-} );
-
-module.exports = DecomposerStateMachine;
+module.exports = ConsumerStateMachine;

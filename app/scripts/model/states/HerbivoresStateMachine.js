@@ -1,5 +1,6 @@
 var inherit = axon.inherit;
 var OrganismStateMachine = require('./OrganismStateMachine');
+var DecomposerStateMachine = require('../states/DecomposerStateMachine');
 
 /**
  *
@@ -12,6 +13,7 @@ function HerbivoresStateMachine(organismModel){
 }
 
 inherit(OrganismStateMachine,HerbivoresStateMachine,{
+
 
 });
 

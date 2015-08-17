@@ -62,9 +62,7 @@ function EcoSystemView( ecoSystemModel ) {
   // Observe new items
   ecoSystemModel.residentOrganismModels.addItemAddedListener( handleOrganismAdded );
 
-
-  var organismPanelNode = new OrganismPanelNode( ecoSystemModel,
-    thisView, gridPanelNode.getOrganismLayerNode() );
+  var organismPanelNode = new OrganismPanelNode( ecoSystemModel, gridPanelNode );
   organismPanelNode.x = gridPanelNode.bounds.left;
   organismPanelNode.y = gridPanelNode.bounds.bottom + PANEL_VERTICAL_PADDING;
   thisView.addChild( organismPanelNode );
