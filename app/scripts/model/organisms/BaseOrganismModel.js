@@ -1,6 +1,7 @@
 var inherit = axon.inherit;
 var PropertySet = axon.PropertySet;
 var EcoSystemConstants = require( '../EcoSystemConstants' );
+var Vector2 = dot.Vector2;
 
 
 /**
@@ -96,6 +97,30 @@ inherit( PropertySet, BaseOrganismModel, {
     else {
       this.position = destination;
     }
+  },
+
+  nextRandomMovement: function() {
+    var direction = _.random( 1, 4 );
+    var playVelocity = EcoSystemConstants.ANIMATION_VELOCITY / 3;
+    var currentPosition = this.position;
+    switch( direction ) {
+      case 1:
+        this.setDestination( currentPosition.plus( new Vector2( EcoSystemConstants.PLAY_STEP_DISTANCE, 0 ) ), true, playVelocity );
+        break;
+      case 2:
+        this.setDestination( currentPosition.plus( new Vector2( -EcoSystemConstants.PLAY_STEP_DISTANCE, 0 ) ), true, playVelocity );
+        break;
+      case 3:
+        this.setDestination( currentPosition.plus( new Vector2( 0, EcoSystemConstants.PLAY_STEP_DISTANCE ) ), true, playVelocity );
+        break;
+      case 4:
+        this.setDestination( currentPosition.plus( new Vector2( 0, -EcoSystemConstants.PLAY_STEP_DISTANCE ) ), true, playVelocity );
+        break;
+    }
+  },
+
+  play: function() {
+    this.stateMachine.startRandomMotion();
   }
 
 

@@ -1,18 +1,22 @@
 var inherit = axon.inherit;
-var OrganismStateMachine = require('./OrganismStateMachine');
+var OrganismStateMachine = require( './OrganismStateMachine' );
 
 /**
  *
  * @param {OrganismModel} organismModel
  * @constructor
  */
-function ProducerStateMachine(organismModel){
-  OrganismStateMachine.call(this,organismModel);
+function ProducerStateMachine( organismModel ) {
+  OrganismStateMachine.call( this, organismModel );
   this.setState( OrganismStateMachine.organismRestingStateInstance );
 }
 
-inherit(OrganismStateMachine,ProducerStateMachine,{
+inherit( OrganismStateMachine, ProducerStateMachine, {
 
-});
+  startRandomMotion: function() {
+
+  }
+
+} );
 
 module.exports = ProducerStateMachine;

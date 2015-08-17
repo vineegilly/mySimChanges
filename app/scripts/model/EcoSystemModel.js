@@ -10,8 +10,15 @@ var PropertySet = axon.PropertySet;
 var ObservableArray = axon.ObservableArray;
 var OrganismImageCollection = require( '../model/organisms/OrganismImageCollection' );
 
+//constants
+var PLAY_STATE = 1;
+var PAUSED_STATE = 2;
+var STOPPED_STATE = 3;
+
 function EcoSystemModel( screenBounds ) {
-  PropertySet.call( this, {} );
+  PropertySet.call( this, {
+    playState: PAUSED_STATE
+  } );
   this.screenBounds = screenBounds;
 
   // Observable array of the organisms that have been placed on grid
@@ -54,7 +61,18 @@ inherit( PropertySet, EcoSystemModel, {
         self.residentOrganismModels.remove( organismModel );
       }
     } );
+  },
+
+  isPlaying: function() {
+    return this.playState === PLAY_STATE;
+  },
+
+  play:function(){
+    this.residentOrganismModels.forEach( function( organismModel ) {
+      organismModel.play(  );
+    } );
   }
+
 } );
 
 module.exports = EcoSystemModel;

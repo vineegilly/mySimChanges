@@ -1,19 +1,19 @@
 var inherit = axon.inherit;
 var ReturnToOriginState = require( './ReturnToOriginState' );
 var OrganismRestingState = require( './OrganismRestingState' );
+var RandomMovementState = require( './RandomMovementState' );
 
 var returnToOriginStateInstance = new ReturnToOriginState();
 var organismRestingStateInstance = new OrganismRestingState();
+var randomMovementState = new RandomMovementState();
 
 /**
  *
  * @param {OrganismModel} organismModel
- * @param {EcoSystemModel} ecoSystemModel
  * @constructor
  */
-function OrganismStateMachine( organismModel, ecoSystemModel ) {
+function OrganismStateMachine( organismModel ) {
   this.organismModel = organismModel;
-  this.ecoSystemModel = ecoSystemModel;
   this.organismState = null;
 }
 
@@ -39,6 +39,10 @@ inherit( Object, OrganismStateMachine, {
 
     goToRest: function() {
       this.setState( organismRestingStateInstance );
+    },
+
+    startRandomMotion:function(){
+      this.setState( randomMovementState );
     }
 
   },
