@@ -9,10 +9,10 @@ var Vector2 = dot.Vector2;
  * @param {EcoSystemModel} ecoSystemModel
  * @param {Image} appearanceImage
  * @param {Vector2} initialPosition
- * @param options
+ * @param {Bounds2} bounds
  * @constructor
  */
-function BaseOrganismModel( ecoSystemModel, type, appearanceImage, initialPosition, options ) {
+function BaseOrganismModel( ecoSystemModel, type, appearanceImage, initialPosition, bounds ) {
   var thisModel = this;
   PropertySet.call( thisModel, {
     userControlled: false,
@@ -25,11 +25,13 @@ function BaseOrganismModel( ecoSystemModel, type, appearanceImage, initialPositi
   thisModel.organismState = null;
   thisModel.stateMachine = this.createStateMachine();
   thisModel.velocity = EcoSystemConstants.ANIMATION_VELOCITY;
+  this.motionBounds = bounds;
 
   thisModel.positionProperty.lazyLink( function( position ) {
     if ( position.equals( initialPosition ) ) {
       thisModel.trigger( 'returnedToOrigin' );
     }
+
   } );
 
 }
@@ -99,19 +101,33 @@ inherit( PropertySet, BaseOrganismModel, {
     var direction = _.random( 1, 4 );
     var playVelocity = EcoSystemConstants.ANIMATION_VELOCITY / 10;
     var currentPosition = this.position;
+
+    var containsPoint = this.motionBounds.containsPoint( currentPosition );
+   // console.log( "Bounds " + this.motionBounds + "  Contains  " + containsPoint + " point " + currentPosition );
+
+
+    var newPosition = null;
     var animatePlay = true;
     switch( direction ) {
       case 1:
-        this.setDestination( currentPosition.plus( new Vector2( EcoSystemConstants.PLAY_STEP_DISTANCE, 0 ) ), animatePlay, playVelocity );
+        newPosition = currentPosition.plus( new Vector2( EcoSystemConstants.PLAY_STEP_DISTANCE, 0 ) );
+        newPosition = this.motionBounds.closestPointTo( newPosition );
+        this.setDestination( newPosition, animatePlay, playVelocity );
         break;
       case 2:
-        this.setDestination( currentPosition.plus( new Vector2( -EcoSystemConstants.PLAY_STEP_DISTANCE, 0 ) ), animatePlay, playVelocity );
+        newPosition = currentPosition.plus( new Vector2( -EcoSystemConstants.PLAY_STEP_DISTANCE, 0 ) );
+        newPosition = this.motionBounds.closestPointTo( newPosition );
+        this.setDestination( newPosition, animatePlay, playVelocity );
         break;
       case 3:
-        this.setDestination( currentPosition.plus( new Vector2( 0, EcoSystemConstants.PLAY_STEP_DISTANCE ) ), animatePlay, playVelocity );
+        newPosition = currentPosition.plus( new Vector2( 0, EcoSystemConstants.PLAY_STEP_DISTANCE ) );
+        newPosition = this.motionBounds.closestPointTo( newPosition );
+        this.setDestination( newPosition, animatePlay, playVelocity );
         break;
       case 4:
-        this.setDestination( currentPosition.plus( new Vector2( 0, -EcoSystemConstants.PLAY_STEP_DISTANCE ) ), animatePlay, playVelocity );
+        newPosition = currentPosition.plus( new Vector2( 0, -EcoSystemConstants.PLAY_STEP_DISTANCE ) );
+        newPosition = this.motionBounds.closestPointTo( newPosition );
+        this.setDestination( newPosition, animatePlay, playVelocity );
         break;
     }
   },

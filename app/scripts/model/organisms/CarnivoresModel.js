@@ -8,10 +8,11 @@ var CarnivoresStateMachine = require('../states/CarnivoresStateMachine');
  * @param {string} type // ex carniovores
  * @param {imageNode} icon // a carnivores can be represented by different icons
  * @param {Vector2} pos // initial Position
+ * @param {Bounds2} bounds
  * @constructor
  */
-function CarnivoresModel( ecoSystemModel,type, icon, pos ) {
-   BaseOrganismModel.call( this,ecoSystemModel, type, icon, pos );
+function CarnivoresModel( ecoSystemModel,type, icon, pos,bounds ) {
+   BaseOrganismModel.call( this,ecoSystemModel, type, icon, pos,bounds );
 }
 
 inherit( BaseOrganismModel, CarnivoresModel, {

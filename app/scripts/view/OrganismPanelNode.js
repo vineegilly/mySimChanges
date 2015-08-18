@@ -21,17 +21,17 @@ var ORGANISMS_STR = "Organisms";
  *
  * @param {EcoSystemModel} ecoSystemModel
  * @param {GridPanelNode} gridPaneNode
+ * @param {Bounds2} motionBounds
  * @constructor
  */
-function OrganismPanelNode( ecoSystemModel, gridPaneNode ) {
+function OrganismPanelNode( ecoSystemModel, gridPaneNode, motionBounds ) {
   var thisPanel = this;
 
   var creatorCallBack = function( type, appearanceImage, pos ) {
-    var organismModel = OrganismModelFactory.getOrganism( ecoSystemModel,type, appearanceImage, pos );
+    var organismModel = OrganismModelFactory.getOrganism( ecoSystemModel, type, appearanceImage, pos, motionBounds );
     ecoSystemModel.addOrganism( organismModel );
     return organismModel;
   };
-
 
   var canPlaceShapeCallBack = function( organismModel, droppedPoint ) {
     if ( gridPaneNode.isInside( droppedPoint ) ) {
@@ -79,7 +79,6 @@ function OrganismPanelNode( ecoSystemModel, gridPaneNode ) {
     children: [ titleBarNode, appearanceLayerNode ],
     spacing: 5
   } );
-
 
 
   // vertical panel

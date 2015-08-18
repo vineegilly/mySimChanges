@@ -3,12 +3,12 @@ var Node = scenery.Node;
 var Shape = kite.Shape;
 var Path = scenery.Path;
 var Bounds2 = dot.Bounds2;
+var EcoSystemConstants = require( '../model/EcoSystemConstants' );
 
 // constants
 var NUM_VERTICAL_LINES = 18;
 var NUM_HORIZONTAL_LINES = 9;
 
-var ORGANISM_SIZE = 40;
 
 /**
  *
@@ -60,10 +60,15 @@ inherit( Node, GridNode, {
     return this.organismContentLayerNode.globalToLocalPoint( globalPoint );
   },
 
+  /**
+   *
+   * @param point // global point
+   * @returns {*}
+   */
   isInside: function( point ) {
-    var gridRefPoint = this.plotGrid.globalToLocalPoint(point);
+    var gridRefPoint = this.plotGrid.globalToLocalPoint( point );
     var pointBounds = Bounds2.point( gridRefPoint.x, gridRefPoint.y );
-    pointBounds.dilate( ORGANISM_SIZE );
+    pointBounds.dilate( EcoSystemConstants.ORGANISM_RADIUS );
     return this.plotGrid.bounds.containsBounds( pointBounds );
   }
 

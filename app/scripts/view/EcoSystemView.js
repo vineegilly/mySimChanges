@@ -15,6 +15,7 @@ var PlayerPanel = require( './PlayerPanel' );
 var SimFont = require( '../core/SimFont' );
 var Text = scenery.Text;
 var HBox = scenery.HBox;
+var EcoSystemConstants = require( '../model/EcoSystemConstants' );
 
 var OrganismModelFactory = require( '../model/organisms/OrganismModelFactory' );
 
@@ -31,6 +32,9 @@ function EcoSystemView( ecoSystemModel ) {
   var gridPanelNode = new GridPanelNode();
   gridPanelNode.x = thisView.layoutBounds.x + GRID_PANEL_OFFSET_X;
   gridPanelNode.y = thisView.layoutBounds.y + GRID_PANEL_OFFSET_Y;
+
+  var gridSize = EcoSystemConstants.GRID_NODE_DIMENSION;
+  var motionBounds = Bounds2.rect( 0, 0, gridSize.width - EcoSystemConstants.ORGANISM_RADIUS * 2, gridSize.height - EcoSystemConstants.ORGANISM_RADIUS * 2 );
 
   function handleOrganismAdded( addedOrganismModel ) {
     // Add a representation of the number.
@@ -57,7 +61,7 @@ function EcoSystemView( ecoSystemModel ) {
 
   // Observe new items
   ecoSystemModel.residentOrganismModels.addItemAddedListener( handleOrganismAdded );
-  var organismPanelNode = new OrganismPanelNode( ecoSystemModel, gridPanelNode );
+  var organismPanelNode = new OrganismPanelNode( ecoSystemModel, gridPanelNode, motionBounds );
   var environmentControlsNode = new EnvironmentControlsNode();
 
   var panelBox = new HBox( {
@@ -70,7 +74,6 @@ function EcoSystemView( ecoSystemModel ) {
   panelBox.x = gridPanelNode.bounds.left;
   panelBox.y = gridPanelNode.bounds.bottom + PANEL_VERTICAL_PADDING;
   thisView.addChild( gridPanelNode );
-
 
   var playerPanel = new PlayerPanel( ecoSystemModel.playPauseProperty, ecoSystemModel.onClearPlay.bind( ecoSystemModel ) );
   thisView.addChild( playerPanel );

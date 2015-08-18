@@ -74,7 +74,7 @@ inherit( PropertySet, EcoSystemModel, {
   },
 
   onClearPlay: function() {
-
+    this.residentOrganismModels.clear();
   },
 
   play: function() {

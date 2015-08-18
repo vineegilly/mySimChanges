@@ -24,19 +24,19 @@ inherit( Object, OrganismModelFactory, {},
      * @param {Vector2} pos
      * @returns {*}
      */
-    getOrganism: function( ecoSystemModel,type, appearanceImage, pos ) {
+    getOrganism: function( ecoSystemModel,type, appearanceImage, pos,bounds ) {
 
       switch( type ) {
         case OrganismImageCollection.CARNIVORES:
-          return new CarnivoresModel( ecoSystemModel,type, appearanceImage, pos );
+          return new CarnivoresModel( ecoSystemModel,type, appearanceImage, pos,bounds );
         case OrganismImageCollection.OMNIVORES:
-          return new OmnivoresModel( ecoSystemModel,type, appearanceImage, pos );
+          return new OmnivoresModel( ecoSystemModel,type, appearanceImage, pos,bounds );
         case OrganismImageCollection.PRODUCERS:
-          return new ProducerModel( ecoSystemModel,type, appearanceImage, pos );
+          return new ProducerModel( ecoSystemModel,type, appearanceImage, pos,bounds );
         case OrganismImageCollection.HERBIVORES:
-          return new HerbivoresModel( ecoSystemModel,type, appearanceImage, pos );
+          return new HerbivoresModel( ecoSystemModel,type, appearanceImage, pos,bounds );
         case OrganismImageCollection.DECOMPOSERS:
-          return new DecomposerModel( ecoSystemModel,type, appearanceImage, pos );
+          return new DecomposerModel( ecoSystemModel,type, appearanceImage, pos,bounds );
 
       }
     }

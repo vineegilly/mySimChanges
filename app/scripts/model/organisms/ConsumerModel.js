@@ -9,10 +9,11 @@ var ConsumerStateMachine = require('../states/ConsumerStateMachine');
  * @param {string} type // ex carniovores
  * @param {imageNode} icon // a carnivores can be represented by different icons
  * @param {Vector2} pos // initial Position
+ * @param {Bounds2} bounds
  * @constructor
  */
-function ConsumerModel( ecoSystemModel,type, icon, pos ) {
-  BaseOrganismModel.call( this, ecoSystemModel,type, icon, pos );
+function ConsumerModel( ecoSystemModel,type, icon, pos,bounds ) {
+  BaseOrganismModel.call( this, ecoSystemModel,type, icon, pos.bounds );
 
 }
 

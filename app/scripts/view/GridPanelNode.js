@@ -8,11 +8,11 @@ var Dimension2 = dot.Dimension2;
 var GridNode = require( './GridNode' );
 
 // private constants
-var GRID_NODE_DIMENSION = new Dimension2( 930, 360 );
+
 
 function GridPanelNode() {
   var thisPanelNode = this;
-  thisPanelNode.gridNode = new GridNode( GRID_NODE_DIMENSION );
+  thisPanelNode.gridNode = new GridNode( EcoSystemConstants.GRID_NODE_DIMENSION );
   var panelChildren = [ thisPanelNode.gridNode ];
   // vertical panel
   Panel.call( this, thisPanelNode.gridNode, {

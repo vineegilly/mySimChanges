@@ -13,7 +13,9 @@ function DecomposerStateMachine( organismModel ) {
 }
 
 inherit( OrganismStateMachine, DecomposerStateMachine, {
+  startRandomMotion: function() {
 
+  }
 
 } );
 
