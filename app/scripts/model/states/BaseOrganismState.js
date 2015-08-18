@@ -1,4 +1,5 @@
 var inherit = axon.inherit;
+var Vector2 = dot.Vector2;
 
 function BaseOrganismState() {
 
@@ -7,7 +8,7 @@ function BaseOrganismState() {
 
 inherit( Object, BaseOrganismState, {
 
-  animateStep:function(organismStateMachine, dt){
+  animateStep: function( organismStateMachine, dt ) {
     var ecoSystemModel = organismStateMachine.organismModel.ecoSystemModel;
     var organism = organismStateMachine.organismModel;
     // perform any animation
@@ -18,7 +19,18 @@ inherit( Object, BaseOrganismState, {
       var stepVector = Vector2.createPolar( organism.velocity * dt, stepAngle );
       organism.position = organism.position.plus( stepVector );
     }
+    else if ( organism.animating ) {
+      // Less than one time step away, so just go to the destination.
+      organism.position = organism.destination;
+      organism.animating = false;
+      this.onAnimateMoveEnd(organismStateMachine);
+    }
   },
+
+  onAnimateMoveEnd: function( organismStateMachine ) {
+
+  },
+
 
   step: function( organismStateMachine, dt ) {
 

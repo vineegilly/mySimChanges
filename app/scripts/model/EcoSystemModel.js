@@ -10,14 +10,11 @@ var PropertySet = axon.PropertySet;
 var ObservableArray = axon.ObservableArray;
 var OrganismImageCollection = require( '../model/organisms/OrganismImageCollection' );
 
-//constants
-var PLAY_STATE = 1;
-var PAUSED_STATE = 2;
-var STOPPED_STATE = 3;
 
 function EcoSystemModel( screenBounds ) {
+  var thisModel = this;
   PropertySet.call( this, {
-    playState: PAUSED_STATE
+    playPause: false
   } );
   this.screenBounds = screenBounds;
 
@@ -31,6 +28,15 @@ function EcoSystemModel( screenBounds ) {
     { type: OrganismImageCollection.DECOMPOSERS, appearanceImage: OrganismImageCollection.getRepresentation( OrganismImageCollection.DECOMPOSERS ) },
     { type: OrganismImageCollection.OMNIVORES, appearanceImage: OrganismImageCollection.getRepresentation( OrganismImageCollection.OMNIVORES ) },
   ];
+
+  this.playPauseProperty.link( function( playPause ) {
+    if ( playPause ) {
+      thisModel.play();
+    }
+    else {
+      thisModel.pause();
+    }
+  } );
 
 
 }
@@ -64,15 +70,25 @@ inherit( PropertySet, EcoSystemModel, {
   },
 
   isPlaying: function() {
-    return this.playState === PLAY_STATE;
+    return this.playPause === true;
   },
 
-  play:function(){
+  onClearPlay: function() {
+
+  },
+
+  play: function() {
     this.residentOrganismModels.forEach( function( organismModel ) {
-      organismModel.play(  );
+      organismModel.play();
+    } );
+  },
+
+  pause: function() {
+    this.residentOrganismModels.forEach( function( organismModel ) {
+      organismModel.pause();
     } );
   }
-
+  
 } );
 
 module.exports = EcoSystemModel;

@@ -8,7 +8,7 @@ var Bounds2 = dot.Bounds2;
 var NUM_VERTICAL_LINES = 18;
 var NUM_HORIZONTAL_LINES = 9;
 
-var ORGANISM_SIZE = 80;
+var ORGANISM_SIZE = 40;
 
 /**
  *
@@ -61,7 +61,8 @@ inherit( Node, GridNode, {
   },
 
   isInside: function( point ) {
-    var pointBounds = Bounds2.point( point.x, point.y );
+    var gridRefPoint = this.plotGrid.globalToLocalPoint(point);
+    var pointBounds = Bounds2.point( gridRefPoint.x, gridRefPoint.y );
     pointBounds.dilate( ORGANISM_SIZE );
     return this.plotGrid.bounds.containsBounds( pointBounds );
   }

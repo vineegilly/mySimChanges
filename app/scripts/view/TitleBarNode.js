@@ -36,7 +36,7 @@ function TitleBarNode( titleBarSize, titleStr, options ) {
   titleBarNode.addChild( barNode );
   titleBarNode.addChild( titleNode );
   // layout
-  titleNode.left = barNode.left + options.xMargin;
+  titleNode.centerX = barNode.centerX;
   titleNode.centerY = barNode.centerY;
 }
 

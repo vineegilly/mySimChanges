@@ -13,13 +13,11 @@ inherit( BaseOrganismState, ReturnToOriginState, {
     if ( !organism.userControlled ) {
       this.animateStep( organismStateMachine, dt );
     }
-    else if ( organism.animating ) {
-      // Less than one time step away, so just go to the destination.
-      organism.position = organism.destination;
-      organism.animating = false;
-      organismStateMachine.goToRest();
-    }
+  },
 
+  onAnimateMoveEnd: function( organismStateMachine ) {
+    var organism = organismStateMachine.organismModel;
+    organismStateMachine.goToRest();
   },
 
   entered: function( organismStateMachine ) {

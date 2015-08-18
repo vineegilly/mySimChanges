@@ -10,23 +10,19 @@ var BaseScreenView = require( '../core/BaseScreenView' );
 var GridPanelNode = require( './GridPanelNode' );
 var OrganismNode = require( './OrganismNode' );
 var OrganismPanelNode = require( './OrganismPanelNode' );
+var EnvironmentControlsNode = require( './EnvironmentControlsNode' );
+var PlayerPanel = require( './PlayerPanel' );
 var SimFont = require( '../core/SimFont' );
 var Text = scenery.Text;
-var SimpleDragHandler = scenery.SimpleDragHandler;
-var CARNIVORES_IMAGE = require( "../../assets/images/carnivores.png" );
-var CheckBox = require( '../controls/CheckBox' );
-var HSlider = require( '../controls/HSlider' );
-var Property = axon.Property;
+var HBox = scenery.HBox;
+
 var OrganismModelFactory = require( '../model/organisms/OrganismModelFactory' );
 
-// private constnats
+// private constants
 var GRID_PANEL_OFFSET_X = 50;
 var GRID_PANEL_OFFSET_Y = 70;
-var CHECK_BOX_OPTIONS = { boxWidth: 40 };
-var TEXT_OPTIONS = { font: new SimFont( 14 ) };
-
 var PANEL_VERTICAL_PADDING = 25;
-var testString = "Check Me";
+
 
 function EcoSystemView( ecoSystemModel ) {
   var thisView = this;
@@ -61,13 +57,26 @@ function EcoSystemView( ecoSystemModel ) {
 
   // Observe new items
   ecoSystemModel.residentOrganismModels.addItemAddedListener( handleOrganismAdded );
-
   var organismPanelNode = new OrganismPanelNode( ecoSystemModel, gridPanelNode );
-  organismPanelNode.x = gridPanelNode.bounds.left;
-  organismPanelNode.y = gridPanelNode.bounds.bottom + PANEL_VERTICAL_PADDING;
-  thisView.addChild( organismPanelNode );
+  var environmentControlsNode = new EnvironmentControlsNode();
 
+  var panelBox = new HBox( {
+    children: [ organismPanelNode, environmentControlsNode ],
+    spacing: 20,
+    align: 'center'
+  } );
+
+  thisView.addChild( panelBox );
+  panelBox.x = gridPanelNode.bounds.left;
+  panelBox.y = gridPanelNode.bounds.bottom + PANEL_VERTICAL_PADDING;
   thisView.addChild( gridPanelNode );
+
+
+  var playerPanel = new PlayerPanel( ecoSystemModel.playPauseProperty, ecoSystemModel.onClearPlay.bind( ecoSystemModel ) );
+  thisView.addChild( playerPanel );
+  playerPanel.x = gridPanelNode.bounds.centerX - playerPanel.bounds.width / 2;
+  playerPanel.y = gridPanelNode.bounds.bottom - playerPanel.bounds.height;
+
 
   /*  var image1 = new scenery.Image( CARNIVORES_IMAGE );
    thisView.addChild( image1 );

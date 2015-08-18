@@ -23,8 +23,13 @@ inherit( BaseOrganismState, RandomMovementState, {
     else if ( organism.animating ) {
       // Less than one time step away, so just go to the destination.
       organism.position = organism.destination;
-      organism.nextRandomMovement();
+
     }
+  },
+
+  onAnimateMoveEnd: function( organismStateMachine ) {
+    var organism = organismStateMachine.organismModel;
+    organism.nextRandomMovement();
   },
 
   entered: function( organismStateMachine, dt ) {

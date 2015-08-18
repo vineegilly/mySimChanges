@@ -74,9 +74,7 @@ inherit( PropertySet, BaseOrganismModel, {
    * @param {number} velocity
    */
   returnToOrigin: function( animate, velocity ) {
-    if ( !velocity ) {
-      this.velocity = EcoSystemConstants.ANIMATION_VELOCITY;
-    }
+    this.velocity = velocity || EcoSystemConstants.ANIMATION_VELOCITY;
     this.setDestination( this.positionProperty.initialValue, animate );
     this.stateMachine.returnToOrigin();
   },
@@ -88,9 +86,7 @@ inherit( PropertySet, BaseOrganismModel, {
    */
   setDestination: function( destination, animate, velocity ) {
     this.destination = destination;
-    if ( !velocity ) {
-      this.velocity = EcoSystemConstants.ANIMATION_VELOCITY;
-    }
+    this.velocity = velocity || EcoSystemConstants.ANIMATION_VELOCITY;
     if ( animate ) {
       this.animating = true;
     }
@@ -101,26 +97,31 @@ inherit( PropertySet, BaseOrganismModel, {
 
   nextRandomMovement: function() {
     var direction = _.random( 1, 4 );
-    var playVelocity = EcoSystemConstants.ANIMATION_VELOCITY / 3;
+    var playVelocity = EcoSystemConstants.ANIMATION_VELOCITY / 10;
     var currentPosition = this.position;
+    var animatePlay = true;
     switch( direction ) {
       case 1:
-        this.setDestination( currentPosition.plus( new Vector2( EcoSystemConstants.PLAY_STEP_DISTANCE, 0 ) ), true, playVelocity );
+        this.setDestination( currentPosition.plus( new Vector2( EcoSystemConstants.PLAY_STEP_DISTANCE, 0 ) ), animatePlay, playVelocity );
         break;
       case 2:
-        this.setDestination( currentPosition.plus( new Vector2( -EcoSystemConstants.PLAY_STEP_DISTANCE, 0 ) ), true, playVelocity );
+        this.setDestination( currentPosition.plus( new Vector2( -EcoSystemConstants.PLAY_STEP_DISTANCE, 0 ) ), animatePlay, playVelocity );
         break;
       case 3:
-        this.setDestination( currentPosition.plus( new Vector2( 0, EcoSystemConstants.PLAY_STEP_DISTANCE ) ), true, playVelocity );
+        this.setDestination( currentPosition.plus( new Vector2( 0, EcoSystemConstants.PLAY_STEP_DISTANCE ) ), animatePlay, playVelocity );
         break;
       case 4:
-        this.setDestination( currentPosition.plus( new Vector2( 0, -EcoSystemConstants.PLAY_STEP_DISTANCE ) ), true, playVelocity );
+        this.setDestination( currentPosition.plus( new Vector2( 0, -EcoSystemConstants.PLAY_STEP_DISTANCE ) ), animatePlay, playVelocity );
         break;
     }
   },
 
   play: function() {
     this.stateMachine.startRandomMotion();
+  },
+
+  pause: function() {
+    this.stateMachine.goToRest();
   }
 
 

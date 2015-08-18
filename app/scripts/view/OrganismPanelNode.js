@@ -34,7 +34,7 @@ function OrganismPanelNode( ecoSystemModel, gridPaneNode ) {
 
 
   var canPlaceShapeCallBack = function( organismModel, droppedPoint ) {
-    if ( gridPaneNode.isInside( organismModel.getPosition() ) ) {
+    if ( gridPaneNode.isInside( droppedPoint ) ) {
       return true;
     }
     return false;
@@ -79,6 +79,8 @@ function OrganismPanelNode( ecoSystemModel, gridPaneNode ) {
     children: [ titleBarNode, appearanceLayerNode ],
     spacing: 5
   } );
+
+
 
   // vertical panel
   Panel.call( thisPanel, titleBox, {

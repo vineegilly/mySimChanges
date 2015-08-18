@@ -1,6 +1,6 @@
 // modules
 var inherit = axon.inherit;
-var RectangularButtonView = require( 'SUN/buttons/RectangularButtonView' );
+var RectangularButtonView = require( './RectangularButtonView' );
 var PushButtonInteractionStateProperty = require( './PushButtonInteractionStateProperty' );
 var PushButtonModel = require( './PushButtonModel' );
 
