@@ -19,6 +19,7 @@ inherit( BaseOrganismModel, OmnivoresModel, {
   createStateMachine: function() {
     return new OmnivoresStateMachine(this);
   }
+
 } );
 
 module.exports = OmnivoresModel;

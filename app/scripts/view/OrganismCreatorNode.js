@@ -1,19 +1,19 @@
 var inherit = axon.inherit;
 var Node = scenery.Node;
 var SimpleDragHandler = scenery.SimpleDragHandler;
+var OrganismImageCollection = require( '../model/organisms/OrganismImageCollection' );
 
 /**
- *@param {string} type
+ *@param {OrganismInfo} organismInfo
  * @param {GridNode} gridNode
- * @param {Image} appearanceNode
  * @param organismCreator
  * @param {Function} canPlaceShape - A function to determine if the Organism can be placed on the board
  * @constructor
  */
-function OrganismCreatorNode( type, gridNode, appearanceImage, organismCreator, canPlaceShape ) {
+function OrganismCreatorNode( organismInfo, gridNode, organismCreator, canPlaceShape ) {
   var thisNode = this;
   Node.call( thisNode, { cursor: 'pointer' } );
-
+  var appearanceImage = OrganismImageCollection.getRepresentation( organismInfo.id );
   var appearanceNode = new scenery.Image( appearanceImage );
   appearanceNode.scale( 0.15, 0.15 );
   thisNode.appearanceNode = appearanceNode;
@@ -29,9 +29,9 @@ function OrganismCreatorNode( type, gridNode, appearanceImage, organismCreator, 
       // Determine the initial position of the new element as a function of the event position and this node's bounds.
       var upperLeftCornerGlobal = thisNode.parentToGlobalPoint( thisNode.leftTop );
       var initialPositionOffset = upperLeftCornerGlobal.minus( event.pointer.point );
-      var initialPosition = gridNode.getRefPoint(event.pointer.point.plus( initialPositionOffset ) );
+      var initialPosition = gridNode.getRefPoint( event.pointer.point.plus( initialPositionOffset ) );
 
-      thisNode.organism = organismCreator( type, appearanceImage, initialPosition );
+      thisNode.organism = organismCreator( organismInfo, initialPosition );
       thisNode.organism.userControlled = true;
     },
 

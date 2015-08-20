@@ -1,5 +1,5 @@
 var inherit = axon.inherit;
-var OrganismImageCollection = require( './OrganismImageCollection' );
+var EcoSystemConstants = require( '../EcoSystemConstants' );
 var CarnivoresModel = require( './CarnivoresModel' );
 var ConsumerModel = require( './ConsumerModel' );
 var DecomposerModel = require( './DecomposerModel' );
@@ -20,23 +20,24 @@ inherit( Object, OrganismModelFactory, {},
     /**
      *
      * @param {string} type
-     * @param {Image} appearanceImage
+     * @param {Image} organismInfo
      * @param {Vector2} pos
      * @returns {*}
      */
-    getOrganism: function( ecoSystemModel,type, appearanceImage, pos,bounds ) {
+    getOrganism: function( ecoSystemModel, organismInfo, pos, bounds ) {
 
+      var type = organismInfo.type;
       switch( type ) {
-        case OrganismImageCollection.CARNIVORES:
-          return new CarnivoresModel( ecoSystemModel,type, appearanceImage, pos,bounds );
-        case OrganismImageCollection.OMNIVORES:
-          return new OmnivoresModel( ecoSystemModel,type, appearanceImage, pos,bounds );
-        case OrganismImageCollection.PRODUCERS:
-          return new ProducerModel( ecoSystemModel,type, appearanceImage, pos,bounds );
-        case OrganismImageCollection.HERBIVORES:
-          return new HerbivoresModel( ecoSystemModel,type, appearanceImage, pos,bounds );
-        case OrganismImageCollection.DECOMPOSERS:
-          return new DecomposerModel( ecoSystemModel,type, appearanceImage, pos,bounds );
+        case EcoSystemConstants.CARNIVORES:
+          return new CarnivoresModel( ecoSystemModel, organismInfo, pos, bounds );
+        case EcoSystemConstants.OMNIVORES:
+          return new OmnivoresModel( ecoSystemModel, organismInfo, pos, bounds );
+        case EcoSystemConstants.PRODUCERS:
+          return new ProducerModel( ecoSystemModel, organismInfo, pos, bounds );
+        case EcoSystemConstants.HERBIVORES:
+          return new HerbivoresModel( ecoSystemModel, organismInfo, pos, bounds );
+        case EcoSystemConstants.DECOMPOSERS:
+          return new DecomposerModel( ecoSystemModel, organismInfo, pos, bounds );
 
       }
     }

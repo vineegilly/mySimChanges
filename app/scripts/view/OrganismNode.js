@@ -13,7 +13,6 @@ function OrganismNode( organismModel ) {
   var appearanceNode = new Image( organismModel.appearanceImage );
   thisNode.addChild( appearanceNode );
   appearanceNode.scale( 0.15, 0.15 );
-
   organismModel.positionProperty.link( function( newPos ) {
     thisNode.leftTop = newPos;
   } );

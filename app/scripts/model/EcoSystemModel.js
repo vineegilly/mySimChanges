@@ -11,23 +11,18 @@ var ObservableArray = axon.ObservableArray;
 var OrganismImageCollection = require( '../model/organisms/OrganismImageCollection' );
 
 
-function EcoSystemModel( screenBounds ) {
+function EcoSystemModel( organismInfos, screenBounds ) {
   var thisModel = this;
   PropertySet.call( this, {
     playPause: false
   } );
+
+  this.organismInfos = organismInfos;
+
   this.screenBounds = screenBounds;
 
   // Observable array of the organisms that have been placed on grid
   this.residentOrganismModels = new ObservableArray();
-
-  this.selectedOrganisms = [
-    { type: OrganismImageCollection.CARNIVORES, appearanceImage: OrganismImageCollection.getRepresentation( OrganismImageCollection.CARNIVORES ) },
-    { type: OrganismImageCollection.HERBIVORES, appearanceImage: OrganismImageCollection.getRepresentation( OrganismImageCollection.HERBIVORES ) },
-    { type: OrganismImageCollection.PRODUCERS, appearanceImage: OrganismImageCollection.getRepresentation( OrganismImageCollection.PRODUCERS ) },
-    { type: OrganismImageCollection.DECOMPOSERS, appearanceImage: OrganismImageCollection.getRepresentation( OrganismImageCollection.DECOMPOSERS ) },
-    { type: OrganismImageCollection.OMNIVORES, appearanceImage: OrganismImageCollection.getRepresentation( OrganismImageCollection.OMNIVORES ) },
-  ];
 
   this.playPauseProperty.link( function( playPause ) {
     if ( playPause ) {
@@ -88,7 +83,7 @@ inherit( PropertySet, EcoSystemModel, {
       organismModel.pause();
     } );
   }
-  
+
 } );
 
 module.exports = EcoSystemModel;

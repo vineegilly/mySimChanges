@@ -1,7 +1,7 @@
 var inherit = axon.inherit;
 var BaseOrganismModel = require( './BaseOrganismModel' );
 var OrganismImageCollection = require( './OrganismImageCollection' );
-var CarnivoresStateMachine = require('../states/CarnivoresStateMachine');
+var CarnivoresStateMachine = require( '../states/CarnivoresStateMachine' );
 
 /**
  * @param {EcoSystemModel} ecoSystemModel
@@ -11,15 +11,15 @@ var CarnivoresStateMachine = require('../states/CarnivoresStateMachine');
  * @param {Bounds2} bounds
  * @constructor
  */
-function CarnivoresModel( ecoSystemModel,type, icon, pos,bounds ) {
-   BaseOrganismModel.call( this,ecoSystemModel, type, icon, pos,bounds );
+function CarnivoresModel( ecoSystemModel, type, icon, pos, bounds ) {
+  BaseOrganismModel.call( this, ecoSystemModel, type, icon, pos, bounds );
 }
 
 inherit( BaseOrganismModel, CarnivoresModel, {
 
-   createStateMachine: function() {
-     return new CarnivoresStateMachine(this);
-   }
+  createStateMachine: function() {
+    return new CarnivoresStateMachine( this );
+  }
 
 } );
 

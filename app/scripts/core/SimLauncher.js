@@ -13,7 +13,9 @@ module.exports = {
   launch: function( callback ) {
 
     //Need to do some preloading ,splash screen etc
-    callback();
+    d3.json( 'testdata/organismInfos.json', function( err, organismInfos ) {
+      callback( organismInfos.organisms );
+    } );
 
   }
 

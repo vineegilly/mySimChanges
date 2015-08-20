@@ -13,10 +13,10 @@ define( function( require ) {
   var EcoSystemView = require( './view/EcoSystemView' );
 
   var energySimTitle = "EcoSystem Simulation";
-  SimLauncher.launch( function() {
+  SimLauncher.launch( function(organismsInfo) {
     var options = { backgroundColor: 'rgb( 242, 255, 204 )' /* Light yellow-green */ };
     var createModel = function() {
-      return new EcoSystemModel();
+      return new EcoSystemModel(organismsInfo);
     };
 
     var createView = function( model ) {

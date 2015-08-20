@@ -6,7 +6,6 @@ var EcoSystemConstants = require( '../model/EcoSystemConstants' );
 var Node = scenery.Node;
 var VBox = scenery.VBox;
 var OrganismModelFactory = require( '../model/organisms/OrganismModelFactory' );
-var OrganismImageCollection = require( '../model/organisms/OrganismImageCollection' );
 var OrganismCreatorNode = require( './OrganismCreatorNode' );
 
 var GridLayout = require( '../util/GridLayout' );
@@ -27,8 +26,8 @@ var ORGANISMS_STR = "Organisms";
 function OrganismPanelNode( ecoSystemModel, gridPaneNode, motionBounds ) {
   var thisPanel = this;
 
-  var creatorCallBack = function( type, appearanceImage, pos ) {
-    var organismModel = OrganismModelFactory.getOrganism( ecoSystemModel, type, appearanceImage, pos, motionBounds );
+  var creatorCallBack = function( organismInfo, pos ) {
+    var organismModel = OrganismModelFactory.getOrganism( ecoSystemModel, organismInfo, pos, motionBounds );
     ecoSystemModel.addOrganism( organismModel );
     return organismModel;
   };
@@ -40,20 +39,14 @@ function OrganismPanelNode( ecoSystemModel, gridPaneNode, motionBounds ) {
     return false;
   };
 
-  var gridLayout = GridLayout();
-  gridLayout
-    .size( [ PANEL_SIZE.width, PANEL_SIZE.height ] )
-    .bands()
-    .padding( [ 0.1, 0.1 ] );
-
-  var organismInfos = ecoSystemModel.selectedOrganisms;
+  var organismInfos = ecoSystemModel.organismInfos;
 
   var organismsCreators = [];
 
   organismInfos.forEach( function( organismInfo ) {
-    var organismImage = organismInfo.appearanceImage;
-    var organismCreatorNode = new OrganismCreatorNode( organismInfo.type, gridPaneNode,
-      organismImage, creatorCallBack, canPlaceShapeCallBack );
+
+    var organismCreatorNode = new OrganismCreatorNode( organismInfo, gridPaneNode,
+      creatorCallBack, canPlaceShapeCallBack );
     organismsCreators.push( organismCreatorNode );
   } );
 
@@ -61,9 +54,16 @@ function OrganismPanelNode( ecoSystemModel, gridPaneNode, motionBounds ) {
     return {};
   } );
 
+  var appearanceLayerNode = new Node();
+
+  var gridLayout = GridLayout();
+  gridLayout
+    .size( [ PANEL_SIZE.width, PANEL_SIZE.height ] )
+    .bands()
+    .padding( [ 0.1, 0.1 ] );
+
   gridLayout( rectElements );
 
-  var appearanceLayerNode = new Node();
 
   for ( var i = 0; i < rectElements.length; i++ ) {
     var rectElement = rectElements[ i ];
@@ -80,7 +80,6 @@ function OrganismPanelNode( ecoSystemModel, gridPaneNode, motionBounds ) {
     spacing: 5
   } );
 
-
   // vertical panel
   Panel.call( thisPanel, titleBox, {
     // panel options
@@ -89,6 +88,7 @@ function OrganismPanelNode( ecoSystemModel, gridPaneNode, motionBounds ) {
     yMargin: 5,
     cornerRadius: 0
   } );
+
 
 }
 

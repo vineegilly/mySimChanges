@@ -2,25 +2,25 @@ var inherit = axon.inherit;
 var PropertySet = axon.PropertySet;
 var EcoSystemConstants = require( '../EcoSystemConstants' );
 var Vector2 = dot.Vector2;
+var OrganismImageCollection = require( '../organisms/OrganismImageCollection' );
 
 
 /**
- * @param {string} type
  * @param {EcoSystemModel} ecoSystemModel
- * @param {Image} appearanceImage
  * @param {Vector2} initialPosition
  * @param {Bounds2} bounds
  * @constructor
  */
-function BaseOrganismModel( ecoSystemModel, type, appearanceImage, initialPosition, bounds ) {
+function BaseOrganismModel( ecoSystemModel, organismInfo, initialPosition, bounds ) {
   var thisModel = this;
   PropertySet.call( thisModel, {
     userControlled: false,
     position: initialPosition.copy(),
-    type: type // the actual type for example if omnivorous is it a bird or human? We need to choose the icon based on that
+    interactionState: EcoSystemConstants.NON_INTERACTION_STATE
   } );
 
-  thisModel.appearanceImage = appearanceImage;
+  thisModel.organismInfo = organismInfo;
+  thisModel.appearanceImage = OrganismImageCollection.getRepresentation( organismInfo.id );
   thisModel.ecoSystemModel = ecoSystemModel;
   thisModel.organismState = null;
   thisModel.stateMachine = this.createStateMachine();
@@ -103,7 +103,7 @@ inherit( PropertySet, BaseOrganismModel, {
     var currentPosition = this.position;
 
     var containsPoint = this.motionBounds.containsPoint( currentPosition );
-   // console.log( "Bounds " + this.motionBounds + "  Contains  " + containsPoint + " point " + currentPosition );
+    // console.log( "Bounds " + this.motionBounds + "  Contains  " + containsPoint + " point " + currentPosition );
 
 
     var newPosition = null;
@@ -138,8 +138,32 @@ inherit( PropertySet, BaseOrganismModel, {
 
   pause: function() {
     this.stateMachine.goToRest();
-  }
+  },
 
+  canInteract: function() {
+    return this.interactionState === EcoSystemConstants.NON_INTERACTION_STATE;
+  },
+
+  updateInteraction: function( otherOrganismModel ) {
+    if ( this.canInteract() && otherOrganismModel.canInteract() ) {
+    }
+  },
+
+  isPrey: function() {
+    return this.organismInfo.prey;
+  },
+
+  isPredator: function() {
+    return this.organismInfo.predator;
+  },
+
+  isProducer: function() {
+    return this.organismInfo.producer;
+  },
+
+  isDecomposer: function() {
+    return this.organismInfo.decomposer;
+  }
 
 } );
 
