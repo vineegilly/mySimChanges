@@ -163,6 +163,14 @@ inherit( PropertySet, BaseOrganismModel, {
 
   isDecomposer: function() {
     return this.organismInfo.decomposer;
+  },
+
+  startDying:function(){
+    this.ecoSystemModel.addDyingOrganisms(this);
+  },
+
+  die:function(){
+
   }
 
 } );

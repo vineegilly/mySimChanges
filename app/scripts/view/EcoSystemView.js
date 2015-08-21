@@ -29,9 +29,9 @@ function EcoSystemView( ecoSystemModel ) {
   var thisView = this;
   BaseScreenView.call( thisView, { layoutBounds: new Bounds2( 0, 0, 1024, 704 ) } );
 
-  var gridPanelNode = new GridPanelNode();
-  gridPanelNode.x = thisView.layoutBounds.x + GRID_PANEL_OFFSET_X;
-  gridPanelNode.y = thisView.layoutBounds.y + GRID_PANEL_OFFSET_Y;
+  thisView.gridPanelNode = new GridPanelNode(ecoSystemModel);
+  thisView.gridPanelNode.x = thisView.layoutBounds.x + GRID_PANEL_OFFSET_X;
+  thisView.gridPanelNode.y = thisView.layoutBounds.y + GRID_PANEL_OFFSET_Y;
 
   var gridSize = EcoSystemConstants.GRID_NODE_DIMENSION;
   var motionBounds = Bounds2.rect( 0, 0, gridSize.width - EcoSystemConstants.ORGANISM_RADIUS * 2, gridSize.height - EcoSystemConstants.ORGANISM_RADIUS * 2 );
@@ -39,7 +39,7 @@ function EcoSystemView( ecoSystemModel ) {
   function handleOrganismAdded( addedOrganismModel ) {
     // Add a representation of the number.
     var organismNode = new OrganismNode( addedOrganismModel );
-    gridPanelNode.addOrganism( organismNode );
+    thisView.gridPanelNode.addOrganism( organismNode );
 
     // Move the shape to the front of this layer when grabbed by the user.
     addedOrganismModel.userControlledProperty.link( function( userControlled ) {
@@ -50,7 +50,7 @@ function EcoSystemView( ecoSystemModel ) {
 
     ecoSystemModel.residentOrganismModels.addItemRemovedListener( function removalListener( removedOrganismModel ) {
       if ( removedOrganismModel === addedOrganismModel ) {
-        gridPanelNode.removeOrganism( organismNode );
+        thisView.gridPanelNode.removeOrganism( organismNode );
         ecoSystemModel.residentOrganismModels.removeItemRemovedListener( removalListener );
       }
     } );
@@ -61,7 +61,7 @@ function EcoSystemView( ecoSystemModel ) {
 
   // Observe new items
   ecoSystemModel.residentOrganismModels.addItemAddedListener( handleOrganismAdded );
-  var organismPanelNode = new OrganismPanelNode( ecoSystemModel, gridPanelNode, motionBounds );
+  var organismPanelNode = new OrganismPanelNode( ecoSystemModel, thisView.gridPanelNode, motionBounds );
   var environmentControlsNode = new EnvironmentControlsNode();
 
   var panelBox = new HBox( {
@@ -71,14 +71,14 @@ function EcoSystemView( ecoSystemModel ) {
   } );
 
   thisView.addChild( panelBox );
-  panelBox.x = gridPanelNode.bounds.left;
-  panelBox.y = gridPanelNode.bounds.bottom + PANEL_VERTICAL_PADDING;
-  thisView.addChild( gridPanelNode );
+  panelBox.x = thisView.gridPanelNode.bounds.left;
+  panelBox.y = thisView.gridPanelNode.bounds.bottom + PANEL_VERTICAL_PADDING;
+  thisView.addChild( thisView.gridPanelNode );
 
   var playerPanel = new PlayerPanel( ecoSystemModel.playPauseProperty, ecoSystemModel.onClearPlay.bind( ecoSystemModel ) );
   thisView.addChild( playerPanel );
-  playerPanel.x = gridPanelNode.bounds.centerX - playerPanel.bounds.width / 2;
-  playerPanel.y = gridPanelNode.bounds.bottom - playerPanel.bounds.height;
+  playerPanel.x = thisView.gridPanelNode.bounds.centerX - playerPanel.bounds.width / 2;
+  playerPanel.y = thisView.gridPanelNode.bounds.bottom - playerPanel.bounds.height;
 
 
   /*  var image1 = new scenery.Image( CARNIVORES_IMAGE );
@@ -123,7 +123,8 @@ inherit( BaseScreenView, EcoSystemView, {
    * @param dt
    */
   step: function( dt ) {
-
+    var thisView = this;
+    thisView.gridPanelNode.step( dt );
   }
 } );
 

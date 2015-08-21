@@ -8,7 +8,7 @@ var CanvasNode = scenery.CanvasNode;
  * @param options
  * @constructor
  */
-function ParticleExplosionEffect( particleCollection, bounds ) {
+function ParticleExplosionEffectNode( particleCollection, bounds ) {
   this.particleCollection = particleCollection;
   this.frameDelay = 0;
 
@@ -16,7 +16,7 @@ function ParticleExplosionEffect( particleCollection, bounds ) {
   this.invalidatePaint();
 }
 
-inherit( CanvasNode, ParticleExplosionEffect, {
+inherit( CanvasNode, ParticleExplosionEffectNode, {
 
   // @param {CanvasContextWrapper} wrapper
   paintCanvas: function( wrapper ) {
@@ -42,4 +42,4 @@ inherit( CanvasNode, ParticleExplosionEffect, {
 } );
 
 
-module.exports = ParticleExplosionEffect;
+module.exports = ParticleExplosionEffectNode;

@@ -44,7 +44,6 @@ function OrganismPanelNode( ecoSystemModel, gridPaneNode, motionBounds ) {
   var organismsCreators = [];
 
   organismInfos.forEach( function( organismInfo ) {
-
     var organismCreatorNode = new OrganismCreatorNode( organismInfo, gridPaneNode,
       creatorCallBack, canPlaceShapeCallBack );
     organismsCreators.push( organismCreatorNode );

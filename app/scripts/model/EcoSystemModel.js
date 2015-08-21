@@ -24,6 +24,8 @@ function EcoSystemModel( organismInfos, screenBounds ) {
   // Observable array of the organisms that have been placed on grid
   this.residentOrganismModels = new ObservableArray();
 
+  this.dyingModels = new ObservableArray();
+
   this.playPauseProperty.link( function( playPause ) {
     if ( playPause ) {
       thisModel.play();
@@ -82,7 +84,16 @@ inherit( PropertySet, EcoSystemModel, {
     this.residentOrganismModels.forEach( function( organismModel ) {
       organismModel.pause();
     } );
+  },
+
+  addDyingOrganisms:function(organismModel){
+    this.dyingModels.add(organismModel);
+  },
+
+  removeDyingOrganisms:function(organismModel){
+    this.dyingModels.remove(organismModel);
   }
+
 
 } );
 

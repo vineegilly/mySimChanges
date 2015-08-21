@@ -42,6 +42,10 @@ inherit( Object, Particle, {
     context2D.fill();
 
     context2D.restore();
+  },
+
+  isLive: function() {
+    return this.scale > 0;
   }
 
 } );
