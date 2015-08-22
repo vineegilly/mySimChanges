@@ -13,13 +13,13 @@ var EcoSystemConstants = require( '../model/EcoSystemConstants' );
 var TitleBarNode = require( './TitleBarNode' );
 
 // constants
-var CHECK_BOX_OPTIONS = { boxWidth: 40 };
-var CONTROL_TEXT_OPTIONS = { font: new SimFont( 14 ) };
+var CHECK_BOX_OPTIONS = { boxWidth: 30 };
+var CONTROL_TEXT_OPTIONS = { font: new SimFont( 15 ) };
 var POPULATION_RANGE_STR = "Population Range";
 var RAIN_STR = "Rain";
 var SUN_LIGHT_STR = "Sun Light";
 var ENVIRONMENTAL_CONTROLS_STR = "Environment Controls";
-var TITLE_SIZE = new Dimension2( 305, 30 );
+var TITLE_SIZE = new Dimension2( 200, 30 );
 
 function EnvironmentControlsNode() {
   var thisPanel = this;

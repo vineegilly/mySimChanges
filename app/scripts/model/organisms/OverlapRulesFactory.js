@@ -11,11 +11,14 @@ inherit( Object, OverlapRulesFactory, {},
   // statics
   {
     applyOverlapRules: function( organism1, organism2 ) {
+      if ( organism1 === organism2 ) {
+        return;
+      }
       if ( organism1.canInteract() && organism2.canInteract() ) {
 
-        var preyPredatorRule = this.checkForPreyPredatorRule( organism1, organism2 );
-        if ( preyPredatorRule.prey && preyPredatorRule.predator ) {
-          this.preyOverlapWithPredator( preyPredatorRule.prey, preyPredatorRule.predator );
+        var preyPredatorOverlapResult = this.checkForPreyPredatorRule( organism1, organism2 );
+        if ( preyPredatorOverlapResult.prey && preyPredatorOverlapResult.predator ) {
+          this.preyOverlapWithPredator( preyPredatorOverlapResult.prey, preyPredatorOverlapResult.predator );
           return;
         }
 
@@ -23,30 +26,30 @@ inherit( Object, OverlapRulesFactory, {},
     },
 
     checkForPreyPredatorRule: function( organism1, organism2 ) {
-      var preyPredatorRule = {};
+      var preyPredatorOverlapResult = {};
       if ( organism1.isPrey() ) {
-        preyPredatorRule[ "prey" ] = organism1;
+        preyPredatorOverlapResult[ "prey" ] = organism1;
       }
       if ( organism2.isPrey() ) {
-        preyPredatorRule[ "prey" ] = organism2;
+        preyPredatorOverlapResult[ "prey" ] = organism2;
       }
       if ( organism1.isPredator() ) {
-        preyPredatorRule[ "predator" ] = organism1;
+        preyPredatorOverlapResult[ "predator" ] = organism1;
       }
       if ( organism2.isPredator() ) {
-        preyPredatorRule[ "predator" ] = organism2;
+        preyPredatorOverlapResult[ "predator" ] = organism2;
       }
 
-      return preyPredatorRule;
+      return preyPredatorOverlapResult;
 
     },
 
     preyOverlapWithPredator: function( prey, predator ) {
       if ( prey.overlapBounds( predator ) ) {
         var preyPosition = prey.position;
-        predator.setDestination( preyPosition, true, EcoSystemConstants.ANIMATION_VELOCITY * 2 );
-        prey.startDying();
+        predator.setDestination( preyPosition, true, EcoSystemConstants.ANIMATION_VELOCITY / 2 );
         predator.startEating();
+        prey.startDying();
       }
     }
 

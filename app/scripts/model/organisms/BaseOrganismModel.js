@@ -136,7 +136,7 @@ inherit( PropertySet, BaseOrganismModel, {
   },
 
   buildExplosionParticles: function() {
-    this.particles = ParticleExplosionBuilder.buildParticles( this.position.x, position.y, EcoSystemConstants.PARTICLE_COLOR );
+    this.particles = ParticleExplosionBuilder.buildParticles( this.position.x, this.position.y, EcoSystemConstants.PARTICLE_COLOR );
   },
 
   play: function() {
@@ -170,10 +170,12 @@ inherit( PropertySet, BaseOrganismModel, {
   startDying: function() {
     this.ecoSystemModel.addDyingOrganisms( this );
     this.stateMachine.startDying();
+    this.interactionState = EcoSystemConstants.DYING_STATE;
   },
 
   startEating: function() {
     this.stateMachine.startEating();
+    this.interactionState = EcoSystemConstants.EATING_STATE;
   },
 
   die: function() {
@@ -181,8 +183,26 @@ inherit( PropertySet, BaseOrganismModel, {
     this.ecoSystemModel.removeOrganism( this );
   },
 
-  overlapBounds: function( otheModel ) {
+  overlapBounds: function( otherModel ) {
 
+    var r1 = EcoSystemConstants.ORGANISM_RADIUS;
+    var r2 = EcoSystemConstants.ORGANISM_RADIUS;
+
+    var c1 = this.position;
+    var c2 = otherModel.position;
+
+    // Determine minimum and maximum radii where circles can intersect
+    var r_max = r1 + r2;
+    var r_min = Math.abs( r1 - r2 );
+
+    // Determine actual distance between circle circles
+    var c_dist = c1.distance( c2 );
+
+    if ( c_dist > r_max ) {
+      return false;
+    }
+
+    return true;
   }
 
 } );

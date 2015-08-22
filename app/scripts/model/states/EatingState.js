@@ -11,7 +11,7 @@ inherit( BaseOrganismState, EatingState, {
   step: function( organismStateMachine, dt ) {
     var organism = organismStateMachine.organismModel;
     if ( !organism.userControlled ) {
-      this.animateStep( organismStateMachine, dt );
+      this.animateMovementStep( organismStateMachine, dt );
     }
   },
 

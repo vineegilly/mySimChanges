@@ -45,17 +45,18 @@ inherit( PropertySet, EcoSystemModel, {
    * @param dt
    */
   step: function( dt ) {
+    var self = this;
     this.residentOrganismModels.forEach( function( organismModel ) {
       organismModel.step( dt );
     } );
 
-    var self = this;
-
-    this.residentOrganismModels.forEach( function( organismModel1 ) {
-      self.residentOrganismModels.forEach( function( organismModel2 ) {
-        OverlapRulesFactory.applyOverlapRules( organismModel1, organismModel2 );
+    if ( this.isPlaying() ) {
+      this.residentOrganismModels.forEach( function( organismModel1 ) {
+        self.residentOrganismModels.forEach( function( organismModel2 ) {
+          OverlapRulesFactory.applyOverlapRules( organismModel1, organismModel2 );
+        } );
       } );
-    } );
+    }
 
   },
 

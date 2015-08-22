@@ -30,8 +30,6 @@ function GridPanelNode( ecoSystemModel ) {
   panelContentsNode.addChild( thisPanelNode.particleExplosionEffectNode );
 
   function handleOrganismDying( addedOrganismModel ) {
-
-    var explosionCenter = addedOrganismModel.position;
     addedOrganismModel.buildExplosionParticles();
     var particles = addedOrganismModel.particles;
     thisPanelNode.particleCollection.add( particles );
