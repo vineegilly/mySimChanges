@@ -29,12 +29,12 @@ function EcoSystemView( ecoSystemModel ) {
   var thisView = this;
   BaseScreenView.call( thisView, { layoutBounds: new Bounds2( 0, 0, 1024, 704 ) } );
 
-  thisView.gridPanelNode = new GridPanelNode(ecoSystemModel);
+  thisView.gridPanelNode = new GridPanelNode( ecoSystemModel );
   thisView.gridPanelNode.x = thisView.layoutBounds.x + GRID_PANEL_OFFSET_X;
   thisView.gridPanelNode.y = thisView.layoutBounds.y + GRID_PANEL_OFFSET_Y;
 
   var gridSize = EcoSystemConstants.GRID_NODE_DIMENSION;
-  var motionBounds = Bounds2.rect( 0, 0, gridSize.width - EcoSystemConstants.ORGANISM_RADIUS * 2, gridSize.height - EcoSystemConstants.ORGANISM_RADIUS * 2 );
+  var motionBounds = Bounds2.rect( EcoSystemConstants.ORGANISM_RADIUS, EcoSystemConstants.ORGANISM_RADIUS, gridSize.width - EcoSystemConstants.ORGANISM_RADIUS * 3, gridSize.height - EcoSystemConstants.ORGANISM_RADIUS * 2 );
 
   function handleOrganismAdded( addedOrganismModel ) {
     // Add a representation of the number.

@@ -1,6 +1,7 @@
 var Node = scenery.Node;
 var inherit = axon.inherit;
 var Image = scenery.Image;
+var EcoSystemConstants = require( '../model/EcoSystemConstants' );
 
 /**
  *
@@ -12,9 +13,9 @@ function OrganismNode( organismModel ) {
   Node.call( thisNode );
   var appearanceNode = new Image( organismModel.appearanceImage );
   thisNode.addChild( appearanceNode );
-  appearanceNode.scale( 0.15, 0.15 );
+  appearanceNode.scale( EcoSystemConstants.IMAGE_SCALE );
   organismModel.positionProperty.link( function( newPos ) {
-    thisNode.leftTop = newPos;
+    thisNode.center = newPos;
   } );
 
 }

@@ -2,6 +2,7 @@ var inherit = axon.inherit;
 var Node = scenery.Node;
 var SimpleDragHandler = scenery.SimpleDragHandler;
 var OrganismImageCollection = require( '../model/organisms/OrganismImageCollection' );
+var EcoSystemConstants = require( '../model/EcoSystemConstants' );
 
 /**
  *@param {OrganismInfo} organismInfo
@@ -15,7 +16,7 @@ function OrganismCreatorNode( organismInfo, gridNode, organismCreator, canPlaceS
   Node.call( thisNode, { cursor: 'pointer' } );
   var appearanceImage = OrganismImageCollection.getRepresentation( organismInfo.id );
   var appearanceNode = new scenery.Image( appearanceImage );
-  appearanceNode.scale( 0.15, 0.15 );
+  appearanceNode.scale(EcoSystemConstants.IMAGE_SCALE);
   thisNode.appearanceNode = appearanceNode;
   thisNode.organism = null;
   thisNode.mouseArea = appearanceNode.bounds;
@@ -27,8 +28,8 @@ function OrganismCreatorNode( organismInfo, gridNode, organismCreator, canPlaceS
     start: function( event ) {
 
       // Determine the initial position of the new element as a function of the event position and this node's bounds.
-      var upperLeftCornerGlobal = thisNode.parentToGlobalPoint( thisNode.leftTop );
-      var initialPositionOffset = upperLeftCornerGlobal.minus( event.pointer.point );
+      var centerGlobal = thisNode.parentToGlobalPoint( thisNode.center );
+      var initialPositionOffset = centerGlobal.minus( event.pointer.point );
       var initialPosition = gridNode.getRefPoint( event.pointer.point.plus( initialPositionOffset ) );
 
       thisNode.organism = organismCreator( organismInfo, initialPosition );

@@ -67,9 +67,9 @@ inherit( Node, GridNode, {
    */
   isInside: function( point ) {
     var gridRefPoint = this.plotGrid.globalToLocalPoint( point );
-    var pointBounds = Bounds2.point( gridRefPoint.x, gridRefPoint.y );
-    pointBounds.dilate( EcoSystemConstants.ORGANISM_RADIUS );
-    return this.plotGrid.bounds.containsBounds( pointBounds );
+    var point = Bounds2.point( gridRefPoint.x, gridRefPoint.y );
+    // point.dilate( EcoSystemConstants.ORGANISM_RADIUS );
+    return this.plotGrid.bounds.containsPoint( point );
   }
 
 } );
