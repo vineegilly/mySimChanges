@@ -9,7 +9,6 @@ var Dimension2 = dot.Dimension2;
 var GridNode = require( './GridNode' );
 var ParticleExplosionEffectNode = require( './effects/ParticleExplosionEffectNode' );
 var ObservableArray = axon.ObservableArray;
-var ParticleExplosionBuilder = require( '../view/effects/ParticleExplosionBuilder' );
 
 
 /**
@@ -30,13 +29,11 @@ function GridPanelNode( ecoSystemModel ) {
   thisPanelNode.particleExplosionEffectNode = new ParticleExplosionEffectNode( thisPanelNode.particleCollection, particleBounds );
   panelContentsNode.addChild( thisPanelNode.particleExplosionEffectNode );
 
-  var particleExplosionBuilder = new ParticleExplosionBuilder();
-
-
   function handleOrganismDying( addedOrganismModel ) {
 
     var explosionCenter = addedOrganismModel.position;
-    var particles = particleExplosionBuilder.buildParticles( explosionCenter.x, explosionCenter.y, EcoSystemConstants.PARTICLE_COLOR );
+    addedOrganismModel.buildExplosionParticles();
+    var particles = addedOrganismModel.particles;
     thisPanelNode.particleCollection.add( particles );
 
     ecoSystemModel.dyingModels.addItemRemovedListener( function removalListener( removedOrganismModel ) {

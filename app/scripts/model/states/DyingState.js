@@ -2,22 +2,22 @@ var inherit = axon.inherit;
 var BaseOrganismState = require( './BaseOrganismState' );
 var Vector2 = dot.Vector2;
 
-function EatingState() {
+function DyingState() {
   BaseOrganismState.call( this );
 }
 
-inherit( BaseOrganismState, EatingState, {
+inherit( BaseOrganismState, DyingState, {
 
   step: function( organismStateMachine, dt ) {
     var organism = organismStateMachine.organismModel;
-    if ( !organism.userControlled ) {
-      this.animateStep( organismStateMachine, dt );
-    }
+    var particles = organism.particles;
+
+    // check if scale is less or equal to zero, it means the particle effect
+    // is over and we can move the organism to death state
+
+
   },
 
-  onAnimateMoveEnd: function( organismStateMachine ) {
-    organismStateMachine.goToRest();
-  },
 
   entered: function( organismStateMachine ) {
 
@@ -30,4 +30,4 @@ inherit( BaseOrganismState, EatingState, {
 } );
 
 
-module.exports = EatingState;
+module.exports = DyingState;

@@ -3,10 +3,12 @@ var PropertySet = axon.PropertySet;
 var EcoSystemConstants = require( '../EcoSystemConstants' );
 var Vector2 = dot.Vector2;
 var OrganismImageCollection = require( '../organisms/OrganismImageCollection' );
-
+var ParticleExplosionBuilder = require( '../effects/ParticleExplosionBuilder' );
+var OrganismStateMachine = require( '../states/OrganismStateMachine' );
 
 /**
  * @param {EcoSystemModel} ecoSystemModel
+ * @param {jsonObject} organismInfo
  * @param {Vector2} initialPosition
  * @param {Bounds2} bounds
  * @constructor
@@ -26,6 +28,7 @@ function BaseOrganismModel( ecoSystemModel, organismInfo, initialPosition, bound
   thisModel.stateMachine = this.createStateMachine();
   thisModel.velocity = EcoSystemConstants.ANIMATION_VELOCITY;
   this.motionBounds = bounds;
+  this.particles = [];
 
   thisModel.positionProperty.lazyLink( function( position ) {
     if ( position.equals( initialPosition ) ) {
@@ -46,7 +49,7 @@ inherit( PropertySet, BaseOrganismModel, {
   },
 
   createStateMachine: function() {
-    throw new Error( "createStateMachine must be implemented in  BaseOrganismModel's descendant class" );
+    return new OrganismStateMachine( this );
   },
 
   /**
@@ -132,6 +135,10 @@ inherit( PropertySet, BaseOrganismModel, {
     }
   },
 
+  buildExplosionParticles: function() {
+    this.particles = ParticleExplosionBuilder.buildParticles( this.position.x, position.y, EcoSystemConstants.PARTICLE_COLOR );
+  },
+
   play: function() {
     this.stateMachine.startRandomMotion();
   },
@@ -142,11 +149,6 @@ inherit( PropertySet, BaseOrganismModel, {
 
   canInteract: function() {
     return this.interactionState === EcoSystemConstants.NON_INTERACTION_STATE;
-  },
-
-  updateInteraction: function( otherOrganismModel ) {
-    if ( this.canInteract() && otherOrganismModel.canInteract() ) {
-    }
   },
 
   isPrey: function() {
@@ -165,11 +167,21 @@ inherit( PropertySet, BaseOrganismModel, {
     return this.organismInfo.decomposer;
   },
 
-  startDying:function(){
-    this.ecoSystemModel.addDyingOrganisms(this);
+  startDying: function() {
+    this.ecoSystemModel.addDyingOrganisms( this );
+    this.stateMachine.startDying();
   },
 
-  die:function(){
+  startEating: function() {
+    this.stateMachine.startEating();
+  },
+
+  die: function() {
+    this.ecoSystemModel.removeDyingOrganisms( this );
+    this.ecoSystemModel.removeOrganism( this );
+  },
+
+  overlapBounds: function( otheModel ) {
 
   }
 

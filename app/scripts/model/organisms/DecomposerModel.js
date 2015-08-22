@@ -1,23 +1,22 @@
 var inherit = axon.inherit;
 var BaseOrganismModel = require( './BaseOrganismModel' );
-var OrganismImageCollection = require( './OrganismImageCollection' );
-var DecomposerStateMachine = require('../states/DecomposerStateMachine');
+
+
 
 /**
  * @param {EcoSystemModel} ecoSystemModel
- * @param {string} type // ex carniovores
- * @param {imageNode} icon // a carnivores can be represented by different icons
- * @param {Vector2} pos // initial Position
+ * @param {jsonObject} organismInfo
+ * @param {Vector2} initialPosition
  * @param {Bounds2} bounds
  * @constructor
  */
-function DecomposerModel( ecoSystemModel,type, icon, pos,bounds ) {
-  BaseOrganismModel.call( this, ecoSystemModel,type, icon, pos,bounds );
+function DecomposerModel( ecoSystemModel, organismInfo, initialPosition,bounds ) {
+  BaseOrganismModel.call( this, ecoSystemModel, organismInfo, initialPosition,bounds );
 }
 
 inherit( BaseOrganismModel, DecomposerModel, {
-  createStateMachine: function() {
-    return  new DecomposerStateMachine(this);
+  nextRandomMovement: function() {
+    this.setDestination( this.position );
   }
 } );
 

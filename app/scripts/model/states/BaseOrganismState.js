@@ -8,7 +8,7 @@ function BaseOrganismState() {
 
 inherit( Object, BaseOrganismState, {
 
-  animateStep: function( organismStateMachine, dt ) {
+  animateMovementStep: function( organismStateMachine, dt ) {
     var ecoSystemModel = organismStateMachine.organismModel.ecoSystemModel;
     var organism = organismStateMachine.organismModel;
     // perform any animation

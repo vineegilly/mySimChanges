@@ -6,7 +6,10 @@ function ParticleExplosionBuilder() {
 
 }
 
-inherit( Object, ParticleExplosionBuilder, {
+inherit( Object, ParticleExplosionBuilder, {},
+
+  // statics
+  {
   /*
    * Advanced Explosion effect
    * Each particle has a different size, move speed and scale speed.

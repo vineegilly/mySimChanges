@@ -2,10 +2,15 @@ var inherit = axon.inherit;
 var ReturnToOriginState = require( './ReturnToOriginState' );
 var OrganismRestingState = require( './OrganismRestingState' );
 var RandomMovementState = require( './RandomMovementState' );
+var EatingState = require( './EatingState' );
+var DyingState = require( './DyingState' );
+
 
 var returnToOriginStateInstance = new ReturnToOriginState();
 var organismRestingStateInstance = new OrganismRestingState();
 var randomMovementState = new RandomMovementState();
+var eatingState = new EatingState();
+var dyingState = new DyingState();
 
 /**
  *
@@ -14,7 +19,8 @@ var randomMovementState = new RandomMovementState();
  */
 function OrganismStateMachine( organismModel ) {
   this.organismModel = organismModel;
-  this.organismState = null;
+  this.organismState = organismRestingStateInstance;
+
 }
 
 
@@ -41,8 +47,16 @@ inherit( Object, OrganismStateMachine, {
       this.setState( organismRestingStateInstance );
     },
 
-    startRandomMotion:function(){
+    startRandomMotion: function() {
       this.setState( randomMovementState );
+    },
+
+    startEating: function() {
+      this.setState( eatingState );
+    },
+
+    startDying: function() {
+      this.setState( dyingState );
     }
 
   },

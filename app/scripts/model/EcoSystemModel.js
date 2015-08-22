@@ -8,7 +8,7 @@
 var inherit = axon.inherit;
 var PropertySet = axon.PropertySet;
 var ObservableArray = axon.ObservableArray;
-var OrganismImageCollection = require( '../model/organisms/OrganismImageCollection' );
+var OverlapRulesFactory = require( '../model/organisms/OverlapRulesFactory' );
 
 
 function EcoSystemModel( organismInfos, screenBounds ) {
@@ -48,6 +48,15 @@ inherit( PropertySet, EcoSystemModel, {
     this.residentOrganismModels.forEach( function( organismModel ) {
       organismModel.step( dt );
     } );
+
+    var self = this;
+
+    this.residentOrganismModels.forEach( function( organismModel1 ) {
+      self.residentOrganismModels.forEach( function( organismModel2 ) {
+        OverlapRulesFactory.applyOverlapRules( organismModel1, organismModel2 );
+      } );
+    } );
+
   },
 
   /**
@@ -66,12 +75,17 @@ inherit( PropertySet, EcoSystemModel, {
     } );
   },
 
+  removeOrganism: function( organismModel ) {
+    this.residentOrganismModels.remove( organismModel );
+  },
+
   isPlaying: function() {
     return this.playPause === true;
   },
 
   onClearPlay: function() {
     this.residentOrganismModels.clear();
+    this.playPause = false;
   },
 
   play: function() {
@@ -86,12 +100,12 @@ inherit( PropertySet, EcoSystemModel, {
     } );
   },
 
-  addDyingOrganisms:function(organismModel){
-    this.dyingModels.add(organismModel);
+  addDyingOrganisms: function( organismModel ) {
+    this.dyingModels.add( organismModel );
   },
 
-  removeDyingOrganisms:function(organismModel){
-    this.dyingModels.remove(organismModel);
+  removeDyingOrganisms: function( organismModel ) {
+    this.dyingModels.remove( organismModel );
   }
 
 
