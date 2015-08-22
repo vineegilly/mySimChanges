@@ -17,6 +17,10 @@ function DecomposerModel( ecoSystemModel, organismInfo, initialPosition,bounds )
 inherit( BaseOrganismModel, DecomposerModel, {
   nextRandomMovement: function() {
     this.setDestination( this.position );
+  },
+
+  clone:function(initialPos){
+    return new DecomposerModel(this.ecoSystemModel,this.organismInfo,initialPos,this.motionBounds);
   }
 } );
 

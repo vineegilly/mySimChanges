@@ -15,7 +15,9 @@ function HerbivoresModel( ecoSystemModel, organismInfo, initialPosition,bounds )
 }
 
 inherit( BaseOrganismModel, HerbivoresModel, {
-
+  clone:function(initialPos){
+    return new HerbivoresModel(this.ecoSystemModel,this.organismInfo,initialPos,this.motionBounds);
+  }
 } );
 
 module.exports = HerbivoresModel;

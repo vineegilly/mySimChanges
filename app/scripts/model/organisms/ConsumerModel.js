@@ -16,7 +16,9 @@ function ConsumerModel( ecoSystemModel, organismInfo, initialPosition,bounds ) {
 }
 
 inherit( BaseOrganismModel, ConsumerModel, {
-
+  clone:function(initialPos){
+    return new ConsumerModel(this.ecoSystemModel,this.organismInfo,initialPos,this.motionBounds);
+  }
 } );
 
 module.exports = ConsumerModel;

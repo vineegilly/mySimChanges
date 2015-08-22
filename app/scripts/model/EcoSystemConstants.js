@@ -5,8 +5,8 @@ var Image = scenery.Image;
 var lion = require( "../../assets/images/lion.png" );
 
 var imageNode = new Image( lion );
-;
-var IMAGE_SCALE = 0.15;
+
+var IMAGE_SCALE = 0.13;
 imageNode.scale( IMAGE_SCALE );
 
 
@@ -18,8 +18,11 @@ var EcoSystemConstants = {
     GRID_PANEL_STROKE_COLOR: new Color( 100, 100, 100 ),
     PANEL_TITLE_FONT: new SimFont( { family: 'Futura', size: 18, weight: 'bold' } ),
     ANIMATION_VELOCITY: 500,
-    PLAY_STEP_DISTANCE: imageNode.width / 2,
-    ORGANISM_RADIUS:    imageNode.width / 2,
+    PLAY_STEP_DISTANCE:  imageNode.width / 2,
+    ORGANISM_RADIUS:     imageNode.width / 2,
+    MOVE_APART_DISTANCE: imageNode.width / 4,
+    MIN_REPRODUCTION_LAPSE: 10,
+    MIN_PREDATE_LAPSE: 10,
     IMAGE_SCALE: IMAGE_SCALE,
     GRID_NODE_DIMENSION: new Dimension2( 930, 360 ),
     PARTICLE_COLOR: new Color( 255, 0, 0 ),
@@ -28,13 +31,14 @@ var EcoSystemConstants = {
     DYING_STATE: 1,
     EATING_STATE: 2,
     REPRODUCING_STATE: 3,
+    BEING_PRODUCED_STATE: 4,
     NON_INTERACTION_STATE: 0,
 
     CARNIVORES: 1,
     DECOMPOSERS: 2,
     HERBIVORES: 3,
     OMNIVORES: 4,
-    PRODUCERS: 5,
+    PRODUCERS: 5
 
 
   }

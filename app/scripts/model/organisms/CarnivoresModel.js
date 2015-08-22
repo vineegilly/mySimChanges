@@ -14,6 +14,9 @@ function CarnivoresModel( ecoSystemModel, organismInfo, initialPosition,bounds )
 
 inherit( BaseOrganismModel, CarnivoresModel, {
 
+  clone:function(initialPos){
+    return new CarnivoresModel(this.ecoSystemModel,this.organismInfo,initialPos,this.motionBounds);
+  }
 
 } );
 

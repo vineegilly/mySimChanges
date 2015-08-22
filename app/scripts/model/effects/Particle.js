@@ -2,14 +2,14 @@ var inherit = axon.inherit;
 
 function Particle() {
 
-  this.scale = 1.0;
+  this.scale = 1.2;
   this.x = 0;
   this.y = 0;
-  this.radius = 20;
+  this.radius = 10;
   this.color = "#000";
   this.velocityX = 0;
   this.velocityY = 0;
-  this.scaleSpeed = 0.5;
+  this.scaleSpeed = 500;
 }
 
 inherit( Object, Particle, {
@@ -17,14 +17,14 @@ inherit( Object, Particle, {
 
   update: function( ms ) {
     // shrinking
-    this.scale -= this.scaleSpeed * ms / 1000.0;
+     this.scale -= this.scaleSpeed * ms;
 
     if ( this.scale <= 0 ) {
       this.scale = 0;
     }
     // moving away from explosion center
-    this.x += this.velocityX * ms / 1000.0;
-    this.y += this.velocityY * ms / 1000.0;
+    this.x += this.velocityX * ms;
+    this.y += this.velocityY * ms;
   },
 
   draw: function( context2D ) {

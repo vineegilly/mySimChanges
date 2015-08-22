@@ -15,7 +15,9 @@ function OmnivoresModel(ecoSystemModel, organismInfo, initialPosition,bounds ) {
 }
 
 inherit( BaseOrganismModel, OmnivoresModel, {
-
+  clone:function(initialPos){
+    return new OmnivoresModel(this.ecoSystemModel,this.organismInfo,initialPos,this.motionBounds);
+  }
 } );
 
 module.exports = OmnivoresModel;

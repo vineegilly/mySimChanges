@@ -18,6 +18,17 @@ function OrganismNode( organismModel ) {
     thisNode.center = newPos;
   } );
 
+
+  organismModel.opacityProperty.link( function( newOpacity ) {
+    thisNode.opacity = newOpacity;
+  } );
+
+
+  organismModel.scaleProperty.link( function( newScale ) {
+    thisNode.scale( newScale );
+  } );
+
+
 }
 
 inherit( Node, OrganismNode );

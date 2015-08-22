@@ -10,25 +10,37 @@ var OrganismStateMachine = require( '../states/OrganismStateMachine' );
  * @param {EcoSystemModel} ecoSystemModel
  * @param {jsonObject} organismInfo
  * @param {Vector2} initialPosition
- * @param {Bounds2} bounds
+ * @param {Bounds2} motionBounds
  * @constructor
  */
-function BaseOrganismModel( ecoSystemModel, organismInfo, initialPosition, bounds ) {
+function BaseOrganismModel( ecoSystemModel, organismInfo, initialPosition, motionBounds ) {
   var thisModel = this;
   PropertySet.call( thisModel, {
     userControlled: false,
     position: initialPosition.copy(),
-    interactionState: EcoSystemConstants.NON_INTERACTION_STATE
+    interactionState: EcoSystemConstants.NON_INTERACTION_STATE,
+    dead: false,
+    scale: 1,
+    opacity: 1
   } );
 
+  thisModel.id = organismInfo.id;
   thisModel.organismInfo = organismInfo;
   thisModel.appearanceImage = OrganismImageCollection.getRepresentation( organismInfo.id );
   thisModel.ecoSystemModel = ecoSystemModel;
   thisModel.organismState = null;
   thisModel.stateMachine = this.createStateMachine();
   thisModel.velocity = EcoSystemConstants.ANIMATION_VELOCITY;
-  this.motionBounds = bounds;
+
+  thisModel.organismBeingEaten = null;
+  thisModel.organismReproducingWith = null;
+  thisModel.newlyProducedModel = null;
+  this.motionBounds = motionBounds;
   this.particles = [];
+
+  // initially make it ready
+  thisModel.reproductionMinimumLapsedTimes = EcoSystemConstants.MIN_REPRODUCTION_LAPSE + 1;
+  thisModel.predatingMiniumLapsedTimes = EcoSystemConstants.MIN_PREDATE_LAPSE + 1;
 
   thisModel.positionProperty.lazyLink( function( position ) {
     if ( position.equals( initialPosition ) ) {
@@ -45,7 +57,15 @@ inherit( PropertySet, BaseOrganismModel, {
   step: function( dt ) {
     if ( !this.userControlled ) {
       this.stateMachine.step( dt );
+
     }
+  },
+
+  canReproduce: function() {
+    if ( this.reproductionMinimumLapsedTimes > EcoSystemConstants.MIN_REPRODUCTION_LAPSE ) {
+      return true;
+    }
+    return false;
   },
 
   createStateMachine: function() {
@@ -62,6 +82,11 @@ inherit( PropertySet, BaseOrganismModel, {
 
   moveRandomly: function() {
     throw new Error( "moveRandomly must be implemented in  BaseOrganismModel's descendant class" );
+  },
+
+
+  clone: function( initialPos ) {
+    throw new Error( "clone must be implemented in  BaseOrganismModel's descendant class" );
   },
 
 
@@ -106,8 +131,6 @@ inherit( PropertySet, BaseOrganismModel, {
     var currentPosition = this.position;
 
     var containsPoint = this.motionBounds.containsPoint( currentPosition );
-    // console.log( "Bounds " + this.motionBounds + "  Contains  " + containsPoint + " point " + currentPosition );
-
 
     var newPosition = null;
     var animatePlay = true;
@@ -133,6 +156,9 @@ inherit( PropertySet, BaseOrganismModel, {
         this.setDestination( newPosition, animatePlay, playVelocity );
         break;
     }
+
+    this.reproductionMinimumLapsedTimes++;
+    this.predatingMiniumLapsedTimes++;
   },
 
   buildExplosionParticles: function() {
@@ -148,7 +174,18 @@ inherit( PropertySet, BaseOrganismModel, {
   },
 
   canInteract: function() {
-    return this.interactionState === EcoSystemConstants.NON_INTERACTION_STATE;
+    if ( this.interactionState === EcoSystemConstants.NON_INTERACTION_STATE ) {
+      return true;
+    }
+    if ( this.interactionState === EcoSystemConstants.BEING_PRODUCED_STATE ) {
+      return true;
+    }
+
+    return false;
+  },
+
+  isDead: function() {
+    return this.dead;
   },
 
   isPrey: function() {
@@ -167,26 +204,41 @@ inherit( PropertySet, BaseOrganismModel, {
     return this.organismInfo.decomposer;
   },
 
+  isEating: function() {
+    return this.interactionState === EcoSystemConstants.EATING_STATE;
+  },
+
   startDying: function() {
     this.ecoSystemModel.addDyingOrganisms( this );
     this.stateMachine.startDying();
     this.interactionState = EcoSystemConstants.DYING_STATE;
   },
 
-  startEating: function() {
-    this.stateMachine.startEating();
+  startPredating: function( preyBeingEaten ) {
+    this.organismBeingEaten = preyBeingEaten;
+    var preyPosition = preyBeingEaten.position;
+    this.setDestination( preyPosition, true, EcoSystemConstants.ANIMATION_VELOCITY / 2 );
+    this.stateMachine.startPredating();
     this.interactionState = EcoSystemConstants.EATING_STATE;
+    this.predatingMiniumLapsedTimes = 0;
   },
 
   die: function() {
     this.ecoSystemModel.removeDyingOrganisms( this );
     this.ecoSystemModel.removeOrganism( this );
+    this.dead = true;
+  },
+
+  finishEating: function() {
+    this.interactionState = EcoSystemConstants.NON_INTERACTION_STATE;
+    this.stateMachine.startRandomMotion();
   },
 
   overlapBounds: function( otherModel ) {
-
     var r1 = EcoSystemConstants.ORGANISM_RADIUS;
     var r2 = EcoSystemConstants.ORGANISM_RADIUS;
+
+    var tolerance = 15;
 
     var c1 = this.position;
     var c2 = otherModel.position;
@@ -198,11 +250,50 @@ inherit( PropertySet, BaseOrganismModel, {
     // Determine actual distance between circle circles
     var c_dist = c1.distance( c2 );
 
+    c_dist += tolerance;
+
     if ( c_dist > r_max ) {
       return false;
     }
 
     return true;
+  },
+
+
+  reproduceWith: function( otherModel ) {
+    var thisPos = this.position;
+    var otherPos = otherModel.position;
+    var midPoint = thisPos.average( otherPos );
+    this.newlyProducedModel = this.ecoSystemModel.cloneOrganism( this, midPoint, EcoSystemConstants.BEING_PRODUCED_STATE );
+  },
+
+  startReproducing: function( otherOrganism ) {
+    //store the partner
+    this.organismReproducingWith = otherOrganism;
+    var otherPartnerPos = otherOrganism.position;
+    this.setDestination( otherPartnerPos, true, EcoSystemConstants.ANIMATION_VELOCITY / 2 );
+    this.interactionState = EcoSystemConstants.REPRODUCING_STATE;
+
+    this.stateMachine.startReproducing();
+    otherOrganism.supportReproducing();
+    this.reproductionMinimumLapsedTimes = 0;
+  },
+
+  supportReproducing: function() {
+    this.interactionState = EcoSystemConstants.REPRODUCING_STATE;
+    this.reproductionMinimumLapsedTimes = 0;
+    this.stateMachine.supportReproducing();
+  },
+
+  finishReproducing: function() {
+    this.interactionState = EcoSystemConstants.NON_INTERACTION_STATE;
+    this.stateMachine.startRandomMotion();
+    if ( this.newlyProducedModel ) {
+      this.newlyProducedModel.interactionState = EcoSystemConstants.NON_INTERACTION_STATE;
+      this.newlyProducedModel.reproductionMinimumLapsedTimes = 0;
+      this.newlyProducedModel.play();
+      this.newlyProducedModel = null;
+    }
   }
 
 } );

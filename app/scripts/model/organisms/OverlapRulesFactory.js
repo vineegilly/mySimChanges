@@ -14,15 +14,21 @@ inherit( Object, OverlapRulesFactory, {},
       if ( organism1 === organism2 ) {
         return;
       }
-      if ( organism1.canInteract() && organism2.canInteract() ) {
-
-        var preyPredatorOverlapResult = this.checkForPreyPredatorRule( organism1, organism2 );
-        if ( preyPredatorOverlapResult.prey && preyPredatorOverlapResult.predator ) {
-          this.preyOverlapWithPredator( preyPredatorOverlapResult.prey, preyPredatorOverlapResult.predator );
-          return;
-        }
-
+      if ( !organism1.canInteract() || !organism2.canInteract() ) {
+        return;
       }
+
+      var preyPredatorOverlapResult = this.checkForPreyPredatorRule( organism1, organism2 );
+      if ( preyPredatorOverlapResult.prey && preyPredatorOverlapResult.predator ) {
+        this.preyOverlapWithPredator( preyPredatorOverlapResult.prey, preyPredatorOverlapResult.predator );
+        return;
+      }
+
+      var reproduceRule = this.checkForReproductionRule( organism1, organism2 );
+      if ( reproduceRule.partner1 ) {
+        this.reproduce( reproduceRule.partner1, reproduceRule.partner2 );
+      }
+
     },
 
     checkForPreyPredatorRule: function( organism1, organism2 ) {
@@ -41,15 +47,30 @@ inherit( Object, OverlapRulesFactory, {},
       }
 
       return preyPredatorOverlapResult;
+    },
 
+    checkForReproductionRule: function( organism1, organism2 ) {
+      var reproductionRuleResult = {};
+
+      // only same items can reproduce
+      if ( organism1.id === organism2.id ) {
+        reproductionRuleResult[ "partner1" ] = organism1;
+        reproductionRuleResult[ "partner2" ] = organism2;
+      }
+      return reproductionRuleResult;
     },
 
     preyOverlapWithPredator: function( prey, predator ) {
       if ( prey.overlapBounds( predator ) ) {
-        var preyPosition = prey.position;
-        predator.setDestination( preyPosition, true, EcoSystemConstants.ANIMATION_VELOCITY / 2 );
-        predator.startEating();
-        prey.startDying();
+        predator.startPredating( prey );
+      }
+    },
+
+    reproduce: function( organism1, organism2 ) {
+      if ( organism1.canReproduce() && organism2.canReproduce() ) {
+        if ( organism1.overlapBounds( organism2 ) ) {
+          organism1.startReproducing( organism2 );
+        }
       }
     }
 

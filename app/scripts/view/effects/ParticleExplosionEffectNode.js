@@ -11,7 +11,6 @@ var CanvasNode = scenery.CanvasNode;
 function ParticleExplosionEffectNode( particleCollection, bounds ) {
   this.particleCollection = particleCollection;
   this.frameDelay = 0;
-
   CanvasNode.call( this, { pickable: false, canvasBounds: bounds, layerSplit: true } );
   this.invalidatePaint();
 }

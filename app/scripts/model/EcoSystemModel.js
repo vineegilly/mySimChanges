@@ -51,11 +51,12 @@ inherit( PropertySet, EcoSystemModel, {
     } );
 
     if ( this.isPlaying() ) {
-      this.residentOrganismModels.forEach( function( organismModel1 ) {
-        self.residentOrganismModels.forEach( function( organismModel2 ) {
-          OverlapRulesFactory.applyOverlapRules( organismModel1, organismModel2 );
-        } );
-      } );
+      var allModels = [].concat( this.residentOrganismModels.getArray() );
+      for ( var i = 0; i < allModels.length; i++ ) {
+        for ( var j = 0; j < allModels.length; j++ ) {
+          OverlapRulesFactory.applyOverlapRules( allModels[ i ], allModels[ j ] );
+        }
+      }
     }
 
   },
@@ -74,6 +75,20 @@ inherit( PropertySet, EcoSystemModel, {
         self.residentOrganismModels.remove( organismModel );
       }
     } );
+  },
+
+  /**
+   *
+   * @param originalOrganism
+   * @param initialPos
+   * @param state
+   * @returns {*}
+   */
+  cloneOrganism: function( originalOrganism, initialPos, interactionState ) {
+    var newOrganismModel = originalOrganism.clone( initialPos );
+    newOrganismModel.interactionState = interactionState;
+    this.addOrganism( newOrganismModel );
+    return newOrganismModel;
   },
 
   removeOrganism: function( organismModel ) {

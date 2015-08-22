@@ -2,11 +2,11 @@ var inherit = axon.inherit;
 var BaseOrganismState = require( './BaseOrganismState' );
 var Vector2 = dot.Vector2;
 
-function EatingState() {
+function PredatingState() {
   BaseOrganismState.call( this );
 }
 
-inherit( BaseOrganismState, EatingState, {
+inherit( BaseOrganismState, PredatingState, {
 
   step: function( organismStateMachine, dt ) {
     var organism = organismStateMachine.organismModel;
@@ -16,7 +16,10 @@ inherit( BaseOrganismState, EatingState, {
   },
 
   onAnimateMoveEnd: function( organismStateMachine ) {
-    organismStateMachine.goToRest();
+    var organism = organismStateMachine.organismModel;
+    var preyBeingEaten = organism.organismBeingEaten;
+    preyBeingEaten.startDying();
+    organism.finishEating();
   },
 
   entered: function( organismStateMachine ) {
@@ -29,5 +32,4 @@ inherit( BaseOrganismState, EatingState, {
 
 } );
 
-
-module.exports = EatingState;
+module.exports = PredatingState;
