@@ -8,8 +8,8 @@ var BaseOrganismModel = require( './BaseOrganismModel' );
  * @param {Bounds2} bounds
  * @constructor
  */
-function ProducerModel( ecoSystemModel, organismInfo, initialPosition, bounds ) {
-  BaseOrganismModel.call( this, ecoSystemModel, organismInfo, initialPosition, bounds );
+function ProducerModel( ecoSystemModel, organismInfo, initialPosition, bounds,createdThroughInteraction ) {
+  BaseOrganismModel.call( this, ecoSystemModel, organismInfo, initialPosition, bounds,createdThroughInteraction );
 }
 
 inherit( BaseOrganismModel, ProducerModel, {
@@ -17,8 +17,9 @@ inherit( BaseOrganismModel, ProducerModel, {
     this.setDestination( this.position );
   },
 
-  clone: function( initialPos ) {
-    return new ProducerModel( this.ecoSystemModel, this.organismInfo, initialPos, this.motionBounds );
+
+  clone:function(initialPos,createdThroughInteraction){
+    return new ProducerModel(this.ecoSystemModel,this.organismInfo,initialPos,this.motionBounds,createdThroughInteraction);
   }
 } );
 

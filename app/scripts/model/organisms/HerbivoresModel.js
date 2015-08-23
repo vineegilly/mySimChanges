@@ -10,13 +10,14 @@ var BaseOrganismModel = require( './BaseOrganismModel' );
  * @param {Bounds2} bounds
  * @constructor
  */
-function HerbivoresModel( ecoSystemModel, organismInfo, initialPosition,bounds ) {
-  BaseOrganismModel.call( this, ecoSystemModel, organismInfo, initialPosition,bounds );
+function HerbivoresModel( ecoSystemModel, organismInfo, initialPosition,bounds,createdThroughInteraction ) {
+  BaseOrganismModel.call( this, ecoSystemModel, organismInfo, initialPosition,bounds,createdThroughInteraction );
 }
 
 inherit( BaseOrganismModel, HerbivoresModel, {
-  clone:function(initialPos){
-    return new HerbivoresModel(this.ecoSystemModel,this.organismInfo,initialPos,this.motionBounds);
+
+  clone:function(initialPos,createdThroughInteraction){
+    return new HerbivoresModel(this.ecoSystemModel,this.organismInfo,initialPos,this.motionBounds,createdThroughInteraction);
   }
 } );
 

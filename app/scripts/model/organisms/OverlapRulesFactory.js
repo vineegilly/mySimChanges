@@ -61,12 +61,17 @@ inherit( Object, OverlapRulesFactory, {},
     },
 
     preyOverlapWithPredator: function( prey, predator ) {
-      if ( prey.overlapBounds( predator ) ) {
-        predator.startPredating( prey );
+      if ( predator.canPredate() ) {
+        if ( prey.overlapBounds( predator ) ) {
+          predator.startPredating( prey );
+        }
       }
     },
 
     reproduce: function( organism1, organism2 ) {
+      if ( organism1.ecoSystemModel.reachedLimit() ) {
+        return;
+      }
       if ( organism1.canReproduce() && organism2.canReproduce() ) {
         if ( organism1.overlapBounds( organism2 ) ) {
           organism1.startReproducing( organism2 );

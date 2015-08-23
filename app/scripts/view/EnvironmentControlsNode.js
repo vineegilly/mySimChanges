@@ -15,19 +15,31 @@ var TitleBarNode = require( './TitleBarNode' );
 // constants
 var CHECK_BOX_OPTIONS = { boxWidth: 30 };
 var CONTROL_TEXT_OPTIONS = { font: new SimFont( 15 ) };
+var POPULATION_TEXT_OPTIONS = { font: new SimFont( 25 ) };
 var POPULATION_RANGE_STR = "Population Range";
 var RAIN_STR = "Rain";
 var SUN_LIGHT_STR = "Sun Light";
 var ENVIRONMENTAL_CONTROLS_STR = "Environment Controls";
 var TITLE_SIZE = new Dimension2( 200, 30 );
 
-function EnvironmentControlsNode() {
+function EnvironmentControlsNode( ecoSystemModel ) {
   var thisPanel = this;
 
-  var sunLightProperty = new Property( true );
-  var rainProperty = new Property( true );
-  var populationRangeProperty = new Property( 100 );
-  var populationRangeSlider = new HSlider( populationRangeProperty, { min: 100, max: 150 } );
+  var sunLightProperty = ecoSystemModel.sunLightProperty;
+  var rainProperty = ecoSystemModel.rainProperty;
+  var populationRangeProperty = ecoSystemModel.populationRangeProperty;
+  var populationRangeSlider = new HSlider( populationRangeProperty, { min: 1, max: 5 } );
+
+  var populationRangeIndicator = new Text( populationRangeProperty.get(), POPULATION_TEXT_OPTIONS );
+  var populationSliderBox = new HBox( {
+    spacing: 15,
+    children: [ populationRangeSlider, populationRangeIndicator ],
+    resize: false
+  } );
+
+  populationRangeProperty.link( function( populationRangeValue ) {
+    populationRangeIndicator.text = Number( populationRangeValue ) | 0;
+  } );
 
   var checkBoxes = [];
   var rainCheckBoxControl = new CheckBox( new Text( RAIN_STR, CONTROL_TEXT_OPTIONS ),
@@ -42,7 +54,7 @@ function EnvironmentControlsNode() {
   } );
 
   var controlLayersNode = new Node();
-  controlLayersNode.addChild( populationRangeSlider );
+  controlLayersNode.addChild( populationSliderBox );
   controlLayersNode.addChild( checkBoxControlBox );
   checkBoxControlBox.x = populationRangeSlider.x - 20;
   checkBoxControlBox.y = populationRangeSlider.bounds.bottom + 60;

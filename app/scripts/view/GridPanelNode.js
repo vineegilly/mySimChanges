@@ -7,8 +7,7 @@ var EcoSystemConstants = require( '../model/EcoSystemConstants' );
 var VBox = scenery.VBox;
 var Dimension2 = dot.Dimension2;
 var GridNode = require( './GridNode' );
-var ParticleExplosionEffectNode = require( './effects/ParticleExplosionEffectNode' );
-var ObservableArray = axon.ObservableArray;
+var EcoSystemEffectNode = require( './effects/EcoSystemEffectNode' );
 
 
 /**
@@ -20,29 +19,14 @@ function GridPanelNode( ecoSystemModel ) {
   var thisPanelNode = this;
   var panelContentsNode = new Node();
 
-  thisPanelNode.particleCollection = new ObservableArray();
 
   thisPanelNode.gridNode = new GridNode( EcoSystemConstants.GRID_NODE_DIMENSION );
   panelContentsNode.addChild( thisPanelNode.gridNode );
 
   var particleBounds = Bounds2.rect( 0, 0, EcoSystemConstants.GRID_NODE_DIMENSION.width, EcoSystemConstants.GRID_NODE_DIMENSION.height );
-  thisPanelNode.particleExplosionEffectNode = new ParticleExplosionEffectNode( thisPanelNode.particleCollection, particleBounds );
-  panelContentsNode.addChild( thisPanelNode.particleExplosionEffectNode );
+  thisPanelNode.ecoSystemEffectNode = new EcoSystemEffectNode( ecoSystemModel, particleBounds );
+  panelContentsNode.addChild( thisPanelNode.ecoSystemEffectNode );
 
-  function handleOrganismDying( addedOrganismModel ) {
-    addedOrganismModel.buildExplosionParticles();
-    var particles = addedOrganismModel.particles;
-    thisPanelNode.particleCollection.add( particles );
-
-    ecoSystemModel.dyingModels.addItemRemovedListener( function removalListener( removedOrganismModel ) {
-      if ( removedOrganismModel === addedOrganismModel ) {
-        thisPanelNode.particleCollection.remove( particles );
-        ecoSystemModel.dyingModels.removeItemRemovedListener( removalListener );
-      }
-    } );
-  }
-
-  ecoSystemModel.dyingModels.addItemAddedListener( handleOrganismDying );
 
 // vertical panel
   Panel.call( this, panelContentsNode, {
@@ -54,16 +38,14 @@ function GridPanelNode( ecoSystemModel ) {
     yMargin: 0
   } );
 
-
 }
 
 inherit( Panel, GridPanelNode, {
 
   step: function( dt ) {
     var thisPanelNode = this;
-    if ( thisPanelNode.particleCollection.length > 0 ) {
-      thisPanelNode.particleExplosionEffectNode.step( dt );
-    }
+    thisPanelNode.ecoSystemEffectNode.step( dt );
+
   },
 
   /**

@@ -9,12 +9,16 @@ var inherit = axon.inherit;
 var PropertySet = axon.PropertySet;
 var ObservableArray = axon.ObservableArray;
 var OverlapRulesFactory = require( '../model/organisms/OverlapRulesFactory' );
+var EcoSystemConstants = require( './EcoSystemConstants' );
 
 
 function EcoSystemModel( organismInfos, screenBounds ) {
   var thisModel = this;
   PropertySet.call( this, {
-    playPause: false
+    playPause: false,
+    populationRange: 1,
+    rain: false,
+    sunLight: false
   } );
 
   this.organismInfos = organismInfos;
@@ -33,6 +37,26 @@ function EcoSystemModel( organismInfos, screenBounds ) {
     else {
       thisModel.pause();
     }
+  } );
+
+  var refPopulationRange = this.populationRange;
+  this.populationRangeProperty.lazyLink( function( newPopulationRange ) {
+    newPopulationRange = newPopulationRange | 0;
+
+    if ( refPopulationRange === newPopulationRange ) {
+      return;
+    }
+
+    // assigning to populationRange property fires  eventListenr,so keeping a local varibale
+    refPopulationRange = newPopulationRange;
+
+    var existingModels = thisModel.residentOrganismModels.getArray();
+
+    existingModels.forEach( function( organismModel ) {
+      organismModel.multiply( newPopulationRange );
+    } );
+
+
   } );
 
 
@@ -77,6 +101,14 @@ inherit( PropertySet, EcoSystemModel, {
     } );
   },
 
+  reachedLimit: function() {
+    if ( this.residentOrganismModels.length >= EcoSystemConstants.MAX_ORGANISMS ) {
+      return true;
+    }
+
+    return false;
+  },
+
   /**
    *
    * @param originalOrganism
@@ -84,8 +116,8 @@ inherit( PropertySet, EcoSystemModel, {
    * @param state
    * @returns {*}
    */
-  cloneOrganism: function( originalOrganism, initialPos, interactionState ) {
-    var newOrganismModel = originalOrganism.clone( initialPos );
+  cloneOrganism: function( originalOrganism, initialPos, interactionState, createdThroughInteraction ) {
+    var newOrganismModel = originalOrganism.clone( initialPos, createdThroughInteraction );
     newOrganismModel.interactionState = interactionState;
     this.addOrganism( newOrganismModel );
     return newOrganismModel;

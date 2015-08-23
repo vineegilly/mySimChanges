@@ -3,7 +3,6 @@ var PropertySet = axon.PropertySet;
 var EcoSystemConstants = require( '../EcoSystemConstants' );
 var Vector2 = dot.Vector2;
 var OrganismImageCollection = require( '../organisms/OrganismImageCollection' );
-var ParticleExplosionBuilder = require( '../effects/ParticleExplosionBuilder' );
 var OrganismStateMachine = require( '../states/OrganismStateMachine' );
 
 /**
@@ -13,7 +12,7 @@ var OrganismStateMachine = require( '../states/OrganismStateMachine' );
  * @param {Bounds2} motionBounds
  * @constructor
  */
-function BaseOrganismModel( ecoSystemModel, organismInfo, initialPosition, motionBounds ) {
+function BaseOrganismModel( ecoSystemModel, organismInfo, initialPosition, motionBounds, createdThroughInteraction ) {
   var thisModel = this;
   PropertySet.call( thisModel, {
     userControlled: false,
@@ -32,18 +31,21 @@ function BaseOrganismModel( ecoSystemModel, organismInfo, initialPosition, motio
   thisModel.stateMachine = this.createStateMachine();
   thisModel.velocity = EcoSystemConstants.ANIMATION_VELOCITY;
 
+  // some models gets created through interaction
+  thisModel.createdThroughInteraction = createdThroughInteraction;
+
   thisModel.organismBeingEaten = null;
   thisModel.organismReproducingWith = null;
   thisModel.newlyProducedModel = null;
   this.motionBounds = motionBounds;
-  this.particles = [];
+  this.multipliedOrganisms = [ this ];// add the current one
 
-  // initially make it ready
-  thisModel.reproductionMinimumLapsedTimes = EcoSystemConstants.MIN_REPRODUCTION_LAPSE + 1;
-  thisModel.predatingMiniumLapsedTimes = EcoSystemConstants.MIN_PREDATE_LAPSE + 1;
+  // initially make it ready, but for the one created through interaction, set them zero to start with
+  thisModel.reproductionMinimumLapsedTimes = createdThroughInteraction ? 0 : EcoSystemConstants.MIN_REPRODUCTION_LAPSE + 1;
+  thisModel.predatingMiniumLapsedTimes = createdThroughInteraction ? 0 : EcoSystemConstants.MIN_PREDATE_LAPSE + 1;
 
   thisModel.positionProperty.lazyLink( function( position ) {
-    if ( position.equals( initialPosition ) ) {
+    if ( position.equals( initialPosition ) && !createdThroughInteraction ) {
       thisModel.trigger( 'returnedToOrigin' );
     }
 
@@ -61,8 +63,54 @@ inherit( PropertySet, BaseOrganismModel, {
     }
   },
 
+  /**
+   * called when population Range slider is invoked
+   * @param newRange
+   */
+  multiply: function( newRange ) {
+
+    // only original elements can be multiplied
+    if ( this.createdThroughInteraction ) {
+      return;
+    }
+
+    if ( this.multipliedOrganisms.length === newRange ) {
+      return;
+    }
+
+    if ( this.multipliedOrganisms.length > newRange ) {
+      for ( var i = newRange; i < this.multipliedOrganisms.length; i++ ) {
+        var organism = this.multipliedOrganisms[ i ];
+        this.ecoSystemModel.removeOrganism( organism );
+      }
+
+      this.multipliedOrganisms.splice( newRange );
+    }
+
+    else {
+      var newOrganisms = [];
+
+      for ( var j = this.multipliedOrganisms.length; j < newRange; j++ ) {
+        var randomPosX = _.random( this.motionBounds.minX, this.motionBounds.maxX );
+        var randomPosY = _.random( this.motionBounds.minY, this.motionBounds.maxY );
+        var newPos = this.motionBounds.closestPointTo( new Vector2( randomPosX, randomPosY ) );
+        var newMultipliedOrganism = this.ecoSystemModel.cloneOrganism( this, newPos, EcoSystemConstants.NON_INTERACTION_STATE, true );
+        newOrganisms.push( newMultipliedOrganism );
+      }
+
+      this.multipliedOrganisms = this.multipliedOrganisms.concat( newOrganisms );
+    }
+  },
+
   canReproduce: function() {
     if ( this.reproductionMinimumLapsedTimes > EcoSystemConstants.MIN_REPRODUCTION_LAPSE ) {
+      return true;
+    }
+    return false;
+  },
+
+  canPredate: function() {
+    if ( this.predatingMiniumLapsedTimes > EcoSystemConstants.MIN_PREDATE_LAPSE ) {
       return true;
     }
     return false;
@@ -161,9 +209,6 @@ inherit( PropertySet, BaseOrganismModel, {
     this.predatingMiniumLapsedTimes++;
   },
 
-  buildExplosionParticles: function() {
-    this.particles = ParticleExplosionBuilder.buildParticles( this.position.x, this.position.y, EcoSystemConstants.PARTICLE_COLOR );
-  },
 
   play: function() {
     this.stateMachine.startRandomMotion();
@@ -264,7 +309,8 @@ inherit( PropertySet, BaseOrganismModel, {
     var thisPos = this.position;
     var otherPos = otherModel.position;
     var midPoint = thisPos.average( otherPos );
-    this.newlyProducedModel = this.ecoSystemModel.cloneOrganism( this, midPoint, EcoSystemConstants.BEING_PRODUCED_STATE );
+    var createdThroughInteraction = true;
+    this.newlyProducedModel = this.ecoSystemModel.cloneOrganism( this, midPoint, EcoSystemConstants.BEING_PRODUCED_STATE, createdThroughInteraction );
   },
 
   startReproducing: function( otherOrganism ) {

@@ -10,8 +10,8 @@ var BaseOrganismModel = require( './BaseOrganismModel' );
  * @param {Bounds2} bounds
  * @constructor
  */
-function DecomposerModel( ecoSystemModel, organismInfo, initialPosition,bounds ) {
-  BaseOrganismModel.call( this, ecoSystemModel, organismInfo, initialPosition,bounds );
+function DecomposerModel( ecoSystemModel, organismInfo, initialPosition,bounds,createdThroughInteraction ) {
+  BaseOrganismModel.call( this, ecoSystemModel, organismInfo, initialPosition,bounds,createdThroughInteraction );
 }
 
 inherit( BaseOrganismModel, DecomposerModel, {
@@ -19,8 +19,9 @@ inherit( BaseOrganismModel, DecomposerModel, {
     this.setDestination( this.position );
   },
 
-  clone:function(initialPos){
-    return new DecomposerModel(this.ecoSystemModel,this.organismInfo,initialPos,this.motionBounds);
+
+  clone:function(initialPos,createdThroughInteraction){
+    return new DecomposerModel(this.ecoSystemModel,this.organismInfo,initialPos,this.motionBounds,createdThroughInteraction);
   }
 } );
 

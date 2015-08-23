@@ -10,15 +10,17 @@ var BaseOrganismModel = require( './BaseOrganismModel' );
  * @param {Bounds2} bounds
  * @constructor
  */
-function ConsumerModel( ecoSystemModel, organismInfo, initialPosition,bounds ) {
-  BaseOrganismModel.call( this, ecoSystemModel, organismInfo, initialPosition,bounds );
+function ConsumerModel( ecoSystemModel, organismInfo, initialPosition,bounds,createdThroughInteraction ) {
+  BaseOrganismModel.call( this, ecoSystemModel, organismInfo, initialPosition,bounds,createdThroughInteraction );
 
 }
 
 inherit( BaseOrganismModel, ConsumerModel, {
-  clone:function(initialPos){
-    return new ConsumerModel(this.ecoSystemModel,this.organismInfo,initialPos,this.motionBounds);
+
+  clone:function(initialPos,createdThroughInteraction){
+    return new ConsumerModel(this.ecoSystemModel,this.organismInfo,initialPos,this.motionBounds,createdThroughInteraction);
   }
+
 } );
 
 module.exports = ConsumerModel;
