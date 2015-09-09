@@ -59,8 +59,12 @@ inherit( PropertySet, BaseOrganismModel, {
   step: function( dt ) {
     if ( !this.userControlled ) {
       this.stateMachine.step( dt );
-
+      this.doStep(dt);
     }
+  },
+
+  doStep:function(dt){
+
   },
 
   /**
