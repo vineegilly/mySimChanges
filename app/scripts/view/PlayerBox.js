@@ -1,6 +1,5 @@
 var inherit = axon.inherit;
 var Dimension2 = dot.Dimension2;
-var Panel = require( '../controls/Panel' );
 var SimFont = require( '../core/SimFont' );
 var Text = scenery.Text;
 var EcoSystemConstants = require( '../model/EcoSystemConstants' );
@@ -10,21 +9,19 @@ var RectangularPushButton = require( '../controls/buttons/RectangularPushButton'
 var Color = scenery.Color;
 var HBox = scenery.HBox;
 
-// constants
-var PANEL_SIZE = new Dimension2( 100, 60 );
 var BUTTON_TEXT_OPTIONS = { font: new SimFont( 22 ) };
 var PLAY_STR = "Play";
 var PAUSE_STR = "Pause";
 var CLEAR_STR = "Clear";
 
-
 /**
- * @param {Property} playPauseProperty
- * @param {Function} onClearPlay
+ *
+ * @param playPauseProperty
+ * @param onClearPlay
  * @constructor
  */
-function PlayerPanel( playPauseProperty, onClearPlay ) {
-  var thisPanel = this;
+function PlayerBox(playPauseProperty, onClearPlay) {
+  var thisBox = this;
 
   var playTextNode = new Text( PLAY_STR, BUTTON_TEXT_OPTIONS );
   var pauseTextNode = new Text( PAUSE_STR, BUTTON_TEXT_OPTIONS );
@@ -36,7 +33,7 @@ function PlayerPanel( playPauseProperty, onClearPlay ) {
     buttonAppearanceStrategy: RectangularButtonView.threeDAppearanceStrategy,
     xMargin: 10, // should be visibly greater than yMargin, see issue #109
     yMargin: 10,
-    baseColor: new Color( 220, 220, 220, 30 ),
+    baseColor: new Color( 239, 239, 195 ),
     stroke: null,
     lineWidth: 0 // Only meaningful if stroke is non-null
   } );
@@ -45,7 +42,7 @@ function PlayerPanel( playPauseProperty, onClearPlay ) {
     buttonAppearanceStrategy: RectangularButtonView.threeDAppearanceStrategy,
     xMargin: 10, // should be visibly greater than yMargin, see issue #109
     yMargin: 10,
-    baseColor: new Color( 220, 220, 220, 30 ),
+    baseColor: new Color( 239, 239, 195 ),
     stroke: null,
     content: clearTextNode,
     lineWidth: 0, // Only meaningful if stroke is non-null,
@@ -60,26 +57,15 @@ function PlayerPanel( playPauseProperty, onClearPlay ) {
   playerItems.push( clearButton );
 
 
-  var playerBox = new HBox( {
+  HBox.call( thisBox,  {
     children: playerItems,
-    spacing: 50
-  } );
-
-  // vertical panel
-  Panel.call( thisPanel, playerBox, {
-    // panel options
-    fill: EcoSystemConstants.PLAYER_PANEL_BACKGROUND_COLOR,
-    resize: false,
-    yMargin: 10,
-    xMargin: 30,
-    cornerRadius: 0,
-    lineWidth:1,
-    stroke: "gray"
+    spacing: 20
   } );
 
 }
 
+inherit( HBox, PlayerBox, {} );
 
-inherit( Panel, PlayerPanel, {} );
 
-module.exports = PlayerPanel;
+module.exports = PlayerBox;
+

@@ -22,11 +22,16 @@ var EcoSystemConstants = {
     ORGANISM_RADIUS:     imageNode.width / 2,
     MOVE_APART_DISTANCE: imageNode.width / 4,
     MIN_REPRODUCTION_LAPSE: 15,
-    MIN_PREDATE_LAPSE: 7,
+    MIN_PREDATE_LAPSE: 5,
     IMAGE_SCALE: IMAGE_SCALE,
     GRID_NODE_DIMENSION: new Dimension2( 930, 360 ),
+    CHART_NODE_DIMENSION: new Dimension2( 350, 200 ),
+    ORGANISM_PANEL_DIMENSION: new Dimension2( 300, 180 ),
     PARTICLE_COLOR: new Color( 255, 0, 0 ),
-    MAX_ORGANISMS: 100,
+    MAX_ORGANISMS: 60,
+    MAX_RIPPLE_FRAMES: 75,
+    RAIN_DROP_COUNT: 10,
+    MAX_PLAY_TIME: 100,
 
 // interaction states
     DYING_STATE: 1,

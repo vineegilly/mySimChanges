@@ -11,6 +11,7 @@ var Dimension2 = dot.Dimension2;
 var Panel = require( '../controls/Panel' );
 var EcoSystemConstants = require( '../model/EcoSystemConstants' );
 var TitleBarNode = require( './TitleBarNode' );
+var PlayerBox = require( './PlayerBox' );
 
 // constants
 var CHECK_BOX_OPTIONS = { boxWidth: 30 };
@@ -41,6 +42,7 @@ function EnvironmentControlsNode( ecoSystemModel ) {
     populationRangeIndicator.text = Number( populationRangeValue ) | 0;
   } );
 
+
   var checkBoxes = [];
   var rainCheckBoxControl = new CheckBox( new Text( RAIN_STR, CONTROL_TEXT_OPTIONS ),
     rainProperty, CHECK_BOX_OPTIONS );
@@ -53,18 +55,20 @@ function EnvironmentControlsNode( ecoSystemModel ) {
     spacing: 20
   } );
 
-  var controlLayersNode = new Node();
-  controlLayersNode.addChild( populationSliderBox );
-  controlLayersNode.addChild( checkBoxControlBox );
-  checkBoxControlBox.x = populationRangeSlider.x - 20;
-  checkBoxControlBox.y = populationRangeSlider.bounds.bottom + 60;
+  ecoSystemModel.playPauseProperty.link( function( playPause ) {
+    populationRangeSlider.enabled = !playPause;
+    rainCheckBoxControl.enabled = !playPause;
+    sunLightBoxControl.enabled = !playPause;
+  } );
 
   var titleBarNode = new TitleBarNode( TITLE_SIZE, ENVIRONMENTAL_CONTROLS_STR );
+  var playerBox = new PlayerBox( ecoSystemModel.playPauseProperty, ecoSystemModel.onClearPlay.bind( ecoSystemModel ) );
   var panelContents = new VBox( {
-    children: [ titleBarNode, controlLayersNode ],
-    spacing: 30,
+    children: [ titleBarNode, populationSliderBox, checkBoxControlBox, playerBox ],
+    spacing: 18,
     resize: false
   } );
+
 
   // vertical panel
   Panel.call( thisPanel, panelContents, {

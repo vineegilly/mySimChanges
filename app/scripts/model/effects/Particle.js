@@ -5,11 +5,11 @@ function Particle() {
   this.scale = 1.2;
   this.x = 0;
   this.y = 0;
-  this.radius = 10;
+  this.radius = 20;
   this.color = "#000";
   this.velocityX = 0;
   this.velocityY = 0;
-  this.scaleSpeed = 500;
+  this.scaleSpeed = 300;
 }
 
 inherit( Object, Particle, {

@@ -29,6 +29,7 @@ function EcoSystemModel( organismInfos, screenBounds ) {
   this.residentOrganismModels = new ObservableArray();
 
   this.dyingModels = new ObservableArray();
+  this.newlyReproducedModels = new ObservableArray();
 
   this.playPauseProperty.link( function( playPause ) {
     if ( playPause ) {
@@ -83,6 +84,10 @@ inherit( PropertySet, EcoSystemModel, {
       }
     }
 
+  },
+
+  isRaining:function(){
+    return this.rain;
   },
 
   /**
@@ -149,13 +154,28 @@ inherit( PropertySet, EcoSystemModel, {
   },
 
   addDyingOrganisms: function( organismModel ) {
-    this.dyingModels.add( organismModel );
+    if ( !this.dyingModels.contains( organismModel ) ) {
+      this.dyingModels.add( organismModel );
+    }
   },
 
   removeDyingOrganisms: function( organismModel ) {
-    this.dyingModels.remove( organismModel );
-  }
+    if ( this.dyingModels.contains( organismModel ) ) {
+      this.dyingModels.remove( organismModel );
+    }
+  },
 
+  addNewlyReproducedOrganism: function( organismModel ) {
+    if ( !this.newlyReproducedModels.contains( organismModel ) ) {
+      this.newlyReproducedModels.add( organismModel );
+    }
+  },
+
+  removeNewlyReproducedOrganism: function( organismModel ) {
+    if ( this.newlyReproducedModels.contains( organismModel ) ) {
+      this.newlyReproducedModels.remove( organismModel );
+    }
+  }
 
 } );
 

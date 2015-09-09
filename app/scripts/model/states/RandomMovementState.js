@@ -16,8 +16,7 @@ inherit( BaseOrganismState, RandomMovementState, {
    */
   step: function( organismStateMachine, dt ) {
     var ecoSystemModel = organismStateMachine.organismModel.ecoSystemModel;
-    var organism = organismStateMachine.organismModel;
-    if ( ecoSystemModel.isPlaying() ) {
+     if ( ecoSystemModel.isPlaying() ) {
       this.animateMovementStep( organismStateMachine, dt );
     }
   },

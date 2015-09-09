@@ -7,7 +7,7 @@ var EcoSystemConstants = require( '../model/EcoSystemConstants' );
 var VBox = scenery.VBox;
 var Dimension2 = dot.Dimension2;
 var GridNode = require( './GridNode' );
-var EcoSystemEffectNode = require( './effects/EcoSystemEffectNode' );
+var EcoSystemEffectNode = require( './EcoSystemEffectNode' );
 
 
 /**
@@ -45,7 +45,6 @@ inherit( Panel, GridPanelNode, {
   step: function( dt ) {
     var thisPanelNode = this;
     thisPanelNode.ecoSystemEffectNode.step( dt );
-
   },
 
   /**

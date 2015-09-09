@@ -11,7 +11,7 @@ var OrganismCreatorNode = require( './OrganismCreatorNode' );
 var GridLayout = require( '../util/GridLayout' );
 
 // constants
-var PANEL_SIZE = new Dimension2( 300, 180 );
+
 var TITLE_SIZE = new Dimension2( 305, 30 );
 var ORGANISMS_STR = "Organisms";
 
@@ -57,7 +57,7 @@ function OrganismPanelNode( ecoSystemModel, gridPaneNode, motionBounds ) {
 
   var gridLayout = GridLayout();
   gridLayout
-    .size( [ PANEL_SIZE.width, PANEL_SIZE.height ] )
+    .size( [ EcoSystemConstants.ORGANISM_PANEL_DIMENSION.width, EcoSystemConstants.ORGANISM_PANEL_DIMENSION.height ] )
     .bands()
     .padding( [ 0.1, 0.1 ] );
 

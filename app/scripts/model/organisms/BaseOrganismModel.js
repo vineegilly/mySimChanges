@@ -311,6 +311,7 @@ inherit( PropertySet, BaseOrganismModel, {
     var midPoint = thisPos.average( otherPos );
     var createdThroughInteraction = true;
     this.newlyProducedModel = this.ecoSystemModel.cloneOrganism( this, midPoint, EcoSystemConstants.BEING_PRODUCED_STATE, createdThroughInteraction );
+    this.ecoSystemModel.addNewlyReproducedOrganism(this.newlyProducedModel);
   },
 
   startReproducing: function( otherOrganism ) {
