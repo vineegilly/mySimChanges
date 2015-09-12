@@ -9,28 +9,30 @@ function ReproducingState() {
 
 inherit( BaseOrganismState, ReproducingState, {
 
-  step: function( organismStateMachine, dt ) {
-    var organism = organismStateMachine.organismModel;
+  /**
+   *
+   * @param {OrganismModel} organism
+   * @param {number} dt
+   */
+  step: function( organism, dt ) {
+
     if ( !organism.userControlled ) {
-      this.animateMovementStep( organismStateMachine, dt );
+      this.animateMovementStep( organism, dt );
     }
   },
 
-  onAnimateMoveEnd: function( organismStateMachine ) {
-
-    var organism = organismStateMachine.organismModel;
+  onAnimateMoveEnd: function( organism ) {
     var organismReproducingWith = organism.organismReproducingWith;
     organism.reproduceWith( organismReproducingWith );
-
     organismReproducingWith.finishReproducing();
     organism.finishReproducing();
   },
 
-  entered: function( organismStateMachine ) {
+  entered: function( organism ) {
 
   },
 
-  exit: function() {
+  exit: function(organism) {
 
   }
 

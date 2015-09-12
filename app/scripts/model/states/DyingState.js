@@ -8,20 +8,23 @@ function DyingState() {
 
 inherit( BaseOrganismState, DyingState, {
 
-  step: function( organismStateMachine, dt ) {
-    var organism = organismStateMachine.organismModel;
+  /**
+   *
+   * @param {OrganismModel} organism
+   * @param {number} dt
+   */
+  step: function( organism, dt ) {
     organism.opacity = Math.max( 0, Math.min( organism.opacity - 0.05, 1 ) );
     if ( organism.opacity <= 0 ) {
       organism.die();
     }
   },
 
-
-  entered: function( organismStateMachine ) {
+  entered: function( organism ) {
 
   },
 
-  exit: function() {
+  exit: function(organism) {
 
   }
 

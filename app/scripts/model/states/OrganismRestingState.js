@@ -7,15 +7,20 @@ function OrganismRestingState() {
 
 inherit( BaseOrganismState, OrganismRestingState, {
 
-  step: function( organismStateMachine, dt ) {
+  /**
+   *
+   * @param {OrganismModel} organism
+   * @param {number} dt
+   */
+  step: function( organism, dt ) {
 
   },
 
-  entered: function( organismStateMachine ) {
+  entered: function( organism ) {
 
   },
 
-  exit: function() {
+  exit: function(organism) {
 
   }
 

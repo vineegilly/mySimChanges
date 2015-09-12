@@ -9,28 +9,24 @@ function SupportReproducingState() {
 inherit( BaseOrganismState, SupportReproducingState, {
 
   /**
-   * This is a compliment to reproducing state. Does nothing
    *
-   * @param organismStateMachine
-   * @param dt
+   * @param {OrganismModel} organism
+   * @param {number} dt
    */
-  step: function( organismStateMachine, dt ) {
+  step: function( organism, dt ) {
 
   },
 
-  /**
-   * This is a compliment to reproducing state. Does nothing
-   * @param organismStateMachine
-   */
-  onAnimateMoveEnd: function( organismStateMachine ) {
+
+  onAnimateMoveEnd: function( organism ) {
 
   },
 
-  entered: function( organismStateMachine ) {
+  entered: function( organism ) {
 
   },
 
-  exit: function() {
+  exit: function(organism) {
 
   }
 

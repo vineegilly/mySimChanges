@@ -11,26 +11,25 @@ inherit( BaseOrganismState, RandomMovementState, {
 
   /**
    *
-   * @param {OrganismStateMachine} organismStateMachine
+   * @param {OrganismModel} organism
    * @param {number} dt
    */
-  step: function( organismStateMachine, dt ) {
-    var ecoSystemModel = organismStateMachine.organismModel.ecoSystemModel;
+  step: function( organism, dt ) {
+    var ecoSystemModel = organism.ecoSystemModel;
      if ( ecoSystemModel.isPlaying() ) {
-      this.animateMovementStep( organismStateMachine, dt );
+      this.animateMovementStep( organism, dt );
     }
   },
 
-  onAnimateMoveEnd: function( organismStateMachine ) {
-    var organism = organismStateMachine.organismModel;
+  onAnimateMoveEnd: function( organism ) {
+     organism.nextRandomMovement();
+  },
+
+  entered: function( organism, dt ) {
     organism.nextRandomMovement();
   },
 
-  entered: function( organismStateMachine, dt ) {
-    organismStateMachine.organismModel.nextRandomMovement();
-  },
-
-  exit: function() {
+  exit: function(organism) {
 
   }
 

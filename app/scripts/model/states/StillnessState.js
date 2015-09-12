@@ -8,15 +8,20 @@ function StillnessState() {
 
 inherit( BaseOrganismState, StillnessState, {
 
-  step: function( organismStateMachine, dt ) {
+  /**
+   *
+   * @param {OrganismModel} organism
+   * @param {number} dt
+   */
+  step: function( organism, dt ) {
 
   },
 
-  entered: function( organismStateMachine, dt ) {
+  entered: function( organism, dt ) {
 
   },
 
-  exit: function() {
+  exit: function(organism) {
 
   }
 

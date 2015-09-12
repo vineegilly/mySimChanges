@@ -1,5 +1,5 @@
 var inherit = axon.inherit;
-var BaseOrganismModel = require( './BaseOrganismModel' );
+var BaseHerbivoresModel = require( './BaseHerbivoresModel' );
 
 /**
  * @param {EcoSystemModel} ecoSystemModel
@@ -9,10 +9,10 @@ var BaseOrganismModel = require( './BaseOrganismModel' );
  * @constructor
  */
 function RabbitModel( ecoSystemModel, organismInfo, initialPosition,bounds,createdThroughInteraction ) {
-  BaseOrganismModel.call( this, ecoSystemModel, organismInfo, initialPosition,bounds,createdThroughInteraction );
+  BaseHerbivoresModel.call( this, ecoSystemModel, organismInfo, initialPosition,bounds,createdThroughInteraction );
 }
 
-inherit( BaseOrganismModel, RabbitModel, {
+inherit( BaseHerbivoresModel, RabbitModel, {
 
   clone:function(initialPos,createdThroughInteraction){
     return new RabbitModel(this.ecoSystemModel,this.organismInfo,initialPos,this.motionBounds,createdThroughInteraction);

@@ -5,6 +5,24 @@ var Vector2 = dot.Vector2;
 var OrganismImageCollection = require( '../organisms/OrganismImageCollection' );
 var OrganismStateMachine = require( '../states/OrganismStateMachine' );
 
+//states
+var ReturnToOriginState = require( './ReturnToOriginState' );
+var OrganismRestingState = require( './OrganismRestingState' );
+var RandomMovementState = require( './RandomMovementState' );
+var SupportReproducingState = require( './SupportReproducingState' );
+var ReproducingState = require( './ReproducingState' );
+var PredatingState = require( './PredatingState' );
+var DyingState = require( './DyingState' );
+
+
+var returnToOriginStateInstance = new ReturnToOriginState();
+var organismRestingStateInstance = new OrganismRestingState();
+var randomMovementState = new RandomMovementState();
+var predatingState = new PredatingState();
+var dyingState = new DyingState();
+var reproducingState = new ReproducingState();
+var supportReproducingState = new SupportReproducingState();
+
 /**
  * @param {EcoSystemModel} ecoSystemModel
  * @param {jsonObject} organismInfo
@@ -28,7 +46,7 @@ function BaseOrganismModel( ecoSystemModel, organismInfo, initialPosition, motio
   thisModel.appearanceImage = OrganismImageCollection.getRepresentation( organismInfo.id );
   thisModel.ecoSystemModel = ecoSystemModel;
   thisModel.organismState = null;
-  thisModel.stateMachine = this.createStateMachine();
+  thisModel.organismState = this.initState();
   thisModel.velocity = EcoSystemConstants.ANIMATION_VELOCITY;
 
   // some models gets created through interaction
@@ -51,6 +69,9 @@ function BaseOrganismModel( ecoSystemModel, organismInfo, initialPosition, motio
 
   } );
 
+  //temp
+  this.elapsedTime = 0;
+
 }
 
 
@@ -58,12 +79,52 @@ inherit( PropertySet, BaseOrganismModel, {
 
   step: function( dt ) {
     if ( !this.userControlled ) {
-      this.stateMachine.step( dt );
-      this.doStep(dt);
+      this.doStep( dt );
+      this.executeBumpingRules();
     }
+
+    console.log( "Time Elapsed " + this.elapsedTime + " Date " + new Date() )
   },
 
-  doStep:function(dt){
+  executeBumpingRules: function() {
+
+  },
+
+  setState: function( newState ) {
+    this.organismState.exit( this );// exist the previus state
+    this.organismState = newState;
+    this.organismState.entered( this ); // enter the new state
+  },
+
+  returnToOrigin: function() {
+    this.setState( returnToOriginStateInstance );
+  },
+
+  goToRest: function() {
+    this.setState( organismRestingStateInstance );
+  },
+
+  startRandomMotion: function() {
+    this.setState( randomMovementState );
+  },
+
+  startPredating: function() {
+    this.setState( predatingState );
+  },
+
+  startDying: function() {
+    this.setState( dyingState );
+  },
+
+  startReproducing: function() {
+    this.setState( reproducingState );
+  },
+
+  supportReproducing: function() {
+    this.setState( supportReproducingState );
+  },
+
+  doStep: function( dt ) {
 
   },
 
@@ -120,8 +181,11 @@ inherit( PropertySet, BaseOrganismModel, {
     return false;
   },
 
-  createStateMachine: function() {
-    return new OrganismStateMachine( this );
+  /**
+   * Organisms like Grass,Flower,Tree override this class because they dont move
+   */
+  initState: function() {
+    this.setState( randomMovementState );
   },
 
   /**
@@ -213,13 +277,16 @@ inherit( PropertySet, BaseOrganismModel, {
     this.predatingMiniumLapsedTimes++;
   },
 
-
   play: function() {
-    this.stateMachine.startRandomMotion();
+    this.setState( randomMovementState );
   },
 
   pause: function() {
-    this.stateMachine.goToRest();
+    this.goToRest();
+  },
+
+  goToRest: function() {
+    this.setState( organismRestingStateInstance );
   },
 
   canInteract: function() {
@@ -308,14 +375,13 @@ inherit( PropertySet, BaseOrganismModel, {
     return true;
   },
 
-
   reproduceWith: function( otherModel ) {
     var thisPos = this.position;
     var otherPos = otherModel.position;
     var midPoint = thisPos.average( otherPos );
     var createdThroughInteraction = true;
     this.newlyProducedModel = this.ecoSystemModel.cloneOrganism( this, midPoint, EcoSystemConstants.BEING_PRODUCED_STATE, createdThroughInteraction );
-    this.ecoSystemModel.addNewlyReproducedOrganism(this.newlyProducedModel);
+    this.ecoSystemModel.addNewlyReproducedOrganism( this.newlyProducedModel );
   },
 
   startReproducing: function( otherOrganism ) {

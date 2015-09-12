@@ -1,5 +1,8 @@
+/**
+ * Model common for Grass,Flower and Tree
+ */
 var inherit = axon.inherit;
-var BaseOrganismModel = require( './BaseOrganismModel' );
+var BaseOrganismModel = require( '../BaseOrganismModel' );
 
 /**
  * @param {EcoSystemModel} ecoSystemModel
@@ -19,7 +22,7 @@ function BaseProducerModel( ecoSystemModel, organismInfo, initialPosition, bound
 inherit( BaseOrganismModel, BaseProducerModel, {
 
   /**
-   *
+   * @override
    * @param dt
    */
   doStep: function( dt ) {
@@ -66,9 +69,17 @@ inherit( BaseOrganismModel, BaseProducerModel, {
   },
 
 
-  clone: function( initialPos, createdThroughInteraction ) {
-    return new BaseProducerModel( this.ecoSystemModel, this.organismInfo, initialPos, this.motionBounds, createdThroughInteraction );
+  initState: function() {
+    this.goToRest();
+  },
+
+  /**
+   * Flower,grass and Tree dont Move and interact, so override play
+   */
+  play: function() {
+
   }
+
 
 } );
 

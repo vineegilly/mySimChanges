@@ -8,9 +8,9 @@ function BaseOrganismState() {
 
 inherit( Object, BaseOrganismState, {
 
-  animateMovementStep: function( organismStateMachine, dt ) {
-    var ecoSystemModel = organismStateMachine.organismModel.ecoSystemModel;
-    var organism = organismStateMachine.organismModel;
+  animateMovementStep: function( organismModel, dt ) {
+    var ecoSystemModel = organismModel.ecoSystemModel;
+    var organism = organismModel;
     // perform any animation
     var distanceToDestination = organism.position.distance( organism.destination );
     if ( distanceToDestination > dt * organism.velocity ) {
@@ -23,24 +23,24 @@ inherit( Object, BaseOrganismState, {
       // Less than one time step away, so just go to the destination.
       organism.position = organism.destination;
       organism.animating = false;
-      this.onAnimateMoveEnd(organismStateMachine);
+      this.onAnimateMoveEnd(organismModel);
     }
   },
 
-  onAnimateMoveEnd: function( organismStateMachine ) {
+  onAnimateMoveEnd: function( organismModel ) {
 
   },
 
 
-  step: function( organismStateMachine, dt ) {
+  step: function( organism, dt ) {
 
   },
 
-  entered: function( organismStateMachine ) {
+  entered: function( organism ) {
 
   },
 
-  exit: function() {
+  exit: function(organism) {
 
   }
 
