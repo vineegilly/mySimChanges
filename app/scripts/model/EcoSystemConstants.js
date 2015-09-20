@@ -2,9 +2,9 @@ var Color = scenery.Color;
 var SimFont = require( '../core/SimFont' );
 var Dimension2 = dot.Dimension2;
 var Image = scenery.Image;
-var lion = require( "../../assets/images/lion.png" );
+var hawk = require( "../../assets/images/hawk.png" );
 
-var imageNode = new Image( lion );
+var imageNode = new Image( hawk );
 
 var IMAGE_SCALE = 0.13;
 imageNode.scale( IMAGE_SCALE );
@@ -38,13 +38,7 @@ var EcoSystemConstants = {
     EATING_STATE: 2,
     REPRODUCING_STATE: 3,
     BEING_PRODUCED_STATE: 4,
-    NON_INTERACTION_STATE: 0,
-
-    CARNIVORES: 1,
-    DECOMPOSERS: 2,
-    HERBIVORES: 3,
-    OMNIVORES: 4,
-    PRODUCERS: 5
+    NON_INTERACTION_STATE: 0
 
 
   }

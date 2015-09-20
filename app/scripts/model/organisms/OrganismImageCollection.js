@@ -1,35 +1,41 @@
 var inherit = axon.inherit;
 
 // constants
-var lion = require( "../../../assets/images/lion.png" );
 var beetle = require( "../../../assets/images/beetle.png" );
-var cow = require( "../../../assets/images/cow.png" );
-var chicken = require( "../../../assets/images/chicken.png" );
 var grass = require( "../../../assets/images/grass.png" );
 var earthworm = require( "../../../assets/images/earthworm.png" );
 var flower = require( "../../../assets/images/flower.png" );
 var hawk = require( "../../../assets/images/hawk.png" );
 var mushroom = require( "../../../assets/images/mushroom.png" );
 var snake = require( "../../../assets/images/snake.png" );
-var squirrel = require( "../../../assets/images/squirrel.png" );
 var tree = require( "../../../assets/images/tree.png" );
-var virus = require( "../../../assets/images/virus.png" );
+var mouse = require( "../../../assets/images/mouse.png" );
+var butterfly = require( "../../../assets/images/butterfly.png" );
+var raccoon = require( "../../../assets/images/raccoon.png" );
+var deer = require( "../../../assets/images/deer.png" );
+var rabbit = require( "../../../assets/images/rabbit.png" );
+var cayote = require( "../../../assets/images/cayote.png" );
+var frog = require( "../../../assets/images/frog.png" );
+var songbird = require( "../../../assets/images/bird.png" );
 
 
 var organismIdImageMap = {
-  1000: lion,
-  2000: beetle,
-  3000: cow,
-  4000: chicken,
-  5000: grass,
-  6000: earthworm,
-  7000: flower,
-  8000: hawk,
-  9000: mushroom,
-  9001: snake,
-  9002: squirrel,
-  9003: tree,
-  9004: virus
+  beetle: beetle,
+  grass: grass,
+  earthworm: earthworm,
+  flower: flower,
+  hawk: hawk,
+  mushroom: mushroom,
+  snake: snake,
+  tree: tree,
+  mouse: mouse,
+  butterfly: butterfly,
+  raccoon: raccoon,
+  deer: deer,
+  rabbit: rabbit,
+  cayote: cayote,
+  frog: frog,
+  songbird: songbird
 };
 
 
@@ -44,11 +50,11 @@ inherit( Object, OrganismImageCollection, {},
 
     /**
      *
-     * @param type
+     * @param name
      * @returns {Image}
      */
-    getRepresentation: function( id ) {
-      return organismIdImageMap[ id ];
+    getRepresentation: function( name ) {
+      return organismIdImageMap[ name ];
     }
   } );
 

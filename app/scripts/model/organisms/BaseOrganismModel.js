@@ -3,16 +3,15 @@ var PropertySet = axon.PropertySet;
 var EcoSystemConstants = require( '../EcoSystemConstants' );
 var Vector2 = dot.Vector2;
 var OrganismImageCollection = require( '../organisms/OrganismImageCollection' );
-var OrganismStateMachine = require( '../states/OrganismStateMachine' );
 
 //states
-var ReturnToOriginState = require( './ReturnToOriginState' );
-var OrganismRestingState = require( './OrganismRestingState' );
-var RandomMovementState = require( './RandomMovementState' );
-var SupportReproducingState = require( './SupportReproducingState' );
-var ReproducingState = require( './ReproducingState' );
-var PredatingState = require( './PredatingState' );
-var DyingState = require( './DyingState' );
+var ReturnToOriginState = require( '../states/ReturnToOriginState' );
+var OrganismRestingState = require( '../states/OrganismRestingState' );
+var RandomMovementState = require( '../states/RandomMovementState' );
+var SupportReproducingState = require( '../states/SupportReproducingState' );
+var ReproducingState = require( '../states/ReproducingState' );
+var PredatingState = require( '../states/PredatingState' );
+var DyingState = require( '../states/DyingState' );
 
 
 var returnToOriginStateInstance = new ReturnToOriginState();
@@ -96,7 +95,7 @@ inherit( PropertySet, BaseOrganismModel, {
     this.organismState.entered( this ); // enter the new state
   },
 
-  returnToOrigin: function() {
+  returnToOriginState: function() {
     this.setState( returnToOriginStateInstance );
   },
 
@@ -108,19 +107,38 @@ inherit( PropertySet, BaseOrganismModel, {
     this.setState( randomMovementState );
   },
 
-  startPredating: function() {
+  startPredating: function( preyBeingEaten ) {
     this.setState( predatingState );
+    this.organismBeingEaten = preyBeingEaten;
+    var preyPosition = preyBeingEaten.position;
+    this.setDestination( preyPosition, true, EcoSystemConstants.ANIMATION_VELOCITY / 2 );
+    this.interactionState = EcoSystemConstants.EATING_STATE;
+    this.predatingMiniumLapsedTimes = 0;
   },
 
   startDying: function() {
     this.setState( dyingState );
+    this.ecoSystemModel.addDyingOrganisms( this );
+    this.interactionState = EcoSystemConstants.DYING_STATE;
   },
 
-  startReproducing: function() {
+  startReproducing: function( otherOrganism ) {
+    //store the partner
+    this.organismReproducingWith = otherOrganism;
+    var otherPartnerPos = otherOrganism.position;
+    this.setDestination( otherPartnerPos, true, EcoSystemConstants.ANIMATION_VELOCITY / 2 );
+    this.interactionState = EcoSystemConstants.REPRODUCING_STATE;
+
+    //set the current state
     this.setState( reproducingState );
+    otherOrganism.supportReproducing();
+    this.reproductionMinimumLapsedTimes = 0;
   },
 
   supportReproducing: function() {
+    this.interactionState = EcoSystemConstants.REPRODUCING_STATE;
+    this.reproductionMinimumLapsedTimes = 0;
+    //set the current to support reproducing
     this.setState( supportReproducingState );
   },
 
@@ -222,7 +240,7 @@ inherit( PropertySet, BaseOrganismModel, {
   returnToOrigin: function( animate, velocity ) {
     this.velocity = velocity || EcoSystemConstants.ANIMATION_VELOCITY;
     this.setDestination( this.positionProperty.initialValue, animate );
-    this.stateMachine.returnToOrigin();
+
   },
 
   /**
@@ -285,9 +303,6 @@ inherit( PropertySet, BaseOrganismModel, {
     this.goToRest();
   },
 
-  goToRest: function() {
-    this.setState( organismRestingStateInstance );
-  },
 
   canInteract: function() {
     if ( this.interactionState === EcoSystemConstants.NON_INTERACTION_STATE ) {
@@ -324,20 +339,6 @@ inherit( PropertySet, BaseOrganismModel, {
     return this.interactionState === EcoSystemConstants.EATING_STATE;
   },
 
-  startDying: function() {
-    this.ecoSystemModel.addDyingOrganisms( this );
-    this.stateMachine.startDying();
-    this.interactionState = EcoSystemConstants.DYING_STATE;
-  },
-
-  startPredating: function( preyBeingEaten ) {
-    this.organismBeingEaten = preyBeingEaten;
-    var preyPosition = preyBeingEaten.position;
-    this.setDestination( preyPosition, true, EcoSystemConstants.ANIMATION_VELOCITY / 2 );
-    this.stateMachine.startPredating();
-    this.interactionState = EcoSystemConstants.EATING_STATE;
-    this.predatingMiniumLapsedTimes = 0;
-  },
 
   die: function() {
     this.ecoSystemModel.removeDyingOrganisms( this );
@@ -347,7 +348,8 @@ inherit( PropertySet, BaseOrganismModel, {
 
   finishEating: function() {
     this.interactionState = EcoSystemConstants.NON_INTERACTION_STATE;
-    this.stateMachine.startRandomMotion();
+    this.setState( randomMovementState );
+
   },
 
   overlapBounds: function( otherModel ) {
@@ -384,27 +386,10 @@ inherit( PropertySet, BaseOrganismModel, {
     this.ecoSystemModel.addNewlyReproducedOrganism( this.newlyProducedModel );
   },
 
-  startReproducing: function( otherOrganism ) {
-    //store the partner
-    this.organismReproducingWith = otherOrganism;
-    var otherPartnerPos = otherOrganism.position;
-    this.setDestination( otherPartnerPos, true, EcoSystemConstants.ANIMATION_VELOCITY / 2 );
-    this.interactionState = EcoSystemConstants.REPRODUCING_STATE;
-
-    this.stateMachine.startReproducing();
-    otherOrganism.supportReproducing();
-    this.reproductionMinimumLapsedTimes = 0;
-  },
-
-  supportReproducing: function() {
-    this.interactionState = EcoSystemConstants.REPRODUCING_STATE;
-    this.reproductionMinimumLapsedTimes = 0;
-    this.stateMachine.supportReproducing();
-  },
 
   finishReproducing: function() {
     this.interactionState = EcoSystemConstants.NON_INTERACTION_STATE;
-    this.stateMachine.startRandomMotion();
+    this.setState( randomMovementState );
     if ( this.newlyProducedModel ) {
       this.newlyProducedModel.interactionState = EcoSystemConstants.NON_INTERACTION_STATE;
       this.newlyProducedModel.reproductionMinimumLapsedTimes = 0;

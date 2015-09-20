@@ -1,52 +1,23 @@
 {
   "organisms": [
     {
-      "id":1000,
-      "name":"lion",
-      "type":1,
-      "prey":false,
-      "predator":true,
-      "producer":false,
-      "decomposer":false
+      "name": "hawk"
     },
     {
-      "id":4000,
-      "name":"chicken",
-      "type":4,
-      "prey":true,
-      "predator":false,
-      "producer":false,
-      "decomposer":false
+      "name": "beetle"
+    },
+    {
+      "name": "songbird"
+    },
+    {
+      "name": "deer"
+    },
+    {
+      "name": "grass"
     },
 
     {
-      "id":3000,
-      "name":"cow",
-      "type":3,
-      "prey":true,
-      "predator":false,
-      "producer":false,
-      "decomposer":false
-    },
-
-    {
-      "id":2000,
-      "name":"fungi",
-      "type":2,
-      "prey":false,
-      "predator":false,
-      "producer":false,
-      "decomposer":true
-    },
-
-    {
-      "id":5000,
-      "name":"grass",
-      "type":5,
-      "prey":false,
-      "predator":false,
-      "producer":true,
-      "decomposer":true
+      "name": "mushroom"
     }
   ]
 }

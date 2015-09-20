@@ -11,14 +11,14 @@ var BaseOrganismModel = require( '../BaseOrganismModel' );
  * @param {Bounds2} bounds
  * @constructor
  */
-function BaseHerbivoresModel( ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction ) {
+function BaseDecomposerModel( ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction ) {
   BaseOrganismModel.call( this, ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction );
 
   this.timeElapsedWithoutProducer = 0; // in milliseconds
   this.timeElapsedSinceReproduction = 0;
 }
 
-inherit( BaseOrganismModel, BaseHerbivoresModel, {
+inherit( BaseOrganismModel, BaseDecomposerModel, {
 
   /**
    * @override
@@ -72,4 +72,4 @@ inherit( BaseOrganismModel, BaseHerbivoresModel, {
 
 } );
 
-module.exports = BaseHerbivoresModel;
+module.exports = BaseCarnivoresModel;
