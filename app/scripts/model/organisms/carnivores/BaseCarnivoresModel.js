@@ -28,12 +28,8 @@ inherit( BaseOrganismModel, BaseCarnivoresModel, {
     this.timeElapsedWithoutProducer += dt;
     this.timeElapsedSinceReproduction += dt;
 
-    if ( this.timeElapsedWithoutProducer >= this.getTimeThresholdForProducer() ) {
+    if ( this.timeElapsedWithoutProducer >= this.getTimeThresholdForLackOfProducer() ) {
       this.moveToDyingStateBecauseOfNoProducer();
-    }
-
-    if ( this.timeElapsedSinceReproduction >= this.getTimeThresholdForReproduction() ) {
-      this.moveToReproductionState();
     }
 
 
@@ -48,12 +44,8 @@ inherit( BaseOrganismModel, BaseCarnivoresModel, {
   },
 
 
-  getTimeThresholdForProducer: function() {
-  //  throw new Error( "getTimeThresholdForProducer must be implemented in  BaseOrganismModel's descendant class" );
-  },
+  getTimeThresholdForLackOfProducer: function() {
 
-  getTimeThresholdForReproduction: function() {
-  //  throw new Error( "getTimeThresholdForReproduction must be implemented in  BaseOrganismModel's descendant class" );
   },
 
 
