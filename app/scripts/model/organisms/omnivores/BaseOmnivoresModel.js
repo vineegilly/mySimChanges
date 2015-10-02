@@ -72,4 +72,4 @@ inherit( BaseOrganismModel, BaseOmnivoresModel, {
 
 } );
 
-module.exports = BaseProducerModel;
+module.exports = BaseOmnivoresModel;

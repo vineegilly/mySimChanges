@@ -12,7 +12,7 @@ function BeetleModel( ecoSystemModel, organismInfo, initialPosition,bounds,creat
   BaseHerbivoresModel.call( this, ecoSystemModel, organismInfo, initialPosition,bounds,createdThroughInteraction );
 }
 
-inherit( BaseOrganismModel, BeetleModel, {
+inherit( BaseHerbivoresModel, BeetleModel, {
 
   clone:function(initialPos,createdThroughInteraction){
     return new BeetleModel(this.ecoSystemModel,this.organismInfo,initialPos,this.motionBounds,createdThroughInteraction);
