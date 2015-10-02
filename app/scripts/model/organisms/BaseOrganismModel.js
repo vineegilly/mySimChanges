@@ -40,12 +40,11 @@ function BaseOrganismModel( ecoSystemModel, organismInfo, initialPosition, motio
     opacity: 1
   } );
 
-  thisModel.id = organismInfo.id;
+  thisModel.name = organismInfo.name;
   thisModel.organismInfo = organismInfo;
-  thisModel.appearanceImage = OrganismImageCollection.getRepresentation( organismInfo.id );
+  thisModel.appearanceImage = OrganismImageCollection.getRepresentation( thisModel.name);
   thisModel.ecoSystemModel = ecoSystemModel;
-  thisModel.organismState = null;
-  thisModel.organismState = this.initState();
+  thisModel.organismState = organismRestingStateInstance;
   thisModel.velocity = EcoSystemConstants.ANIMATION_VELOCITY;
 
   // some models gets created through interaction

@@ -26,12 +26,10 @@ function OrganismCreatorNode( organismInfo, gridNode, organismCreator, canPlaceS
 
     allowTouchSnag: true,
     start: function( event ) {
-
       // Determine the initial position of the new element as a function of the event position and this node's bounds.
       var centerGlobal = thisNode.parentToGlobalPoint( thisNode.center );
       var initialPositionOffset = centerGlobal.minus( event.pointer.point );
       var initialPosition = gridNode.getRefPoint( event.pointer.point.plus( initialPositionOffset ) );
-
       thisNode.organism = organismCreator( organismInfo, initialPosition );
       thisNode.organism.userControlled = true;
     },

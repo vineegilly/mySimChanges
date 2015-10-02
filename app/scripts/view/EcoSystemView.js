@@ -82,7 +82,6 @@ function EcoSystemView( ecoSystemModel ) {
   panelBox.y = thisView.gridPanelNode.bounds.bottom + PANEL_VERTICAL_PADDING;
   thisView.addChild( thisView.gridPanelNode );
 
-
   /*  playerPanel.x = thisView.gridPanelNode.bounds.centerX - playerPanel.bounds.width / 2;
    playerPanel.y = thisView.gridPanelNode.bounds.bottom - playerPanel.bounds.height; */
 

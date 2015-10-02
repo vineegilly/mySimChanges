@@ -43,18 +43,17 @@ inherit( BaseOrganismModel, BaseCarnivoresModel, {
 
   },
 
-
   moveToReproductionState: function() {
 
   },
 
 
   getTimeThresholdForProducer: function() {
-    throw new Error( "getTimeThresholdForRain must be implemented in  BaseOrganismModel's descendant class" );
+  //  throw new Error( "getTimeThresholdForProducer must be implemented in  BaseOrganismModel's descendant class" );
   },
 
   getTimeThresholdForReproduction: function() {
-    throw new Error( "getTimeThresholdForReproduction must be implemented in  BaseOrganismModel's descendant class" );
+  //  throw new Error( "getTimeThresholdForReproduction must be implemented in  BaseOrganismModel's descendant class" );
   },
 
 

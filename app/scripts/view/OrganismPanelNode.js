@@ -49,6 +49,8 @@ function OrganismPanelNode( ecoSystemModel, gridPaneNode, motionBounds ) {
     organismsCreators.push( organismCreatorNode );
   } );
 
+
+  //create a empty object, the layout will assign the right x and y values
   var rectElements = organismInfos.map( function() {
     return {};
   } );
