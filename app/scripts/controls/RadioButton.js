@@ -1,5 +1,3 @@
-
-
 /**
  * Base class for radio buttons.
  */
@@ -68,7 +66,7 @@ function RadioButton( property, value, selectedNode, deselectedNode, options ) {
   };
 }
 
- inherit( Node, RadioButton, {
+inherit( Node, RadioButton, {
 
   // Provide dispose() on the prototype for ease of subclassing.
   dispose: function() {

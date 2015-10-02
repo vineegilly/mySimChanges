@@ -2,26 +2,26 @@ var inherit = axon.inherit;
 var EcoSystemConstants = require( '../EcoSystemConstants' );
 
 
-var BeetleModel = require('../organisms/herbivores/BeetleModel' );
-var ButterflyModel = require('../organisms/herbivores/ButterflyModel' );
-var DeerModel = require('../organisms/herbivores/DeerModel' );
-var RabbitModel = require('../organisms/herbivores/RabbitModel' );
+var BeetleModel = require( '../organisms/herbivores/BeetleModel' );
+var ButterflyModel = require( '../organisms/herbivores/ButterflyModel' );
+var DeerModel = require( '../organisms/herbivores/DeerModel' );
+var RabbitModel = require( '../organisms/herbivores/RabbitModel' );
 
-var FrogModel = require('../organisms/carnivores/FrogModel' );
-var HawkModel = require('../organisms/carnivores/HawkModel' );
-var CoyoteModel = require('../organisms/carnivores/CoyoteModel' );
-var SnakeModel = require('../organisms/carnivores/SnakeModel' );
+var FrogModel = require( '../organisms/carnivores/FrogModel' );
+var HawkModel = require( '../organisms/carnivores/HawkModel' );
+var CoyoteModel = require( '../organisms/carnivores/CoyoteModel' );
+var SnakeModel = require( '../organisms/carnivores/SnakeModel' );
 
-var EarthwormModel = require('../organisms/decomposers/EarthwormModel' );
-var MushroomModel = require('../organisms/decomposers/MushroomModel' );
+var EarthwormModel = require( '../organisms/decomposers/EarthwormModel' );
+var MushroomModel = require( '../organisms/decomposers/MushroomModel' );
 
-var MouseModel = require('../organisms/omnivores/MouseModel' );
-var RaccoonModel = require('../organisms/omnivores/RaccoonModel' );
-var SongbirdModel = require('../organisms/omnivores/SongbirdModel' );
+var MouseModel = require( '../organisms/omnivores/MouseModel' );
+var RaccoonModel = require( '../organisms/omnivores/RaccoonModel' );
+var SongbirdModel = require( '../organisms/omnivores/SongbirdModel' );
 
-var FlowerModel = require('../organisms/producers/FlowerModel' );
-var GrassModel = require('../organisms/producers/GrassModel' );
-var TreeModel = require('../organisms/producers/TreeModel' );
+var FlowerModel = require( '../organisms/producers/FlowerModel' );
+var GrassModel = require( '../organisms/producers/GrassModel' );
+var TreeModel = require( '../organisms/producers/TreeModel' );
 
 
 function OrganismModelFactory() {
@@ -81,7 +81,6 @@ inherit( Object, OrganismModelFactory, {},
           return new GrassModel( ecoSystemModel, organismInfo, pos, bounds );
         case "tree":
           return new TreeModel( ecoSystemModel, organismInfo, pos, bounds );
-
 
 
       }

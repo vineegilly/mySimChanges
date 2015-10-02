@@ -14,9 +14,9 @@ var EcoSystemConstants = require( '../model/EcoSystemConstants' );
 function OrganismCreatorNode( organismInfo, gridNode, organismCreator, canPlaceShape ) {
   var thisNode = this;
   Node.call( thisNode, { cursor: 'pointer' } );
-  var appearanceImage = OrganismImageCollection.getRepresentation( organismInfo.id );
+  var appearanceImage = OrganismImageCollection.getRepresentation( organismInfo.name );
   var appearanceNode = new scenery.Image( appearanceImage );
-  appearanceNode.scale(EcoSystemConstants.IMAGE_SCALE);
+  appearanceNode.scale( EcoSystemConstants.IMAGE_SCALE );
   thisNode.appearanceNode = appearanceNode;
   thisNode.organism = null;
   thisNode.mouseArea = appearanceNode.bounds;
@@ -52,7 +52,6 @@ function OrganismCreatorNode( organismInfo, gridNode, organismCreator, canPlaceS
     }
 
   } ) );
-
 
   // Add the main node with which the user will interact.
   thisNode.addChild( appearanceNode );

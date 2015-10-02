@@ -23,7 +23,7 @@ inherit( Object, BaseOrganismState, {
       // Less than one time step away, so just go to the destination.
       organism.position = organism.destination;
       organism.animating = false;
-      this.onAnimateMoveEnd(organismModel);
+      this.onAnimateMoveEnd( organismModel );
     }
   },
 
@@ -40,7 +40,7 @@ inherit( Object, BaseOrganismState, {
 
   },
 
-  exit: function(organism) {
+  exit: function( organism ) {
 
   }
 

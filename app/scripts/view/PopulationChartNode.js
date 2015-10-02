@@ -52,7 +52,7 @@ function PopulationChartNode() {
     .attr( "width", CHART_WIDTH )
     .attr( "height", CHART_HEIGHT );
 
-  this.buildChart(svgSelection);
+  this.buildChart( svgSelection );
 
   // vertical panel
   Panel.call( thisPanel, domContent, {
@@ -67,7 +67,7 @@ function PopulationChartNode() {
 
 inherit( Panel, PopulationChartNode, {
 
-  buildChart:function(svgSelection){
+  buildChart: function( svgSelection ) {
     var xScale = d3.scale.linear()
       .range( [ MARGINS.left, CHART_WIDTH - MARGINS.right ] )
       .domain( [ 0, EcoSystemConstants.MAX_PLAY_TIME ] );
@@ -77,12 +77,12 @@ inherit( Panel, PopulationChartNode, {
 
     var xAxis = d3.svg.axis()
       .scale( xScale )
-      .ticks(5);
+      .ticks( 5 );
 
     var yAxis = d3.svg.axis()
       .scale( yScale )
       .orient( "left" )
-      .ticks(5);
+      .ticks( 5 );
 
     svgSelection.append( "svg:g" )
       .attr( "transform", "translate(0," + (CHART_HEIGHT - MARGINS.bottom) + ")" )

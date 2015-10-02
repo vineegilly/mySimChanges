@@ -16,20 +16,20 @@ inherit( BaseOrganismState, RandomMovementState, {
    */
   step: function( organism, dt ) {
     var ecoSystemModel = organism.ecoSystemModel;
-     if ( ecoSystemModel.isPlaying() ) {
+    if ( ecoSystemModel.isPlaying() ) {
       this.animateMovementStep( organism, dt );
     }
   },
 
   onAnimateMoveEnd: function( organism ) {
-     organism.nextRandomMovement();
+    organism.nextRandomMovement();
   },
 
   entered: function( organism, dt ) {
     organism.nextRandomMovement();
   },
 
-  exit: function(organism) {
+  exit: function( organism ) {
 
   }
 

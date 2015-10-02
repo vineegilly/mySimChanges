@@ -44,7 +44,7 @@ function RectangularPushButton( options ) {
   this.rectangularPushButtonTandem && this.rectangularPushButtonTandem.addInstance( this );
 }
 
- inherit( RectangularButtonView, RectangularPushButton, {
+inherit( RectangularButtonView, RectangularPushButton, {
   dispose: function() {
     this.buttonModel.dispose();
     RectangularButtonView.prototype.dispose.call( this );

@@ -32,7 +32,7 @@ inherit( BaseOrganismState, ReproducingState, {
 
   },
 
-  exit: function(organism) {
+  exit: function( organism ) {
 
   }
 

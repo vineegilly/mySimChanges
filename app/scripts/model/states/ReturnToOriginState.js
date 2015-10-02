@@ -27,7 +27,7 @@ inherit( BaseOrganismState, ReturnToOriginState, {
 
   },
 
-  exit: function(organism) {
+  exit: function( organism ) {
 
   }
 

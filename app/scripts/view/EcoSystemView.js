@@ -30,7 +30,7 @@ function EcoSystemView( ecoSystemModel ) {
   var thisView = this;
   BaseScreenView.call( thisView, { layoutBounds: new Bounds2( 0, 0, 1024, 704 ) } );
 
-  var viewBoundsPath = new Path( Shape.bounds( this.layoutBounds ), { pickable: false, stroke: 'red', lineWidth: 0,fill:'#87cefa' } );
+  var viewBoundsPath = new Path( Shape.bounds( this.layoutBounds ), { pickable: false, stroke: 'red', lineWidth: 0, fill: '#87cefa' } );
   thisView.addChild( viewBoundsPath );
 
 

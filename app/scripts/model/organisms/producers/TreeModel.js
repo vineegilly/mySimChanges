@@ -8,14 +8,14 @@ var BaseProducerModel = require( './BaseProducerModel' );
  * @param {Bounds2} bounds
  * @constructor
  */
-function TreeModel( ecoSystemModel, organismInfo, initialPosition,bounds,createdThroughInteraction ) {
-  BaseProducerModel.call( this, ecoSystemModel, organismInfo, initialPosition,bounds,createdThroughInteraction );
+function TreeModel( ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction ) {
+  BaseProducerModel.call( this, ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction );
 }
 
 inherit( BaseProducerModel, TreeModel, {
 
-  clone:function(initialPos,createdThroughInteraction){
-    return new TreeModel(this.ecoSystemModel,this.organismInfo,initialPos,this.motionBounds,createdThroughInteraction);
+  clone: function( initialPos, createdThroughInteraction ) {
+    return new TreeModel( this.ecoSystemModel, this.organismInfo, initialPos, this.motionBounds, createdThroughInteraction );
   }
 
 } );

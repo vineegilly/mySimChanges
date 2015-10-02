@@ -3,8 +3,17 @@
  *
  * @author Sharfudeen Ashraf
  */
+
+//constants
+var ASSERT = true; // ASSET slows down the code, so use nly for debugging
+
 define( function( require ) {
   'use strict';
+
+  if ( ASSERT ) {
+
+  }
+
   var SimLauncher = require( './core/SimLauncher' );
   var SimApp = require( './core/SimApp' );
   var SimScreen = require( './core/Screen' );
@@ -13,10 +22,10 @@ define( function( require ) {
   var EcoSystemView = require( './view/EcoSystemView' );
 
   var energySimTitle = "EcoSystem Simulation";
-  SimLauncher.launch( function(organismsInfo) {
+  SimLauncher.launch( function( organismsInfo ) {
     var options = { backgroundColor: 'rgb( 242, 255, 204 )' /* Light yellow-green */ };
     var createModel = function() {
-      return new EcoSystemModel(organismsInfo);
+      return new EcoSystemModel( organismsInfo );
     };
 
     var createView = function( model ) {

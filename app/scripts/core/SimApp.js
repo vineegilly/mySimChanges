@@ -10,7 +10,7 @@ var Dimension2 = dot.Dimension2;
 var Util = scenery.Util;
 var ObservableArray = axon.ObservableArray;
 var Rectangle = scenery.Rectangle;
-var ButtonListener =  scenery.ButtonListener;
+var ButtonListener = scenery.ButtonListener;
 
 
 var Timer = require( './Timer' );
@@ -146,9 +146,9 @@ inherit( PropertySet, SimApp, {
 
     // Fixes problems where the div would be way off center on iOS7
     // TODO
-   /* if ( platform.mobileSafari ) {
-      window.scrollTo( 0, 0 );
-    }*/
+    /* if ( platform.mobileSafari ) {
+     window.scrollTo( 0, 0 );
+     }*/
 
     // update our scale and bounds properties after other changes (so listeners can be fired after screens are resized)
     this.scale = scale;

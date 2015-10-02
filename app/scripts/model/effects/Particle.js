@@ -17,7 +17,7 @@ inherit( Object, Particle, {
 
   update: function( ms ) {
     // shrinking
-     this.scale -= this.scaleSpeed * ms;
+    this.scale -= this.scaleSpeed * ms;
 
     if ( this.scale <= 0 ) {
       this.scale = 0;

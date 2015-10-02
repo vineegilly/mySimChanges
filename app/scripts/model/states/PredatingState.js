@@ -30,7 +30,7 @@ inherit( BaseOrganismState, PredatingState, {
 
   },
 
-  exit: function(organism) {
+  exit: function( organism ) {
 
   }
 

@@ -86,7 +86,7 @@ inherit( PropertySet, EcoSystemModel, {
 
   },
 
-  isRaining:function(){
+  isRaining: function() {
     return this.rain;
   },
 

@@ -19,8 +19,10 @@
   <!-- bower:js -->
   <script src="bower_components/jquery/dist/jquery.min.js"></script>
   <script src="bower_components/lodash/lodash.min.js"></script>
+
   <!-- end of bower.js-->
 
+  <script src="vendor/assert.js"></script>
   <script>
     window.phet ={};
     phet.chipper={};
@@ -28,11 +30,14 @@
       return [];
     }
 
+ // debug   window.assertions.enableAssert();
   </script>
 
   <!-- vendor js -->
+
   <script src="vendor/scenery.js"></script>
   <script src="vendor/axonbuild.js"></script>
+
   <!-- end of vendor js -->
 
 </head>

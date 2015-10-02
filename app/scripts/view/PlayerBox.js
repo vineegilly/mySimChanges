@@ -20,7 +20,7 @@ var CLEAR_STR = "Clear";
  * @param onClearPlay
  * @constructor
  */
-function PlayerBox(playPauseProperty, onClearPlay) {
+function PlayerBox( playPauseProperty, onClearPlay ) {
   var thisBox = this;
 
   var playTextNode = new Text( PLAY_STR, BUTTON_TEXT_OPTIONS );
@@ -57,7 +57,7 @@ function PlayerBox(playPauseProperty, onClearPlay) {
   playerItems.push( clearButton );
 
 
-  HBox.call( thisBox,  {
+  HBox.call( thisBox, {
     children: playerItems,
     spacing: 20
   } );

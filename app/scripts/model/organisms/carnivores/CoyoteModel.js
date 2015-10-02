@@ -8,14 +8,14 @@ var BaseCarnivoresModel = require( './BaseCarnivoresModel' );
  * @param {Bounds2} bounds
  * @constructor
  */
-function CoyoteModel( ecoSystemModel, organismInfo, initialPosition,bounds,createdThroughInteraction ) {
-  BaseCarnivoresModel.call( this, ecoSystemModel, organismInfo, initialPosition,bounds,createdThroughInteraction );
+function CoyoteModel( ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction ) {
+  BaseCarnivoresModel.call( this, ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction );
 }
 
 inherit( BaseCarnivoresModel, CoyoteModel, {
 
-  clone:function(initialPos,createdThroughInteraction){
-    return new CoyoteModel(this.ecoSystemModel,this.organismInfo,initialPos,this.motionBounds,createdThroughInteraction);
+  clone: function( initialPos, createdThroughInteraction ) {
+    return new CoyoteModel( this.ecoSystemModel, this.organismInfo, initialPos, this.motionBounds, createdThroughInteraction );
   }
 
 } );
