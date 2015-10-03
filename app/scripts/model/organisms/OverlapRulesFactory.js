@@ -33,16 +33,16 @@ inherit( Object, OverlapRulesFactory, {},
 
     checkForPreyPredatorRule: function( organism1, organism2 ) {
       var preyPredatorOverlapResult = {};
-      if ( organism1.isPrey() ) {
+      if ( organism1.isPrey( organism2 ) ) {
         preyPredatorOverlapResult[ "prey" ] = organism1;
       }
-      if ( organism2.isPrey() ) {
+      if ( organism2.isPrey( organism1 ) ) {
         preyPredatorOverlapResult[ "prey" ] = organism2;
       }
-      if ( organism1.isPredator() ) {
+      if ( organism1.isPredator( organism2 ) ) {
         preyPredatorOverlapResult[ "predator" ] = organism1;
       }
-      if ( organism2.isPredator() ) {
+      if ( organism2.isPredator( organism1 ) ) {
         preyPredatorOverlapResult[ "predator" ] = organism2;
       }
 

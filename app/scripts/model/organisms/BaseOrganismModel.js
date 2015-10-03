@@ -42,7 +42,7 @@ function BaseOrganismModel( ecoSystemModel, organismInfo, initialPosition, motio
 
   thisModel.name = organismInfo.name;
   thisModel.organismInfo = organismInfo;
-  thisModel.appearanceImage = OrganismImageCollection.getRepresentation( thisModel.name);
+  thisModel.appearanceImage = OrganismImageCollection.getRepresentation( thisModel.name );
   thisModel.ecoSystemModel = ecoSystemModel;
   thisModel.organismState = organismRestingStateInstance;
   thisModel.velocity = EcoSystemConstants.ANIMATION_VELOCITY;
@@ -318,20 +318,16 @@ inherit( PropertySet, BaseOrganismModel, {
     return this.dead;
   },
 
-  isPrey: function() {
-    return this.organismInfo.prey;
+  /**
+   * check if this organism is a prey with respect to the given arg (also checks for producer/consumer)
+   * @returns {*}
+   */
+  isPrey: function( withRespectToPredator ) {
+    throw new Error( "IsPrey method is to be implemented by descendants of BaseOrganismModel" );
   },
 
-  isPredator: function() {
-    return this.organismInfo.predator;
-  },
-
-  isProducer: function() {
-    return this.organismInfo.producer;
-  },
-
-  isDecomposer: function() {
-    return this.organismInfo.decomposer;
+  isPredator: function( withRespectToPrey ) {
+    throw new Error( "isPredator method is to be implemented by descendants of BaseOrganismModel" );
   },
 
   isEating: function() {
