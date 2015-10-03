@@ -7,37 +7,37 @@
 
 var OverlapRuleConstants = {
   beetle: {
-    prey: [ "songbird", "mouse","frog" ], predator: [ "grass", "flower", "tree" ]
+    prey: [ "songbird", "mouse"], predator: [ "grass", "flower", "tree" ]
   },
   grass: {
-      prey: ["beetle","mouse","deer","rabbit","songbird"], predator:[]
+      prey: ["beetle","rabbit","deer","songbird","mouse"], predator:[]
   },
     flower: {
-        prey:["beetle","mouse","deer","rabbit","butterfly"],predator:[]
+        prey:["beetle","butterfly","rabbit","deer"],predator:[]
     },
 
     tree: {
-        prey :["beetle","mouse","deer","butterfly","songbird","raccoon"],predator: []
+        prey :["beetle","butterfly","deer","mouse","songbird"],predator: []
     },
 
     butterfly:{
-        prey:["songbird","frog"],predator:["flower","tree"]
+        prey:["songbird"],predator:["flower","tree"]
     },
 
     rabbit:  {
-        prey: ["coyote","hawk"],predator:["mushroom","grass","flower"]
+        prey: [],predator:["grass","flower"]
     },
 
     deer:{
-        prey:["coyote"],predator:["mushroom","grass","flower","tree"]
+        prey:[],predator:["mushroom","grass","flower","tree"]
     },
 
     songbird:{
-        prey:["snake","hawk"],predator:["beetle","grass","earthworm","tree","butterfly"]
+        prey:["snake","hawk"],predator:["grass","tree","beetle","butterfly"]
     },
 
     mouse:{
-        prey:["raccoon","snake","hawk","coyote"],predator:["mushroom","grass","tree","beetle"]
+        prey:[],predator:["grass","flower","tree","beetle"]
     }
 
 };
