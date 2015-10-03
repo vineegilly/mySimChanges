@@ -17,7 +17,7 @@ var OverlapRuleConstants = {
     },
 
     tree: {
-        prey :["beetle","butterfly","deer","mouse","songbird"],predator: []
+        prey :["beetle","butterfly","deer","songbird","mouse"],predator: []
     },
 
     butterfly:{
@@ -29,15 +29,38 @@ var OverlapRuleConstants = {
     },
 
     deer:{
-        prey:[],predator:["mushroom","grass","flower","tree"]
-    },
-
-    songbird:{
-        prey:["snake","hawk"],predator:["grass","tree","beetle","butterfly"]
+        prey:[],predator:["grass","flower","tree"]
     },
 
     mouse:{
         prey:[],predator:["grass","flower","tree","beetle"]
+    },
+
+    earthworm:{
+        prey:["songbird"],predator:[]
+    },
+
+    hawk:{
+        prey:[],predator:["rabbit","songbird","mouse"]
+    },
+
+    mushroom:{
+        prey:["rabbit","deer","mouse"],predator:[]
+    },
+    snake:{
+        prey:[],predator:["songbird","mouse"]
+    },
+    raccoon:{
+        prey:[],predator:["tree","mouse"]
+    },
+    coyote:{
+        prey:[],predator:["rabbit","deer","mouse"]
+    },
+    frog:{
+        prey:[],predator:["beetle","butterfly"]
+    },
+    songbird:{
+        prey:[],predator:["grass","tree","beetle","butterfly"]
     }
 
 };
