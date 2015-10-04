@@ -79,15 +79,18 @@ inherit( PropertySet, BaseOrganismModel, {
 
   step: function( dt ) {
     if ( !this.userControlled ) {
+      this.stepState( this, dt );
       this.doStep( dt );
-      this.executeBumpingRules();
     }
-
-    console.log( "Time Elapsed " + this.elapsedTime + " Date " + new Date() )
+    // console.log( "Time Elapsed " + this.elapsedTime + " Date " + new Date() )
   },
 
-  executeBumpingRules: function() {
-
+  /**
+   *
+   * @param {number} dt
+   */
+  stepState: function( dt ) {
+    this.organismState.step( dt );
   },
 
   setState: function( newState ) {

@@ -51,13 +51,6 @@ inherit( BaseOrganismModel, BaseCarnivoresModel, {
 
   initState: function() {
     this.goToRest();
-  },
-
-  /**
-   * Flower,grass and Tree dont Move and interact, so override play
-   */
-  play: function() {
-
   }
 
 

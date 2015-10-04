@@ -32,6 +32,11 @@ inherit( Object, BaseOrganismState, {
   },
 
 
+  /**
+   *
+   * @param {OrganismModel} organism
+   * @param dt
+   */
   step: function( organism, dt ) {
 
   },
