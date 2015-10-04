@@ -7,61 +7,61 @@
 
 var OverlapRuleConstants = {
   beetle: {
-    prey: [ "songbird", "mouse"], predator: [ "grass", "flower", "tree" ]
+    prey: [ "songbird", "mouse" ], predator: [ "grass", "flower", "tree" ]
   },
   grass: {
-      prey: ["beetle","rabbit","deer","songbird","mouse"], predator:[]
+    prey: [ "beetle", "rabbit", "deer", "songbird", "mouse" ], predator: []
   },
-    flower: {
-        prey:["beetle","butterfly","rabbit","deer"],predator:[]
-    },
+  flower: {
+    prey: [ "beetle", "butterfly", "rabbit", "deer" ], predator: []
+  },
 
-    tree: {
-        prey :["beetle","butterfly","deer","songbird","mouse"],predator: []
-    },
+  tree: {
+    prey: [ "beetle", "butterfly", "deer", "songbird", "mouse" ], predator: []
+  },
 
-    butterfly:{
-        prey:["songbird"],predator:["flower","tree"]
-    },
+  butterfly: {
+    prey: [ "songbird" ], predator: [ "flower", "tree" ]
+  },
 
-    rabbit:  {
-        prey: [],predator:["grass","flower"]
-    },
+  rabbit: {
+    prey: [], predator: [ "grass", "flower" ]
+  },
 
-    deer:{
-        prey:[],predator:["grass","flower","tree"]
-    },
+  deer: {
+    prey: [], predator: [ "grass", "flower", "tree" ]
+  },
 
-    mouse:{
-        prey:[],predator:["grass","flower","tree","beetle"]
-    },
+  mouse: {
+    prey: [], predator: [ "grass", "flower", "tree", "beetle" ]
+  },
 
-    earthworm:{
-        prey:["songbird"],predator:[]
-    },
+  earthworm: {
+    prey: [ "songbird" ], predator: []
+  },
 
-    hawk:{
-        prey:[],predator:["rabbit","songbird","mouse"]
-    },
+  hawk: {
+    prey: [], predator: [ "rabbit", "songbird", "mouse" ]
+  },
 
-    mushroom:{
-        prey:["rabbit","deer","mouse"],predator:[]
-    },
-    snake:{
-        prey:[],predator:["songbird","mouse"]
-    },
-    raccoon:{
-        prey:[],predator:["tree","mouse"]
-    },
-    coyote:{
-        prey:[],predator:["rabbit","deer","mouse"]
-    },
-    frog:{
-        prey:[],predator:["beetle","butterfly"]
-    },
-    songbird:{
-        prey:[],predator:["grass","tree","beetle","butterfly"]
-    }
+  mushroom: {
+    prey: [ "rabbit", "deer", "mouse" ], predator: []
+  },
+  snake: {
+    prey: [], predator: [ "songbird", "mouse" ]
+  },
+  raccoon: {
+    prey: [], predator: [ "tree", "mouse" ]
+  },
+  coyote: {
+    prey: [], predator: [ "rabbit", "deer", "mouse" ]
+  },
+  frog: {
+    prey: [], predator: [ "beetle", "butterfly" ]
+  },
+  songbird: {
+    prey: [], predator: [ "grass", "tree", "beetle", "butterfly" ]
+  }
 
 };
 

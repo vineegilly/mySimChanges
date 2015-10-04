@@ -3,6 +3,7 @@ var PropertySet = axon.PropertySet;
 var EcoSystemConstants = require( '../EcoSystemConstants' );
 var Vector2 = dot.Vector2;
 var OrganismImageCollection = require( '../organisms/OrganismImageCollection' );
+var _ = require( 'lodash' );
 
 //states
 var ReturnToOriginState = require( '../states/ReturnToOriginState' );
@@ -12,6 +13,7 @@ var SupportReproducingState = require( '../states/SupportReproducingState' );
 var ReproducingState = require( '../states/ReproducingState' );
 var PredatingState = require( '../states/PredatingState' );
 var DyingState = require( '../states/DyingState' );
+var OverlapRuleConstants = require( '../../model/OverlapRuleConstants' );
 
 
 var returnToOriginStateInstance = new ReturnToOriginState();
@@ -319,15 +321,35 @@ inherit( PropertySet, BaseOrganismModel, {
   },
 
   /**
-   * check if this organism is a prey with respect to the given arg (also checks for producer/consumer)
+   * check if this organism is a prey with respect to the given predator (also checks for producer/consumer)
    * @returns {*}
    */
   isPrey: function( withRespectToPredator ) {
-    throw new Error( "IsPrey method is to be implemented by descendants of BaseOrganismModel" );
+    var preyPredatorRule = OverlapRuleConstants[ withRespectToPredator.name ];
+    if ( preyPredatorRule ) {
+      var listOfPreys = preyPredatorRule[ "prey" ];
+      if ( listOfPreys ) {
+        return _.contains( listOfPreys, this.name );
+      }
+    }
+    return false;
   },
 
+  /**
+   * Checks if this object is a predator with respect to a given prey
+   *
+   * @param withRespectToPrey
+   * @returns {boolean}
+   */
   isPredator: function( withRespectToPrey ) {
-    throw new Error( "isPredator method is to be implemented by descendants of BaseOrganismModel" );
+    var preyPredatorRule = OverlapRuleConstants[ withRespectToPrey.name ];
+    if ( preyPredatorRule ) {
+      var listOfPredators = preyPredatorRule[ "predator" ];
+      if ( listOfPredators ) {
+        return _.contains( listOfPredators, this.name );
+      }
+    }
+    return false;
   },
 
   isEating: function() {

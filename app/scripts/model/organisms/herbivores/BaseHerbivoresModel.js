@@ -29,17 +29,15 @@ inherit( BaseOrganismModel, BaseHerbivoresModel, {
     this.timeElapsedSinceReproduction += dt;
 
     if ( this.timeElapsedWithoutProducer >= this.getTimeThresholdForProducer() ) {
-      this.moveToDyingStateBecauseOfNoProducer();
+      this.moveToDyingState();
     }
-
-    if ( this.timeElapsedSinceReproduction >= this.getTimeThresholdForReproduction() ) {
-      this.moveToReproductionState();
-    }
-
 
   },
 
-  moveToDyingStateBecauseOfNoProducer: function() {
+  /**
+   * This could be because there is no prey to eat or exposed to pesticide
+   */
+  moveToDyingState: function() {
 
   },
 
@@ -48,13 +46,20 @@ inherit( BaseOrganismModel, BaseHerbivoresModel, {
 
   },
 
-
+  /**
+   * Time it can live without a prey
+   * @returns {OrganismTimeActionConstants.BEETLE_DIE_NO_PREY|*}
+   */
   getTimeThresholdForProducer: function() {
-    throw new Error( "getTimeThresholdForRain must be implemented in  BaseOrganismModel's descendant class" );
+    throw new Error( "getTimeThresholdForRain must be implemented in  BaseHerbivoresModel's descendant class" );
   },
 
+  /**
+   * Time it has to wait for reproduction
+   * @returns {OrganismTimeActionConstants.BEETLE_DIE_NO_PREY|*}
+   */
   getTimeThresholdForReproduction: function() {
-    throw new Error( "getTimeThresholdForReproduction must be implemented in  BaseOrganismModel's descendant class" );
+    throw new Error( "getTimeThresholdForReproduction must be implemented in  BaseHerbivoresModel's descendant class" );
   },
 
 
