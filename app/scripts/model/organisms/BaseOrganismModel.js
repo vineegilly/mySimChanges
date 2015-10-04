@@ -79,7 +79,7 @@ inherit( PropertySet, BaseOrganismModel, {
 
   step: function( dt ) {
     if ( !this.userControlled ) {
-      this.stepState( this, dt );
+      this.stepState( dt );
       this.doStep( dt );
     }
     // console.log( "Time Elapsed " + this.elapsedTime + " Date " + new Date() )
@@ -90,7 +90,7 @@ inherit( PropertySet, BaseOrganismModel, {
    * @param {number} dt
    */
   stepState: function( dt ) {
-    this.organismState.step( dt );
+    this.organismState.step( this, dt );
   },
 
   setState: function( newState ) {
