@@ -6,7 +6,7 @@ var hawk = require( "../../assets/images/hawk.png" );
 
 var imageNode = new Image( hawk );
 
-var IMAGE_SCALE = 1;
+var IMAGE_SCALE = 0.12;
 imageNode.scale( IMAGE_SCALE );
 
 
