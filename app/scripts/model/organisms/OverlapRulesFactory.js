@@ -53,7 +53,8 @@ inherit( Object, OverlapRulesFactory, {},
       var reproductionRuleResult = {};
 
       // only same items can reproduce
-      if ( organism1.id === organism2.id ) {
+      if ( organism1.name === organism2.name ) {
+
         reproductionRuleResult[ "partner1" ] = organism1;
         reproductionRuleResult[ "partner2" ] = organism2;
       }

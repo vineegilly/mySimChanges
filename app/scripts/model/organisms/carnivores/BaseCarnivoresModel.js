@@ -14,8 +14,6 @@ var BaseOrganismModel = require( '../BaseOrganismModel' );
 function BaseCarnivoresModel( ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction ) {
   BaseOrganismModel.call( this, ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction );
 
-  this.timeElapsedWithoutProducer = 0; // in milliseconds
-  this.timeElapsedSinceReproduction = 0;
 }
 
 inherit( BaseOrganismModel, BaseCarnivoresModel, {
@@ -25,26 +23,6 @@ inherit( BaseOrganismModel, BaseCarnivoresModel, {
    * @param dt
    */
   doStep: function( dt ) {
-    this.timeElapsedWithoutProducer += dt;
-    this.timeElapsedSinceReproduction += dt;
-
-    if ( this.timeElapsedWithoutProducer >= this.getTimeThresholdForLackOfProducer() ) {
-      this.moveToDyingStateBecauseOfNoProducer();
-    }
-
-
-  },
-
-  moveToDyingStateBecauseOfNoProducer: function() {
-
-  },
-
-  moveToReproductionState: function() {
-
-  },
-
-
-  getTimeThresholdForLackOfProducer: function() {
 
   },
 

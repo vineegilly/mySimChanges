@@ -21,8 +21,6 @@ var EcoSystemConstants = {
     PLAY_STEP_DISTANCE:  imageNode.width / 2,
     ORGANISM_RADIUS:     imageNode.width / 2,
     MOVE_APART_DISTANCE: imageNode.width / 4,
-    MIN_REPRODUCTION_LAPSE: 15,
-    MIN_PREDATE_LAPSE: 5,
     IMAGE_SCALE: IMAGE_SCALE,
     GRID_NODE_DIMENSION: new Dimension2( 930, 360 ),
     CHART_NODE_DIMENSION: new Dimension2( 350, 200 ),

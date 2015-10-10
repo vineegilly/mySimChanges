@@ -3,6 +3,7 @@ var PropertySet = axon.PropertySet;
 var EcoSystemConstants = require( '../EcoSystemConstants' );
 var Vector2 = dot.Vector2;
 var OrganismImageCollection = require( '../organisms/OrganismImageCollection' );
+var OrganismRuleConstants = require( '../OrganismRuleConstants' );
 var _ = require( 'lodash' );
 
 //states
@@ -13,7 +14,6 @@ var SupportReproducingState = require( '../states/SupportReproducingState' );
 var ReproducingState = require( '../states/ReproducingState' );
 var PredatingState = require( '../states/PredatingState' );
 var DyingState = require( '../states/DyingState' );
-var OverlapRuleConstants = require( '../../model/OverlapRuleConstants' );
 
 
 var returnToOriginStateInstance = new ReturnToOriginState();
@@ -58,9 +58,9 @@ function BaseOrganismModel( ecoSystemModel, organismInfo, initialPosition, motio
   this.motionBounds = motionBounds;
   this.multipliedOrganisms = [ this ];// add the current one
 
-  // initially make it ready, but for the one created through interaction, set them zero to start with
-  thisModel.reproductionMinimumLapsedTimes = createdThroughInteraction ? 0 : EcoSystemConstants.MIN_REPRODUCTION_LAPSE + 1;
-  thisModel.predatingMiniumLapsedTimes = createdThroughInteraction ? 0 : EcoSystemConstants.MIN_PREDATE_LAPSE + 1;
+  this.timeElapsedWithoutFood = 0;
+  this.timeElapsedSinceReproduction = OrganismRuleConstants[ this.name ].REPRODUCE_RULE.elapse * -1; // start with negative span
+
 
   thisModel.positionProperty.lazyLink( function( position ) {
     if ( position.equals( initialPosition ) && !createdThroughInteraction ) {
@@ -79,10 +79,29 @@ inherit( PropertySet, BaseOrganismModel, {
 
   step: function( dt ) {
     if ( !this.userControlled ) {
+
+      this.timeElapsedWithoutFood += dt; // in milliseconds
+      this.timeElapsedSinceReproduction += dt;
       this.stepState( dt );
       this.doStep( dt );
+
+      this.validateExpiryState( dt );
     }
-    // console.log( "Time Elapsed " + this.elapsedTime + " Date " + new Date() )
+
+  },
+
+  validateExpiryState: function( dt ) {
+    if ( this.timeElapsedWithoutFood >= this.getTimeThresholdWithoutFood() ) {
+      this.moveToDyingStateBecauseOfNoFood();
+    }
+  },
+
+  moveToDyingStateBecauseOfNoFood: function() {
+
+  },
+
+  getTimeThresholdWithoutFood: function() {
+    return OrganismRuleConstants[ this.name ].DIE_NO_FOOD;
   },
 
   /**
@@ -190,18 +209,14 @@ inherit( PropertySet, BaseOrganismModel, {
   },
 
   canReproduce: function() {
-    if ( this.reproductionMinimumLapsedTimes > EcoSystemConstants.MIN_REPRODUCTION_LAPSE ) {
-      return true;
+    var minThresholdTime = OrganismRuleConstants[ this.name ].REPRODUCE_RULE.elapse;
+    if ( this.timeElapsedSinceReproduction < minThresholdTime ) {
+      return false;
     }
-    return false;
+
+    return true;
   },
 
-  canPredate: function() {
-    if ( this.predatingMiniumLapsedTimes > EcoSystemConstants.MIN_PREDATE_LAPSE ) {
-      return true;
-    }
-    return false;
-  },
 
   /**
    * Organisms like Grass,Flower,Tree override this class because they dont move
@@ -328,7 +343,7 @@ inherit( PropertySet, BaseOrganismModel, {
    * @returns {*}
    */
   isPrey: function( withRespectToPredator ) {
-    var preyPredatorRule = OverlapRuleConstants[ withRespectToPredator.name ];
+    var preyPredatorRule = OrganismRuleConstants[ withRespectToPredator.name ];
     if ( preyPredatorRule ) {
       var listOfPreys = preyPredatorRule[ "prey" ];
       if ( listOfPreys ) {
@@ -345,7 +360,7 @@ inherit( PropertySet, BaseOrganismModel, {
    * @returns {boolean}
    */
   isPredator: function( withRespectToPrey ) {
-    var preyPredatorRule = OverlapRuleConstants[ withRespectToPrey.name ];
+    var preyPredatorRule = OrganismRuleConstants[ withRespectToPrey.name ];
     if ( preyPredatorRule ) {
       var listOfPredators = preyPredatorRule[ "predator" ];
       if ( listOfPredators ) {
