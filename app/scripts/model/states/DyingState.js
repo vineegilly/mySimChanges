@@ -2,6 +2,10 @@ var inherit = axon.inherit;
 var BaseOrganismState = require( './BaseOrganismState' );
 var Vector2 = dot.Vector2;
 
+/**
+ * DyingState is differentiated fron naturally expiring state (since the effect needs to be different)
+ * @constructor
+ */
 function DyingState() {
   BaseOrganismState.call( this );
 }

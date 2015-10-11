@@ -46,6 +46,14 @@ inherit( BaseOrganismModel, BaseProducerModel, {
 
   },
 
+  incrementTimeElapsedWithoutFood: function( dt ) {
+    if(this.ecoSystemModel.isRaining()){
+      return;
+    }
+
+    this.timeElapsedWithoutFood += dt * 1000; // in milliseconds
+  },
+
   initState: function() {
     this.goToRest();
   },
@@ -55,8 +63,11 @@ inherit( BaseOrganismModel, BaseProducerModel, {
    */
   play: function() {
 
-  }
+  },
 
+  onRain:function(){
+    this.timeElapsedWithoutFood =0;
+  }
 
 } );
 

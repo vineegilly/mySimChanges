@@ -18,7 +18,6 @@ function OrganismNode( organismModel ) {
   appearanceNode.scale( EcoSystemConstants.IMAGE_SCALE );
   thisNode.addChild( appearanceNode );
 
-
   /*var debugPoint = new Circle( 10, {
    fill: "red",
    opacity:1

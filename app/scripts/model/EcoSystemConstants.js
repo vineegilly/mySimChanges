@@ -18,7 +18,7 @@ var EcoSystemConstants = {
     GRID_PANEL_STROKE_COLOR: new Color( 100, 100, 100 ),
     PANEL_TITLE_FONT: new SimFont( { family: 'Futura', size: 18, weight: 'bold' } ),
     ANIMATION_VELOCITY: 500,
-    PLAY_STEP_DISTANCE:  imageNode.width,
+    PLAY_STEP_DISTANCE: imageNode.width,
     ORGANISM_RADIUS:     imageNode.width / 2,
     MOVE_APART_DISTANCE: imageNode.width / 2,
     IMAGE_SCALE: IMAGE_SCALE,
@@ -26,10 +26,12 @@ var EcoSystemConstants = {
     CHART_NODE_DIMENSION: new Dimension2( 350, 200 ),
     ORGANISM_PANEL_DIMENSION: new Dimension2( 300, 180 ),
     PARTICLE_COLOR: new Color( 255, 0, 0 ),
-    MAX_ORGANISMS: 60,
+    MAX_ORGANISMS: 20,
     MAX_RIPPLE_FRAMES: 75,
     RAIN_DROP_COUNT: 10,
-    MAX_PLAY_TIME: 100,
+    DIE_BECAUSE_OF_NO_FOOD: 1,
+    SNAPSHOT_CAPTURE_ELAPSE: 500,
+    TOTAL_LIFE_SPAN: 12000,
 
 // interaction states
     DYING_STATE: 1,

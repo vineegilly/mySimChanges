@@ -7,6 +7,7 @@ var EcoSystemConstants = require( '../model/EcoSystemConstants' );
 var RippleCirlce = require( '../model/effects/RippleCircle' );
 var RainDropParticles = require( '../model/effects/RainDropParticles' );
 
+// Applies different effects based on the state of Organisms
 /**
  *
  * @param {EcoSystemModel} ecoSystemModel
@@ -26,6 +27,8 @@ function EcoSystemEffectNode( ecoSystemModel, bounds ) {
 
   function handleOrganismDying( addedOrganismModel ) {
     var position = addedOrganismModel.position;
+
+
     var dyingParticles = ParticleExplosionBuilder.buildParticles( position.x, position.y, EcoSystemConstants.PARTICLE_COLOR );
     thisNode.dyingParticleCollection.add( dyingParticles );
 

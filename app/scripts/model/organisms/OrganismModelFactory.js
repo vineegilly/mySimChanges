@@ -67,7 +67,6 @@ inherit( Object, OrganismModelFactory, {},
         case "mushroom":
           return new MushroomModel( ecoSystemModel, organismInfo, pos, bounds );
 
-
         case "mouse":
           return new MouseModel( ecoSystemModel, organismInfo, pos, bounds );
         case "raccoon":

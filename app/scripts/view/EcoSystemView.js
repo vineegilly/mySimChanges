@@ -28,6 +28,7 @@ var PANEL_VERTICAL_PADDING = 25;
 
 function EcoSystemView( ecoSystemModel ) {
   var thisView = this;
+  thisView.model = ecoSystemModel;
   BaseScreenView.call( thisView, { layoutBounds: new Bounds2( 0, 0, 1024, 704 ) } );
 
   var viewBoundsPath = new Path( Shape.bounds( this.layoutBounds ), { pickable: false, stroke: 'red', lineWidth: 0, fill: '#87cefa' } );
@@ -64,12 +65,13 @@ function EcoSystemView( ecoSystemModel ) {
   //Initial Organism Creation
   ecoSystemModel.residentOrganismModels.forEach( handleOrganismAdded );
 
+  thisView.populationChartNode = new PopulationChartNode();
+
   // Observe new items
   ecoSystemModel.residentOrganismModels.addItemAddedListener( handleOrganismAdded );
   var organismPanelNode = new OrganismPanelNode( ecoSystemModel, thisView.gridPanelNode, motionBounds );
-  var environmentControlsNode = new EnvironmentControlsNode( ecoSystemModel );
+  var environmentControlsNode = new EnvironmentControlsNode( ecoSystemModel, thisView.populationChartNode );
 
-  thisView.populationChartNode = new PopulationChartNode();
 
   var panelBox = new HBox( {
     children: [ organismPanelNode, environmentControlsNode, thisView.populationChartNode ],
@@ -95,6 +97,10 @@ inherit( BaseScreenView, EcoSystemView, {
   step: function( dt ) {
     var thisView = this;
     thisView.gridPanelNode.step( dt );
+    if ( thisView.model.isPlaying() ) {
+      thisView.populationChartNode.updateChart( thisView.model.organismLifeLineSnapShots );
+    }
+
 
   }
 } );

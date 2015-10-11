@@ -16,7 +16,12 @@ inherit( BaseDecomposerModel, MushroomModel, {
 
   clone: function( initialPos, createdThroughInteraction ) {
     return new MushroomModel( this.ecoSystemModel, this.organismInfo, initialPos, this.motionBounds, createdThroughInteraction );
+  },
+
+  play: function() {
+
   }
+
 
 } );
 

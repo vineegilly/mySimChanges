@@ -61,6 +61,9 @@ function BaseOrganismModel( ecoSystemModel, organismInfo, initialPosition, motio
   this.timeElapsedWithoutFood = 0;
   this.timeElapsedSinceReproduction = OrganismRuleConstants[ this.name ].REPRODUCE_RULE.elapse; // start with the ability to reproduce
 
+  // to differentiate natural and death by predator
+  this.causeOfDying = -1;
+
   thisModel.positionProperty.lazyLink( function( position ) {
     if ( position.equals( initialPosition ) && !createdThroughInteraction ) {
       thisModel.trigger( 'returnedToOrigin' );
@@ -78,20 +81,33 @@ inherit( PropertySet, BaseOrganismModel, {
 
   step: function( dt ) {
     if ( !this.userControlled ) {
-      this.incrementTimeElapsedWithoutFood( dt );
-      this.incrementTimeElapsedSinceReproduction( dt );
-
-      this.stepState( dt );
       this.doStep( dt );
-
-      this.validateExpiryState( dt );
     }
+
+    if ( this.ecoSystemModel.isPlaying() ) {
+      this.playStep( dt );
+    }
+
+  },
+
+  onRain:function(){
+
+  },
+
+
+  playStep: function( dt ) {
+    this.incrementTimeElapsedWithoutFood( dt );
+    this.incrementTimeElapsedSinceReproduction( dt );
+    this.stepState( dt );
+    this.validateExpiryState( dt );
+  },
+
+  playReset: function() {
 
   },
 
   incrementTimeElapsedWithoutFood: function( dt ) {
     this.timeElapsedWithoutFood += dt * 1000; // in milliseconds
-
   },
 
   incrementTimeElapsedSinceReproduction: function( dt ) {
@@ -106,7 +122,8 @@ inherit( PropertySet, BaseOrganismModel, {
   },
 
   moveToDyingStateBecauseOfNoFood: function() {
-
+    this.causeOfDying = EcoSystemConstants.DIE_BECAUSE_OF_NO_FOOD;
+    this.startDying();
   },
 
   getTimeThresholdWithoutFood: function() {
@@ -145,7 +162,7 @@ inherit( PropertySet, BaseOrganismModel, {
     var preyPosition = preyBeingEaten.position;
     this.setDestination( preyPosition, true, EcoSystemConstants.ANIMATION_VELOCITY / 2 );
     this.interactionState = EcoSystemConstants.EATING_STATE;
-    this.predatingMiniumLapsedTimes = 0;
+    this.timeElapsedWithoutFood = 0;
   },
 
   startDying: function() {
@@ -319,8 +336,8 @@ inherit( PropertySet, BaseOrganismModel, {
       cellY = cellY + 1;
     }
 
-    snapedPt.x =  (cellX * gridGap);
-    snapedPt.y =  (cellY * gridGap );
+    snapedPt.x = (cellX * gridGap);
+    snapedPt.y = (cellY * gridGap );
 
     return snapedPt;
   },
@@ -433,7 +450,7 @@ inherit( PropertySet, BaseOrganismModel, {
     var r1 = EcoSystemConstants.ORGANISM_RADIUS;
     var r2 = EcoSystemConstants.ORGANISM_RADIUS;
 
-    var tolerance = 15;
+    var tolerance = 5;
 
     var c1 = this.position;
     var c2 = otherModel.position;

@@ -43,7 +43,7 @@ inherit( Object, OverlapRulesFactory, {},
         preyPredatorOverlapResult[ "prey" ] = organism2;
         return preyPredatorOverlapResult;
       }
-    
+
       return preyPredatorOverlapResult;
     },
 

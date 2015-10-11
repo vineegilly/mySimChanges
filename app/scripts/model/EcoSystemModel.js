@@ -10,6 +10,7 @@ var PropertySet = axon.PropertySet;
 var ObservableArray = axon.ObservableArray;
 var OverlapRulesFactory = require( '../model/organisms/OverlapRulesFactory' );
 var EcoSystemConstants = require( './EcoSystemConstants' );
+var OrganismLifeLineSnapShot = require( '../model/organisms/OrganismLifeLineSnapShot' );
 
 
 function EcoSystemModel( organismInfos, screenBounds ) {
@@ -30,6 +31,10 @@ function EcoSystemModel( organismInfos, screenBounds ) {
 
   this.dyingModels = new ObservableArray();
   this.newlyReproducedModels = new ObservableArray();
+  this.organismLifeLineSnapShots = [];
+  this.snapShotCounter = -1;
+  this.totalTimeLapse = 0; // in milli seconds
+  this.totalLifeSpan = EcoSystemConstants.TOTAL_LIFE_SPAN;
 
   this.playPauseProperty.link( function( playPause ) {
     if ( playPause ) {
@@ -39,6 +44,14 @@ function EcoSystemModel( organismInfos, screenBounds ) {
       thisModel.pause();
     }
   } );
+
+  this.rainProperty.link( function( rain ) {
+    if ( rain ) {
+      thisModel.onRain();
+    }
+
+  } );
+
 
   var refPopulationRange = this.populationRange;
   this.populationRangeProperty.lazyLink( function( newPopulationRange ) {
@@ -56,8 +69,6 @@ function EcoSystemModel( organismInfos, screenBounds ) {
     existingModels.forEach( function( organismModel ) {
       organismModel.multiply( newPopulationRange );
     } );
-
-
   } );
 
 
@@ -76,18 +87,53 @@ inherit( PropertySet, EcoSystemModel, {
     } );
 
     if ( this.isPlaying() ) {
+
       var allModels = [].concat( this.residentOrganismModels.getArray() );
       for ( var i = 0; i < allModels.length; i++ ) {
         for ( var j = 0; j < allModels.length; j++ ) {
           OverlapRulesFactory.applyOverlapRules( allModels[ i ], allModels[ j ] );
         }
       }
+      self.addLifeLineSnapShot( dt );
+
+      if ( this.totalTimeLapse > this.totalLifeSpan ) {
+        this.playPause=false;
+      }
     }
 
   },
 
+  onRain:function()
+  {
+    this.residentOrganismModels.forEach( function( organismModel ) {
+      organismModel.onRain(  );
+    } );
+  },
+
   isRaining: function() {
     return this.rain;
+  },
+
+  addLifeLineSnapShot: function( dt ) {
+    var self = this;
+    this.totalTimeLapse += dt * 1000;
+
+    var currentCounter = this.totalTimeLapse / EcoSystemConstants.SNAPSHOT_CAPTURE_ELAPSE;
+
+    if ( currentCounter > this.snapShotCounter ) {
+      this.snapShotCounter++;
+
+      var groupedElements = _.groupBy( this.residentOrganismModels.getArray(), function( organismModel ) {
+        return organismModel.name;
+      } );
+
+      _.each( groupedElements, function( elementArray, name ) {
+        var organismLifeLineSnapShot = new OrganismLifeLineSnapShot( name, self.totalTimeLapse, elementArray.length );
+        self.organismLifeLineSnapShots.push( organismLifeLineSnapShot );
+
+      } );
+
+    }
   },
 
   /**
@@ -139,9 +185,17 @@ inherit( PropertySet, EcoSystemModel, {
   onClearPlay: function() {
     this.residentOrganismModels.clear();
     this.playPause = false;
+    this.resetPlayState();
+  },
+
+  resetPlayState: function() {
+    this.totalTimeLapse = 0;
+    this.snapShotCounter = 0;
+    this.organismLifeLineSnapShots = [];
   },
 
   play: function() {
+    this.resetPlayState();
     this.residentOrganismModels.forEach( function( organismModel ) {
       organismModel.play();
     } );
@@ -164,6 +218,7 @@ inherit( PropertySet, EcoSystemModel, {
       this.dyingModels.remove( organismModel );
     }
   },
+
 
   addNewlyReproducedOrganism: function( organismModel ) {
     if ( !this.newlyReproducedModels.contains( organismModel ) ) {

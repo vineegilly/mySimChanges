@@ -23,7 +23,7 @@ var SUN_LIGHT_STR = "Sun Light";
 var ENVIRONMENTAL_CONTROLS_STR = "Environment Controls";
 var TITLE_SIZE = new Dimension2( 200, 30 );
 
-function EnvironmentControlsNode( ecoSystemModel ) {
+function EnvironmentControlsNode( ecoSystemModel, populationChartNode ) {
   var thisPanel = this;
 
   var sunLightProperty = ecoSystemModel.sunLightProperty;
@@ -57,12 +57,15 @@ function EnvironmentControlsNode( ecoSystemModel ) {
 
   ecoSystemModel.playPauseProperty.link( function( playPause ) {
     populationRangeSlider.enabled = !playPause;
-    rainCheckBoxControl.enabled = !playPause;
-    sunLightBoxControl.enabled = !playPause;
+
   } );
 
   var titleBarNode = new TitleBarNode( TITLE_SIZE, ENVIRONMENTAL_CONTROLS_STR );
-  var playerBox = new PlayerBox( ecoSystemModel.playPauseProperty, ecoSystemModel.onClearPlay.bind( ecoSystemModel ) );
+  var playerBox = new PlayerBox( ecoSystemModel.playPauseProperty, function() {
+    populationChartNode.clearChart();
+    ecoSystemModel.onClearPlay();
+    populationRangeProperty.set( 1 );
+  } );
   var panelContents = new VBox( {
     children: [ titleBarNode, populationSliderBox, checkBoxControlBox, playerBox ],
     spacing: 18,
