@@ -14,7 +14,7 @@ var butterfly = require( "../../../assets/images/butterfly.png" );
 var raccoon = require( "../../../assets/images/raccoon.png" );
 var deer = require( "../../../assets/images/deer.png" );
 var rabbit = require( "../../../assets/images/rabbit.png" );
-var cayote = require( "../../../assets/images/cayote.png" );
+var coyote = require( "../../../assets/images/coyote.png" );
 var frog = require( "../../../assets/images/frog.png" );
 var songbird = require( "../../../assets/images/bird.png" );
 
@@ -33,7 +33,7 @@ var organismIdImageMap = {
   raccoon: raccoon,
   deer: deer,
   rabbit: rabbit,
-  cayote: cayote,
+  coyote: coyote,
   frog: frog,
   songbird: songbird
 };

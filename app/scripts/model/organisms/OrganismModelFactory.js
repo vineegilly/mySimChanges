@@ -57,7 +57,7 @@ inherit( Object, OrganismModelFactory, {},
           return new FrogModel( ecoSystemModel, organismInfo, pos, bounds );
         case "hawk":
           return new HawkModel( ecoSystemModel, organismInfo, pos, bounds );
-        case "cayote":
+        case "coyote":
           return new CoyoteModel( ecoSystemModel, organismInfo, pos, bounds );
         case "snake":
           return new SnakeModel( ecoSystemModel, organismInfo, pos, bounds );

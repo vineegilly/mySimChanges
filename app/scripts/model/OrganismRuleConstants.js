@@ -59,6 +59,7 @@ var OrganismRuleConstants = {
     REPRODUCE_RULE: { offspring: 2, elapse: 12000 }
   },
 
+  //hawk is a predator of rabbit,songbird and mouse
   hawk: {
     prey: [], predator: [ "rabbit", "songbird", "mouse" ],
     DIE_NO_FOOD: 6000,

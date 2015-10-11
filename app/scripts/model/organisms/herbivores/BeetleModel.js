@@ -24,7 +24,6 @@ inherit( BaseHerbivoresModel, BeetleModel, {
   }
 
 
-
 } );
 
 module.exports = BeetleModel;

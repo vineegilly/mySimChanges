@@ -2,11 +2,11 @@ var Color = scenery.Color;
 var SimFont = require( '../core/SimFont' );
 var Dimension2 = dot.Dimension2;
 var Image = scenery.Image;
-var hawk = require( "../../assets/images/hawk.png" );
+var beetle = require( "../../assets/images/beetle.png" );
 
-var imageNode = new Image( hawk );
+var imageNode = new Image( beetle );
 
-var IMAGE_SCALE = 0.12;
+var IMAGE_SCALE = 0.1;
 imageNode.scale( IMAGE_SCALE );
 
 
@@ -18,11 +18,11 @@ var EcoSystemConstants = {
     GRID_PANEL_STROKE_COLOR: new Color( 100, 100, 100 ),
     PANEL_TITLE_FONT: new SimFont( { family: 'Futura', size: 18, weight: 'bold' } ),
     ANIMATION_VELOCITY: 500,
-    PLAY_STEP_DISTANCE:  imageNode.width / 2,
+    PLAY_STEP_DISTANCE:  imageNode.width,
     ORGANISM_RADIUS:     imageNode.width / 2,
-    MOVE_APART_DISTANCE: imageNode.width / 4,
+    MOVE_APART_DISTANCE: imageNode.width / 2,
     IMAGE_SCALE: IMAGE_SCALE,
-    GRID_NODE_DIMENSION: new Dimension2( 930, 360 ),
+    GRID_NODE_DIMENSION: new Dimension2( 930, 320 ),
     CHART_NODE_DIMENSION: new Dimension2( 350, 200 ),
     ORGANISM_PANEL_DIMENSION: new Dimension2( 300, 180 ),
     PARTICLE_COLOR: new Color( 255, 0, 0 ),

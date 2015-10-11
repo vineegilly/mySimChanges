@@ -35,17 +35,15 @@ inherit( Object, OverlapRulesFactory, {},
       var preyPredatorOverlapResult = {};
       if ( organism1.isPrey( organism2 ) ) {
         preyPredatorOverlapResult[ "prey" ] = organism1;
-      }
-      if ( organism2.isPrey( organism1 ) ) {
-        preyPredatorOverlapResult[ "prey" ] = organism2;
+        preyPredatorOverlapResult[ "predator" ] = organism2;
+        return preyPredatorOverlapResult;
       }
       if ( organism1.isPredator( organism2 ) ) {
         preyPredatorOverlapResult[ "predator" ] = organism1;
+        preyPredatorOverlapResult[ "prey" ] = organism2;
+        return preyPredatorOverlapResult;
       }
-      if ( organism2.isPredator( organism1 ) ) {
-        preyPredatorOverlapResult[ "predator" ] = organism2;
-      }
-
+    
       return preyPredatorOverlapResult;
     },
 
@@ -55,8 +53,16 @@ inherit( Object, OverlapRulesFactory, {},
       // only same items can reproduce
       if ( organism1.name === organism2.name ) {
 
-        reproductionRuleResult[ "partner1" ] = organism1;
-        reproductionRuleResult[ "partner2" ] = organism2;
+        //min time must have been elapsed
+        if ( organism1.canReproduce() && organism2.canReproduce() ) {
+
+          // they must  overlap
+          if ( organism1.overlapBounds( organism2 ) ) {
+            reproductionRuleResult[ "partner1" ] = organism1;
+            reproductionRuleResult[ "partner2" ] = organism2;
+          }
+        }
+
       }
       return reproductionRuleResult;
     },

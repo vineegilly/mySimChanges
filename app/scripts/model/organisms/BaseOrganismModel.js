@@ -54,13 +54,12 @@ function BaseOrganismModel( ecoSystemModel, organismInfo, initialPosition, motio
 
   thisModel.organismBeingEaten = null;
   thisModel.organismReproducingWith = null;
-  thisModel.newlyProducedModel = null;
+  thisModel.newlyProducedModels = [];
   this.motionBounds = motionBounds;
   this.multipliedOrganisms = [ this ];// add the current one
 
   this.timeElapsedWithoutFood = 0;
-  this.timeElapsedSinceReproduction = OrganismRuleConstants[ this.name ].REPRODUCE_RULE.elapse * -1; // start with negative span
-
+  this.timeElapsedSinceReproduction = OrganismRuleConstants[ this.name ].REPRODUCE_RULE.elapse; // start with the ability to reproduce
 
   thisModel.positionProperty.lazyLink( function( position ) {
     if ( position.equals( initialPosition ) && !createdThroughInteraction ) {
@@ -79,9 +78,9 @@ inherit( PropertySet, BaseOrganismModel, {
 
   step: function( dt ) {
     if ( !this.userControlled ) {
+      this.incrementTimeElapsedWithoutFood( dt );
+      this.incrementTimeElapsedSinceReproduction( dt );
 
-      this.timeElapsedWithoutFood += dt; // in milliseconds
-      this.timeElapsedSinceReproduction += dt;
       this.stepState( dt );
       this.doStep( dt );
 
@@ -89,6 +88,16 @@ inherit( PropertySet, BaseOrganismModel, {
     }
 
   },
+
+  incrementTimeElapsedWithoutFood: function( dt ) {
+    this.timeElapsedWithoutFood += dt * 1000; // in milliseconds
+
+  },
+
+  incrementTimeElapsedSinceReproduction: function( dt ) {
+    this.timeElapsedSinceReproduction += dt * 1000;
+  },
+
 
   validateExpiryState: function( dt ) {
     if ( this.timeElapsedWithoutFood >= this.getTimeThresholdWithoutFood() ) {
@@ -155,12 +164,12 @@ inherit( PropertySet, BaseOrganismModel, {
     //set the current state
     this.setState( reproducingState );
     otherOrganism.supportReproducing();
-    this.reproductionMinimumLapsedTimes = 0;
+    this.timeElapsedSinceReproduction = 0;
   },
 
   supportReproducing: function() {
     this.interactionState = EcoSystemConstants.REPRODUCING_STATE;
-    this.reproductionMinimumLapsedTimes = 0;
+    this.timeElapsedSinceReproduction = 0;
     //set the current to support reproducing
     this.setState( supportReproducingState );
   },
@@ -210,10 +219,19 @@ inherit( PropertySet, BaseOrganismModel, {
 
   canReproduce: function() {
     var minThresholdTime = OrganismRuleConstants[ this.name ].REPRODUCE_RULE.elapse;
-    if ( this.timeElapsedSinceReproduction < minThresholdTime ) {
-      return false;
+    // if it passes the min time allow to reproduce
+    if ( this.timeElapsedSinceReproduction >= minThresholdTime ) {
+      return true;
     }
 
+    return false;
+  },
+
+  /**
+   * As of now, no restriction on predator rule
+   * @returns {boolean}
+   */
+  canPredate: function() {
     return true;
   },
 
@@ -278,43 +296,67 @@ inherit( PropertySet, BaseOrganismModel, {
     }
   },
 
+  /**
+   *
+   * @param pt
+   */
+  snapToGrid: function( point ) {
+    var snapedPt = new Vector2();
+
+    var scaledPadding = 3.2;// TODO? why
+    var gridGap = EcoSystemConstants.ORGANISM_RADIUS * 2 + scaledPadding;
+    var middleOfGap = gridGap / 2;
+
+    //find the cell where to place the organism
+    var cellX = (point.x / gridGap) | 0;
+    var cellY = (point.y / gridGap) | 0;
+
+    if ( (point.x % gridGap) > middleOfGap ) {
+      cellX = cellX + 1;
+    }
+
+    if ( (point.y % gridGap) > middleOfGap ) {
+      cellY = cellY + 1;
+    }
+
+    snapedPt.x =  (cellX * gridGap);
+    snapedPt.y =  (cellY * gridGap );
+
+    return snapedPt;
+  },
+
   nextRandomMovement: function() {
     var direction = _.random( 1, 4 );
     var playVelocity = EcoSystemConstants.ANIMATION_VELOCITY / 10;
     var currentPosition = this.position;
-
     var containsPoint = this.motionBounds.containsPoint( currentPosition );
+    var nextDistance = EcoSystemConstants.PLAY_STEP_DISTANCE - 10;
 
     var newPosition = null;
     var animatePlay = true;
     switch( direction ) {
       case 1:
-        newPosition = currentPosition.plus( new Vector2( EcoSystemConstants.PLAY_STEP_DISTANCE, 0 ) );
-        newPosition = this.motionBounds.closestPointTo( newPosition );
-        this.setDestination( newPosition, animatePlay, playVelocity );
+        newPosition = currentPosition.plus( new Vector2( nextDistance, 0 ) );
         break;
       case 2:
-        newPosition = currentPosition.plus( new Vector2( -EcoSystemConstants.PLAY_STEP_DISTANCE, 0 ) );
-        newPosition = this.motionBounds.closestPointTo( newPosition );
-        this.setDestination( newPosition, animatePlay, playVelocity );
+        newPosition = currentPosition.plus( new Vector2( -nextDistance, 0 ) );
         break;
       case 3:
-        newPosition = currentPosition.plus( new Vector2( 0, EcoSystemConstants.PLAY_STEP_DISTANCE ) );
-        newPosition = this.motionBounds.closestPointTo( newPosition );
-        this.setDestination( newPosition, animatePlay, playVelocity );
+        newPosition = currentPosition.plus( new Vector2( 0, nextDistance ) );
         break;
       case 4:
-        newPosition = currentPosition.plus( new Vector2( 0, -EcoSystemConstants.PLAY_STEP_DISTANCE ) );
-        newPosition = this.motionBounds.closestPointTo( newPosition );
-        this.setDestination( newPosition, animatePlay, playVelocity );
+        newPosition = currentPosition.plus( new Vector2( 0, -nextDistance ) );
         break;
     }
 
-    this.reproductionMinimumLapsedTimes++;
-    this.predatingMiniumLapsedTimes++;
+    newPosition = this.snapToGrid( newPosition );
+    newPosition = this.motionBounds.closestPointTo( newPosition );
+    this.setDestination( newPosition, animatePlay, playVelocity );
+
   },
 
   play: function() {
+    this.position = this.snapToGrid( this.position );
     this.setState( randomMovementState );
   },
 
@@ -345,9 +387,9 @@ inherit( PropertySet, BaseOrganismModel, {
   isPrey: function( withRespectToPredator ) {
     var preyPredatorRule = OrganismRuleConstants[ withRespectToPredator.name ];
     if ( preyPredatorRule ) {
-      var listOfPreys = preyPredatorRule[ "prey" ];
-      if ( listOfPreys ) {
-        return _.contains( listOfPreys, this.name );
+      var predatorOfList = preyPredatorRule[ "predator" ];
+      if ( predatorOfList ) {
+        return _.contains( predatorOfList, this.name ); // is predator of this.name?
       }
     }
     return false;
@@ -362,9 +404,9 @@ inherit( PropertySet, BaseOrganismModel, {
   isPredator: function( withRespectToPrey ) {
     var preyPredatorRule = OrganismRuleConstants[ withRespectToPrey.name ];
     if ( preyPredatorRule ) {
-      var listOfPredators = preyPredatorRule[ "predator" ];
-      if ( listOfPredators ) {
-        return _.contains( listOfPredators, this.name );
+      var preyOf = preyPredatorRule[ "prey" ];
+      if ( preyOf ) {
+        return _.contains( preyOf, this.name );
       }
     }
     return false;
@@ -417,19 +459,29 @@ inherit( PropertySet, BaseOrganismModel, {
     var otherPos = otherModel.position;
     var midPoint = thisPos.average( otherPos );
     var createdThroughInteraction = true;
-    this.newlyProducedModel = this.ecoSystemModel.cloneOrganism( this, midPoint, EcoSystemConstants.BEING_PRODUCED_STATE, createdThroughInteraction );
-    this.ecoSystemModel.addNewlyReproducedOrganism( this.newlyProducedModel );
-  },
 
+    var noOfOffSpringToProduce = OrganismRuleConstants[ this.name ].REPRODUCE_RULE.offspring;
+    for ( var i = 0; i < noOfOffSpringToProduce; i++ ) {
+      var newlyProducedModel = this.ecoSystemModel.cloneOrganism( this, midPoint, EcoSystemConstants.BEING_PRODUCED_STATE, createdThroughInteraction );
+      newlyProducedModel.timeElapsedSinceReproduction = 0;
+      this.ecoSystemModel.addNewlyReproducedOrganism( newlyProducedModel );
+      this.newlyProducedModels.push( newlyProducedModel );
+    }
+
+  },
 
   finishReproducing: function() {
     this.interactionState = EcoSystemConstants.NON_INTERACTION_STATE;
     this.setState( randomMovementState );
-    if ( this.newlyProducedModel ) {
-      this.newlyProducedModel.interactionState = EcoSystemConstants.NON_INTERACTION_STATE;
-      this.newlyProducedModel.reproductionMinimumLapsedTimes = 0;
-      this.newlyProducedModel.play();
-      this.newlyProducedModel = null;
+
+    for ( var i = 0; i < this.newlyProducedModels.length; i++ ) {
+      var newlyProducedModel = this.newlyProducedModels[ i ];
+      newlyProducedModel.interactionState = EcoSystemConstants.NON_INTERACTION_STATE;
+      newlyProducedModel.play();
+    }
+
+    if ( this.newlyProducedModels.length ) {
+      this.newlyProducedModels = [];
     }
   }
 

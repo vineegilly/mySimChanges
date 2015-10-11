@@ -19,7 +19,6 @@ function GridPanelNode( ecoSystemModel ) {
   var thisPanelNode = this;
   var panelContentsNode = new Node();
 
-
   thisPanelNode.gridNode = new GridNode( EcoSystemConstants.GRID_NODE_DIMENSION );
   panelContentsNode.addChild( thisPanelNode.gridNode );
 

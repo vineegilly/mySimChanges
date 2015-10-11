@@ -5,11 +5,6 @@ var Path = scenery.Path;
 var Bounds2 = dot.Bounds2;
 var EcoSystemConstants = require( '../model/EcoSystemConstants' );
 
-// constants
-var NUM_VERTICAL_LINES = 18;
-var NUM_HORIZONTAL_LINES = 9;
-
-
 /**
  *
  * @param {Dimension2} gridDimension
@@ -19,22 +14,24 @@ function GridNode( gridDimension ) {
   var thisGrid = this;
   Node.call( thisGrid );
 
+  var numVerticalLines = gridDimension.width / (EcoSystemConstants.ORGANISM_RADIUS * 2) | 0;
+  var numHorizontalLines = gridDimension.height / (EcoSystemConstants.ORGANISM_RADIUS * 2) | 0;
+
   var gridShape = new Shape();
-  thisGrid.plotGrid = new Path( gridShape, { stroke: 'gray', lineWidth: 0.6 } );
-
-  //vertical grid lines
-  for ( var i = 0; i < NUM_VERTICAL_LINES + 1; i++ ) {
-    gridShape.moveTo( i * gridDimension.width / NUM_VERTICAL_LINES, 0 );
-    gridShape.lineTo( i * gridDimension.width / NUM_VERTICAL_LINES, gridDimension.height );
-
-  }
 
   //horizontal grid lines
-  for ( i = 0; i < NUM_HORIZONTAL_LINES + 1; i++ ) {
-    gridShape.moveTo( 0, i * gridDimension.height / NUM_HORIZONTAL_LINES );
-    gridShape.lineTo( gridDimension.width, i * gridDimension.height / NUM_HORIZONTAL_LINES );
-
+  for ( var i = 0; i < numHorizontalLines + 1; i++ ) {
+    gridShape.moveTo( 0, i * (gridDimension.height / numHorizontalLines) );
+    gridShape.lineTo( gridDimension.width, i * (gridDimension.height / numHorizontalLines) );
   }
+
+  //vertical grid lines
+  for ( i = 0; i < numVerticalLines + 1; i++ ) {
+    gridShape.moveTo( i * (gridDimension.width / numVerticalLines), 0 );
+    gridShape.lineTo( i * (gridDimension.width / numVerticalLines), gridDimension.height );
+  }
+
+  thisGrid.plotGrid = new Path( gridShape, { stroke: 'gray', lineWidth: 0.6 } );
 
   thisGrid.addChild( thisGrid.plotGrid );
   thisGrid.organismContentLayerNode = new Node();
