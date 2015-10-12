@@ -67,6 +67,9 @@ inherit( Panel, PopulationChartNode, {
       .scale( this.xScale )
       .ticks( 12 )
       .tickFormat( function( d ) {
+        if ( d === 0 ) {
+          return "";
+        }
         return d / 1000;
       } );
 
@@ -76,7 +79,7 @@ inherit( Panel, PopulationChartNode, {
       .ticks( 5 );
 
     svgSelection.append( "svg:g" )
-      .attr( "transform", "translate(0," + (CHART_HEIGHT - MARGINS.bottom) + ")" )
+      .attr( "transform", "translate(-5," + (CHART_HEIGHT - MARGINS.bottom) + ")" )
       .call( xAxis );
 
     svgSelection.append( "svg:g" )
