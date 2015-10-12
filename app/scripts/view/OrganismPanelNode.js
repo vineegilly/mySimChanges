@@ -59,9 +59,10 @@ function OrganismPanelNode( ecoSystemModel, gridPaneNode, motionBounds ) {
 
   var gridLayout = GridLayout();
   gridLayout
-    .size( [ EcoSystemConstants.ORGANISM_PANEL_DIMENSION.width, EcoSystemConstants.ORGANISM_PANEL_DIMENSION.height ] )
+    .size( [ EcoSystemConstants.ORGANISM_PANEL_DIMENSION.width,
+      EcoSystemConstants.ORGANISM_PANEL_DIMENSION.height ] )
     .bands()
-    .padding( [ 0.1, 0.1 ] );
+    .padding( [ 0.05, 0.05 ] );
 
   gridLayout( rectElements );
 

@@ -5,6 +5,7 @@ var EcoSystemConstants = require( '../model/EcoSystemConstants' );
 var d3 = require( 'd3' );
 var _ = require( 'lodash' );
 var OrganismRuleConstants = require( '../model/OrganismRuleConstants' );
+var ChartLegend = require( './ChartLegend' );
 
 // constants
 var POPULATION_CHART_ID = "populationChartDiv";
@@ -18,25 +19,6 @@ var MARGINS = {
 var CHART_WIDTH = EcoSystemConstants.CHART_NODE_DIMENSION.width - 10;
 var CHART_HEIGHT = EcoSystemConstants.CHART_NODE_DIMENSION.height - 10;
 
-var data = [ {
-  "sale": "202",
-  "year": "2000"
-}, {
-  "sale": "215",
-  "year": "2001"
-}, {
-  "sale": "179",
-  "year": "2002"
-}, {
-  "sale": "199",
-  "year": "2003"
-}, {
-  "sale": "134",
-  "year": "2003"
-}, {
-  "sale": "176",
-  "year": "2010"
-} ];
 
 function PopulationChartNode() {
   var thisPanel = this;
@@ -84,9 +66,9 @@ inherit( Panel, PopulationChartNode, {
     var xAxis = d3.svg.axis()
       .scale( this.xScale )
       .ticks( 12 )
-      .tickFormat(function(d){
-        return d/1000;
-      });
+      .tickFormat( function( d ) {
+        return d / 1000;
+      } );
 
     var yAxis = d3.svg.axis()
       .scale( this.yScale )
@@ -101,7 +83,7 @@ inherit( Panel, PopulationChartNode, {
       .attr( "transform", "translate(" + (MARGINS.left) + ",0)" )
       .call( yAxis );
 
-    this.organismLifeLine = d3.svg.line().interpolate( "monotone" )
+    this.organismLifeLine = d3.svg.line().interpolate( "basis" )
       .x( function( d ) {
         return self.xScale( d.time )
       } )
@@ -109,6 +91,17 @@ inherit( Panel, PopulationChartNode, {
         return self.yScale( d.count )
       } );
 
+    this.legend = svgSelection.append( "g" )
+      .attr( "class", "legend" )
+      .attr( "transform", "translate(250,30)" )
+      .style( "font-size", "12px" )
+      .style( "font-size", "20px" )
+      .attr( "data-style-padding", 10 );
+  },
+
+  //private
+  drawLegends: function() {
+    this.legend.call( d3.legend );
   },
 
   /**
@@ -136,7 +129,7 @@ inherit( Panel, PopulationChartNode, {
     var lines = svgSelection.selectAll( ".line" ).data( data ).attr( "class", "line" );
 
 // transition from previous paths to new paths
-    lines.transition().duration( EcoSystemConstants.SNAPSHOT_CAPTURE_ELAPSE  )
+    lines.transition().duration( EcoSystemConstants.SNAPSHOT_CAPTURE_ELAPSE )
       .attr( "d", function( d ) {
         return self.organismLifeLine( d.points );
       } )
@@ -151,6 +144,7 @@ inherit( Panel, PopulationChartNode, {
     lines.enter()
       .append( "path" )
       .attr( "class", "line" )
+      .attr( "data-legend", function( d ) { return d.name} )
       .attr( "d", function( d ) {
         return self.organismLifeLine( d.points );
       } )
@@ -162,6 +156,8 @@ inherit( Panel, PopulationChartNode, {
     lines.exit().remove();
 
     this.prevCollectionCount = organismSnapShotCollection.length;
+
+    this.drawLegends();
 
   },
 

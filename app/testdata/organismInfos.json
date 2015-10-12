@@ -15,9 +15,17 @@
     {
       "name": "grass"
     },
-
     {
       "name": "mushroom"
+    },
+    {
+      "name": "frog"
+    },
+    {
+      "name": "butterfly"
+    },
+    {
+      "name": "deer"
     }
   ]
 }

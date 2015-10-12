@@ -73,15 +73,18 @@ function EcoSystemView( ecoSystemModel ) {
   var environmentControlsNode = new EnvironmentControlsNode( ecoSystemModel, thisView.populationChartNode );
 
 
-  var panelBox = new HBox( {
-    children: [ organismPanelNode, environmentControlsNode, thisView.populationChartNode ],
-    spacing: 20,
-    align: 'center'
-  } );
+  thisView.addChild( organismPanelNode );
+  thisView.addChild( environmentControlsNode );
+  thisView.addChild( thisView.populationChartNode );
 
-  thisView.addChild( panelBox );
-  panelBox.x = thisView.gridPanelNode.bounds.left;
-  panelBox.y = thisView.gridPanelNode.bounds.bottom + PANEL_VERTICAL_PADDING;
+  organismPanelNode.x = thisView.gridPanelNode.bounds.left;
+  environmentControlsNode.x = organismPanelNode.x + organismPanelNode.bounds.width + 20;
+  thisView.populationChartNode.x = environmentControlsNode.x + environmentControlsNode.bounds.width + 20;
+
+  organismPanelNode.y = thisView.gridPanelNode.bounds.bottom + PANEL_VERTICAL_PADDING;
+  environmentControlsNode.y = thisView.gridPanelNode.bounds.bottom + PANEL_VERTICAL_PADDING;
+  thisView.populationChartNode.y = thisView.gridPanelNode.bounds.bottom + PANEL_VERTICAL_PADDING;
+
   thisView.addChild( thisView.gridPanelNode );
 
   /*  playerPanel.x = thisView.gridPanelNode.bounds.centerX - playerPanel.bounds.width / 2;
