@@ -19,14 +19,14 @@ var CONTROL_TEXT_OPTIONS = { font: new SimFont( 15 ) };
 var POPULATION_TEXT_OPTIONS = { font: new SimFont( 25 ) };
 var POPULATION_RANGE_STR = "Population Range";
 var RAIN_STR = "Rain";
-var SUN_LIGHT_STR = "Sun Light";
+var PESTICIDE_STR = "PESTICIDE";
 var ENVIRONMENTAL_CONTROLS_STR = "Environment Controls";
 var TITLE_SIZE = new Dimension2( 200, 30 );
 
 function EnvironmentControlsNode( ecoSystemModel, populationChartNode ) {
   var thisPanel = this;
 
-  var sunLightProperty = ecoSystemModel.sunLightProperty;
+ // var pesticideSprayProperty = ecoSystemModel.pesticideSprayProperty;
   var rainProperty = ecoSystemModel.rainProperty;
   var populationRangeProperty = ecoSystemModel.populationRangeProperty;
   var populationRangeSlider = new HSlider( populationRangeProperty, { min: 1, max: 5 } );
@@ -46,10 +46,10 @@ function EnvironmentControlsNode( ecoSystemModel, populationChartNode ) {
   var checkBoxes = [];
   var rainCheckBoxControl = new CheckBox( new Text( RAIN_STR, CONTROL_TEXT_OPTIONS ),
     rainProperty, CHECK_BOX_OPTIONS );
-  var sunLightBoxControl = new CheckBox( new Text( SUN_LIGHT_STR, CONTROL_TEXT_OPTIONS ),
-    sunLightProperty, CHECK_BOX_OPTIONS );
+ /* var pesticideBoxControl = new CheckBox( new Text( PESTICIDE_STR, CONTROL_TEXT_OPTIONS ),
+    pesticideSprayProperty, CHECK_BOX_OPTIONS );*/
   checkBoxes.push( rainCheckBoxControl );
-  checkBoxes.push( sunLightBoxControl );
+//  checkBoxes.push( pesticideBoxControl );
   var checkBoxControlBox = new HBox( {
     children: checkBoxes,
     spacing: 20

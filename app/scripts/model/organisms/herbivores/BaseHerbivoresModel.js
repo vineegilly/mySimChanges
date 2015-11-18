@@ -30,6 +30,10 @@ inherit( BaseOrganismModel, BaseHerbivoresModel, {
 
   initState: function() {
     this.goToRest();
+  },
+
+  getTimeThresholdForPoison: function() {
+    return 0;
   }
 
 

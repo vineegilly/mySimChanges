@@ -1,5 +1,6 @@
 var inherit = axon.inherit;
 var BaseHerbivoresModel = require( './BaseHerbivoresModel' );
+var BaseOrganismModel = require( '../BaseOrganismModel' );
 
 /**
  * @param {EcoSystemModel} ecoSystemModel
@@ -10,7 +11,7 @@ var BaseHerbivoresModel = require( './BaseHerbivoresModel' );
  */
 function BeetleModel( ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction ) {
   BaseHerbivoresModel.call( this, ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction );
-
+  this.timeElapsedSincePoision = 0; // pesticide or herbicide
 }
 
 inherit( BaseHerbivoresModel, BeetleModel, {
@@ -20,6 +21,27 @@ inherit( BaseHerbivoresModel, BeetleModel, {
   },
 
   doStep: function( dt ) {
+
+  },
+
+  isSprayApplicable: function() {
+    return true;
+  },
+
+  validateExpiryState: function( dt ) {
+    BaseOrganismModel.prototype.validateExpiryState.call( this, dt );
+
+    if ( this.ecoSystemModel.isSpraying() ) {
+      this.timeElapsedSincePoision += dt;
+
+      if ( this.timeElapsedSincePoision >= this.getTimeThresholdForPoison() ) {
+     //   this.moveToDyingStateDueToPoison();
+      }
+    }
+    else {
+      this.timeElapsedSincePoision = 0;
+    }
+
 
   }
 

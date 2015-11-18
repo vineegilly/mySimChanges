@@ -24,6 +24,7 @@ var dyingState = new DyingState();
 var reproducingState = new ReproducingState();
 var supportReproducingState = new SupportReproducingState();
 
+var OBJECT_ID_COUNTER = 100;
 /**
  * @param {EcoSystemModel} ecoSystemModel
  * @param {jsonObject} organismInfo
@@ -42,6 +43,7 @@ function BaseOrganismModel( ecoSystemModel, organismInfo, initialPosition, motio
     opacity: 1
   } );
 
+  thisModel.objectId = OBJECT_ID_COUNTER++;
   thisModel.name = organismInfo.name;
   thisModel.organismInfo = organismInfo;
   thisModel.appearanceImage = OrganismImageCollection.getRepresentation( thisModel.name );
@@ -90,7 +92,11 @@ inherit( PropertySet, BaseOrganismModel, {
 
   },
 
-  onRain:function(){
+  onRain: function() {
+
+  },
+
+  onPoisonSpray: function() {
 
   },
 
@@ -104,6 +110,10 @@ inherit( PropertySet, BaseOrganismModel, {
 
   playReset: function() {
 
+  },
+
+  isSprayApplicable: function() {
+    return false;
   },
 
   incrementTimeElapsedWithoutFood: function( dt ) {

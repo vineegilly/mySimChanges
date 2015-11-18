@@ -19,7 +19,7 @@ function EcoSystemModel( organismInfos, screenBounds ) {
     playPause: false,
     populationRange: 1,
     rain: false,
-    sunLight: false
+    poisonSpray: false
   } );
 
   this.organismInfos = organismInfos;
@@ -49,7 +49,13 @@ function EcoSystemModel( organismInfos, screenBounds ) {
     if ( rain ) {
       thisModel.onRain();
     }
+  } );
 
+
+  this.poisonSprayProperty.link( function( poisonSpray ) {
+    if ( poisonSpray ) {
+      thisModel.onPoisonSpray();
+    }
   } );
 
 
@@ -97,17 +103,26 @@ inherit( PropertySet, EcoSystemModel, {
       self.addLifeLineSnapShot( dt );
 
       if ( this.totalTimeLapse > this.totalLifeSpan ) {
-        this.playPause=false;
+        this.playPause = false;
       }
     }
 
   },
 
-  onRain:function()
-  {
+  onRain: function() {
     this.residentOrganismModels.forEach( function( organismModel ) {
-      organismModel.onRain(  );
+      organismModel.onRain();
     } );
+  },
+
+  onPoisonSpray: function() {
+    this.residentOrganismModels.forEach( function( organismModel ) {
+      organismModel.onPoisonSpray();
+    } );
+  },
+
+  isSpraying: function() {
+    return this.onPoisonSpray;
   },
 
   isRaining: function() {
@@ -230,6 +245,21 @@ inherit( PropertySet, EcoSystemModel, {
     if ( this.newlyReproducedModels.contains( organismModel ) ) {
       this.newlyReproducedModels.remove( organismModel );
     }
+  },
+
+  /**
+   *
+   * @returns {Array}
+   */
+  getSprayableModels: function() {
+    var sprayableModels = [];
+    this.residentOrganismModels.forEach( function( model ) {
+      if ( model.isSprayApplicable() ) {
+        sprayableModels.push( model );
+      }
+    } );
+
+    return sprayableModels;
   }
 
 } );

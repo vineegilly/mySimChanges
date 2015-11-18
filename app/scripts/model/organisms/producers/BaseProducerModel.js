@@ -28,14 +28,22 @@ inherit( BaseOrganismModel, BaseProducerModel, {
 
   },
 
+  isSprayApplicable: function() {
+    return true;
+  },
+
   validateExpiryState: function( dt ) {
     BaseOrganismModel.prototype.validateExpiryState.call( this, dt );
-    this.timeElapsedSincePoision += dt;
+    if ( this.ecoSystemModel.isSpraying() ) {
+      this.timeElapsedSincePoision += dt;
 
-    if ( this.timeElapsedSincePoision >= this.getTimeThresholdForPoison() ) {
-      this.moveToDyingStateDueToPoison();
+      if ( this.timeElapsedSincePoision >= this.getTimeThresholdForPoison() ) {
+        this.moveToDyingStateDueToPoison();
+      }
     }
-
+    else {
+      this.timeElapsedSincePoision = 0;
+    }
   },
 
   getTimeThresholdForPoison: function() {
@@ -47,7 +55,7 @@ inherit( BaseOrganismModel, BaseProducerModel, {
   },
 
   incrementTimeElapsedWithoutFood: function( dt ) {
-    if(this.ecoSystemModel.isRaining()){
+    if ( this.ecoSystemModel.isRaining() ) {
       return;
     }
 
@@ -65,8 +73,8 @@ inherit( BaseOrganismModel, BaseProducerModel, {
 
   },
 
-  onRain:function(){
-    this.timeElapsedWithoutFood =0;
+  onRain: function() {
+    this.timeElapsedWithoutFood = 0;
   }
 
 } );

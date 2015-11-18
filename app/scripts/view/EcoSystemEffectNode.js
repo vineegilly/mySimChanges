@@ -3,6 +3,7 @@ var inherit = axon.inherit;
 var CanvasNode = scenery.CanvasNode;
 var ObservableArray = axon.ObservableArray;
 var ParticleExplosionBuilder = require( '../model/effects/ParticleExplosionBuilder' );
+var SprayParticlesBuilder = require( '../model/effects/SprayParticlesBuilder' );
 var EcoSystemConstants = require( '../model/EcoSystemConstants' );
 var RippleCirlce = require( '../model/effects/RippleCircle' );
 var RainDropParticles = require( '../model/effects/RainDropParticles' );
@@ -20,7 +21,7 @@ function EcoSystemEffectNode( ecoSystemModel, bounds ) {
   this.newlyReproducedRippleCollection = new ObservableArray();
   this.rainDropParticles = new RainDropParticles( EcoSystemConstants.RAIN_DROP_COUNT, bounds );
   this.ecoSystemModel = ecoSystemModel;
-
+  this.sprayParticlesBuilder = new SprayParticlesBuilder( ecoSystemModel );
 
   this.frameDelay = 0;
   CanvasNode.call( this, { pickable: false, canvasBounds: bounds, layerSplit: true } );
@@ -97,8 +98,12 @@ inherit( CanvasNode, EcoSystemEffectNode, {
 
   step: function( dt ) {
     this.frameDelay = dt;
+   // this.generateSprayParticles();
     this.invalidatePaint();
+  },
 
+
+  drawPesticideSpray: function() {
   },
 
 
