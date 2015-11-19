@@ -1,13 +1,16 @@
+var webpack = require('webpack');
 module.exports.getConfig = function( type ) {
 
   var isDev = type === 'development';
 
   var config = {
-    entry: './app/scripts/main.js',
+    entry: isDev?'./app/scripts/main.js':'./build/scripts/main.js',
     output: {
       path: __dirname,
-      filename: 'main.js'
+      filename: 'main.js',
+      pathinfo: false
     },
+
     debug: isDev,
     module: {
       loaders: [ {
