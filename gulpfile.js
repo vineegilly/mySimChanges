@@ -28,7 +28,7 @@ var autoprefixerBrowsers = [
   'bb >= 10'
 ];
 
-gulp.task( 'stripComments',['clean'], function() {
+gulp.task( 'stripComments', [ 'clean', 'testdata', 'assets', 'bower', 'images', 'vendor', 'html' ], function() {
   return gulp.src( app + 'scripts/**/*.js' )
     .pipe( strip() )
     .pipe( gulp.dest( commentStrippedScriptsFolder ) );
@@ -45,7 +45,8 @@ gulp.task( 'scripts', function() {
 
 gulp.task( 'productionScript', function() {
   var productionConfig = require( './webpack.config.js' ).getConfig( 'production' );
-  return gulp.src( commentStrippedMainJS )
+  console.log( productionConfig.entry );
+  return gulp.src( productionConfig.entry )
     .pipe( $.webpack( productionConfig ) )
     .pipe( gulp.dest( dist + 'js/' ) )
     .pipe( $.size( { title: 'js' } ) )
@@ -111,13 +112,11 @@ gulp.task( 'watch', function() {
   gulp.watch( app + 'assets/**/*.*', [ 'assets' ] );
   gulp.watch( app + 'index.html', [ 'html' ] );
   gulp.watch( app + 'scripts/**/*.js', [ 'scripts' ] );
-
-
 } );
 
 // remove bundels
 gulp.task( 'clean', function( cb ) {
-  del( [ dist ], cb );
+  return del( [ dist ], cb );
 } );
 
 
@@ -132,5 +131,5 @@ gulp.task( 'build', [ 'clean' ], function() {
 
 // waits until clean is finished then builds the project
 gulp.task( 'prod', function() {
-  gulp.start( [ 'testdata', 'assets', 'bower', 'images', 'vendor', 'html', 'productionScript' ] );
+  gulp.start( [ 'productionScript' ] );
 } );

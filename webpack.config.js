@@ -1,15 +1,20 @@
-var webpack = require('webpack');
+var webpack = require( 'webpack' );
 module.exports.getConfig = function( type ) {
 
   var isDev = type === 'development';
+  console.log( "Environment Type " + type );
 
   var config = {
-    entry: isDev?'./app/scripts/main.js':'./build/scripts/main.js',
+    entry: isDev ? './app/scripts/main.js' : './build/scripts/main.js',
     output: {
       path: __dirname,
       filename: 'main.js',
       pathinfo: false
     },
+    plugins:[
+      new webpack.optimize.UglifyJsPlugin({ output: {comments: false} })
+
+    ],
 
     debug: isDev,
     module: {
