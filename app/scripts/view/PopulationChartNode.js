@@ -3,7 +3,6 @@ var DOM = scenery.DOM;
 var Panel = require( '../controls/Panel' );
 var EcoSystemConstants = require( '../model/EcoSystemConstants' );
 var d3 = require( 'd3' );
-var _ = require( 'lodash' );
 var OrganismRuleConstants = require( '../model/OrganismRuleConstants' );
 var ChartLegend = require( './ChartLegend' );
 

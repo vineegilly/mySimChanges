@@ -4,7 +4,7 @@ var EcoSystemConstants = require( '../EcoSystemConstants' );
 var Vector2 = dot.Vector2;
 var OrganismImageCollection = require( '../organisms/OrganismImageCollection' );
 var OrganismRuleConstants = require( '../OrganismRuleConstants' );
-var _ = require( 'lodash' );
+
 
 //states
 var ReturnToOriginState = require( '../states/ReturnToOriginState' );

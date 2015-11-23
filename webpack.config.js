@@ -12,7 +12,7 @@ module.exports.getConfig = function( type ) {
       pathinfo: false
     },
     plugins:[
-      new webpack.optimize.UglifyJsPlugin({ output: {comments: false} })
+     new webpack.optimize.UglifyJsPlugin({ output: {comments: false} })
 
     ],
 
@@ -31,7 +31,8 @@ module.exports.getConfig = function( type ) {
       // require("jquery") is external and available
       //  on the global var jQuery
       "jquery": "jQuery",
-      "themeMain": "themeMain"
+      "themeMain": "themeMain",
+      "lodash":"_"
 
     }
   };
