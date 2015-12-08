@@ -16,14 +16,14 @@ var energySimTitle = "EcoSystem Simulation";
 
 var SimLaunchAdapter = {
 
-  launchByURL: function( url ) {
+  launchByURL: function( url, sceneId ) {
     var self = this;
     SimLauncher.launch( function( organismsInfo ) {
-      self.startApp( organismsInfo );
+      self.startApp( organismsInfo, sceneId );
     }, url );
   },
 
-  startApp: function( organismsInfo ) {
+  startApp: function( organismsInfo, sceneId ) {
     var options = { backgroundColor: 'rgb( 242, 255, 204 )' /* Light yellow-green */ };
     var createModel = function() {
       return new EcoSystemModel( organismsInfo );
@@ -34,14 +34,14 @@ var SimLaunchAdapter = {
     };
 
     var energySimScreen = new SimScreen( energySimTitle, createModel, createView );
-    var app = new SimApp( energySimTitle, energySimScreen, '"main-scene', options );
+    var app = new SimApp( energySimTitle, energySimScreen, sceneId, options );
     //start rendering..
     app.start();
   },
 
-  launchUsingData: function( organismsInfo ) {
+  launchUsingData: function( organismsInfo, sceneId ) {
     var self = this;
-    self.startApp( organismsInfo );
+    self.startApp( organismsInfo, sceneId );
   }
 
 };
