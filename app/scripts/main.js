@@ -16,6 +16,8 @@ var energySimTitle = "EcoSystem Simulation";
 
 var SimLaunchAdapter = {
 
+
+
   launchByURL: function( url, sceneId ) {
     var self = this;
     SimLauncher.launch( function( organismsInfo ) {

@@ -44,8 +44,11 @@ function SimApp( titleName, screen, simId, options ) {
   sim.display = new Display( sim.rootNode, options );
 
   var simDiv = sim.display.domElement;
-  simDiv.id = simId;
-  document.body.appendChild( simDiv );
+  simDiv.id = simId + "-sim";
+
+  $( "#" + simId ).append( simDiv );
+
+  // document.body.appendChild( simDiv );
 
   // for preventing Safari from going to sleep. see https://github.com/phetsims/joist/issues/140
   var heartbeatDiv = this.heartbeatDiv = document.createElement( 'div' );
