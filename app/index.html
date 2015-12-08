@@ -24,13 +24,13 @@
 
   <script src="vendor/assert.js"></script>
   <script>
-    window.phet ={};
-    phet.chipper={};
-    phet.chipper.getCacheBusterArgs = function(){
+    window.phet = {};
+    phet.chipper = {};
+    phet.chipper.getCacheBusterArgs = function() {
       return [];
     };
 
- // debug   window.assertions.enableAssert();
+    // debug   window.assertions.enableAssert();
   </script>
 
   <!-- vendor js -->
@@ -49,6 +49,6 @@
 <script src="js/main.js"></script>
 
 
-<button onclick="EcoSystemLauncher.launchByURL()">Launch Simulation</button>
+<button onclick="EcoSystemLauncher.launchByURL('','main-scene')">Launch Simulation</button>
 </body>
 </html>

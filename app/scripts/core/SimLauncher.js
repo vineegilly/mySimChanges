@@ -12,7 +12,12 @@ module.exports = {
    */
   launch: function( callback, url ) {
 
+    if ( url == "" ) {
+      url = null;
+    }
+
     url = url || 'testdata/organismInfos.json';
+
 
     //Need to do some preloading ,splash screen etc
     d3.json( url, function( err, organismInfos ) {
