@@ -28,7 +28,7 @@ var autoprefixerBrowsers = [
   'bb >= 10'
 ];
 
-gulp.task( 'stripComments', [ 'clean', 'testdata', 'assets', 'bower', 'images', 'vendor', 'html' ], function() {
+gulp.task( 'stripComments', [ 'build' ], function() {
   return gulp.src( app + 'scripts/**/*.js' )
     .pipe( strip() )
     .pipe( gulp.dest( commentStrippedScriptsFolder ) );
