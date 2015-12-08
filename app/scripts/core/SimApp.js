@@ -31,6 +31,9 @@ function SimApp( titleName, screen, simId, options ) {
 
   window.sim = this;
 
+  this.sceneWidth = options.screenWidth || 1024;
+  this.sceneHeight = options.screenHeight || 768;
+
   // update our scale and bounds properties after other changes (so listeners can be fired after screens are resized)
   this.scale = 1;
   this.bounds = new Bounds2( 0, 0, 1, 1 ); // just place holder values
@@ -125,7 +128,7 @@ inherit( PropertySet, SimApp, {
   },
 
   resizeToWindow: function() {
-    this.resize( window.innerWidth, window.innerHeight );
+    this.resize( this.sceneWidth, this.sceneHeight );
   },
 
   resize: function( width, height ) {
