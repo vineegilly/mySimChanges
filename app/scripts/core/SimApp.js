@@ -41,6 +41,7 @@ function SimApp(titleName, screen, simId, options) {
     sim.model = screen.createModel();
     sim.view = screen.createView(sim.model);
     sim.rootNode = new Node();
+    //sim.rootNode.translate(0, -100);
 
     sim.rootNode.addChild(sim.view);
     sim.display = new Display(sim.rootNode, options);
@@ -49,6 +50,8 @@ function SimApp(titleName, screen, simId, options) {
     simDiv.id = simId + "-sim";
 
     $("#" + simId).append(simDiv);
+
+    window.simId = simDiv.id;
 
     // document.body.appendChild( simDiv );
 
@@ -129,7 +132,7 @@ inherit(PropertySet, SimApp, {
     },
 
     resizeToWindow: function () {
-      //  this.resize(this.sceneWidth, this.sceneHeight);
+        //  this.resize(this.sceneWidth, this.sceneHeight);
         this.resize(window.innerWidth, window.innerHeight);
     },
 

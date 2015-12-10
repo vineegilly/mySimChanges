@@ -13,7 +13,7 @@
  */
 
 (function() {
-  
+
 
   window.assertions = window.assertions || {};
   window.assertions.assertFunction = window.assertions.assertFunction || function( predicate, message ) {
@@ -479,7 +479,7 @@ define("almond", function(){});
 // Copyright 2002-2014, University of Colorado Boulder
 
 define( 'PHET_CORE/phetCore',['require'],function( require ) {
-  
+
 
   // no phetAllocation initialized, since we don't need it with just phet-core, and this file is required before that
 
@@ -504,7 +504,7 @@ define( 'PHET_CORE/phetCore',['require'],function( require ) {
  */
 
 define( 'PHET_CORE/phetAllocation',['require','PHET_CORE/phetCore'],function( require ) {
-  
+
 
   var phetCore = require( 'PHET_CORE/phetCore' );
 
@@ -551,7 +551,7 @@ define( 'PHET_CORE/phetAllocation',['require','PHET_CORE/phetCore'],function( re
  */
 
 define( 'SCENERY/scenery',['require','PHET_CORE/phetAllocation'],function( require ) {
-  
+
 
   window.sceneryLog = null;
   window.sceneryEventLog = null;
@@ -728,7 +728,7 @@ define( 'SCENERY/scenery',['require','PHET_CORE/phetAllocation'],function( requi
  */
 
 define( 'PHET_CORE/extend',['require','PHET_CORE/phetCore'],function( require ) {
-  
+
 
   var phetCore = require( 'PHET_CORE/phetCore' );
 
@@ -774,7 +774,7 @@ define( 'PHET_CORE/extend',['require','PHET_CORE/phetCore'],function( require ) 
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 define( 'PHET_CORE/inherit',['require','PHET_CORE/phetCore','PHET_CORE/extend'],function( require ) {
-  
+
 
   var phetCore = require( 'PHET_CORE/phetCore' );
   var extend = require( 'PHET_CORE/extend' );
@@ -819,7 +819,7 @@ define( 'PHET_CORE/inherit',['require','PHET_CORE/phetCore','PHET_CORE/extend'],
  */
 
 define( 'KITE/kite',['require','PHET_CORE/phetAllocation'],function( require ) {
-  
+
 
   // object allocation tracking
   window.phetAllocation = require( 'PHET_CORE/phetAllocation' );
@@ -846,7 +846,7 @@ define( 'KITE/kite',['require','PHET_CORE/phetAllocation'],function( require ) {
 // Copyright 2002-2015, University of Colorado Boulder
 
 define( 'AXON/axon',['require'],function( require ) {
-  
+
 
   var axon = {};
 
@@ -869,7 +869,7 @@ define( 'AXON/axon',['require'],function( require ) {
  */
 
 define( 'PHET_CORE/cleanArray',['require','PHET_CORE/phetCore'],function( require ) {
-  
+
 
   var phetCore = require( 'PHET_CORE/phetCore' );
 
@@ -898,7 +898,7 @@ define( 'PHET_CORE/cleanArray',['require','PHET_CORE/phetCore'],function( requir
  * @author Sam Reid
  */
 define( 'AXON/Events',['require','AXON/axon','PHET_CORE/cleanArray'],function( require ) {
-  
+
 
   var axon = require( 'AXON/axon' );
   var cleanArray = require( 'PHET_CORE/cleanArray' );
@@ -1244,7 +1244,7 @@ define( 'AXON/Events',['require','AXON/axon','PHET_CORE/cleanArray'],function( r
 // Copyright 2002-2014, University of Colorado Boulder
 
 define( 'DOT/dot',['require','PHET_CORE/phetAllocation'],function( require ) {
-  
+
 
   // object allocation tracking
   window.phetAllocation = require( 'PHET_CORE/phetAllocation' );
@@ -1283,7 +1283,7 @@ define( 'DOT/dot',['require','PHET_CORE/phetAllocation'],function( require ) {
  */
 
 define( 'PHET_CORE/Poolable',['require','PHET_CORE/phetCore','PHET_CORE/extend'],function( require ) {
-  
+
 
   var phetCore = require( 'PHET_CORE/phetCore' );
   var extend = require( 'PHET_CORE/extend' );
@@ -1369,7 +1369,7 @@ define( 'PHET_CORE/Poolable',['require','PHET_CORE/phetCore','PHET_CORE/extend']
  */
 
 define( 'DOT/Util',['require','DOT/dot'],function( require ) {
-  
+
 
   var dot = require( 'DOT/dot' );
   // require( 'DOT/Vector2' ); // Require.js doesn't like the circular reference
@@ -1798,7 +1798,7 @@ define( 'DOT/Util',['require','DOT/dot'],function( require ) {
  */
 
 define( 'DOT/Vector2',['require','DOT/dot','PHET_CORE/inherit','PHET_CORE/Poolable','DOT/Util'],function( require ) {
-  
+
 
   var dot = require( 'DOT/dot' );
 
@@ -2167,7 +2167,7 @@ define( 'DOT/Vector2',['require','DOT/dot','PHET_CORE/inherit','PHET_CORE/Poolab
  */
 
 define( 'DOT/Bounds2',['require','DOT/dot','DOT/Vector2','PHET_CORE/Poolable'],function( require ) {
-  
+
 
   var dot = require( 'DOT/dot' );
   var Vector2 = require( 'DOT/Vector2' );
@@ -2737,7 +2737,7 @@ define( 'DOT/Bounds2',['require','DOT/dot','DOT/Vector2','PHET_CORE/Poolable'],f
  */
 
 define( 'DOT/Ray2',['require','DOT/dot'],function( require ) {
-  
+
 
   var dot = require( 'DOT/dot' );
 
@@ -2779,7 +2779,7 @@ define( 'DOT/Ray2',['require','DOT/dot'],function( require ) {
  */
 
 define( 'KITE/segments/Segment',['require','KITE/kite','PHET_CORE/inherit','AXON/Events','DOT/Util','DOT/Bounds2'],function( require ) {
-  
+
 
   var kite = require( 'KITE/kite' );
 
@@ -3077,7 +3077,7 @@ define( 'KITE/segments/Segment',['require','KITE/kite','PHET_CORE/inherit','AXON
  */
 
 define( 'KITE/segments/Line',['require','PHET_CORE/inherit','DOT/Bounds2','DOT/Vector2','DOT/Util','KITE/kite','KITE/segments/Segment'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var Bounds2 = require( 'DOT/Bounds2' );
@@ -3307,7 +3307,7 @@ define( 'KITE/segments/Line',['require','PHET_CORE/inherit','DOT/Bounds2','DOT/V
  */
 
 define( 'KITE/segments/Arc',['require','PHET_CORE/inherit','DOT/Vector2','DOT/Bounds2','DOT/Util','KITE/kite','KITE/segments/Segment'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var Vector2 = require( 'DOT/Vector2' );
@@ -3736,7 +3736,7 @@ define( 'KITE/segments/Arc',['require','PHET_CORE/inherit','DOT/Vector2','DOT/Bo
  */
 
 define( 'KITE/util/LineStyles',['require','KITE/kite','DOT/Util','PHET_CORE/inherit','KITE/segments/Arc','KITE/segments/Line'],function( require ) {
-  
+
 
   var kite = require( 'KITE/kite' );
   var lineLineIntersection = require( 'DOT/Util' ).lineLineIntersection;
@@ -3892,7 +3892,7 @@ define( 'KITE/util/LineStyles',['require','KITE/kite','DOT/Util','PHET_CORE/inhe
  */
 
 define( 'KITE/util/Subpath',['require','DOT/Bounds2','PHET_CORE/inherit','AXON/Events','KITE/kite','KITE/segments/Line','KITE/segments/Arc','KITE/util/LineStyles'],function( require ) {
-  
+
 
   var Bounds2 = require( 'DOT/Bounds2' );
   var inherit = require( 'PHET_CORE/inherit' );
@@ -7047,7 +7047,7 @@ define( 'KITE/parser/svgPath',['require','KITE/kite'],function( require ) {
  */
 
 define( 'DOT/Vector4',['require','DOT/dot','DOT/Util'],function( require ) {
-  
+
 
   var dot = require( 'DOT/dot' );
 
@@ -7321,7 +7321,7 @@ define( 'DOT/Vector4',['require','DOT/dot','DOT/Util'],function( require ) {
  */
 
 define( 'DOT/Vector3',['require','DOT/dot','DOT/Util','DOT/Vector2','DOT/Vector4'],function( require ) {
-  
+
 
   var dot = require( 'DOT/dot' );
 
@@ -7625,7 +7625,7 @@ define( 'DOT/Vector3',['require','DOT/dot','DOT/Util','DOT/Vector2','DOT/Vector4
  */
 
 define( 'DOT/Matrix4',['require','DOT/dot','DOT/Vector3','DOT/Vector4'],function( require ) {
-  
+
 
   var dot = require( 'DOT/dot' );
 
@@ -8168,7 +8168,7 @@ define( 'DOT/Matrix4',['require','DOT/dot','DOT/Vector3','DOT/Vector4'],function
  */
 
 define( 'DOT/Matrix3',['require','DOT/dot','PHET_CORE/Poolable','DOT/Vector2','DOT/Vector3','DOT/Matrix4'],function( require ) {
-  
+
 
   var dot = require( 'DOT/dot' );
   var Poolable = require( 'PHET_CORE/Poolable' );
@@ -9159,7 +9159,7 @@ define( 'DOT/Matrix3',['require','DOT/dot','PHET_CORE/Poolable','DOT/Vector2','D
  */
 
 define( 'KITE/segments/Quadratic',['require','PHET_CORE/inherit','DOT/Bounds2','DOT/Matrix3','DOT/Util','DOT/Util','KITE/kite','KITE/segments/Segment'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var Bounds2 = require( 'DOT/Bounds2' );
@@ -9538,7 +9538,7 @@ define( 'KITE/segments/Quadratic',['require','PHET_CORE/inherit','DOT/Bounds2','
  */
 
 define( 'KITE/segments/Cubic',['require','PHET_CORE/inherit','DOT/Bounds2','DOT/Vector2','DOT/Matrix3','DOT/Util','DOT/Util','DOT/Util','KITE/kite','KITE/segments/Segment','KITE/segments/Quadratic'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var Bounds2 = require( 'DOT/Bounds2' );
@@ -10071,7 +10071,7 @@ define( 'KITE/segments/Cubic',['require','PHET_CORE/inherit','DOT/Bounds2','DOT/
  */
 
 define( 'DOT/Transform3',['require','PHET_CORE/inherit','AXON/Events','DOT/dot','DOT/Matrix3','DOT/Vector2','DOT/Ray2'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var Events = require( 'AXON/Events' );
@@ -10394,7 +10394,7 @@ define( 'DOT/Transform3',['require','PHET_CORE/inherit','AXON/Events','DOT/dot',
  */
 
 define( 'KITE/segments/EllipticalArc',['require','PHET_CORE/inherit','DOT/Vector2','DOT/Bounds2','DOT/Matrix3','DOT/Transform3','DOT/Util','DOT/Util','KITE/kite','KITE/segments/Segment'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var Vector2 = require( 'DOT/Vector2' );
@@ -10890,7 +10890,7 @@ define( 'KITE/segments/EllipticalArc',['require','PHET_CORE/inherit','DOT/Vector
  */
 
 define( 'KITE/Shape',['require','KITE/kite','PHET_CORE/inherit','AXON/Events','DOT/Vector2','DOT/Bounds2','DOT/Ray2','KITE/util/Subpath','KITE/parser/svgPath','KITE/segments/Arc','KITE/segments/Cubic','KITE/segments/EllipticalArc','KITE/segments/Line','KITE/segments/Quadratic'],function( require ) {
-  
+
 
   var kite = require( 'KITE/kite' );
 
@@ -11819,7 +11819,7 @@ define( 'KITE/Shape',['require','KITE/kite','PHET_CORE/inherit','AXON/Events','D
  */
 
 define( 'SCENERY/display/Renderer',['require','SCENERY/scenery'],function( require ) {
-  
+
 
   var scenery = require( 'SCENERY/scenery' );
 
@@ -12003,7 +12003,7 @@ define( 'SCENERY/display/Renderer',['require','SCENERY/scenery'],function( requi
  */
 
 define( 'SCENERY/util/RendererSummary',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/display/Renderer'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -12349,7 +12349,7 @@ define( 'SCENERY/util/RendererSummary',['require','PHET_CORE/inherit','SCENERY/s
  */
 
 define( 'SCENERY/util/CanvasContextWrapper',['require','PHET_CORE/inherit','SCENERY/scenery'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -12517,7 +12517,7 @@ define( 'SCENERY/util/CanvasContextWrapper',['require','PHET_CORE/inherit','SCEN
  */
 
 define( 'SCENERY/nodes/Node',['require','PHET_CORE/inherit','PHET_CORE/extend','AXON/Events','DOT/Bounds2','DOT/Transform3','DOT/Matrix3','DOT/Vector2','DOT/Util','KITE/Shape','SCENERY/scenery','SCENERY/display/Renderer','SCENERY/util/RendererSummary','SCENERY/util/CanvasContextWrapper'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var extend = require( 'PHET_CORE/extend' );
@@ -15457,7 +15457,7 @@ define( 'SCENERY/nodes/Node',['require','PHET_CORE/inherit','PHET_CORE/extend','
  */
 
 define( 'SCENERY/util/Color',['require','PHET_CORE/inherit','SCENERY/scenery','DOT/Util','DOT/Util'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -16155,7 +16155,7 @@ define( 'SCENERY/util/Color',['require','PHET_CORE/inherit','SCENERY/scenery','D
  * @author Sam Reid
  */
 define( 'PHET_CORE/platform',['require','PHET_CORE/phetCore'],function( require ) {
-  
+
 
   var phetCore = require( 'PHET_CORE/phetCore' );
 
@@ -16228,7 +16228,7 @@ define( 'PHET_CORE/platform',['require','PHET_CORE/phetCore'],function( require 
  */
 
 define( 'PHET_CORE/arrayRemove',['require','PHET_CORE/phetCore'],function( require ) {
-  
+
 
   var phetCore = require( 'PHET_CORE/phetCore' );
 
@@ -16256,7 +16256,7 @@ define( 'PHET_CORE/arrayRemove',['require','PHET_CORE/phetCore'],function( requi
  */
 
 define( 'SCENERY/nodes/Paintable',['require','SCENERY/scenery','SCENERY/util/Color','KITE/util/LineStyles','SCENERY/display/Renderer','PHET_CORE/inherit','PHET_CORE/extend','PHET_CORE/platform','PHET_CORE/arrayRemove'],function( require ) {
-  
+
 
   var scenery = require( 'SCENERY/scenery' );
   var Color = require( 'SCENERY/util/Color' );
@@ -17239,7 +17239,7 @@ define( 'SCENERY/nodes/Paintable',['require','SCENERY/scenery','SCENERY/util/Col
  */
 
 define( 'SCENERY/display/Drawable',['require','PHET_CORE/inherit','AXON/Events','SCENERY/scenery','SCENERY/display/Renderer'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var Events = require( 'AXON/Events' );
@@ -17624,7 +17624,7 @@ define( 'SCENERY/display/Drawable',['require','PHET_CORE/inherit','AXON/Events',
  */
 
 define( 'SCENERY/display/SelfDrawable',['require','PHET_CORE/inherit','PHET_CORE/Poolable','SCENERY/scenery','SCENERY/display/Drawable'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var Poolable = require( 'PHET_CORE/Poolable' );
@@ -17717,7 +17717,7 @@ define( 'SCENERY/display/SelfDrawable',['require','PHET_CORE/inherit','PHET_CORE
  */
 
 define( 'SCENERY/display/SVGSelfDrawable',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/display/SelfDrawable','SCENERY/nodes/Paintable'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -17893,7 +17893,7 @@ define( 'SCENERY/display/SVGSelfDrawable',['require','PHET_CORE/inherit','SCENER
  */
 
 define( 'SCENERY/display/CanvasSelfDrawable',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/display/SelfDrawable','SCENERY/nodes/Paintable'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -18012,7 +18012,7 @@ define( 'SCENERY/display/CanvasSelfDrawable',['require','PHET_CORE/inherit','SCE
  */
 
 define( 'SCENERY/display/WebGLSelfDrawable',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/display/SelfDrawable'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -18076,7 +18076,7 @@ define( 'SCENERY/display/WebGLSelfDrawable',['require','PHET_CORE/inherit','SCEN
  */
 
 define( 'SCENERY/display/PixiSelfDrawable',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/display/SelfDrawable'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -18137,7 +18137,7 @@ define( 'SCENERY/display/PixiSelfDrawable',['require','PHET_CORE/inherit','SCENE
  * @author Sam Reid (PhET Interactive Simulations)
  */
 define( 'SCENERY/display/webgl/SquareUnstrokedRectangle',['require','PHET_CORE/inherit','SCENERY/util/Color'],function( require ) {
-  
+
 
   // modules
   var inherit = require( 'PHET_CORE/inherit' );
@@ -18177,7 +18177,7 @@ define( 'SCENERY/display/webgl/SquareUnstrokedRectangle',['require','PHET_CORE/i
       // Create a random color if the color wasn't found.
       // TODO: Remove this when this geometry no longer used for debugging
       color = color || new Color( Math.round( Math.random() * 255 ), Math.round( Math.random() * 255 ), Math.round( Math.random() * 255 ), 1 );
-      
+
       // TODO: maybe better to update in fragment shader?  It depends how often we update()
       var r = color.red / 255;
       var g = color.green / 255;
@@ -18216,7 +18216,7 @@ define( 'SCENERY/display/webgl/SquareUnstrokedRectangle',['require','PHET_CORE/i
  */
 
 define( 'SCENERY/nodes/Path',['require','PHET_CORE/inherit','KITE/Shape','DOT/Bounds2','SCENERY/scenery','SCENERY/nodes/Node','SCENERY/display/Renderer','SCENERY/nodes/Paintable','SCENERY/display/SVGSelfDrawable','SCENERY/display/CanvasSelfDrawable','SCENERY/display/SelfDrawable','SCENERY/display/WebGLSelfDrawable','SCENERY/display/PixiSelfDrawable','SCENERY/display/webgl/SquareUnstrokedRectangle','SCENERY/util/Color'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var Shape = require( 'KITE/Shape' );
@@ -18797,7 +18797,7 @@ define( 'SCENERY/nodes/Path',['require','PHET_CORE/inherit','KITE/Shape','DOT/Bo
  * @author Chris Malley (PixelZoom, Inc.)
  */
 define( 'AXON/Property',['require','AXON/axon','PHET_CORE/inherit','AXON/Events'],function( require ) {
-  
+
 
   // modules
   var axon = require( 'AXON/axon' );
@@ -19128,7 +19128,7 @@ define( 'AXON/Property',['require','AXON/axon','PHET_CORE/inherit','AXON/Events'
  * @author Sam Reid (PhET Interactive Simulations)
  */
 define( 'SCENERY/accessibility/FocusCursor',['require','PHET_CORE/inherit','SCENERY/nodes/Path','KITE/Shape','AXON/Property'],function( require ) {
-  
+
 
   // modules
   var inherit = require( 'PHET_CORE/inherit' );
@@ -19184,7 +19184,7 @@ define( 'SCENERY/accessibility/FocusCursor',['require','PHET_CORE/inherit','SCEN
  */
 
 define( 'SCENERY/util/TrailPointer',['require','PHET_CORE/inherit','SCENERY/scenery'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -19516,7 +19516,7 @@ define( 'SCENERY/util/TrailPointer',['require','PHET_CORE/inherit','SCENERY/scen
  */
 
 define( 'SCENERY/util/Trail',['require','PHET_CORE/inherit','DOT/Matrix3','DOT/Transform3','SCENERY/scenery','SCENERY/util/TrailPointer','SCENERY/nodes/Node'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var Matrix3 = require( 'DOT/Matrix3' );
@@ -20326,7 +20326,7 @@ define( 'SCENERY/util/Trail',['require','PHET_CORE/inherit','DOT/Matrix3','DOT/T
  */
 
 define( 'SCENERY/input/Pointer',['require','PHET_CORE/inherit','SCENERY/scenery'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -20373,7 +20373,7 @@ define( 'SCENERY/input/Pointer',['require','PHET_CORE/inherit','SCENERY/scenery'
  */
 
 define( 'SCENERY/input/Mouse',['require','PHET_CORE/inherit','SCENERY/scenery','DOT/Vector3','SCENERY/input/Pointer'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -20510,7 +20510,7 @@ define( 'SCENERY/input/Mouse',['require','PHET_CORE/inherit','SCENERY/scenery','
  */
 
 define( 'SCENERY/input/Touch',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/input/Pointer'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -20573,7 +20573,7 @@ define( 'SCENERY/input/Touch',['require','PHET_CORE/inherit','SCENERY/scenery','
  */
 
 define( 'SCENERY/input/Pen',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/input/Pointer'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -20639,7 +20639,7 @@ define( 'SCENERY/input/Pen',['require','PHET_CORE/inherit','SCENERY/scenery','SC
  */
 
 define( 'SCENERY/input/Event',['require','PHET_CORE/inherit','SCENERY/scenery'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -20704,7 +20704,7 @@ define( 'SCENERY/input/Event',['require','PHET_CORE/inherit','SCENERY/scenery'],
  */
 
 define( 'SCENERY/input/Key',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/input/Pointer'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -20736,7 +20736,7 @@ define( 'SCENERY/input/Key',['require','PHET_CORE/inherit','SCENERY/scenery','SC
  */
 
 define( 'SCENERY/input/BatchedDOMEvent',['require','PHET_CORE/inherit','PHET_CORE/Poolable','SCENERY/scenery'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var Poolable = require( 'PHET_CORE/Poolable' );
@@ -20853,7 +20853,7 @@ define( 'SCENERY/input/BatchedDOMEvent',['require','PHET_CORE/inherit','PHET_COR
  */
 
 define( 'SCENERY/input/Input',['require','PHET_CORE/inherit','PHET_CORE/cleanArray','SCENERY/scenery','SCENERY/util/Trail','SCENERY/input/Mouse','SCENERY/input/Touch','SCENERY/input/Pen','SCENERY/input/Event','SCENERY/input/Key','SCENERY/input/BatchedDOMEvent','AXON/Property'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var cleanArray = require( 'PHET_CORE/cleanArray' );
@@ -21897,7 +21897,7 @@ define( 'SCENERY/input/Input',['require','PHET_CORE/inherit','PHET_CORE/cleanArr
  */
 
 define( 'DOT/Dimension2',['require','DOT/dot','DOT/Bounds2'],function( require ) {
-  
+
 
   var dot = require( 'DOT/dot' );
   require( 'DOT/Bounds2' );
@@ -21966,7 +21966,7 @@ define( 'DOT/Dimension2',['require','DOT/dot','DOT/Bounds2'],function( require )
  */
 
 define( 'PHET_CORE/detectPrefix',['require','PHET_CORE/phetCore'],function( require ) {
-  
+
 
   var phetCore = require( 'PHET_CORE/phetCore' );
 
@@ -21998,7 +21998,7 @@ define( 'PHET_CORE/detectPrefix',['require','PHET_CORE/phetCore'],function( requ
  */
 
 define( 'SCENERY/util/Features',['require','PHET_CORE/detectPrefix','SCENERY/scenery'],function( require ) {
-  
+
 
   var detectPrefix = require( 'PHET_CORE/detectPrefix' );
   var scenery = require( 'SCENERY/scenery' );
@@ -22131,7 +22131,7 @@ define( 'SCENERY/util/Features',['require','PHET_CORE/detectPrefix','SCENERY/sce
  */
 
 define( 'SCENERY/display/DOMSelfDrawable',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/display/SelfDrawable','SCENERY/display/Renderer'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -22229,7 +22229,7 @@ define( 'SCENERY/display/DOMSelfDrawable',['require','PHET_CORE/inherit','SCENER
  */
 
 define( 'SCENERY/nodes/Rectangle',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/nodes/Path','KITE/Shape','DOT/Bounds2','DOT/Dimension2','DOT/Matrix3','SCENERY/util/Features','SCENERY/util/Color','SCENERY/nodes/Paintable','SCENERY/display/DOMSelfDrawable','SCENERY/display/SVGSelfDrawable','SCENERY/display/CanvasSelfDrawable','SCENERY/display/WebGLSelfDrawable','SCENERY/display/PixiSelfDrawable','SCENERY/display/SelfDrawable','SCENERY/display/Renderer','SCENERY/display/webgl/SquareUnstrokedRectangle'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -23221,7 +23221,7 @@ define( 'SCENERY/nodes/Rectangle',['require','PHET_CORE/inherit','SCENERY/scener
  * @author Sam Reid (PhET Interactive Simulations)
  */
 define( 'SCENERY/accessibility/FocusRectangle',['require','PHET_CORE/inherit','SCENERY/nodes/Rectangle','AXON/Property'],function( require ) {
-  
+
 
   // modules
   var inherit = require( 'PHET_CORE/inherit' );
@@ -23268,7 +23268,7 @@ define( 'SCENERY/accessibility/FocusRectangle',['require','PHET_CORE/inherit','S
  */
 
 define( 'AXON/DerivedProperty',['require','AXON/Property','AXON/axon','PHET_CORE/inherit'],function( require ) {
-  
+
 
   var Property = require( 'AXON/Property' );
   var axon = require( 'AXON/axon' );
@@ -23348,7 +23348,7 @@ define( 'AXON/DerivedProperty',['require','AXON/Property','AXON/axon','PHET_CORE
  * @author Sam Reid (PhET Interactive Simulations)
  */
 define( 'SCENERY/accessibility/FocusLayer',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/nodes/Node','SCENERY/input/Input','SCENERY/accessibility/FocusRectangle','SCENERY/accessibility/FocusCursor','AXON/DerivedProperty','AXON/Property'],function( require ) {
-  
+
 
   // modules
   var inherit = require( 'PHET_CORE/inherit' );
@@ -23537,7 +23537,7 @@ define( 'SCENERY/accessibility/FocusLayer',['require','PHET_CORE/inherit','SCENE
  */
 
 define( 'SCENERY/debug/DebugContext',['require','PHET_CORE/inherit','SCENERY/scenery'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -24062,7 +24062,7 @@ define( 'SCENERY/debug/DebugContext',['require','PHET_CORE/inherit','SCENERY/sce
  */
 
 define( 'SCENERY/display/Block',['require','PHET_CORE/inherit','PHET_CORE/cleanArray','SCENERY/scenery','SCENERY/display/Drawable'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var cleanArray = require( 'PHET_CORE/cleanArray' );
@@ -24219,7 +24219,7 @@ define( 'SCENERY/display/Block',['require','PHET_CORE/inherit','PHET_CORE/cleanA
  */
 
 define( 'SCENERY/display/FittedBlock',['require','PHET_CORE/inherit','DOT/Bounds2','DOT/Vector2','SCENERY/scenery','SCENERY/display/Block'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var Bounds2 = require( 'DOT/Bounds2' );
@@ -24418,7 +24418,7 @@ define( 'SCENERY/display/FittedBlock',['require','PHET_CORE/inherit','DOT/Bounds
  */
 
 define( 'SCENERY/util/Util',['require','SCENERY/scenery','DOT/Matrix3','DOT/Transform3','DOT/Bounds2','DOT/Vector2','SCENERY/util/Features'],function( require ) {
-  
+
 
   var scenery = require( 'SCENERY/scenery' );
 
@@ -24882,7 +24882,7 @@ define( 'SCENERY/util/Util',['require','SCENERY/scenery','DOT/Matrix3','DOT/Tran
  */
 
 define( 'SCENERY/display/CanvasBlock',['require','PHET_CORE/inherit','PHET_CORE/Poolable','PHET_CORE/cleanArray','DOT/Vector2','SCENERY/scenery','SCENERY/display/FittedBlock','SCENERY/util/CanvasContextWrapper','SCENERY/display/Renderer','SCENERY/util/Util'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var Poolable = require( 'PHET_CORE/Poolable' );
@@ -25134,7 +25134,7 @@ define( 'SCENERY/display/CanvasBlock',['require','PHET_CORE/inherit','PHET_CORE/
  */
 
 define( 'SCENERY/display/SVGGroup',['require','PHET_CORE/inherit','PHET_CORE/Poolable','PHET_CORE/cleanArray','PHET_CORE/platform','SCENERY/scenery'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var Poolable = require( 'PHET_CORE/Poolable' );
@@ -25561,7 +25561,7 @@ define( 'SCENERY/display/SVGGroup',['require','PHET_CORE/inherit','PHET_CORE/Poo
  */
 
 define( 'SCENERY/display/SVGBlock',['require','PHET_CORE/inherit','PHET_CORE/Poolable','PHET_CORE/cleanArray','SCENERY/scenery','SCENERY/display/FittedBlock','SCENERY/display/SVGGroup','SCENERY/util/Util'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var Poolable = require( 'PHET_CORE/Poolable' );
@@ -25860,7 +25860,7 @@ define( 'SCENERY/display/SVGBlock',['require','PHET_CORE/inherit','PHET_CORE/Poo
  */
 
 define( 'SCENERY/display/DOMBlock',['require','PHET_CORE/inherit','PHET_CORE/Poolable','SCENERY/scenery','SCENERY/display/Block'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var Poolable = require( 'PHET_CORE/Poolable' );
@@ -25948,7 +25948,7 @@ define( 'SCENERY/display/DOMBlock',['require','PHET_CORE/inherit','PHET_CORE/Poo
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 define( 'DOT/BinPacker',['require','DOT/dot','PHET_CORE/inherit','DOT/Bounds2'],function( require ) {
-  
+
 
   // modules
   var dot = require( 'DOT/dot' );
@@ -26205,7 +26205,7 @@ define( 'DOT/BinPacker',['require','DOT/dot','PHET_CORE/inherit','DOT/Bounds2'],
  * @author Sam Reid (PhET Interactive Simulations)
  */
 define( 'SCENERY/util/SpriteSheet',['require','SCENERY/scenery','PHET_CORE/inherit','DOT/BinPacker','DOT/Bounds2'],function( require ) {
-  
+
 
   // modules
   var scenery = require( 'SCENERY/scenery' );
@@ -26449,7 +26449,7 @@ define( 'SCENERY/util/SpriteSheet',['require','SCENERY/scenery','PHET_CORE/inher
  */
 
 define( 'SCENERY/util/ShaderProgram',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/util/Util'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -26597,7 +26597,7 @@ define( 'SCENERY/util/ShaderProgram',['require','PHET_CORE/inherit','SCENERY/sce
  * @author Sharfudeen Ashraf (For Ghent University)
  */
 define( 'SCENERY/display/WebGLBlock',['require','SCENERY/scenery','PHET_CORE/inherit','PHET_CORE/Poolable','PHET_CORE/cleanArray','DOT/Matrix3','SCENERY/display/FittedBlock','SCENERY/display/Renderer','SCENERY/util/Util','SCENERY/util/SpriteSheet','SCENERY/util/ShaderProgram'],function( require ) {
-  
+
 
   // modules
   var scenery = require( 'SCENERY/scenery' );
@@ -27120,7 +27120,7 @@ define( 'SCENERY/display/WebGLBlock',['require','SCENERY/scenery','PHET_CORE/inh
  */
 
 define( 'SCENERY/display/PixiDisplayObject',['require','PHET_CORE/inherit','PHET_CORE/Poolable','PHET_CORE/cleanArray','SCENERY/scenery'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var Poolable = require( 'PHET_CORE/Poolable' );
@@ -27572,7 +27572,7 @@ define( 'SCENERY/display/PixiDisplayObject',['require','PHET_CORE/inherit','PHET
  */
 
 define( 'SCENERY/display/PixiBlock',['require','PHET_CORE/inherit','PHET_CORE/Poolable','PHET_CORE/cleanArray','SCENERY/scenery','SCENERY/display/FittedBlock','SCENERY/display/PixiDisplayObject','SCENERY/util/Util'],function( require ) {
-  
+
 
   var count = 0;
   var inherit = require( 'PHET_CORE/inherit' );
@@ -27876,7 +27876,7 @@ define( 'SCENERY/display/PixiBlock',['require','PHET_CORE/inherit','PHET_CORE/Po
  */
 
 define( 'SCENERY/display/Stitcher',['require','PHET_CORE/inherit','PHET_CORE/cleanArray','SCENERY/scenery','SCENERY/display/Drawable','SCENERY/display/Renderer','SCENERY/display/CanvasBlock','SCENERY/display/SVGBlock','SCENERY/display/DOMBlock','SCENERY/display/WebGLBlock','SCENERY/display/PixiBlock'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var cleanArray = require( 'PHET_CORE/cleanArray' );
@@ -28440,7 +28440,7 @@ define( 'SCENERY/display/Stitcher',['require','PHET_CORE/inherit','PHET_CORE/cle
  */
 
 define( 'SCENERY/display/GreedyStitcher',['require','PHET_CORE/inherit','PHET_CORE/cleanArray','SCENERY/scenery','SCENERY/display/Renderer','SCENERY/display/Stitcher'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var cleanArray = require( 'PHET_CORE/cleanArray' );
@@ -29146,7 +29146,7 @@ define( 'SCENERY/display/GreedyStitcher',['require','PHET_CORE/inherit','PHET_CO
  */
 
 define( 'SCENERY/display/RebuildStitcher',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/display/Renderer','SCENERY/display/Stitcher'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -29225,7 +29225,7 @@ define( 'SCENERY/display/RebuildStitcher',['require','PHET_CORE/inherit','SCENER
  */
 
 define( 'SCENERY/display/BackboneDrawable',['require','PHET_CORE/inherit','PHET_CORE/Poolable','PHET_CORE/cleanArray','SCENERY/scenery','SCENERY/display/Drawable','SCENERY/display/Stitcher','SCENERY/display/GreedyStitcher','SCENERY/display/RebuildStitcher','SCENERY/util/Util'],function( require ) {
-  
+
 
   // modules
   var inherit = require( 'PHET_CORE/inherit' );
@@ -29692,7 +29692,7 @@ define( 'SCENERY/display/BackboneDrawable',['require','PHET_CORE/inherit','PHET_
  */
 
 define( 'SCENERY/display/ChangeInterval',['require','PHET_CORE/inherit','PHET_CORE/Poolable','SCENERY/scenery','SCENERY/display/Drawable'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var Poolable = require( 'PHET_CORE/Poolable' );
@@ -29932,7 +29932,7 @@ define( 'SCENERY/display/ChangeInterval',['require','PHET_CORE/inherit','PHET_CO
  */
 
 define( 'SCENERY/display/RelativeTransform',['require','PHET_CORE/inherit','PHET_CORE/cleanArray','DOT/Matrix3','SCENERY/scenery'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var cleanArray = require( 'PHET_CORE/cleanArray' );
@@ -30454,7 +30454,7 @@ define( 'SCENERY/display/RelativeTransform',['require','PHET_CORE/inherit','PHET
  */
 
 define( 'SCENERY/display/Instance',['require','PHET_CORE/inherit','PHET_CORE/Poolable','PHET_CORE/cleanArray','SCENERY/scenery','SCENERY/display/ChangeInterval','SCENERY/display/Drawable','SCENERY/display/Renderer','SCENERY/display/RelativeTransform','SCENERY/util/Util','AXON/Events'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var Poolable = require( 'PHET_CORE/Poolable' );
@@ -32026,7 +32026,7 @@ define( 'SCENERY/display/Instance',['require','PHET_CORE/inherit','PHET_CORE/Poo
  */
 
 define( 'SCENERY/display/InlineCanvasCacheDrawable',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/display/Drawable'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -32065,7 +32065,7 @@ define( 'SCENERY/display/InlineCanvasCacheDrawable',['require','PHET_CORE/inheri
  */
 
 define( 'SCENERY/display/SharedCanvasCacheDrawable',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/display/Drawable'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -32097,7 +32097,7 @@ define( 'SCENERY/display/SharedCanvasCacheDrawable',['require','PHET_CORE/inheri
  */
 
 define( 'SCENERY/overlays/PointerAreaOverlay',['require','PHET_CORE/inherit','KITE/Shape','SCENERY/scenery','SCENERY/util/Trail'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var Shape = require( 'KITE/Shape' );
@@ -32201,7 +32201,7 @@ define( 'SCENERY/overlays/PointerAreaOverlay',['require','PHET_CORE/inherit','KI
  */
 
 define( 'SCENERY/overlays/PointerOverlay',['require','PHET_CORE/inherit','DOT/Matrix3','SCENERY/scenery','SCENERY/util/Trail','SCENERY/util/Util'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var Matrix3 = require( 'DOT/Matrix3' );
@@ -32324,7 +32324,7 @@ define( 'SCENERY/overlays/PointerOverlay',['require','PHET_CORE/inherit','DOT/Ma
  */
 
 define( 'SCENERY/overlays/CanvasNodeBoundsOverlay',['require','PHET_CORE/inherit','KITE/Shape','SCENERY/scenery','SCENERY/util/Trail'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var Shape = require( 'KITE/Shape' );
@@ -32453,7 +32453,7 @@ define( 'SCENERY/overlays/CanvasNodeBoundsOverlay',['require','PHET_CORE/inherit
  */
 
 define( 'SCENERY/display/Display',['require','PHET_CORE/inherit','PHET_CORE/extend','AXON/Events','DOT/Dimension2','DOT/Vector2','DOT/Matrix3','SCENERY/scenery','SCENERY/util/Features','SCENERY/display/BackboneDrawable','SCENERY/display/CanvasBlock','SCENERY/display/CanvasSelfDrawable','SCENERY/display/ChangeInterval','SCENERY/display/DOMSelfDrawable','SCENERY/display/Drawable','SCENERY/display/Instance','SCENERY/display/InlineCanvasCacheDrawable','SCENERY/display/Renderer','SCENERY/display/SharedCanvasCacheDrawable','SCENERY/display/SVGSelfDrawable','SCENERY/input/Input','SCENERY/util/Trail','SCENERY/overlays/PointerAreaOverlay','SCENERY/overlays/PointerOverlay','SCENERY/overlays/CanvasNodeBoundsOverlay'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var extend = require( 'PHET_CORE/extend' );
@@ -33217,7 +33217,12 @@ define( 'SCENERY/display/Display',['require','PHET_CORE/inherit','PHET_CORE/exte
       this.initializeEvents( _.extend( {}, {
         listenerTarget: window,
         pointFromEvent: function pointFromEvent( evt ) {
-          return Vector2.createFromPool( evt.clientX, evt.clientY );
+         // return Vector2.createFromPool( evt.clientX, evt.clientY );
+
+          var scrollTop     = $(window).scrollTop(),
+	      elementOffset = $('#'+window.simId).offset().top,
+          distanceY      = (elementOffset - scrollTop);
+          return Vector2.createFromPool( evt.clientX, evt.clientY-distanceY);
         }
       }, parameters ) );
     },
@@ -33772,7 +33777,7 @@ define( 'SCENERY/display/Display',['require','PHET_CORE/inherit','PHET_CORE/exte
  */
 
 define( 'SCENERY/input/DownUpListener',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/util/Trail','SCENERY/input/Input'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -33924,7 +33929,7 @@ define( 'SCENERY/input/DownUpListener',['require','PHET_CORE/inherit','SCENERY/s
  */
 
 define( 'SCENERY/input/ButtonListener',['require','SCENERY/scenery','SCENERY/util/Trail','PHET_CORE/inherit','SCENERY/input/DownUpListener'],function( require ) {
-  
+
 
   var scenery = require( 'SCENERY/scenery' );
   require( 'SCENERY/util/Trail' );
@@ -34029,7 +34034,7 @@ define( 'SCENERY/input/ButtonListener',['require','SCENERY/scenery','SCENERY/uti
  */
 
 define( 'SCENERY/input/SimpleDragHandler',['require','PHET_CORE/inherit','SCENERY/scenery'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -34244,7 +34249,7 @@ define( 'SCENERY/input/SimpleDragHandler',['require','PHET_CORE/inherit','SCENER
  */
 
 define( 'SCENERY/nodes/CanvasNode',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/nodes/Node','SCENERY/display/Renderer','SCENERY/display/CanvasSelfDrawable','SCENERY/display/SelfDrawable'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -34355,7 +34360,7 @@ define( 'SCENERY/nodes/CanvasNode',['require','PHET_CORE/inherit','SCENERY/scene
  */
 
 define( 'SCENERY/nodes/Circle',['require','PHET_CORE/inherit','SCENERY/scenery','DOT/Bounds2','DOT/Matrix3','SCENERY/util/Color','SCENERY/nodes/Path','KITE/Shape','SCENERY/util/Features','SCENERY/nodes/Paintable','SCENERY/display/DOMSelfDrawable','SCENERY/display/SVGSelfDrawable','SCENERY/display/CanvasSelfDrawable','SCENERY/display/SelfDrawable','SCENERY/display/Renderer','SCENERY/util/Util','SCENERY/display/WebGLSelfDrawable','SCENERY/display/PixiSelfDrawable','SCENERY/display/webgl/SquareUnstrokedRectangle'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -34919,7 +34924,7 @@ define( 'SCENERY/nodes/Circle',['require','PHET_CORE/inherit','SCENERY/scenery',
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 define( 'PHET_CORE/escapeHTML',['require','PHET_CORE/phetCore'],function( require ) {
-  
+
 
   var phetCore = require( 'PHET_CORE/phetCore' );
 
@@ -34945,7 +34950,7 @@ define( 'PHET_CORE/escapeHTML',['require','PHET_CORE/phetCore'],function( requir
  */
 
 define( 'SCENERY/nodes/DOM',['require','PHET_CORE/inherit','PHET_CORE/escapeHTML','DOT/Bounds2','SCENERY/scenery','SCENERY/nodes/Node','SCENERY/display/Renderer','SCENERY/util/Util','SCENERY/display/DOMSelfDrawable','SCENERY/display/SelfDrawable'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var escapeHTML = require( 'PHET_CORE/escapeHTML' );
@@ -35192,7 +35197,7 @@ define( 'SCENERY/nodes/DOM',['require','PHET_CORE/inherit','PHET_CORE/escapeHTML
  * @author Chris Malley (PixelZoom, Inc.)
  */
 define( 'SCENERY/nodes/LayoutBox',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/nodes/Node'],function( require ) {
-  
+
 
   // modules
   var inherit = require( 'PHET_CORE/inherit' );
@@ -35440,7 +35445,7 @@ define( 'SCENERY/nodes/LayoutBox',['require','PHET_CORE/inherit','SCENERY/scener
  * @author Sam Reid
  */
 define( 'SCENERY/nodes/HBox',['require','PHET_CORE/inherit','SCENERY/nodes/LayoutBox','SCENERY/scenery'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var LayoutBox = require( 'SCENERY/nodes/LayoutBox' );
@@ -35485,7 +35490,7 @@ define( 'SCENERY/nodes/HBox',['require','PHET_CORE/inherit','SCENERY/nodes/Layou
  */
 
 define( 'SCENERY/util/Font',['require','PHET_CORE/inherit','SCENERY/scenery'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -35678,7 +35683,7 @@ define( 'SCENERY/util/Font',['require','PHET_CORE/inherit','SCENERY/scenery'],fu
  */
 
 define( 'SCENERY/nodes/Text',['require','PHET_CORE/inherit','PHET_CORE/escapeHTML','DOT/Bounds2','DOT/Matrix3','SCENERY/scenery','SCENERY/nodes/Node','SCENERY/display/Renderer','SCENERY/nodes/Paintable','SCENERY/util/Font','SCENERY/util/Util','SCENERY/util/CanvasContextWrapper','SCENERY/display/DOMSelfDrawable','SCENERY/display/SVGSelfDrawable','SCENERY/display/CanvasSelfDrawable','SCENERY/display/SelfDrawable','SCENERY/display/WebGLSelfDrawable','SCENERY/display/PixiSelfDrawable'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var escapeHTML = require( 'PHET_CORE/escapeHTML' );
@@ -36621,7 +36626,7 @@ define( 'SCENERY/nodes/Text',['require','PHET_CORE/inherit','PHET_CORE/escapeHTM
  */
 
 define( 'SCENERY/nodes/HTMLText',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/nodes/Text'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -36655,7 +36660,7 @@ define( 'SCENERY/nodes/HTMLText',['require','PHET_CORE/inherit','SCENERY/scenery
  */
 
 define( 'SCENERY/nodes/Leaf',['require','SCENERY/scenery'],function( require ) {
-  
+
 
   var scenery = require( 'SCENERY/scenery' );
 
@@ -36685,7 +36690,7 @@ define( 'SCENERY/nodes/Leaf',['require','SCENERY/scenery'],function( require ) {
  */
 
 define( 'SCENERY/nodes/Spacer',['require','PHET_CORE/inherit','SCENERY/scenery','DOT/Bounds2','SCENERY/nodes/Node','SCENERY/nodes/Leaf'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -36724,7 +36729,7 @@ define( 'SCENERY/nodes/Spacer',['require','PHET_CORE/inherit','SCENERY/scenery',
  */
 
 define( 'SCENERY/nodes/HStrut',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/nodes/Spacer'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -36753,7 +36758,7 @@ define( 'SCENERY/nodes/HStrut',['require','PHET_CORE/inherit','SCENERY/scenery',
  */
 
 define( 'SCENERY/nodes/Image',['require','PHET_CORE/inherit','PHET_CORE/cleanArray','PHET_CORE/platform','DOT/Bounds2','DOT/Vector2','SCENERY/scenery','SCENERY/nodes/Node','SCENERY/display/Renderer','SCENERY/util/Util','SCENERY/display/DOMSelfDrawable','SCENERY/display/SVGSelfDrawable','SCENERY/display/CanvasSelfDrawable','SCENERY/display/SelfDrawable','SCENERY/display/WebGLSelfDrawable','SCENERY/display/PixiSelfDrawable'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var cleanArray = require( 'PHET_CORE/cleanArray' );
@@ -37779,7 +37784,7 @@ define( 'SCENERY/nodes/Image',['require','PHET_CORE/inherit','PHET_CORE/cleanArr
  */
 
 define( 'SCENERY/nodes/LayoutNode',['require','PHET_CORE/inherit','PHET_CORE/extend','SCENERY/scenery','SCENERY/nodes/Node','DOT/Bounds2'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var extend = require( 'PHET_CORE/extend' );
@@ -38053,7 +38058,7 @@ define( 'SCENERY/nodes/LayoutNode',['require','PHET_CORE/inherit','PHET_CORE/ext
  */
 
 define( 'SCENERY/nodes/Line',['require','PHET_CORE/inherit','SCENERY/scenery','KITE/segments/Line','SCENERY/nodes/Path','KITE/Shape','DOT/Bounds2','DOT/Vector2','SCENERY/nodes/Paintable','SCENERY/display/SVGSelfDrawable','SCENERY/display/CanvasSelfDrawable','SCENERY/display/WebGLSelfDrawable','SCENERY/display/SelfDrawable','SCENERY/display/PixiSelfDrawable','SCENERY/display/Renderer','SCENERY/display/webgl/SquareUnstrokedRectangle','SCENERY/util/Color'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -38734,7 +38739,7 @@ Paintable.PaintableStatelessDrawable.mixin( Line.LinePixiDrawable );
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 define( 'SCENERY/nodes/PixiNode',['require','PHET_CORE/inherit','SCENERY/nodes/DOM','SCENERY/nodes/Path','SCENERY/scenery','SCENERY/nodes/Node','SCENERY/nodes/Text','SCENERY/nodes/Image'],function( require ) {
-  
+
 
   // modules
   var inherit = require( 'PHET_CORE/inherit' );
@@ -38889,7 +38894,7 @@ define( 'SCENERY/nodes/PixiNode',['require','PHET_CORE/inherit','SCENERY/nodes/D
  */
 
 define( 'SCENERY/nodes/Plane',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/nodes/Rectangle'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -38916,7 +38921,7 @@ define( 'SCENERY/nodes/Plane',['require','PHET_CORE/inherit','SCENERY/scenery','
  * @author Sam Reid
  */
 define( 'SCENERY/nodes/VBox',['require','PHET_CORE/inherit','SCENERY/nodes/LayoutBox','SCENERY/scenery'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var LayoutBox = require( 'SCENERY/nodes/LayoutBox' );
@@ -38944,7 +38949,7 @@ define( 'SCENERY/nodes/VBox',['require','PHET_CORE/inherit','SCENERY/nodes/Layou
  */
 
 define( 'SCENERY/nodes/VStrut',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/nodes/Spacer'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -38974,7 +38979,7 @@ define( 'SCENERY/nodes/VStrut',['require','PHET_CORE/inherit','SCENERY/scenery',
  * @author Sam Reid
  */
 define( 'SCENERY/nodes/WebGLNode',['require','PHET_CORE/inherit','SCENERY/scenery','DOT/Matrix3','SCENERY/nodes/Node','SCENERY/display/Renderer','SCENERY/display/WebGLSelfDrawable','SCENERY/display/SelfDrawable'],function( require ) {
-  
+
 
   // modules
   var inherit = require( 'PHET_CORE/inherit' );
@@ -39118,7 +39123,7 @@ define( 'SCENERY/nodes/WebGLNode',['require','PHET_CORE/inherit','SCENERY/scener
  */
 
 define( 'SCENERY/util/Paint',['require','SCENERY/util/Color','PHET_CORE/inherit','SCENERY/scenery'],function( require ) {
-  
+
 
   require( 'SCENERY/util/Color' );
   var inherit = require( 'PHET_CORE/inherit' );
@@ -39160,7 +39165,7 @@ define( 'SCENERY/util/Paint',['require','SCENERY/util/Color','PHET_CORE/inherit'
  */
 
 define( 'SCENERY/util/Gradient',['require','SCENERY/util/Color','PHET_CORE/inherit','SCENERY/scenery','SCENERY/util/Paint','SCENERY/util/Color'],function( require ) {
-  
+
 
   require( 'SCENERY/util/Color' );
   var inherit = require( 'PHET_CORE/inherit' );
@@ -39237,7 +39242,7 @@ define( 'SCENERY/util/Gradient',['require','SCENERY/util/Color','PHET_CORE/inher
  */
 
 define( 'SCENERY/util/LinearGradient',['require','SCENERY/scenery','PHET_CORE/inherit','DOT/Vector2','SCENERY/util/Gradient'],function( require ) {
-  
+
 
   var scenery = require( 'SCENERY/scenery' );
 
@@ -39323,7 +39328,7 @@ define( 'SCENERY/util/LinearGradient',['require','SCENERY/scenery','PHET_CORE/in
  */
 
 define( 'SCENERY/util/LiveRegion',['require','PHET_CORE/inherit','SCENERY/scenery'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -39373,7 +39378,7 @@ define( 'SCENERY/util/LiveRegion',['require','PHET_CORE/inherit','SCENERY/scener
  */
 
 define( 'SCENERY/util/Pattern',['require','PHET_CORE/inherit','SCENERY/scenery','SCENERY/util/Paint'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -39435,7 +39440,7 @@ define( 'SCENERY/util/Pattern',['require','PHET_CORE/inherit','SCENERY/scenery',
  */
 
 define( 'SCENERY/util/RadialGradient',['require','SCENERY/scenery','PHET_CORE/inherit','DOT/Vector2','SCENERY/util/Gradient'],function( require ) {
-  
+
 
   var scenery = require( 'SCENERY/scenery' );
 
@@ -39556,7 +39561,7 @@ define( 'SCENERY/util/RadialGradient',['require','SCENERY/scenery','PHET_CORE/in
  */
 
 define( 'SCENERY/util/SceneImage',['require','PHET_CORE/inherit','SCENERY/scenery'],function( require ) {
-  
+
 
   var inherit = require( 'PHET_CORE/inherit' );
   var scenery = require( 'SCENERY/scenery' );
@@ -39609,7 +39614,7 @@ define( 'SCENERY/util/SceneImage',['require','PHET_CORE/inherit','SCENERY/scener
  */
 
 define( 'SCENERY/util/SceneryStyle',['require','SCENERY/scenery'],function( require ) {
-  
+
 
   require( 'SCENERY/scenery' );
 
@@ -39739,7 +39744,7 @@ define( 'main',[
   'SCENERY/util/TrailPointer',
   'SCENERY/util/Util'
 ], function( scenery ) {
-  
+
 
   // note: we don't need any of the other parts, we just need to specify them as dependencies so they fill in the scenery namespace
   return scenery;
@@ -39773,7 +39778,7 @@ define( 'KITE/main',[
   'KITE/parser/svgPath'
 ], function( kite // note: we don't need any of the other parts, we just need to specify them as dependencies so they fill in the kite namespace
 ) {
-  
+
 
   return kite;
 } );
@@ -39794,7 +39799,7 @@ define( 'KITE/main',[
  */
 
 define( 'DOT/Bounds3',['require','DOT/dot','DOT/Vector3'],function( require ) {
-  
+
 
   var dot = require( 'DOT/dot' );
 
@@ -40307,7 +40312,7 @@ define( 'DOT/Bounds3',['require','DOT/dot','DOT/Vector3'],function( require ) {
  */
 
 define( 'DOT/Complex',['require','DOT/dot','PHET_CORE/inherit','DOT/Vector2'],function( require ) {
-  
+
 
   var dot = require( 'DOT/dot' );
 
@@ -40391,7 +40396,7 @@ define( 'DOT/Complex',['require','DOT/dot','PHET_CORE/inherit','DOT/Vector2'],fu
  */
 
 define( 'DOT/ConvexHull2',['require','DOT/dot'],function( require ) {
-  
+
 
   var dot = require( 'DOT/dot' );
 
@@ -40487,7 +40492,7 @@ define( 'DOT/ConvexHull2',['require','DOT/dot'],function( require ) {
  */
 
 define( 'DOT/EigenvalueDecomposition',['require','DOT/dot'],function( require ) {
-  
+
 
   var dot = require( 'DOT/dot' );
 
@@ -41412,7 +41417,7 @@ define( 'DOT/EigenvalueDecomposition',['require','DOT/dot'],function( require ) 
  * @author Chris Malley (PixelZoom, Inc.)
  */
 define( 'DOT/LinearFunction',['require','DOT/dot','DOT/Util'],function( require ) {
-  
+
 
   var dot = require( 'DOT/dot' );
 
@@ -41471,7 +41476,7 @@ define( 'DOT/LinearFunction',['require','DOT/dot','DOT/Util'],function( require 
  */
 
 define( 'DOT/LUDecomposition',['require','DOT/dot'],function( require ) {
-  
+
 
   var dot = require( 'DOT/dot' );
 
@@ -41677,7 +41682,7 @@ define( 'DOT/LUDecomposition',['require','DOT/dot'],function( require ) {
  */
 
 define( 'PHET_CORE/isArray',['require','PHET_CORE/phetCore'],function( require ) {
-  
+
 
   var phetCore = require( 'PHET_CORE/phetCore' );
 
@@ -41697,7 +41702,7 @@ define( 'PHET_CORE/isArray',['require','PHET_CORE/phetCore'],function( require )
  */
 
 define( 'DOT/SingularValueDecomposition',['require','DOT/dot'],function( require ) {
-  
+
 
   var dot = require( 'DOT/dot' );
 
@@ -42221,7 +42226,7 @@ define( 'DOT/SingularValueDecomposition',['require','DOT/dot'],function( require
  */
 
 define( 'DOT/QRDecomposition',['require','DOT/dot'],function( require ) {
-  
+
 
   var dot = require( 'DOT/dot' );
 
@@ -42403,7 +42408,7 @@ define( 'DOT/QRDecomposition',['require','DOT/dot'],function( require ) {
  */
 
 define( 'DOT/Matrix',['require','DOT/dot','PHET_CORE/isArray','DOT/SingularValueDecomposition','DOT/LUDecomposition','DOT/QRDecomposition','DOT/EigenvalueDecomposition','DOT/Vector2','DOT/Vector3','DOT/Vector4'],function( require ) {
-  
+
 
   var dot = require( 'DOT/dot' );
 
@@ -42971,7 +42976,7 @@ define( 'DOT/Matrix',['require','DOT/dot','PHET_CORE/isArray','DOT/SingularValue
  */
 
 define( 'DOT/ObservableBounds2',['require','DOT/dot','PHET_CORE/inherit','PHET_CORE/extend','PHET_CORE/Poolable','AXON/Property','DOT/Bounds2'],function( require ) {
-  
+
 
   var dot = require( 'DOT/dot' );
 
@@ -43098,7 +43103,7 @@ define( 'DOT/ObservableBounds2',['require','DOT/dot','PHET_CORE/inherit','PHET_C
  */
 
 define( 'DOT/ObservableMatrix3',['require','DOT/dot','PHET_CORE/inherit','PHET_CORE/extend','PHET_CORE/Poolable','AXON/Property','DOT/Matrix3'],function( require ) {
-  
+
 
   var dot = require( 'DOT/dot' );
 
@@ -43240,7 +43245,7 @@ define( 'DOT/ObservableMatrix3',['require','DOT/dot','PHET_CORE/inherit','PHET_C
  */
 
 define( 'DOT/ObservableVector2',['require','DOT/dot','PHET_CORE/inherit','PHET_CORE/extend','PHET_CORE/Poolable','AXON/Property','DOT/Vector2'],function( require ) {
-  
+
 
   var dot = require( 'DOT/dot' );
 
@@ -43345,7 +43350,7 @@ define( 'DOT/ObservableVector2',['require','DOT/dot','PHET_CORE/inherit','PHET_C
  */
 
 define( 'DOT/Permutation',['require','DOT/dot','PHET_CORE/isArray','DOT/Util'],function( require ) {
-  
+
 
   var dot = require( 'DOT/dot' );
 
@@ -43488,7 +43493,7 @@ define( 'DOT/Permutation',['require','DOT/dot','PHET_CORE/isArray','DOT/Util'],f
  */
 
 define( 'DOT/Plane3',['require','DOT/dot','DOT/Vector3'],function( require ) {
-  
+
 
   var dot = require( 'DOT/dot' );
   var Vector3 = require( 'DOT/Vector3' );
@@ -43554,7 +43559,7 @@ define( 'DOT/Plane3',['require','DOT/dot','DOT/Vector3'],function( require ) {
  */
 
 define( 'DOT/Quaternion',['require','DOT/dot','PHET_CORE/Poolable','DOT/Vector3','DOT/Matrix3','DOT/Util'],function( require ) {
-  
+
 
   var dot = require( 'DOT/dot' );
 
@@ -43833,7 +43838,7 @@ define( 'DOT/Quaternion',['require','DOT/dot','PHET_CORE/Poolable','DOT/Vector3'
  *
  */
 define( 'DOT/Random',['require','DOT/Util','DOT/dot'],function( require ) {
-  
+
 
   // modules
   var Util = require( 'DOT/Util' );
@@ -43883,7 +43888,7 @@ define( 'DOT/Random',['require','DOT/Util','DOT/dot'],function( require ) {
  */
 
 define( 'DOT/Ray3',['require','DOT/dot'],function( require ) {
-  
+
 
   var dot = require( 'DOT/dot' );
 
@@ -43927,7 +43932,7 @@ define( 'DOT/Ray3',['require','DOT/dot'],function( require ) {
  */
 
 define( 'DOT/Rectangle',['require','DOT/dot','PHET_CORE/inherit','DOT/Bounds2'],function( require ) {
-  
+
 
   var dot = require( 'DOT/dot' );
   var inherit = require( 'PHET_CORE/inherit' );
@@ -43953,7 +43958,7 @@ define( 'DOT/Rectangle',['require','DOT/dot','PHET_CORE/inherit','DOT/Bounds2'],
  */
 
 define( 'DOT/Sphere3',['require','DOT/dot'],function( require ) {
-  
+
 
   var dot = require( 'DOT/dot' );
 
@@ -44115,7 +44120,7 @@ define( 'DOT/Sphere3',['require','DOT/dot'],function( require ) {
  */
 
 define( 'DOT/Transform4',['require','DOT/dot','DOT/Matrix4','DOT/Vector3','DOT/Ray3'],function( require ) {
-  
+
 
   var dot = require( 'DOT/dot' );
 
@@ -44305,7 +44310,7 @@ define( 'DOT/main',[
   'DOT/Vector3',
   'DOT/Vector4'
 ], function( dot ) {
-  
+
   return dot;
 } );
 
@@ -44321,7 +44326,7 @@ define( 'DOT/main',[
  * @author Chris Malley
  */
 define( 'AXON/ObservableArray',['require','AXON/Property','AXON/axon','PHET_CORE/inherit','AXON/Events'],function( require ) {
-  
+
 
   // modules
   var Property = require( 'AXON/Property' );
@@ -44639,7 +44644,7 @@ define( 'AXON/ObservableArray',['require','AXON/Property','AXON/axon','PHET_CORE
  * @author Sam Reid
  */
 define( 'AXON/Multilink',['require','AXON/axon','PHET_CORE/inherit'],function( require ) {
-  
+
 
   var axon = require( 'AXON/axon' );
   var inherit = require( 'PHET_CORE/inherit' );
@@ -44738,7 +44743,7 @@ define( 'AXON/Multilink',['require','AXON/axon','PHET_CORE/inherit'],function( r
  */
 
 define( 'AXON/PropertySet',['require','AXON/Property','AXON/DerivedProperty','AXON/Multilink','AXON/Events','AXON/axon','PHET_CORE/inherit'],function( require ) {
-  
+
 
   // modules
   var Property = require( 'AXON/Property' );
@@ -45041,7 +45046,7 @@ define( 'AXON/main',[
   'AXON/PropertySet',
   'AXON/Multilink'
 ], function( axon ) {
-  
+
   return axon;
 } );
 // Copyright 2002-2014, University of Colorado Boulder
@@ -45057,7 +45062,7 @@ define( 'AXON/main',[
  */
 
 define( 'PHET_CORE/collect',['require','PHET_CORE/phetCore'],function( require ) {
-  
+
 
   var phetCore = require( 'PHET_CORE/phetCore' );
 
@@ -45083,7 +45088,7 @@ define( 'PHET_CORE/collect',['require','PHET_CORE/phetCore'],function( require )
  */
 
 define( 'PHET_CORE/detectPrefixEvent',['require','PHET_CORE/phetCore'],function( require ) {
-  
+
 
   var phetCore = require( 'PHET_CORE/phetCore' );
 
@@ -45150,7 +45155,7 @@ define( 'PHET_CORE/detectPrefixEvent',['require','PHET_CORE/phetCore'],function(
  */
 
 define( 'PHET_CORE/EventTimer',['require','PHET_CORE/phetCore','PHET_CORE/inherit'],function( require ) {
-  
+
 
   var phetCore = require( 'PHET_CORE/phetCore' );
   var inherit = require( 'PHET_CORE/inherit' );
@@ -45280,7 +45285,7 @@ define( 'PHET_CORE/EventTimer',['require','PHET_CORE/phetCore','PHET_CORE/inheri
  */
 
 define( 'PHET_CORE/loadScript',['require','PHET_CORE/phetCore'],function( require ) {
-  
+
 
   var phetCore = require( 'PHET_CORE/phetCore' );
 
@@ -45346,7 +45351,7 @@ define( 'PHET_CORE/loadScript',['require','PHET_CORE/phetCore'],function( requir
  */
 
 define( 'PHET_CORE/pairs',['require','PHET_CORE/phetCore'],function( require ) {
-  
+
 
   var phetCore = require( 'PHET_CORE/phetCore' );
 
@@ -45378,7 +45383,7 @@ define( 'PHET_CORE/pairs',['require','PHET_CORE/phetCore'],function( require ) {
  */
 
 define( 'PHET_CORE/partition',['require','PHET_CORE/phetCore'],function( require ) {
-  
+
 
   var phetCore = require( 'PHET_CORE/phetCore' );
 
@@ -45423,7 +45428,7 @@ define( 'PHET_CORE/main',[
   'PHET_CORE/platform',
   'PHET_CORE/Poolable'
 ], function( phetCore ) {
-  
+
   return phetCore;
 } );
 

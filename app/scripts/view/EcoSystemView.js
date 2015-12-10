@@ -33,6 +33,7 @@ function EcoSystemView(ecoSystemModel, options) {
         layoutBounds: new Bounds2(0, 0, 1024, 704)
     });
 
+
     var viewBoundsPath = new Path(Shape.bounds(this.layoutBounds), {
         pickable: false,
         stroke: 'red',
