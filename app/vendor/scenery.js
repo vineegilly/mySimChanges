@@ -33219,10 +33219,16 @@ define( 'SCENERY/display/Display',['require','PHET_CORE/inherit','PHET_CORE/exte
         pointFromEvent: function pointFromEvent( evt ) {
          // return Vector2.createFromPool( evt.clientX, evt.clientY );
 
-          var scrollTop     = $(window).scrollTop(),
-	      elementOffset = $('#'+window.simId).offset().top,
-          distanceY      = (elementOffset - scrollTop);
-          return Vector2.createFromPool( evt.clientX, evt.clientY-distanceY);
+
+          var scrollLeft = $(window).scrollLeft();
+          var scrollTop     = $(window).scrollTop();
+          var offset = $('#'+window.simId).offset();
+	      var elementOffsetX = offset.left;
+	      var elementOffsetY = offset.top;
+	      var distanceX      = (elementOffsetX - scrollLeft);
+          var distanceY      = (elementOffsetY - scrollTop);
+
+          return Vector2.createFromPool( evt.clientX-distanceX, evt.clientY-distanceY);
         }
       }, parameters ) );
     },
