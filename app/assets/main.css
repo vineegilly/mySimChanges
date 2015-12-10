@@ -4,3 +4,7 @@
   height: 480px;
   border: 1px solid black;
 }
+
+#main-scene{
+  position: relative;
+  }
