@@ -18,9 +18,7 @@ var SimLaunchAdapter = {
 
     launchByURL: function (url, sceneId, options) {
         options = _.extend({
-                screenWidth: 800,
-                screenHeight: 600,
-                offsetX: 100, offsetY: 200
+                tx: 0, ty: 0, scale: 1
             }, options
         );
         var self = this;
@@ -35,14 +33,14 @@ var SimLaunchAdapter = {
         };
 
         var createView = function (model) {
-            return new EcoSystemView(model,options);
+            return new EcoSystemView(model, options);
         };
 
         var energySimScreen = new SimScreen(energySimTitle, createModel, createView);
         var app = new SimApp(energySimTitle, energySimScreen, sceneId, options);
         //start rendering..
 
-     //   app.resize(options.screenWidth,options.screenHeight);
+       
         app.start();
     },
 
@@ -55,9 +53,7 @@ var SimLaunchAdapter = {
     launchUsingData: function (organismsInfo, sceneId, options) {
         var self = this;
         options = _.extend({
-                screenWidth: 800,
-                screenHeight: 600,
-                offsetX: 100, offsetY: 100
+                tx: 0, ty: 0, scale: 1
             }, options
         );
 

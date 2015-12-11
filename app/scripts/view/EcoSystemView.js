@@ -17,6 +17,8 @@ var HBox = scenery.HBox;
 var Path = scenery.Path;
 var Shape = kite.Shape;
 var Color = scenery.Color;
+var Node = scenery.Node;
+var Vector2 = dot.Vector2;
 var EcoSystemConstants = require('../model/EcoSystemConstants');
 
 
@@ -36,11 +38,14 @@ function EcoSystemView(ecoSystemModel, options) {
 
     var viewBoundsPath = new Path(Shape.bounds(this.layoutBounds), {
         pickable: false,
-        stroke: 'red',
-        lineWidth: 0,
-        fill: '#87cefa'
+        lineWidth: 0
+
     });
     thisView.addChild(viewBoundsPath);
+
+    var viewWrapper = new Node();
+
+    thisView.addChild(viewWrapper);
 
 
     thisView.gridPanelNode = new GridPanelNode(ecoSystemModel);
@@ -81,9 +86,9 @@ function EcoSystemView(ecoSystemModel, options) {
     var environmentControlsNode = new EnvironmentControlsNode(ecoSystemModel, thisView.populationChartNode);
 
 
-    thisView.addChild(organismPanelNode);
-    thisView.addChild(environmentControlsNode);
-    thisView.addChild(thisView.populationChartNode);
+    viewWrapper.addChild(organismPanelNode);
+    viewWrapper.addChild(environmentControlsNode);
+    viewWrapper.addChild(thisView.populationChartNode);
 
     organismPanelNode.x = thisView.gridPanelNode.bounds.left;
     environmentControlsNode.x = organismPanelNode.x + organismPanelNode.bounds.width + 20;
@@ -93,7 +98,12 @@ function EcoSystemView(ecoSystemModel, options) {
     environmentControlsNode.y = thisView.gridPanelNode.bounds.bottom + PANEL_VERTICAL_PADDING;
     thisView.populationChartNode.y = thisView.gridPanelNode.bounds.bottom + PANEL_VERTICAL_PADDING;
 
-    thisView.addChild(thisView.gridPanelNode);
+    viewWrapper.addChild(thisView.gridPanelNode);
+
+
+    viewWrapper.translate(options.tx || 0, options.ty || 0);
+    viewWrapper.scale(options.scale || 1);
+
 
     /*  playerPanel.x = thisView.gridPanelNode.bounds.centerX - playerPanel.bounds.width / 2;
      playerPanel.y = thisView.gridPanelNode.bounds.bottom - playerPanel.bounds.height; */
