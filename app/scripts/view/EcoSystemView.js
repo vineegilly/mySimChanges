@@ -101,8 +101,14 @@ function EcoSystemView(ecoSystemModel, options) {
     viewWrapper.addChild(thisView.gridPanelNode);
 
 
-    viewWrapper.translate(options.tx || 0, options.ty || 0);
-    viewWrapper.scale(options.scale || 1);
+    if (options.transformOrder === 1) {
+        viewWrapper.translate(options.tx || 0, options.ty || 0);
+        viewWrapper.scale(options.scale || 1);
+    }
+    else {
+        viewWrapper.scale(options.scale || 1);
+        viewWrapper.translate(options.tx || 0, options.ty || 0);
+    }
 
 
     /*  playerPanel.x = thisView.gridPanelNode.bounds.centerX - playerPanel.bounds.width / 2;

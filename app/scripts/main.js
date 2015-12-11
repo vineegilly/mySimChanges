@@ -18,7 +18,7 @@ var SimLaunchAdapter = {
 
     launchByURL: function (url, sceneId, options) {
         options = _.extend({
-                tx: 0, ty: 0, scale: 1
+                tx: 0, ty: 0, scale: 1,transformOrder:1
             }, options
         );
         var self = this;
@@ -40,7 +40,7 @@ var SimLaunchAdapter = {
         var app = new SimApp(energySimTitle, energySimScreen, sceneId, options);
         //start rendering..
 
-       
+
         app.start();
     },
 
@@ -53,7 +53,7 @@ var SimLaunchAdapter = {
     launchUsingData: function (organismsInfo, sceneId, options) {
         var self = this;
         options = _.extend({
-                tx: 0, ty: 0, scale: 1
+                tx: 0, ty: 0, scale: 1,transformOrder:1
             }, options
         );
 
