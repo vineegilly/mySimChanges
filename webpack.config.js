@@ -12,7 +12,7 @@ module.exports.getConfig = function( type ) {
       pathinfo: false
     },
     plugins:[
-    // new webpack.optimize.UglifyJsPlugin({ output: {comments: false} })
+     new webpack.optimize.UglifyJsPlugin({ output: {comments: false} })
 
     ],
 
