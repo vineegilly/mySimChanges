@@ -16,8 +16,8 @@ var MARGINS = {
     left: 50
 };
 
-var CHART_WIDTH = EcoSystemConstants.CHART_NODE_DIMENSION.width - 10;
-var CHART_HEIGHT = EcoSystemConstants.CHART_NODE_DIMENSION.height - 10;
+var CHART_WIDTH = EcoSystemConstants.CHART_NODE_DIMENSION.width;
+var CHART_HEIGHT = EcoSystemConstants.CHART_NODE_DIMENSION.height;
 
 
 function PopulationChartNode() {
@@ -29,9 +29,6 @@ function PopulationChartNode() {
     element.style.height = EcoSystemConstants.CHART_NODE_DIMENSION.height;
     var domContent = new DOM(element);
     var populationChartDiv = d3.select(element);
-
-    $(element).parent().width(CHART_WIDTH);
-    $(element).parent().height(CHART_HEIGHT);
 
     this.svgSelection = populationChartDiv.append("svg")
         .attr("width", CHART_WIDTH)
