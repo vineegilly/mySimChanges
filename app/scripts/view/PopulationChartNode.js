@@ -12,12 +12,12 @@ var POPULATION_CHART_ID = "populationChartDiv";
 var MARGINS = {
     top: 20,
     right: 20,
-    bottom: 30,
+    bottom: 20,
     left: 50
 };
 
-var CHART_WIDTH = EcoSystemConstants.CHART_NODE_DIMENSION.width - 10;
-var CHART_HEIGHT = EcoSystemConstants.CHART_NODE_DIMENSION.height - 10;
+var CHART_WIDTH = EcoSystemConstants.CHART_NODE_DIMENSION.width;
+var CHART_HEIGHT = EcoSystemConstants.CHART_NODE_DIMENSION.height;
 
 
 function PopulationChartNode() {
@@ -76,7 +76,7 @@ inherit(Node, PopulationChartNode, {
             .call(xAxis);
 
         svgSelection.append("svg:g")
-            .attr("transform", "translate(" + (MARGINS.left) + ",-10)")
+            .attr("transform", "translate(" + (MARGINS.left) + ",0)")
             .call(yAxis);
 
         this.organismLifeLine = d3.svg.line().interpolate("basis")
