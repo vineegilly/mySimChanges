@@ -37,7 +37,7 @@ function PopulationChartNode() {
 
         thisPanel.svgSelection = populationChartDiv.append("svg")
             .attr("width", CHART_WIDTH)
-            .attr("height", CHART_HEIGHT);
+            .attr("height", CHART_HEIGHT+20);
 
         thisPanel.buildChart();
 
@@ -176,4 +176,3 @@ inherit(Node, PopulationChartNode, {
 });
 
 module.exports = PopulationChartNode;
-
