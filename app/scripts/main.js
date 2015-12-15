@@ -53,7 +53,7 @@ var SimLaunchAdapter = {
     launchUsingData: function (organismsInfo, sceneId, options) {
         var self = this;
         options = _.extend({
-                tx: 0, ty: 0, scale: 1,transformOrder:1
+                tx: 0, ty: 0, scale: 0.8,transformOrder:1
             }, options
         );
 
@@ -64,7 +64,3 @@ var SimLaunchAdapter = {
 };
 
 window.EcoSystemLauncher = SimLaunchAdapter;
-
-
-
-
