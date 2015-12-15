@@ -18,12 +18,15 @@ var SimLaunchAdapter = {
 
     launchByURL: function (url, sceneId, options) {
         options = _.extend({
-                tx: 0, ty: 0, scale: 1,transformOrder:1
+                tx: 0, ty: 0, scale: 1, transformOrder: 1
             }, options
         );
         var self = this;
         SimLauncher.launch(function (organismsInfo) {
-            self.startApp(organismsInfo, sceneId, options);
+            setTimeout(function () {
+                self.startApp(organismsInfo, sceneId, options);
+            }, 1000);
+
         }, url);
     },
 
@@ -53,12 +56,14 @@ var SimLaunchAdapter = {
     launchUsingData: function (organismsInfo, sceneId, options) {
         var self = this;
         options = _.extend({
-                tx: 0, ty: 0, scale: 0.8,transformOrder:1
+                tx: 0, ty: 0, scale: 0.8, transformOrder: 1
             }, options
         );
 
+        setTimeout(function () {
+            self.startApp(organismsInfo, sceneId, options);
+        }, 1000);
 
-        self.startApp(organismsInfo, sceneId, options);
     }
 
 };

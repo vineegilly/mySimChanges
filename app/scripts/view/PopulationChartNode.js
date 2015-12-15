@@ -45,8 +45,9 @@ function PopulationChartNode() {
         thisPanel.prevCollectionCount = 0;
     }
 
+    deferedInitialization();
 
-    setTimeout(deferedInitialization, 2000);
+
 
 
 }
