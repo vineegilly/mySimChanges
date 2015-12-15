@@ -12,6 +12,7 @@ var SimApp = require('./core/SimApp');
 var SimScreen = require('./core/Screen');
 var EcoSystemModel = require('./model/EcoSystemModel');
 var EcoSystemView = require('./view/EcoSystemView');
+var OrganismImageCollection = require('./model/organisms/OrganismImageCollection');
 var energySimTitle = "EcoSystem Simulation";
 
 var SimLaunchAdapter = {
@@ -24,6 +25,7 @@ var SimLaunchAdapter = {
         var self = this;
         SimLauncher.launch(function (organismsInfo) {
             setTimeout(function () {
+                OrganismImageCollection.loadImages();
                 self.startApp(organismsInfo, sceneId, options);
             }, 1000);
 
@@ -61,6 +63,7 @@ var SimLaunchAdapter = {
         );
 
         setTimeout(function () {
+            OrganismImageCollection.loadImages();
             self.startApp(organismsInfo, sceneId, options);
         }, 1000);
 
