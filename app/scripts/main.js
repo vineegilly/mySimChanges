@@ -57,6 +57,7 @@ var SimLaunchAdapter = {
             }, options
         );
 
+
         self.startApp(organismsInfo, sceneId, options);
     }
 

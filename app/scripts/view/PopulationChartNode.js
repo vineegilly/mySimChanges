@@ -22,24 +22,32 @@ var CHART_HEIGHT = EcoSystemConstants.CHART_NODE_DIMENSION.height;
 
 function PopulationChartNode() {
     var thisPanel = this;
-    var element = document.createElement('div');
-    $(element).attr('id', POPULATION_CHART_ID);
-
-    element.style.width = EcoSystemConstants.CHART_NODE_DIMENSION.width;
-    element.style.height = EcoSystemConstants.CHART_NODE_DIMENSION.height;
-    var domContent = new DOM(element);
-    var populationChartDiv = d3.select(element);
-
-    this.svgSelection = populationChartDiv.append("svg")
-        .attr("width", CHART_WIDTH)
-        .attr("height", CHART_HEIGHT);
-
-    this.buildChart();
-
     // vertical panel
     Node.call(thisPanel);
-    thisPanel.addChild(domContent);
-    this.prevCollectionCount = 0;
+
+    function deferedInitialization() {
+
+        var element = document.createElement('div');
+        $(element).attr('id', POPULATION_CHART_ID);
+
+        element.style.width = EcoSystemConstants.CHART_NODE_DIMENSION.width;
+        element.style.height = EcoSystemConstants.CHART_NODE_DIMENSION.height;
+        var domContent = new DOM(element);
+        var populationChartDiv = d3.select(element);
+
+        thisPanel.svgSelection = populationChartDiv.append("svg")
+            .attr("width", CHART_WIDTH)
+            .attr("height", CHART_HEIGHT);
+
+        thisPanel.buildChart();
+
+        thisPanel.addChild(domContent);
+        thisPanel.prevCollectionCount = 0;
+    }
+
+
+    setTimeout(deferedInitialization, 2000);
+
 
 }
 
@@ -162,7 +170,6 @@ inherit(Node, PopulationChartNode, {
     clearChart: function () {
         this.svgSelection.selectAll(".line").remove();
     }
-
 
 
 });
