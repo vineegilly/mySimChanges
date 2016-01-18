@@ -24,7 +24,7 @@ var EcoSystemConstants = {
     IMAGE_SCALE: IMAGE_SCALE,
     GRID_NODE_DIMENSION: new Dimension2( 930, 320 ),
     CHART_NODE_DIMENSION: new Dimension2( 350, 260 ),
-    ORGANISM_PANEL_DIMENSION: new Dimension2( 300, 260 ),
+    ORGANISM_PANEL_DIMENSION: new Dimension2( 300, 200 ),
     PARTICLE_COLOR: new Color( 255, 0, 0 ),
     SPRAY_COLOR: new Color( 200, 200, 0 ),
     MAX_ORGANISMS: 20,

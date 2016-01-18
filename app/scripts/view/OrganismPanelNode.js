@@ -7,23 +7,35 @@ var Node = scenery.Node;
 var VBox = scenery.VBox;
 var OrganismModelFactory = require( '../model/organisms/OrganismModelFactory' );
 var OrganismCreatorNode = require( './OrganismCreatorNode' );
+var SimFont = require( '../core/SimFont' );
+var CheckBox = require( '../controls/CheckBox' );
+var HSlider = require( '../controls/HSlider' );
+var Text = scenery.Text;
+var HBox = scenery.HBox;
+var PlayerBox = require( './PlayerBox' );
 
 var GridLayout = require( '../util/GridLayout' );
 
 // constants
-
-var TITLE_SIZE = new Dimension2( 305, 30 );
 var ORGANISMS_STR = "Organisms";
+var CHECK_BOX_OPTIONS = { boxWidth: 30 };
+var CONTROL_TEXT_OPTIONS = { font: new SimFont( 15 ) };
+var POPULATION_TEXT_OPTIONS = { font: new SimFont( 25 ) };
+var POPULATION_RANGE_STR = "Population Range";
+var RAIN_STR = "Rain";
+var PESTICIDE_STR = "PESTICIDE";
+var TITLE_SIZE = new Dimension2( 200, 30 );
 
 
 /**
  *
  * @param {EcoSystemModel} ecoSystemModel
  * @param {GridPanelNode} gridPaneNode
+ * @param {PopulationChartNode} populationChartNode
  * @param {Bounds2} motionBounds
  * @constructor
  */
-function OrganismPanelNode( ecoSystemModel, gridPaneNode, motionBounds ) {
+function OrganismPanelNode( ecoSystemModel, gridPaneNode, populationChartNode,motionBounds ) {
   var thisPanel = this;
 
   var creatorCallBack = function( organismInfo, pos ) {
@@ -76,14 +88,55 @@ function OrganismPanelNode( ecoSystemModel, gridPaneNode, motionBounds ) {
   }
 
   var titleBarNode = new TitleBarNode( TITLE_SIZE, ORGANISMS_STR );
-  var titleBox = new VBox( {
-    align: 'center',
-    children: [ titleBarNode, appearanceLayerNode ],
-    spacing: 5
+
+
+  var rainProperty = ecoSystemModel.rainProperty;
+  var populationRangeProperty = ecoSystemModel.populationRangeProperty;
+  var populationRangeSlider = new HSlider( populationRangeProperty, { min: 1, max: 5 } );
+
+  var populationRangeIndicator = new Text( populationRangeProperty.get(), POPULATION_TEXT_OPTIONS );
+  var populationSliderBox = new HBox( {
+    spacing: 15,
+    children: [ populationRangeSlider, populationRangeIndicator ],
+    resize: false
+  } );
+
+  populationRangeProperty.link( function( populationRangeValue ) {
+    populationRangeIndicator.text = Number( populationRangeValue ) | 0;
+  } );
+
+
+  var checkBoxes = [];
+  var rainCheckBoxControl = new CheckBox( new Text( RAIN_STR, CONTROL_TEXT_OPTIONS ),
+      rainProperty, CHECK_BOX_OPTIONS );
+  /* var pesticideBoxControl = new CheckBox( new Text( PESTICIDE_STR, CONTROL_TEXT_OPTIONS ),
+   pesticideSprayProperty, CHECK_BOX_OPTIONS );*/
+  checkBoxes.push( rainCheckBoxControl );
+//  checkBoxes.push( pesticideBoxControl );
+  var checkBoxControlBox = new HBox( {
+    children: checkBoxes,
+    spacing: 20
+  } );
+
+  ecoSystemModel.playPauseProperty.link( function( playPause ) {
+    populationRangeSlider.enabled = !playPause;
+
+  } );
+
+  var playerBox = new PlayerBox( ecoSystemModel.playPauseProperty, function() {
+    populationChartNode.clearChart();
+    ecoSystemModel.onClearPlay();
+    populationRangeProperty.set( 1 );
+  } );
+
+  var panelContents = new VBox( {
+    children: [ titleBarNode,appearanceLayerNode,populationSliderBox,checkBoxControlBox, playerBox ],
+    spacing: 18,
+    resize: false
   } );
 
   // vertical panel
-  Panel.call( thisPanel, titleBox, {
+  Panel.call( thisPanel, panelContents, {
     // panel options
     fill: EcoSystemConstants.GRID_BACKGROUND_COLOR,
     resize: false,

@@ -10,7 +10,6 @@ var BaseScreenView = require('../core/BaseScreenView');
 var GridPanelNode = require('./GridPanelNode');
 var OrganismNode = require('./OrganismNode');
 var OrganismPanelNode = require('./OrganismPanelNode');
-var EnvironmentControlsNode = require('./EnvironmentControlsNode');
 var PopulationChartNode = require('./PopulationChartNode');
 var Text = scenery.Text;
 var HBox = scenery.HBox;
@@ -82,20 +81,14 @@ function EcoSystemView(ecoSystemModel, options) {
 
     // Observe new items
     ecoSystemModel.residentOrganismModels.addItemAddedListener(handleOrganismAdded);
-    var organismPanelNode = new OrganismPanelNode(ecoSystemModel, thisView.gridPanelNode, motionBounds);
-    var environmentControlsNode = new EnvironmentControlsNode(ecoSystemModel, thisView.populationChartNode);
-
-
+    var organismPanelNode = new OrganismPanelNode(ecoSystemModel, thisView.gridPanelNode, thisView.populationChartNode, motionBounds);
     viewWrapper.addChild(organismPanelNode);
-    viewWrapper.addChild(environmentControlsNode);
     viewWrapper.addChild(thisView.populationChartNode);
 
     organismPanelNode.x = thisView.gridPanelNode.bounds.left;
-    environmentControlsNode.x = organismPanelNode.x + organismPanelNode.bounds.width + 20;
-    thisView.populationChartNode.x = environmentControlsNode.x + environmentControlsNode.bounds.width + 20;
+    thisView.populationChartNode.x = organismPanelNode.x + organismPanelNode.bounds.width + 20;
 
     organismPanelNode.y = thisView.gridPanelNode.bounds.bottom + PANEL_VERTICAL_PADDING;
-    environmentControlsNode.y = thisView.gridPanelNode.bounds.bottom + PANEL_VERTICAL_PADDING;
     thisView.populationChartNode.y = thisView.gridPanelNode.bounds.bottom + PANEL_VERTICAL_PADDING;
 
     viewWrapper.addChild(thisView.gridPanelNode);
@@ -110,9 +103,6 @@ function EcoSystemView(ecoSystemModel, options) {
         viewWrapper.translate(options.tx || 0, options.ty || 0);
     }
 
-
-    /*  playerPanel.x = thisView.gridPanelNode.bounds.centerX - playerPanel.bounds.width / 2;
-     playerPanel.y = thisView.gridPanelNode.bounds.bottom - playerPanel.bounds.height; */
 
 }
 
