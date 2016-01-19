@@ -34,9 +34,10 @@ inherit( Object, OrganismModelFactory, {},
   {
     /**
      *
-     * @param {string} type
-     * @param {Image} organismInfo
-     * @param {Vector2} pos
+     * @param ecoSystemModel
+     * @param organismInfo
+     * @param pos
+     * @param bounds
      * @returns {*}
      */
     getOrganism: function( ecoSystemModel, organismInfo, pos, bounds ) {
