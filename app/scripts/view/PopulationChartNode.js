@@ -13,7 +13,7 @@ var MARGINS = {
     top: 20,
     right: 20,
     bottom: 20,
-    left: 50
+    left: 35
 };
 
 var CHART_WIDTH = EcoSystemConstants.CHART_NODE_DIMENSION.width;
@@ -37,7 +37,7 @@ function PopulationChartNode() {
 
         thisPanel.svgSelection = populationChartDiv.append("svg")
             .attr("width", CHART_WIDTH)
-            .attr("height", CHART_HEIGHT+20);
+            .attr("height", CHART_HEIGHT + 40);
 
         thisPanel.buildChart();
 
@@ -46,8 +46,6 @@ function PopulationChartNode() {
     }
 
     deferedInitialization();
-
-
 
 
 }
@@ -78,7 +76,7 @@ inherit(Node, PopulationChartNode, {
         var yAxis = d3.svg.axis()
             .scale(this.yScale)
             .orient("left")
-            .ticks(5);
+            .ticks(EcoSystemConstants.MAX_ORGANISMS);
 
         svgSelection.append("svg:g")
             .attr("transform", "translate(-5," + (CHART_HEIGHT - MARGINS.bottom) + ")")
@@ -98,7 +96,7 @@ inherit(Node, PopulationChartNode, {
 
         this.legend = svgSelection.append("g")
             .attr("class", "legend")
-            .attr("transform", "translate(250,30)")
+            .attr("transform", "translate(250,20)")
             .style("font-size", "12px")
             .style("font-size", "20px")
             .attr("data-style-padding", 10);

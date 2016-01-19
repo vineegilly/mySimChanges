@@ -24,7 +24,7 @@ var POPULATION_TEXT_OPTIONS = {font: new SimFont(25)};
 var POPULATION_RANGE_STR = "Population Range";
 var RAIN_STR = "Rain";
 var PESTICIDE_STR = "PESTICIDE";
-var TITLE_SIZE = new Dimension2(200, 30);
+var TITLE_SIZE = new Dimension2(EcoSystemConstants.ORGANISM_PANEL_DIMENSION.width, 30);
 
 
 /**
@@ -129,8 +129,10 @@ function OrganismPanelNode(ecoSystemModel, gridPaneNode, populationChartNode, mo
     });
 
 
+    // populationSliderBox, checkBoxControlBox,
+
     var panelContents = new VBox({
-        children: [titleBarNode, appearanceLayerNode, populationSliderBox, checkBoxControlBox, playerBox],
+        children: [titleBarNode, appearanceLayerNode,  playerBox],
         spacing: 18,
         resize: false
     });

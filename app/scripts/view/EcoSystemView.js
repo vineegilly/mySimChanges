@@ -24,6 +24,7 @@ var EcoSystemConstants = require('../model/EcoSystemConstants');
 // private constants
 var GRID_PANEL_OFFSET_X = 50;
 var GRID_PANEL_OFFSET_Y = 70;
+var CHART_PANEL_TOP_OFFSET = 20;
 var PANEL_VERTICAL_PADDING = 25;
 
 
@@ -81,17 +82,18 @@ function EcoSystemView(ecoSystemModel, options) {
 
     // Observe new items
     ecoSystemModel.residentOrganismModels.addItemAddedListener(handleOrganismAdded);
-    var organismPanelNode = new OrganismPanelNode(ecoSystemModel, thisView.gridPanelNode, thisView.populationChartNode,motionBounds);
+    var organismPanelNode = new OrganismPanelNode(ecoSystemModel, thisView.gridPanelNode, thisView.populationChartNode, motionBounds);
 
 
     viewWrapper.addChild(organismPanelNode);
-     viewWrapper.addChild(thisView.populationChartNode);
+    viewWrapper.addChild(thisView.populationChartNode);
 
     organismPanelNode.x = thisView.gridPanelNode.bounds.left;
-    thisView.populationChartNode.x = organismPanelNode.x + organismPanelNode.bounds.width + 20;
+    thisView.populationChartNode.x = organismPanelNode.x + organismPanelNode.bounds.width + 5;
 
     organismPanelNode.y = thisView.gridPanelNode.bounds.bottom + PANEL_VERTICAL_PADDING;
-    thisView.populationChartNode.y = thisView.gridPanelNode.bounds.bottom + PANEL_VERTICAL_PADDING;
+    thisView.populationChartNode.y = thisView.gridPanelNode.y + CHART_PANEL_TOP_OFFSET;
+    //;thisView.gridPanelNode.bounds.bottom + PANEL_VERTICAL_PADDING;
 
     viewWrapper.addChild(thisView.gridPanelNode);
 
