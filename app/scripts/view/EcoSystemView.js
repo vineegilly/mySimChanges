@@ -120,12 +120,20 @@ inherit(BaseScreenView, EcoSystemView, {
      */
     step: function (dt) {
         var thisView = this;
+        if (thisView.model.replayMode) {
+            thisView.populationChartNode.updateChart(thisView.model.organismLifeLineSnapShots);
+            return;
+        }
+
         thisView.gridPanelNode.step(dt);
         if (thisView.model.isPlaying()) {
             thisView.populationChartNode.updateChart(thisView.model.organismLifeLineSnapShots);
         }
+    },
 
-
+    replay: function (prevReplayState) {
+        var thisView = this;
+        thisView.model.replay(prevReplayState);
     }
 });
 
