@@ -15,6 +15,9 @@ var EcoSystemView = require('./view/EcoSystemView');
 var OrganismImageCollection = require('./model/organisms/OrganismImageCollection');
 var energySimTitle = "EcoSystem Simulation";
 
+var SECS_DEFERED = 1000;
+var ecoSystemView = null;
+
 var SimLaunchAdapter = {
 
     launchByURL: function (url, sceneId, options) {
@@ -27,7 +30,7 @@ var SimLaunchAdapter = {
             setTimeout(function () {
                 OrganismImageCollection.loadImages();
                 self.startApp(organismsInfo, sceneId, options);
-            }, 1000);
+            }, SECS_DEFERED);
 
         }, url);
     },
@@ -38,7 +41,8 @@ var SimLaunchAdapter = {
         };
 
         var createView = function (model) {
-            return new EcoSystemView(model, options);
+            ecoSystemView = new EcoSystemView(model, options); // store it globally
+            return ecoSystemView;
         };
 
         var energySimScreen = new SimScreen(energySimTitle, createModel, createView);
@@ -65,8 +69,17 @@ var SimLaunchAdapter = {
         setTimeout(function () {
             OrganismImageCollection.loadImages();
             self.startApp(organismsInfo, sceneId, options);
-        }, 1000);
+        }, SECS_DEFERED);
 
+    },
+
+    getReplayData: function () {
+        return JSON.stringify(ecoSystemView.getReplayData());
+    },
+
+    replay: function (prevStateJSON) {
+        var prevPlayState = JSON.parse(prevStateJSON);
+        ecoSystemView.replay(prevStateJSON);
     }
 
 };
