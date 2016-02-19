@@ -1,71 +1,38 @@
 var inherit = axon.inherit;
 var Node = scenery.Node;
-var SimpleDragHandler = scenery.SimpleDragHandler;
-var OrganismImageCollection = require( '../model/organisms/OrganismImageCollection' );
-var EcoSystemConstants = require( '../model/EcoSystemConstants' );
+var OrganismImageCollection = require('../model/organisms/OrganismImageCollection');
+var EcoSystemConstants = require('../model/EcoSystemConstants');
+var QuantitySelectionBox = require('./QuantitySelectionBox');
+var VBox = scenery.VBox;
 
 /**
- *@param {OrganismInfo} organismInfo
- * @param {GridNode} gridNode
- * @param organismCreator
- * @param {Function} canPlaceShape - A function to determine if the Organism can be placed on the board
+ *
+ * @param organismModel
  * @constructor
  */
-function OrganismCreatorNode( organismInfo, gridNode, organismCreator, canPlaceShape ) {
-  var thisNode = this;
-  Node.call( thisNode, { cursor: 'pointer' } );
-  var appearanceImage = OrganismImageCollection.getRepresentation( organismInfo.name );
-  var appearanceNode = new scenery.Image( appearanceImage );
-  appearanceNode.scale( EcoSystemConstants.IMAGE_SCALE );
-  thisNode.appearanceNode = appearanceNode;
-  thisNode.organism = null;
-  thisNode.mouseArea = appearanceNode.bounds;
-  thisNode.touchArea = appearanceNode.bounds;
+function OrganismCreatorNode(organismModel, ecosystemModel) {
+    var thisNode = this;
+    Node.call(thisNode, {cursor: 'pointer'});
+    var appearanceImage = OrganismImageCollection.getRepresentation(organismModel.name);
+    var appearanceNode = new scenery.Image(appearanceImage);
+    appearanceNode.scale(EcoSystemConstants.IMAGE_SCALE);
 
-  thisNode.addInputListener( new SimpleDragHandler( {
+    var quantityProperty = ecosystemModel[organismModel.name.toLowerCase() + "Quantity"];
+    var quantitySelectionBox = new QuantitySelectionBox(quantityProperty);
+    var organismWithQuantity = new VBox({
+        children: [appearanceNode, quantitySelectionBox],
+        spacing: 12,
+        resize: false
+    });
 
-    allowTouchSnag: true,
-    start: function( event ) {
-      // Determine the initial position of the new element as a function of the event position and this node's bounds.
-      var centerGlobal = thisNode.parentToGlobalPoint( thisNode.center );
-      var initialPositionOffset = centerGlobal.minus( event.pointer.point );
-      var initialPosition = gridNode.getRefPoint( event.pointer.point.plus( initialPositionOffset ) );
-      thisNode.organism = organismCreator( organismInfo, initialPosition );
-      thisNode.organism.userControlled = true;
-    },
 
-    translate: function( translationParams ) {
-      thisNode.organism.setPosition( thisNode.organism.getPosition().plus( translationParams.delta ) );
-    },
-
-    end: function( event ) {
-      var droppedPoint = event.pointer.point;
-      thisNode.organism.userControlled = false;
-      //check if the user has dropped the number within the panel itself, if "yes" return to origin
-      if ( !canPlaceShape( thisNode.organism, droppedPoint ) ) {
-        thisNode.organism.returnToOrigin( true );
-      }
-
-      thisNode.organism = null;
-    }
-
-  } ) );
-
-  // Add the main node with which the user will interact.
-  thisNode.addChild( appearanceNode );
+    // Add the main node with which the user will interact.
+    thisNode.addChild(organismWithQuantity);
 
 }
 
 
-inherit( Node, OrganismCreatorNode, {
-
-  getModelPosition: function( point ) {
-    var canvasPosition = this.canvas.globalToLocalPoint( point );
-    return canvasPosition;
-  }
-
-
-} );
+inherit(Node, OrganismCreatorNode);
 
 
 module.exports = OrganismCreatorNode;

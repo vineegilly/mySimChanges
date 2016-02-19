@@ -7,11 +7,14 @@
 // modules
 var inherit = axon.inherit;
 var PropertySet = axon.PropertySet;
+var Property = axon.Property;
 var ObservableArray = axon.ObservableArray;
 var OverlapRulesFactory = require('../model/organisms/OverlapRulesFactory');
 var EcoSystemConstants = require('./EcoSystemConstants');
 var OrganismModelFactory = require('../model/organisms/OrganismModelFactory');
 var OrganismLifeLineSnapShot = require('../model/organisms/OrganismLifeLineSnapShot');
+var Bounds2 = dot.Bounds2;
+var Vector2 = dot.Vector2;
 
 /**
  *
@@ -31,6 +34,12 @@ function EcoSystemModel(organismInfos, screenBounds) {
     });
 
     this.organismInfos = organismInfos;
+
+
+    organismInfos.forEach(function (organismInfo) {
+        thisModel[organismInfo.name.toLowerCase() + "Quantity"] = new Property(2);
+    });
+
 
     this.screenBounds = screenBounds;
 
@@ -71,25 +80,6 @@ function EcoSystemModel(organismInfos, screenBounds) {
         if (poisonSpray) {
             thisModel.onPoisonSpray();
         }
-    });
-
-
-    var refPopulationRange = this.populationRange;
-    this.populationRangeProperty.lazyLink(function (newPopulationRange) {
-        newPopulationRange = newPopulationRange | 0;
-
-        if (refPopulationRange === newPopulationRange) {
-            return;
-        }
-
-        // assigning to populationRange property fires  eventListenr,so keeping a local varibale
-        refPopulationRange = newPopulationRange;
-
-        var existingModels = thisModel.residentOrganismModels.getArray();
-
-        existingModels.forEach(function (organismModel) {
-            organismModel.multiply(newPopulationRange);
-        });
     });
 
 
@@ -270,6 +260,23 @@ inherit(PropertySet, EcoSystemModel, {
     play: function () {
         var self = this;
         this.resetPlayState();
+        var gridSize = EcoSystemConstants.GRID_NODE_DIMENSION;
+        var motionBounds = Bounds2.rect(EcoSystemConstants.ORGANISM_RADIUS, EcoSystemConstants.ORGANISM_RADIUS,
+            gridSize.width - EcoSystemConstants.ORGANISM_RADIUS * 3,
+            gridSize.height - EcoSystemConstants.ORGANISM_RADIUS * 2);
+
+        var organismInfos = this.organismInfos;
+        organismInfos.forEach(function (organismInfo) {
+            var randomPosX = _.random(motionBounds.minX, motionBounds.maxX);
+            var randomPosY = _.random(motionBounds.minY, motionBounds.maxY);
+            var newPos = motionBounds.closestPointTo(new Vector2(randomPosX, randomPosY));
+            var organismModel = OrganismModelFactory.getOrganism(self, organismInfo, newPos, motionBounds);
+            self.residentOrganismModels.add(organismModel);
+            var quantity = self[organismInfo.name.toLowerCase() + "Quantity"].get();
+            organismModel.multiply(quantity);
+        });
+
+
         this.residentOrganismModels.forEach(function (organismModel) {
             organismModel.play();
 

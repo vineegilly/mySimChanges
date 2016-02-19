@@ -9,10 +9,10 @@ var OrganismModelFactory = require('../model/organisms/OrganismModelFactory');
 var OrganismCreatorNode = require('./OrganismCreatorNode');
 var SimFont = require('../core/SimFont');
 var CheckBox = require('../controls/CheckBox');
-var HSlider = require('../controls/HSlider');
 var Text = scenery.Text;
 var HBox = scenery.HBox;
 var PlayerBox = require('./PlayerBox');
+var Vector2 = dot.Vector2;
 
 var GridLayout = require('../util/GridLayout');
 
@@ -40,7 +40,6 @@ function OrganismPanelNode(ecoSystemModel, gridPaneNode, populationChartNode, mo
 
     var creatorCallBack = function (organismInfo, pos) {
         var organismModel = OrganismModelFactory.getOrganism(ecoSystemModel, organismInfo, pos, motionBounds);
-        ecoSystemModel.addOrganism(organismModel);
         return organismModel;
     };
 
@@ -53,12 +52,12 @@ function OrganismPanelNode(ecoSystemModel, gridPaneNode, populationChartNode, mo
 
     var organismInfos = ecoSystemModel.organismInfos;
 
-    var organismsCreators = [];
+    var organismNodes = [];
 
     organismInfos.forEach(function (organismInfo) {
-        var organismCreatorNode = new OrganismCreatorNode(organismInfo, gridPaneNode,
-            creatorCallBack, canPlaceShapeCallBack);
-        organismsCreators.push(organismCreatorNode);
+        var organismModel = creatorCallBack(organismInfo, new Vector2(0, 0));
+        var organismCreatorNode = new OrganismCreatorNode(organismModel, ecoSystemModel);
+        organismNodes.push(organismCreatorNode);
     });
 
 
@@ -72,16 +71,16 @@ function OrganismPanelNode(ecoSystemModel, gridPaneNode, populationChartNode, mo
     var gridLayout = GridLayout();
     gridLayout
         .size([EcoSystemConstants.ORGANISM_PANEL_DIMENSION.width,
-            EcoSystemConstants.ORGANISM_PANEL_DIMENSION.height])
+            EcoSystemConstants.ORGANISM_PANEL_DIMENSION.height + 30])
         .bands()
-        .padding([0.05, 0.05]);
+        .padding([0.02, 0.2]);
 
     gridLayout(rectElements);
 
 
     for (var i = 0; i < rectElements.length; i++) {
         var rectElement = rectElements[i];
-        var creatorNode = organismsCreators[i];
+        var creatorNode = organismNodes[i];
         creatorNode.x = rectElement.x;
         creatorNode.y = rectElement.y;
         appearanceLayerNode.addChild(creatorNode);
@@ -89,19 +88,6 @@ function OrganismPanelNode(ecoSystemModel, gridPaneNode, populationChartNode, mo
 
     var titleBarNode = new TitleBarNode(TITLE_SIZE, ORGANISMS_STR);
     var rainProperty = ecoSystemModel.rainProperty;
-    var populationRangeProperty = ecoSystemModel.populationRangeProperty;
-    var populationRangeSlider = new HSlider(populationRangeProperty, {min: 1, max: 5});
-
-    var populationRangeIndicator = new Text(populationRangeProperty.get(), POPULATION_TEXT_OPTIONS);
-    var populationSliderBox = new HBox({
-        spacing: 15,
-        children: [populationRangeSlider, populationRangeIndicator],
-        resize: false
-    });
-
-    populationRangeProperty.link(function (populationRangeValue) {
-        populationRangeIndicator.text = Number(populationRangeValue) | 0;
-    });
 
 
     var checkBoxes = [];
@@ -116,23 +102,15 @@ function OrganismPanelNode(ecoSystemModel, gridPaneNode, populationChartNode, mo
         spacing: 20
     });
 
-    ecoSystemModel.playPauseProperty.link(function (playPause) {
-        populationRangeSlider.enabled = !playPause;
-
-    });
-
 
     var playerBox = new PlayerBox(ecoSystemModel.playPauseProperty, function () {
         populationChartNode.clearChart();
         ecoSystemModel.onClearPlay();
-        populationRangeProperty.set(1);
+
     });
 
-
-    // populationSliderBox, checkBoxControlBox,
-
     var panelContents = new VBox({
-        children: [titleBarNode, appearanceLayerNode,  playerBox],
+        children: [titleBarNode, appearanceLayerNode, playerBox],
         spacing: 18,
         resize: false
     });

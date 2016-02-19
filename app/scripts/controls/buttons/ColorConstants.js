@@ -13,14 +13,18 @@ var Color = scenery.Color;
 function ColorConstants() {
 }
 
-inherit( Object, ColorConstants, {}, {
+inherit(Object, ColorConstants, {}, {
 
-  //The default blue color used in many places, for buttons
-  LIGHT_BLUE: new Color( 153, 206, 255 ),
+    //The default blue color used in many places, for buttons
+    LIGHT_BLUE: new Color(153, 206, 255),
 
-  //Light gray, used as the 'disabled' color in many places.
-  LIGHT_GRAY: new Color( 220, 220, 220 )
-} );
+    GREEN: new Color(255, 200, 0),
+
+    YELLOW: new Color(255, 255, 0),
+
+    //Light gray, used as the 'disabled' color in many places.
+    LIGHT_GRAY: new Color(220, 220, 220)
+});
 
 
 module.exports = ColorConstants;

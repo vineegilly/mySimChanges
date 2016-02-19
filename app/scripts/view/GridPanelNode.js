@@ -22,7 +22,8 @@ function GridPanelNode( ecoSystemModel ) {
   thisPanelNode.gridNode = new GridNode( EcoSystemConstants.GRID_NODE_DIMENSION );
   panelContentsNode.addChild( thisPanelNode.gridNode );
 
-  var particleBounds = Bounds2.rect( 0, 0, EcoSystemConstants.GRID_NODE_DIMENSION.width, EcoSystemConstants.GRID_NODE_DIMENSION.height );
+  var particleBounds = Bounds2.rect( 0, 0, EcoSystemConstants.GRID_NODE_DIMENSION.width,
+      EcoSystemConstants.GRID_NODE_DIMENSION.height );
   thisPanelNode.ecoSystemEffectNode = new EcoSystemEffectNode( ecoSystemModel, particleBounds );
   panelContentsNode.addChild( thisPanelNode.ecoSystemEffectNode );
 

@@ -87,7 +87,6 @@ function EcoSystemView(ecoSystemModel, options) {
     ecoSystemModel.residentOrganismModels.addItemAddedListener(handleOrganismAdded);
     var organismPanelNode = new OrganismPanelNode(ecoSystemModel, thisView.gridPanelNode, thisView.populationChartNode, motionBounds);
 
-
     viewWrapper.addChild(organismPanelNode);
     viewWrapper.addChild(thisView.populationChartNode);
 
@@ -96,7 +95,6 @@ function EcoSystemView(ecoSystemModel, options) {
 
     organismPanelNode.y = thisView.gridPanelNode.bounds.bottom + PANEL_VERTICAL_PADDING;
     thisView.populationChartNode.y = thisView.gridPanelNode.y + CHART_PANEL_TOP_OFFSET;
-    //;thisView.gridPanelNode.bounds.bottom + PANEL_VERTICAL_PADDING;
 
     viewWrapper.addChild(thisView.gridPanelNode);
 
