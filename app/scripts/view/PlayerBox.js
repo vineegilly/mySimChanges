@@ -2,6 +2,7 @@ var inherit = axon.inherit;
 var Dimension2 = dot.Dimension2;
 var SimFont = require('../core/SimFont');
 var Text = scenery.Text;
+var CheckBox = require('../controls/CheckBox');
 var EcoSystemConstants = require('../model/EcoSystemConstants');
 var BooleanRectangularToggleButton = require('../controls/buttons/BooleanRectangularToggleButton');
 var RectangularButtonView = require('../controls/buttons/RectangularButtonView');
@@ -9,6 +10,9 @@ var RectangularPushButton = require('../controls/buttons/RectangularPushButton')
 var Color = scenery.Color;
 var HBox = scenery.HBox;
 var Property = axon.Property;
+var RAIN_STR = "Rain";
+var CHECK_BOX_OPTIONS = {boxWidth: 30};
+var CONTROL_TEXT_OPTIONS = {font: new SimFont(15)};
 
 var BUTTON_TEXT_OPTIONS = {font: new SimFont(22)};
 
@@ -24,7 +28,7 @@ var CLEAR_STR = "Clear";
  * @param onClearPlay
  * @constructor
  */
-function PlayerBox(playPauseProperty, onClearPlay) {
+function PlayerBox(playPauseProperty,rainProperty, onClearPlay) {
     var thisBox = this;
 
     var playTextNode = new Text(PLAY_STR, BUTTON_TEXT_OPTIONS);
@@ -55,8 +59,20 @@ function PlayerBox(playPauseProperty, onClearPlay) {
         }
     };
 
+
+
+    var checkBoxes = [];
+    var rainCheckBoxControl = new CheckBox(new Text(RAIN_STR, CONTROL_TEXT_OPTIONS),
+        rainProperty, CHECK_BOX_OPTIONS);
+     checkBoxes.push(rainCheckBoxControl);
+   var checkBoxControlBox = new HBox({
+        children: checkBoxes,
+        spacing: 20
+    });
+
     var clearButton = new RectangularPushButton(options);
 
+    playerItems.push(checkBoxControlBox);
     playerItems.push(playPauseButton);
     playerItems.push(clearButton);
 
