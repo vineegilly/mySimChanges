@@ -2,7 +2,7 @@
  * Model common for Grass,Flower and Tree
  */
 var inherit = axon.inherit;
-var BaseOrganismModel = require( '../BaseOrganismModel' );
+var BaseOrganismModel = require('../BaseOrganismModel');
 
 /**
  * @param {EcoSystemModel} ecoSystemModel
@@ -11,27 +11,27 @@ var BaseOrganismModel = require( '../BaseOrganismModel' );
  * @param {Bounds2} bounds
  * @constructor
  */
-function BaseCarnivoresModel( ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction ) {
-  BaseOrganismModel.call( this, ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction );
+function BaseCarnivoresModel(ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction) {
+    BaseOrganismModel.call(this, ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction);
 
 }
 
-inherit( BaseOrganismModel, BaseCarnivoresModel, {
+inherit(BaseOrganismModel, BaseCarnivoresModel, {
 
-  /**
-   * @override
-   * @param dt
-   */
-  doStep: function( dt ) {
+    /**
+     * @override
+     * @param dt
+     */
+    doStep: function (dt) {
 
-  },
-
-
-  initState: function() {
-    this.goToRest();
-  }
+    },
 
 
-} );
+    initState: function () {
+        this.goToRest();
+    }
+
+
+});
 
 module.exports = BaseCarnivoresModel;

@@ -1,5 +1,5 @@
 var inherit = axon.inherit;
-var BaseOmnivoresModel = require( './BaseOmnivoresModel' );
+var BaseOmnivoresModel = require('./BaseOmnivoresModel');
 
 /**
  * @param {EcoSystemModel} ecoSystemModel
@@ -8,16 +8,16 @@ var BaseOmnivoresModel = require( './BaseOmnivoresModel' );
  * @param {Bounds2} bounds
  * @constructor
  */
-function SongbirdModel( ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction ) {
-  BaseOmnivoresModel.call( this, ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction );
+function SongbirdModel(ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction) {
+    BaseOmnivoresModel.call(this, ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction);
 }
 
-inherit( BaseOmnivoresModel, SongbirdModel, {
+inherit(BaseOmnivoresModel, SongbirdModel, {
 
-  clone: function( initialPos, createdThroughInteraction ) {
-    return new SongbirdModel( this.ecoSystemModel, this.organismInfo, initialPos, this.motionBounds, createdThroughInteraction );
-  }
+    clone: function (initialPos, createdThroughInteraction) {
+        return new SongbirdModel(this.ecoSystemModel, this.organismInfo, initialPos, this.motionBounds, createdThroughInteraction);
+    }
 
-} );
+});
 
 module.exports = SongbirdModel;

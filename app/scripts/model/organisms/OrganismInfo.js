@@ -10,12 +10,12 @@ var inherit = axon.inherit;
  * @param decomposer
  * @constructor
  */
-function OrganismInfo( jsonInfo ) {
-  this.id = jsonInfo.id;
-  this.name = jsonInfo.name;
+function OrganismInfo(jsonInfo) {
+    this.id = jsonInfo.id;
+    this.name = jsonInfo.name;
 }
 
-inherit( Object, OrganismInfo );
+inherit(Object, OrganismInfo);
 
 
 module.exports = OrganismInfo;

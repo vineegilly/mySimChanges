@@ -1,5 +1,5 @@
 var inherit = axon.inherit;
-var BaseHerbivoresModel = require( './BaseHerbivoresModel' );
+var BaseHerbivoresModel = require('./BaseHerbivoresModel');
 
 /**
  * @param {EcoSystemModel} ecoSystemModel
@@ -8,16 +8,16 @@ var BaseHerbivoresModel = require( './BaseHerbivoresModel' );
  * @param {Bounds2} bounds
  * @constructor
  */
-function ButterflyModel( ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction ) {
-  BaseHerbivoresModel.call( this, ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction );
+function ButterflyModel(ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction) {
+    BaseHerbivoresModel.call(this, ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction);
 }
 
-inherit( BaseHerbivoresModel, ButterflyModel, {
+inherit(BaseHerbivoresModel, ButterflyModel, {
 
-  clone: function( initialPos, createdThroughInteraction ) {
-    return new ButterflyModel( this.ecoSystemModel, this.organismInfo, initialPos, this.motionBounds, createdThroughInteraction );
-  }
+    clone: function (initialPos, createdThroughInteraction) {
+        return new ButterflyModel(this.ecoSystemModel, this.organismInfo, initialPos, this.motionBounds, createdThroughInteraction);
+    }
 
-} );
+});
 
 module.exports = ButterflyModel;

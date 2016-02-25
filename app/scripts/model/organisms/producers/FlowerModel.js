@@ -1,5 +1,5 @@
 var inherit = axon.inherit;
-var BaseProducerModel = require( './BaseProducerModel' );
+var BaseProducerModel = require('./BaseProducerModel');
 
 /**
  * @param {EcoSystemModel} ecoSystemModel
@@ -8,16 +8,16 @@ var BaseProducerModel = require( './BaseProducerModel' );
  * @param {Bounds2} bounds
  * @constructor
  */
-function FlowerModel( ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction ) {
-  BaseProducerModel.call( this, ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction );
+function FlowerModel(ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction) {
+    BaseProducerModel.call(this, ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction);
 }
 
-inherit( BaseProducerModel, FlowerModel, {
+inherit(BaseProducerModel, FlowerModel, {
 
-  clone: function( initialPos, createdThroughInteraction ) {
-    return new FlowerModel( this.ecoSystemModel, this.organismInfo, initialPos, this.motionBounds, createdThroughInteraction );
-  }
+    clone: function (initialPos, createdThroughInteraction) {
+        return new FlowerModel(this.ecoSystemModel, this.organismInfo, initialPos, this.motionBounds, createdThroughInteraction);
+    }
 
-} );
+});
 
 module.exports = FlowerModel;

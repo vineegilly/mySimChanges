@@ -1,5 +1,5 @@
 var inherit = axon.inherit;
-var BaseCarnivoresModel = require( './BaseCarnivoresModel' );
+var BaseCarnivoresModel = require('./BaseCarnivoresModel');
 
 /**
  * @param {EcoSystemModel} ecoSystemModel
@@ -8,16 +8,16 @@ var BaseCarnivoresModel = require( './BaseCarnivoresModel' );
  * @param {Bounds2} bounds
  * @constructor
  */
-function HawkModel( ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction ) {
-  BaseCarnivoresModel.call( this, ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction );
+function HawkModel(ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction) {
+    BaseCarnivoresModel.call(this, ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction);
 }
 
-inherit( BaseCarnivoresModel, HawkModel, {
+inherit(BaseCarnivoresModel, HawkModel, {
 
-  clone: function( initialPos, createdThroughInteraction ) {
-    return new HawkModel( this.ecoSystemModel, this.organismInfo, initialPos, this.motionBounds, createdThroughInteraction );
-  }
+    clone: function (initialPos, createdThroughInteraction) {
+        return new HawkModel(this.ecoSystemModel, this.organismInfo, initialPos, this.motionBounds, createdThroughInteraction);
+    }
 
-} );
+});
 
 module.exports = HawkModel;

@@ -3,7 +3,7 @@
  * Rain is the "food" . In addition this can be exposed to Pesticide
  */
 var inherit = axon.inherit;
-var BaseOrganismModel = require( '../BaseOrganismModel' );
+var BaseOrganismModel = require('../BaseOrganismModel');
 
 /**
  * @param {EcoSystemModel} ecoSystemModel
@@ -12,71 +12,71 @@ var BaseOrganismModel = require( '../BaseOrganismModel' );
  * @param {Bounds2} bounds
  * @constructor
  */
-function BaseProducerModel( ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction ) {
-  BaseOrganismModel.call( this, ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction );
-  this.timeElapsedSincePoision = 0; // pesticide or herbicide
+function BaseProducerModel(ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction) {
+    BaseOrganismModel.call(this, ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction);
+    this.timeElapsedSincePoision = 0; // pesticide or herbicide
 }
 
-inherit( BaseOrganismModel, BaseProducerModel, {
+inherit(BaseOrganismModel, BaseProducerModel, {
 
-  /**
-   * @override
-   * @param dt
-   */
-  doStep: function( dt ) {
+    /**
+     * @override
+     * @param dt
+     */
+    doStep: function (dt) {
 
 
-  },
+    },
 
-  isSprayApplicable: function() {
-    return true;
-  },
+    isSprayApplicable: function () {
+        return true;
+    },
 
-  validateExpiryState: function( dt ) {
-    BaseOrganismModel.prototype.validateExpiryState.call( this, dt );
-    if ( this.ecoSystemModel.isSpraying() ) {
-      this.timeElapsedSincePoision += dt;
+    validateExpiryState: function (dt) {
+        BaseOrganismModel.prototype.validateExpiryState.call(this, dt);
+        if (this.ecoSystemModel.isSpraying()) {
+            this.timeElapsedSincePoision += dt;
 
-      if ( this.timeElapsedSincePoision >= this.getTimeThresholdForPoison() ) {
-        this.moveToDyingStateDueToPoison();
-      }
+            if (this.timeElapsedSincePoision >= this.getTimeThresholdForPoison()) {
+                this.moveToDyingStateDueToPoison();
+            }
+        }
+        else {
+            this.timeElapsedSincePoision = 0;
+        }
+    },
+
+    getTimeThresholdForPoison: function () {
+
+    },
+
+    moveToDyingStateDueToPoison: function () {
+
+    },
+
+    incrementTimeElapsedWithoutFood: function (dt) {
+        if (this.ecoSystemModel.isRaining()) {
+            return;
+        }
+
+        this.timeElapsedWithoutFood += dt * 1000; // in milliseconds
+    },
+
+    initState: function () {
+        this.goToRest();
+    },
+
+    /**
+     * Flower,grass and Tree dont Move and interact, so override play
+     */
+    play: function () {
+
+    },
+
+    onRain: function () {
+        this.timeElapsedWithoutFood = 0;
     }
-    else {
-      this.timeElapsedSincePoision = 0;
-    }
-  },
 
-  getTimeThresholdForPoison: function() {
-
-  },
-
-  moveToDyingStateDueToPoison: function() {
-
-  },
-
-  incrementTimeElapsedWithoutFood: function( dt ) {
-    if ( this.ecoSystemModel.isRaining() ) {
-      return;
-    }
-
-    this.timeElapsedWithoutFood += dt * 1000; // in milliseconds
-  },
-
-  initState: function() {
-    this.goToRest();
-  },
-
-  /**
-   * Flower,grass and Tree dont Move and interact, so override play
-   */
-  play: function() {
-
-  },
-
-  onRain: function() {
-    this.timeElapsedWithoutFood = 0;
-  }
-
-} );
+});
 
 module.exports = BaseProducerModel;

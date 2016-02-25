@@ -7,15 +7,15 @@ var inherit = axon.inherit;
  * @param count
  * @constructor
  */
-function OrganismLifeLineSnapShot( name, time, count ) {
-  this.name = name;
-  this.time = time;
-  this.count = count;
+function OrganismLifeLineSnapShot(name, time, count) {
+    this.name = name;
+    this.time = time;
+    this.count = count;
 
 }
 
 
-inherit( Object, OrganismLifeLineSnapShot );
+inherit(Object, OrganismLifeLineSnapShot);
 
 
 module.exports = OrganismLifeLineSnapShot;

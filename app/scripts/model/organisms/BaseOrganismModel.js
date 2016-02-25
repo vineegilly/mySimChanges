@@ -41,7 +41,7 @@ function BaseOrganismModel(ecoSystemModel, organismInfo, initialPosition, motion
         dead: false,
         scale: 1,
         opacity: 1
-      });
+    });
 
     thisModel.objectId = OBJECT_ID_COUNTER++;
     thisModel.name = organismInfo.name;
