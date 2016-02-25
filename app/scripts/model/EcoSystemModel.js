@@ -114,10 +114,10 @@ inherit(PropertySet, EcoSystemModel, {
         if (this.replayMode) {
 
             if (this.currentReplayCounter < this.replayState.graphStateList.length) {
-                var groupedElements = this.replayState.graphStateList[this.currentReplayCounter].groupedElements;
+                var elementGroupCountMap = this.replayState.graphStateList[this.currentReplayCounter].elementGroupCountMap;
                 var totalTimeLapse = this.replayState.graphStateList[this.currentReplayCounter].totalTimeLapse;
-                _.each(groupedElements, function (elementArray, name) {
-                    var organismLifeLineSnapShot = new OrganismLifeLineSnapShot(name, totalTimeLapse, elementArray.length);
+                _.each(elementGroupCountMap, function (elementCount, name) {
+                    var organismLifeLineSnapShot = new OrganismLifeLineSnapShot(name, totalTimeLapse, elementCount);
                     self.organismLifeLineSnapShots.push(organismLifeLineSnapShot);
                 });
                 this.currentReplayCounter++;
@@ -168,6 +168,10 @@ inherit(PropertySet, EcoSystemModel, {
         return this.rain;
     },
 
+    /**
+     * Store the element name and its count at every step - to reproduce the graph
+     * @param dt
+     */
     addLifeLineSnapShot: function (dt) {
         var self = this;
         this.totalTimeLapse += dt * 1000;
@@ -186,8 +190,14 @@ inherit(PropertySet, EcoSystemModel, {
                 self.organismLifeLineSnapShots.push(organismLifeLineSnapShot);
             });
 
+            var elementGroupCountMap = {};
+
+            _.each(groupedElements, function (elementArray, name) {
+                elementGroupCountMap[name] = elementArray.length;
+            });
+
             this.replayState.graphStateList.push({
-                groupedElements: groupedElements,
+                elementGroupCountMap: elementGroupCountMap,
                 totalTimeLapse: self.totalTimeLapse
             });
 
