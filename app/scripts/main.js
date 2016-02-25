@@ -74,12 +74,11 @@ var SimLaunchAdapter = {
     },
 
     getReplayData: function () {
-        return JSON.stringify(ecoSystemView.getReplayData());
+        return ecoSystemView.getReplayData();
     },
 
     replay: function (prevStateJSON) {
-        var prevPlayState = JSON.parse(prevStateJSON);
-        ecoSystemView.replay(prevStateJSON);
+       ecoSystemView.replay(prevStateJSON);
     }
 
 };

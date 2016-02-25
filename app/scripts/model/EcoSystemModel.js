@@ -89,15 +89,16 @@ function EcoSystemModel(organismInfos, screenBounds) {
 inherit(PropertySet, EcoSystemModel, {
 
     replay: function (prevReplayState) {
-        this.resetPlayState();
+        var currentReplayState = _.clone(prevReplayState, true);
         this.currentReplayCounter = 0;
+        this.startReplayTimeLapse = 0;
 
-        this.replayState = prevReplayState;
-        var oldOrganisms = prevReplayState.organismState;
+        this.replayState = currentReplayState;
+        var oldOrganisms = currentReplayState.organismState;
         for (var i = 0; i < oldOrganisms.length; i++) {
             OrganismModelFactory.getOrganism(this, {
                 name: oldOrganisms[i].name
-            }, oldOrganisms[i].position, EcoSystemConstants.MOTION_BOUNDS);
+            }, new Vector2(oldOrganisms[i].position.x, oldOrganisms[i].position.y), EcoSystemConstants.MOTION_BOUNDS);
         }
 
         this.organismLifeLineSnapShots = [];
@@ -113,16 +114,21 @@ inherit(PropertySet, EcoSystemModel, {
         var self = this;
         if (this.replayMode) {
 
-            if (this.currentReplayCounter < this.replayState.graphStateList.length) {
-                var elementGroupCountMap = this.replayState.graphStateList[this.currentReplayCounter].elementGroupCountMap;
-                var totalTimeLapse = this.replayState.graphStateList[this.currentReplayCounter].totalTimeLapse;
-                _.each(elementGroupCountMap, function (elementCount, name) {
-                    var organismLifeLineSnapShot = new OrganismLifeLineSnapShot(name, totalTimeLapse, elementCount);
-                    self.organismLifeLineSnapShots.push(organismLifeLineSnapShot);
-                });
-                this.currentReplayCounter++;
+            var totalTimeLapse = this.replayState.graphStateList[this.currentReplayCounter].totalTimeLapse;
+            if (this.startReplayTimeLapse > totalTimeLapse) {
+                if (this.currentReplayCounter < this.replayState.graphStateList.length - 1) {
+                    var elementGroupCountMap = this.replayState.graphStateList[this.currentReplayCounter].elementGroupCountMap;
+                    _.each(elementGroupCountMap, function (elementCount, name) {
+                        var organismLifeLineSnapShot = new OrganismLifeLineSnapShot(name, totalTimeLapse, elementCount);
+                        self.organismLifeLineSnapShots.push(organismLifeLineSnapShot);
+                    });
+
+                    this.currentReplayCounter++;
+                }
+
             }
 
+            this.startReplayTimeLapse += dt * 1000;
             return;
         }
 
