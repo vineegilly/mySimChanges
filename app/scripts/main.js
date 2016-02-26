@@ -79,6 +79,10 @@ var SimLaunchAdapter = {
 
     replay: function (prevStateJSON) {
         ecoSystemView.replay(prevStateJSON);
+    },
+
+    clear: function () {
+        ecoSystemView.clear();
     }
 
 };

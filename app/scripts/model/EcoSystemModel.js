@@ -37,7 +37,7 @@ function EcoSystemModel(organismInfos, screenBounds) {
 
 
     organismInfos.forEach(function (organismInfo) {
-        thisModel[organismInfo.name.toLowerCase() + "Quantity"] = new Property(2);
+        thisModel[organismInfo.name.toLowerCase() + "Quantity"] = new Property(0);// set default to zero
     });
 
 

@@ -136,6 +136,10 @@ inherit(BaseScreenView, EcoSystemView, {
 
     getReplayData: function () {
         return this.model.replayState;
+    },
+
+    clear: function () {
+        this.model.onClearPlay();
     }
 });
 
