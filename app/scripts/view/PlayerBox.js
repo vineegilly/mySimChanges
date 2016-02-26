@@ -21,14 +21,13 @@ var PAUSE_STR = "Pause";
 var CLEAR_STR = "Clear";
 
 
-
 /**
  *
  * @param playPauseProperty
  * @param onClearPlay
  * @constructor
  */
-function PlayerBox(playPauseProperty,rainProperty, onClearPlay) {
+function PlayerBox(playPauseProperty, rainProperty, onClearPlay) {
     var thisBox = this;
 
     var playTextNode = new Text(PLAY_STR, BUTTON_TEXT_OPTIONS);
@@ -40,7 +39,7 @@ function PlayerBox(playPauseProperty,rainProperty, onClearPlay) {
     var playPauseButton = new BooleanRectangularToggleButton(pauseTextNode, playTextNode, playPauseProperty, {
         buttonAppearanceStrategy: RectangularButtonView.threeDAppearanceStrategy,
         xMargin: 10, // should be visibly greater than yMargin, see issue #109
-        yMargin: 10,
+        yMargin: 4,
         baseColor: new Color(239, 239, 195),
         stroke: null,
         lineWidth: 0 // Only meaningful if stroke is non-null
@@ -49,7 +48,7 @@ function PlayerBox(playPauseProperty,rainProperty, onClearPlay) {
     var options = {
         buttonAppearanceStrategy: RectangularButtonView.threeDAppearanceStrategy,
         xMargin: 10, // should be visibly greater than yMargin, see issue #109
-        yMargin: 10,
+        yMargin: 4,
         baseColor: new Color(239, 239, 195),
         stroke: null,
         content: clearTextNode,
@@ -60,12 +59,11 @@ function PlayerBox(playPauseProperty,rainProperty, onClearPlay) {
     };
 
 
-
     var checkBoxes = [];
     var rainCheckBoxControl = new CheckBox(new Text(RAIN_STR, CONTROL_TEXT_OPTIONS),
         rainProperty, CHECK_BOX_OPTIONS);
-     checkBoxes.push(rainCheckBoxControl);
-   var checkBoxControlBox = new HBox({
+    checkBoxes.push(rainCheckBoxControl);
+    var checkBoxControlBox = new HBox({
         children: checkBoxes,
         spacing: 20
     });
@@ -81,6 +79,8 @@ function PlayerBox(playPauseProperty,rainProperty, onClearPlay) {
         children: playerItems,
         spacing: 20
     });
+
+    thisBox.scale(0.8);
 
 }
 

@@ -57,6 +57,10 @@ function OrganismPanelNode(ecoSystemModel, gridPaneNode, populationChartNode, mo
     organismInfos.forEach(function (organismInfo) {
         var organismModel = creatorCallBack(organismInfo, new Vector2(0, 0));
         var organismCreatorNode = new OrganismCreatorNode(organismModel, ecoSystemModel);
+
+        if (organismInfos.length > 6) {
+            organismCreatorNode.scale(0.8);
+        }
         organismNodes.push(organismCreatorNode);
     });
 
@@ -68,12 +72,18 @@ function OrganismPanelNode(ecoSystemModel, gridPaneNode, populationChartNode, mo
 
     var appearanceLayerNode = new Node();
 
+    var padding = [0.02, 0.2];
+
+    if (organismInfos.length > 6) {
+        padding = [0.01, 0.015];
+    }
+
     var gridLayout = GridLayout();
     gridLayout
         .size([EcoSystemConstants.ORGANISM_PANEL_DIMENSION.width,
-            EcoSystemConstants.ORGANISM_PANEL_DIMENSION.height + 30])
+            EcoSystemConstants.ORGANISM_PANEL_DIMENSION.height + 60])
         .bands()
-        .padding([0.02, 0.2]);
+        .padding(padding);
 
     gridLayout(rectElements);
 
@@ -88,7 +98,6 @@ function OrganismPanelNode(ecoSystemModel, gridPaneNode, populationChartNode, mo
 
     var titleBarNode = new TitleBarNode(TITLE_SIZE, ORGANISMS_STR);
     var rainProperty = ecoSystemModel.rainProperty;
-
 
     var checkBoxes = [];
     var rainCheckBoxControl = new CheckBox(new Text(RAIN_STR, CONTROL_TEXT_OPTIONS),
@@ -111,7 +120,7 @@ function OrganismPanelNode(ecoSystemModel, gridPaneNode, populationChartNode, mo
 
     var panelContents = new VBox({
         children: [titleBarNode, appearanceLayerNode, playerBox],
-        spacing: 18,
+        spacing: 8,
         resize: false
     });
 

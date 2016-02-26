@@ -85,15 +85,15 @@ function EcoSystemView(ecoSystemModel, options) {
 
     // Observe new items
     ecoSystemModel.residentOrganismModels.addItemAddedListener(handleOrganismAdded);
-    var organismPanelNode = new OrganismPanelNode(ecoSystemModel, thisView.gridPanelNode, thisView.populationChartNode, motionBounds);
+    thisView.organismPanelNode = new OrganismPanelNode(ecoSystemModel, thisView.gridPanelNode, thisView.populationChartNode, motionBounds);
 
-    viewWrapper.addChild(organismPanelNode);
+    viewWrapper.addChild(thisView.organismPanelNode);
     viewWrapper.addChild(thisView.populationChartNode);
 
-    organismPanelNode.x = thisView.gridPanelNode.bounds.left;
-    thisView.populationChartNode.x = organismPanelNode.x + organismPanelNode.bounds.width + 5;
+    thisView.organismPanelNode.x = thisView.gridPanelNode.bounds.left;
+    thisView.populationChartNode.x = thisView.organismPanelNode.x + thisView.organismPanelNode.bounds.width + 5;
 
-    organismPanelNode.y = thisView.gridPanelNode.bounds.bottom + PANEL_VERTICAL_PADDING;
+    thisView.organismPanelNode.y = thisView.gridPanelNode.bounds.bottom + PANEL_VERTICAL_PADDING;
     thisView.populationChartNode.y = thisView.gridPanelNode.y + CHART_PANEL_TOP_OFFSET;
 
     viewWrapper.addChild(thisView.gridPanelNode);
@@ -108,6 +108,11 @@ function EcoSystemView(ecoSystemModel, options) {
         viewWrapper.translate(options.tx || 0, options.ty || 0);
     }
 
+    $(window).resize(function () {
+        // Do calcualtions here
+        // you can scale organismPanel Node
+        // chart Node or grid node
+    });
 
 }
 
@@ -141,7 +146,24 @@ inherit(BaseScreenView, EcoSystemView, {
     clear: function () {
         this.populationChartNode.clearChart();
         this.model.onClearPlay();
+    },
+
+    /**
+     *
+     * @param options
+     */
+    resizeParts: function (options) {
+        if (options && options.gridScale) {
+            this.gridPanelNode.scale(options.gridScale);
+        }
+
+        if (options && options.organismPanelScale) {
+            this.gridPanelNode.scale(options.gridScale);
+        }
+
     }
+
+
 });
 
 

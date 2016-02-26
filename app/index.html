@@ -62,7 +62,6 @@
 </div> -->
 
 
-
 <button onclick="EcoSystemLauncher.launchUsingData(organisms,'main-scene')">Launch Simulation
 </button>
 
@@ -101,6 +100,15 @@
             "name": "deer"
         }, {
             "name": "rabbit"
+        },
+        {
+            "name": "frog"
+        },
+        {
+            "name": "butterfly"
+        },
+        {
+            "name": "grass"
         }];
 
     var replayData = {};
@@ -113,12 +121,11 @@
         EcoSystemLauncher.replay(replayData);
     }
 
-    function clearSimulation(){
+    function clearSimulation() {
         EcoSystemLauncher.clear();
     }
 
 </script>
-
 
 
 </body>

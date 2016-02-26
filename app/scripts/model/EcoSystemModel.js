@@ -98,7 +98,7 @@ inherit(PropertySet, EcoSystemModel, {
         if (!oldOrganisms) {
             return;
         }
-         
+
 
         for (var i = 0; i < oldOrganisms.length; i++) {
             OrganismModelFactory.getOrganism(this, {
