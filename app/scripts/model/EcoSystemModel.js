@@ -95,6 +95,11 @@ inherit(PropertySet, EcoSystemModel, {
 
         this.replayState = currentReplayState;
         var oldOrganisms = currentReplayState.organismState;
+        if (!oldOrganisms) {
+            return;
+        }
+         
+
         for (var i = 0; i < oldOrganisms.length; i++) {
             OrganismModelFactory.getOrganism(this, {
                 name: oldOrganisms[i].name

@@ -139,6 +139,7 @@ inherit(BaseScreenView, EcoSystemView, {
     },
 
     clear: function () {
+        this.populationChartNode.clearChart();
         this.model.onClearPlay();
     }
 });

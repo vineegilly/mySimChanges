@@ -73,6 +73,8 @@
 
 <button onclick="review()">Review</button>
 
+<button onclick="clearSimulation()">Clear</button>
+
 <div id="main-scene">
 </div>
 
@@ -109,6 +111,10 @@
 
     function review() {
         EcoSystemLauncher.replay(replayData);
+    }
+
+    function clearSimulation(){
+        EcoSystemLauncher.clear();
     }
 
 </script>
