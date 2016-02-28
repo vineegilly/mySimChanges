@@ -6,7 +6,7 @@ var Circle = scenery.Circle;
 var EcoSystemConstants = require('../model/EcoSystemConstants');
 var OrganismImageCollection = require('../model/organisms/OrganismImageCollection');
 
-
+var ORG_COUNTER = 0;
 /**
  *
  * @param {OrganismModel} organismModel
@@ -19,8 +19,11 @@ function OrganismNode(organismModel) {
     var appearanceNode = new Image(appearanceImage);
     appearanceNode.scale(EcoSystemConstants.IMAGE_SCALE);
 
+    ORG_COUNTER++;
+    console.log("ORG_COUNTER" + ORG_COUNTER);
 
     organismModel.positionProperty.link(function (newPos) {
+        console.log("Positioining " + newPos);
         thisNode.center = newPos;
     });
 

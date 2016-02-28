@@ -18,6 +18,8 @@ inherit(BaseProducerModel, FlowerModel, {
         return new FlowerModel(this.ecoSystemModel, this.organismInfo, initialPos, this.motionBounds, createdThroughInteraction);
     }
 
+
+
 });
 
 module.exports = FlowerModel;

@@ -34,6 +34,7 @@ var EcoSystemConstants = {
         DIE_BECAUSE_OF_NO_FOOD: 1,
         SNAPSHOT_CAPTURE_ELAPSE: 500,
         TOTAL_LIFE_SPAN: 12000,
+        LOW_QUANTITY:0,
 
         // interaction states
         DYING_STATE: 1,

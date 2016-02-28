@@ -14,6 +14,10 @@ inherit(Object, OverlapRulesFactory, {},
             if (organism1 === organism2) {
                 return;
             }
+
+            if (organism1.isInAnimate()) {
+                return;
+            }
             if (!organism1.canInteract() || !organism2.canInteract()) {
                 return;
             }

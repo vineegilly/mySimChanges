@@ -19,7 +19,7 @@ var OrganismRuleConstants = {
         prey: ["beetle", "rabbit", "deer", "songbird", "mouse"], predator: [],
         DIE_NO_FOOD: 6000,
         DIE_POISON: 2000,
-        REPRODUCE_RULE: {offspring: 2, elapse: 12000}, // reproduce 2 per 12 ms
+        REPRODUCE_RULE: {offspring: 1, elapse: 12000}, // reproduce 2 per 12 ms
         PREDATOR_BUMP: 1,
         color: "#1f78b4"
     },
@@ -111,12 +111,14 @@ var OrganismRuleConstants = {
     // earthworm and mushroom has different set of rules
     earthworm: {
         color: "#b2182b",
-        REPRODUCE_RULE: {offspring: 0, elapse: -1}
+        REPRODUCE_RULE: {offspring: 1, elapse: 12000}
+
     },
 
     mushroom: {
         color: "#c51b7d",
-        REPRODUCE_RULE: {offspring: 0, elapse: -1}
+        REPRODUCE_RULE: {offspring: 1, elapse: 12000},
+        growsByRain: true
     }
 
 };

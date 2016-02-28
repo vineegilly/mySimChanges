@@ -53,7 +53,8 @@ function EcoSystemView(ecoSystemModel, options) {
     thisView.gridPanelNode.y = thisView.layoutBounds.y + GRID_PANEL_OFFSET_Y;
 
     var gridSize = EcoSystemConstants.GRID_NODE_DIMENSION;
-    var motionBounds = Bounds2.rect(EcoSystemConstants.ORGANISM_RADIUS, EcoSystemConstants.ORGANISM_RADIUS, gridSize.width - EcoSystemConstants.ORGANISM_RADIUS * 3,
+    var motionBounds = Bounds2.rect(EcoSystemConstants.ORGANISM_RADIUS, EcoSystemConstants.ORGANISM_RADIUS,
+        gridSize.width - EcoSystemConstants.ORGANISM_RADIUS * 3,
         gridSize.height - EcoSystemConstants.ORGANISM_RADIUS * 2);
 
     EcoSystemConstants.MOTION_BOUNDS = motionBounds;

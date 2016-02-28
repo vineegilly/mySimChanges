@@ -25,7 +25,7 @@ function QuantitySelectionBox(quantityProperty) {
     var quantityRadioButtonContent = [
         {value: 8, color: Color.GREEN, node: new Text(HIGH_STR, {font: radioButtonFont})},
         {value: 4, color: Color.ORANGE, node: new Text(MEDIUM_STR, {font: radioButtonFont})},
-        {value: 0, color: Color.CYAN, node: new Text(LOW_STR, {font: radioButtonFont})}
+        {value: EcoSystemConstants.LOW_QUANTITY, color: Color.CYAN, node: new Text(LOW_STR, {font: radioButtonFont})}
 
     ];
     var quantityRadioGroup = new RadioButtonGroup(quantityProperty, quantityRadioButtonContent, {

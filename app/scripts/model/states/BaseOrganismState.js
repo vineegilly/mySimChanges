@@ -11,6 +11,10 @@ inherit(Object, BaseOrganismState, {
     animateMovementStep: function (organismModel, dt) {
         var ecoSystemModel = organismModel.ecoSystemModel;
         var organism = organismModel;
+
+        if (organism.isInAnimate()) {
+            return;
+        }
         // perform any animation
         var distanceToDestination = organism.position.distance(organism.destination);
         if (distanceToDestination > dt * organism.velocity) {

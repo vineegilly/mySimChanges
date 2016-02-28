@@ -20,6 +20,11 @@ inherit(BaseDecomposerModel, MushroomModel, {
 
     play: function () {
 
+    },
+
+    //No movement override
+    stepState: function (dt) {
+
     }
 
 

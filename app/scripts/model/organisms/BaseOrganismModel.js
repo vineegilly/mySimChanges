@@ -60,18 +60,10 @@ function BaseOrganismModel(ecoSystemModel, organismInfo, initialPosition, motion
     this.motionBounds = motionBounds;
     this.multipliedOrganisms = [this];// add the current one
 
-    this.timeElapsedWithoutFood = 0;
-    this.timeElapsedSinceReproduction = OrganismRuleConstants[this.name].REPRODUCE_RULE.elapse; // start with the ability to reproduce
+   this.defineTimeLapseRules();
 
     // to differentiate natural and death by predator
     this.causeOfDying = -1;
-
-    thisModel.positionProperty.lazyLink(function (position) {
-        if (position.equals(initialPosition) && !createdThroughInteraction) {
-            thisModel.trigger('returnedToOrigin');
-        }
-
-    });
 
     //temp
     this.elapsedTime = 0;
@@ -90,6 +82,12 @@ inherit(PropertySet, BaseOrganismModel, {
             this.playStep(dt);
         }
 
+    },
+
+    defineTimeLapseRules:function()
+    {
+        this.timeElapsedWithoutFood = 0;
+        this.timeElapsedSinceReproduction = OrganismRuleConstants[this.name].REPRODUCE_RULE.elapse; // start with the ability to reproduce
     },
 
     onRain: function () {
@@ -285,6 +283,10 @@ inherit(PropertySet, BaseOrganismModel, {
 
     clone: function (initialPos) {
         throw new Error("clone must be implemented in  BaseOrganismModel's descendant class");
+    },
+
+    canGerminate: function () {
+        return false;
     },
 
 
@@ -497,6 +499,13 @@ inherit(PropertySet, BaseOrganismModel, {
 
     },
 
+    /**
+     * True only for non-animate beings like mushroom, grass etc
+     */
+    germinate:function(){
+
+    },
+
     finishReproducing: function () {
         this.interactionState = EcoSystemConstants.NON_INTERACTION_STATE;
         this.setState(randomMovementState);
@@ -510,6 +519,10 @@ inherit(PropertySet, BaseOrganismModel, {
         if (this.newlyProducedModels.length) {
             this.newlyProducedModels = [];
         }
+    },
+
+    isInAnimate:function(){
+        return false;
     }
 
 });

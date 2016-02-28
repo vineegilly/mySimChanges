@@ -19,13 +19,8 @@ function BaseProducerModel(ecoSystemModel, organismInfo, initialPosition, bounds
 
 inherit(BaseOrganismModel, BaseProducerModel, {
 
-    /**
-     * @override
-     * @param dt
-     */
-    doStep: function (dt) {
-
-
+    isInAnimate: function () {
+        return true;
     },
 
     isSprayApplicable: function () {
@@ -54,23 +49,9 @@ inherit(BaseOrganismModel, BaseProducerModel, {
 
     },
 
-    incrementTimeElapsedWithoutFood: function (dt) {
-        if (this.ecoSystemModel.isRaining()) {
-            return;
-        }
-
-        this.timeElapsedWithoutFood += dt * 1000; // in milliseconds
-    },
-
-    initState: function () {
-        this.goToRest();
-    },
-
-    /**
-     * Flower,grass and Tree dont Move and interact, so override play
-     */
-    play: function () {
-
+    defineTimeLapseRules: function () {
+        this.timeElapsedWithoutFood = 0;
+        this.timeElapsedSinceReproduction = 0;
     },
 
     onRain: function () {

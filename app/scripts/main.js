@@ -85,7 +85,7 @@ var SimLaunchAdapter = {
         ecoSystemView.clear();
     },
 
-    resizeParts:function(options){
+    resizeParts: function (options) {
         ecoSystemView.resizeParts(options);
     }
 

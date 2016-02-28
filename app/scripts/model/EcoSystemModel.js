@@ -10,6 +10,7 @@ var PropertySet = axon.PropertySet;
 var Property = axon.Property;
 var ObservableArray = axon.ObservableArray;
 var OverlapRulesFactory = require('../model/organisms/OverlapRulesFactory');
+var RainRulesFactory = require('../model/organisms/RainRulesFactory');
 var EcoSystemConstants = require('./EcoSystemConstants');
 var OrganismModelFactory = require('../model/organisms/OrganismModelFactory');
 var OrganismLifeLineSnapShot = require('../model/organisms/OrganismLifeLineSnapShot');
@@ -37,7 +38,7 @@ function EcoSystemModel(organismInfos, screenBounds) {
 
 
     organismInfos.forEach(function (organismInfo) {
-        thisModel[organismInfo.name.toLowerCase() + "Quantity"] = new Property(0);// set default to zero
+        thisModel[organismInfo.name.toLowerCase() + "Quantity"] = new Property(EcoSystemConstants.LOW_QUANTITY);// set default to zero
     });
 
 
@@ -150,12 +151,22 @@ inherit(PropertySet, EcoSystemModel, {
                     OverlapRulesFactory.applyOverlapRules(allModels[i], allModels[j]);
                 }
             }
-            self.addLifeLineSnapShot(dt);
+
 
             if (this.totalTimeLapse > this.totalLifeSpan) {
                 this.playPause = false;
             }
+
+
+            for (i = 0; i < allModels.length; i++) {
+                RainRulesFactory.applyRainReproductionRule(this, allModels[i], dt);
+            }
+
+            self.addLifeLineSnapShot(dt);
+
         }
+
+
 
     },
 
@@ -288,13 +299,15 @@ inherit(PropertySet, EcoSystemModel, {
 
         var organismInfos = this.organismInfos;
         organismInfos.forEach(function (organismInfo) {
-            var randomPosX = _.random(motionBounds.minX, motionBounds.maxX);
-            var randomPosY = _.random(motionBounds.minY, motionBounds.maxY);
-            var newPos = motionBounds.closestPointTo(new Vector2(randomPosX, randomPosY));
-            var organismModel = OrganismModelFactory.getOrganism(self, organismInfo, newPos, motionBounds);
-            self.residentOrganismModels.add(organismModel);
             var quantity = self[organismInfo.name.toLowerCase() + "Quantity"].get();
-            organismModel.multiply(quantity);
+            if (quantity > 0) {
+                var randomPosX = _.random(motionBounds.minX, motionBounds.maxX);
+                var randomPosY = _.random(motionBounds.minY, motionBounds.maxY);
+                var newPos = motionBounds.closestPointTo(new Vector2(randomPosX, randomPosY));
+                var organismModel = OrganismModelFactory.getOrganism(self, organismInfo, newPos, motionBounds);
+                self.residentOrganismModels.add(organismModel);
+                organismModel.multiply(quantity);
+            }
         });
 
 

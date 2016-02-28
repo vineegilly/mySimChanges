@@ -46,7 +46,8 @@ function EcoSystemEffectNode( ecoSystemModel, bounds ) {
 
   function handleNewlyReproducedOrganism( addedOrganismModel ) {
     var position = addedOrganismModel.position;
-    var rippleCircle = new RippleCirlce( position, EcoSystemConstants.ORGANISM_RADIUS * 2, EcoSystemConstants.MAX_RIPPLE_FRAMES, function onComplete() {
+    var rippleCircle = new RippleCirlce( position, EcoSystemConstants.ORGANISM_RADIUS * 2,
+        EcoSystemConstants.MAX_RIPPLE_FRAMES, function onComplete() {
       ecoSystemModel.removeNewlyReproducedOrganism( addedOrganismModel );
     } );
 
