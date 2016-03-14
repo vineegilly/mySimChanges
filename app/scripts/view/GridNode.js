@@ -4,6 +4,7 @@ var Shape = kite.Shape;
 var Path = scenery.Path;
 var Bounds2 = dot.Bounds2;
 var EcoSystemConstants = require( '../model/EcoSystemConstants' );
+var gridImage = require('../../assets/images/grid.png');
 
 /**
  *
@@ -14,7 +15,7 @@ function GridNode( gridDimension ) {
   var thisGrid = this;
   Node.call( thisGrid );
 
-  var numVerticalLines = gridDimension.width / (EcoSystemConstants.ORGANISM_RADIUS * 2) | 1;
+  /*var numVerticalLines = gridDimension.width / (EcoSystemConstants.ORGANISM_RADIUS * 2) | 1;
   var numHorizontalLines = gridDimension.height / (EcoSystemConstants.ORGANISM_RADIUS * 2) | 1;
 
   var gridShape = new Shape();
@@ -31,7 +32,9 @@ function GridNode( gridDimension ) {
     gridShape.lineTo( i * (gridDimension.width / numVerticalLines), gridDimension.height );
   }
 
-  thisGrid.plotGrid = new Path( gridShape, { stroke: 'gray', lineWidth: 0.6 } );
+  thisGrid.plotGrid = new Path( gridShape, { stroke: 'gray', lineWidth: 0.6 } ); */
+
+  thisGrid.plotGrid = new scenery.Image(gridImage);
 
   thisGrid.addChild( thisGrid.plotGrid );
   thisGrid.organismContentLayerNode = new Node();
