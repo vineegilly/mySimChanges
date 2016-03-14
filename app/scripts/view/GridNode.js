@@ -14,8 +14,8 @@ function GridNode( gridDimension ) {
   var thisGrid = this;
   Node.call( thisGrid );
 
-  var numVerticalLines = gridDimension.width / (EcoSystemConstants.ORGANISM_RADIUS * 2) | 0;
-  var numHorizontalLines = gridDimension.height / (EcoSystemConstants.ORGANISM_RADIUS * 2) | 0;
+  var numVerticalLines = gridDimension.width / (EcoSystemConstants.ORGANISM_RADIUS * 2) | 1;
+  var numHorizontalLines = gridDimension.height / (EcoSystemConstants.ORGANISM_RADIUS * 2) | 1;
 
   var gridShape = new Shape();
 

@@ -4156,9 +4156,9 @@
 
             addPoint: function (point) {
 
-                /* if ( (!_.isFinite(point.x )) || (!_.isFinite( point.y )) ) {
+               /* if ( (!_.isFinite(point.x )) || (!_.isFinite( point.y )) ) {
                  debugger;
-                 } */
+                 }*/
 
                 this.points.push(point);
 
@@ -4167,6 +4167,11 @@
 
             // @private - REALLY! Make sure we invalidate() after this is called
             addSegmentDirectly: function (segment) {
+
+             /*   if ( (!segment.start.isFinite())) {
+                    debugger;
+                } */
+
                 assert && assert(segment.start.isFinite(), 'Segment start is infinite');
                 assert && assert(segment.end.isFinite(), 'Segment end is infinite');
                 assert && assert(segment.startTangent.isFinite(), 'Segment startTangent is infinite');
