@@ -121,7 +121,7 @@ function OrganismPanelNode(ecoSystemModel, gridPaneNode, populationChartNode, mo
     var panelContents = new VBox({
         children: [titleBarNode, appearanceLayerNode, playerBox],
         spacing: 8,
-        resize: false
+        resize: true
     });
 
 
@@ -129,7 +129,7 @@ function OrganismPanelNode(ecoSystemModel, gridPaneNode, populationChartNode, mo
     Panel.call(thisPanel, panelContents, {
         // panel options
         fill: EcoSystemConstants.GRID_BACKGROUND_COLOR,
-        resize: false,
+        resize: true,
         yMargin: 5,
         cornerRadius: 0
     });

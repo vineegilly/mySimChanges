@@ -22,7 +22,7 @@ function OrganismCreatorNode(organismModel, ecosystemModel) {
     var organismWithQuantity = new VBox({
         children: [appearanceNode, quantitySelectionBox],
         spacing: 4,
-        resize: false
+        resize: true
     });
 
 
