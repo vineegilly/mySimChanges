@@ -117,6 +117,7 @@ var OrganismRuleConstants = {
 
     mushroom: {
         color: "#c51b7d",
+        DIE_NO_FOOD: 6000,
         REPRODUCE_RULE: {offspring: 1, elapse: 12000},
         growsByRain: true
     }

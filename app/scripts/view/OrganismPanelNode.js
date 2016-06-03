@@ -17,7 +17,7 @@ var Vector2 = dot.Vector2;
 var GridLayout = require('../util/GridLayout');
 
 // constants
-var ORGANISMS_STR = "Organisms";
+var ORGANISMS_STR = "Organisms(Choose up to 4 organisms)";
 var CHECK_BOX_OPTIONS = {boxWidth: 30};
 var CONTROL_TEXT_OPTIONS = {font: new SimFont(15)};
 var POPULATION_TEXT_OPTIONS = {font: new SimFont(25)};

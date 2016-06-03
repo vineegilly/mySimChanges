@@ -20,10 +20,10 @@ function OrganismNode(organismModel) {
     appearanceNode.scale(EcoSystemConstants.IMAGE_SCALE);
 
     ORG_COUNTER++;
-    console.log("ORG_COUNTER" + ORG_COUNTER);
+    //console.log("ORG_COUNTER" + ORG_COUNTER);
 
     organismModel.positionProperty.link(function (newPos) {
-        console.log("Positioining " + newPos);
+        //console.log("Positioining " + newPos);
         thisNode.center = newPos;
     });
 

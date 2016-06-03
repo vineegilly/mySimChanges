@@ -290,8 +290,9 @@ inherit(PropertySet, EcoSystemModel, {
     },
 
     play: function () {
+    //  debugger;
         var self = this;
-        this.resetPlayState();
+        //this.resetPlayState();
         var gridSize = EcoSystemConstants.GRID_NODE_DIMENSION;
         var motionBounds = Bounds2.rect(EcoSystemConstants.ORGANISM_RADIUS, EcoSystemConstants.ORGANISM_RADIUS,
             gridSize.width - EcoSystemConstants.ORGANISM_RADIUS * 3,

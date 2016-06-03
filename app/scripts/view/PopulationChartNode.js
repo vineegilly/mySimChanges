@@ -61,7 +61,7 @@ inherit(Node, PopulationChartNode, {
 
         // number of organisms
         this.yScale = d3.scale.linear().range([CHART_HEIGHT - MARGINS.top, MARGINS.bottom])
-            .domain([0, EcoSystemConstants.MAX_ORGANISMS]);
+            .domain([0, 50]);
 
         var xAxis = d3.svg.axis()
             .scale(this.xScale)
@@ -76,7 +76,7 @@ inherit(Node, PopulationChartNode, {
         var yAxis = d3.svg.axis()
             .scale(this.yScale)
             .orient("left")
-            .ticks(EcoSystemConstants.MAX_ORGANISMS);
+            .ticks(5);
 
         svgSelection.append("svg:g")
             .attr("transform", "translate(-5," + (CHART_HEIGHT - MARGINS.bottom) + ")")
@@ -96,7 +96,7 @@ inherit(Node, PopulationChartNode, {
 
         this.legend = svgSelection.append("g")
             .attr("class", "legend")
-            .attr("transform", "translate(250,20)")
+            .attr("transform", "translate(220,20)")
             .style("font-size", "12px")
             .style("font-size", "20px")
             .attr("data-style-padding", 10);
