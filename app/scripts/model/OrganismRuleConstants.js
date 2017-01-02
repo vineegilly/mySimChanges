@@ -49,21 +49,21 @@ var OrganismRuleConstants = {
     },
 
     rabbit: {
-        prey: [], predator: ["grass", "flower"],
+        prey: [], predator: ["grass", "flower","mushroom"],
         DIE_NO_FOOD: 12000,
         REPRODUCE_RULE: {offspring: 3, elapse: 12000},
         color: "#e31a1c"
     },
 
     deer: {
-        prey: [], predator: ["grass", "flower", "tree"],
+        prey: [], predator: ["grass", "flower", "tree","mushroom"],
         DIE_NO_FOOD: 6000,
         REPRODUCE_RULE: {offspring: 2, elapse: 12000},
         color: "#fdbf6f"
     },
 
     mouse: {
-        prey: [], predator: ["grass", "flower", "tree", "beetle"],
+        prey: [], predator: ["grass", "flower", "tree", "beetle","mushroom"],
         DIE_NO_FOOD: 6000,
         REPRODUCE_RULE: {offspring: 2, elapse: 12000},
         color: "#ff7f00"
@@ -117,8 +117,9 @@ var OrganismRuleConstants = {
 
     mushroom: {
         color: "#c51b7d",
+        prey:["rabbit","mouse","deer"],
         DIE_NO_FOOD: 6000,
-        REPRODUCE_RULE: {offspring: 1, elapse: 12000},
+        REPRODUCE_RULE: {offspring: 0, elapse: 12000},
         growsByRain: true
     }
 

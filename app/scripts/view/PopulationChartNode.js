@@ -115,8 +115,6 @@ inherit(Node, PopulationChartNode, {
         if (this.prevCollectionCount === organismSnapShotCollection.length) {
             return;
         }
-
-
         var self = this;
         var groupedElements = _.groupBy(organismSnapShotCollection, function (organismSnapShot) {
             return organismSnapShot.name;
@@ -168,6 +166,7 @@ inherit(Node, PopulationChartNode, {
 
     clearChart: function () {
         this.svgSelection.selectAll(".line").remove();
+        this.drawLegends();
     }
 
 

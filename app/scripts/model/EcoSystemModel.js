@@ -30,6 +30,7 @@ function EcoSystemModel(organismInfos, screenBounds) {
         playPause: false,
         populationRange: 1,
         rain: false,
+        pauseFlag:0,
         poisonSpray: false,
         replayMode: false
     });
@@ -274,9 +275,14 @@ inherit(PropertySet, EcoSystemModel, {
     },
 
     onClearPlay: function () {
+        var self = this;
         this.residentOrganismModels.clear();
         this.playPause = false;
+        this.pauseFlag = 1;
         this.resetPlayState();
+        this.organismInfos.forEach(function (organismInfo) {
+            self[organismInfo.name.toLowerCase() + "Quantity"].set(EcoSystemConstants.LOW_QUANTITY);
+        });
     },
 
     resetPlayState: function () {
@@ -301,7 +307,7 @@ inherit(PropertySet, EcoSystemModel, {
         var organismInfos = this.organismInfos;
         organismInfos.forEach(function (organismInfo) {
             var quantity = self[organismInfo.name.toLowerCase() + "Quantity"].get();
-            if (quantity > 0) {
+            if (quantity > 0 && self.pauseFlag == 1 ) {
                 var randomPosX = _.random(motionBounds.minX, motionBounds.maxX);
                 var randomPosY = _.random(motionBounds.minY, motionBounds.maxY);
                 var newPos = motionBounds.closestPointTo(new Vector2(randomPosX, randomPosY));
@@ -325,6 +331,7 @@ inherit(PropertySet, EcoSystemModel, {
     },
 
     pause: function () {
+        this.pauseFlag = ++this.pauseFlag;
         this.residentOrganismModels.forEach(function (organismModel) {
             organismModel.pause();
         });

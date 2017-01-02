@@ -22,6 +22,7 @@ var SongbirdModel = require('../organisms/omnivores/SongbirdModel');
 var FlowerModel = require('../organisms/producers/FlowerModel');
 var GrassModel = require('../organisms/producers/GrassModel');
 var TreeModel = require('../organisms/producers/TreeModel');
+var MushroomModel = require('../organisms/producers/MushroomModel');
 
 
 function OrganismModelFactory() {
