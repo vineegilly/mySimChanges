@@ -17,13 +17,13 @@ inherit(Object, RainRulesFactory, {},
                 return;
             }
 
-
-            if (ecoSystemModel.isRaining()) {
+            // mushroom should not germinate it should spawn producer
+            if (ecoSystemModel.isRaining() && organism.name != "mushroom") {
 
                 organism.timeElapsedSinceReproduction += dt * 1000;
                 organism.timeElapsedWithoutFood = 0;
                 var reproductionElapsedTime = OrganismRuleConstants[organism.name].REPRODUCE_RULE.elapse;
-                if (organism.timeElapsedSinceReproduction > reproductionElapsedTime ) {
+                if (organism.timeElapsedSinceReproduction > reproductionElapsedTime) {
                     organism.germinate();
                     organism.timeElapsedSinceReproduction = 0;
                 }
@@ -32,9 +32,7 @@ inherit(Object, RainRulesFactory, {},
                 organism.timeElapsedWithoutFood += dt * 1000;
                 organism.timeElapsedSinceReproduction = 0;
             }
-
         }
-
     });
 
 module.exports = RainRulesFactory;
