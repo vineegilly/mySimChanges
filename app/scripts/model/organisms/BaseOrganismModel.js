@@ -500,6 +500,20 @@ inherit(PropertySet, BaseOrganismModel, {
     },
 
     /**
+     * some dying organisms produce new organism
+     * @param organismToProduce
+     */
+    produceNewOrganism:function(organismToProduce){
+        var currentPosition = this.position;
+        var createdThroughInteraction = true;
+        var newlyProducedModel = this.ecoSystemModel.cloneOrganism(organismToProduce, currentPosition, EcoSystemConstants.BEING_PRODUCED_STATE, createdThroughInteraction);
+        newlyProducedModel.timeElapsedSinceReproduction = 0;
+        this.ecoSystemModel.addNewlyReproducedOrganism(newlyProducedModel);
+        this.newlyProducedModels.push(newlyProducedModel);
+
+    },
+
+    /**
      * True only for non-animate beings like mushroom, grass etc
      */
     germinate:function(){

@@ -1,7 +1,8 @@
 var inherit = axon.inherit;
 var BaseOrganismState = require('./BaseOrganismState');
 var Vector2 = dot.Vector2;
-
+var OrganismRuleConstants = require('../../OrganismRuleConstants');
+var OrganismModelFactory = require('../model/organisms/OrganismModelFactory');
 /**
  * Mushroom dying has a specialized behaviour, grass needs to grow at the same place where mushroom dies (provided it is raining)
  * @constructor
@@ -24,13 +25,16 @@ inherit(BaseOrganismState, MushroomDyingState, {
             organism.die();
         }
 
-        if(organism.ecoSystemModel.isRaining()){
-
-        }
     },
 
+    //gets executed only once per state- using this code in "step" is wrong, because state's step will fired as long as the model's step gets its own share of time slice
     entered: function (organism) {
-
+        //if it is raining add a Grass organism
+        if(organism.ecoSystemModel.isRaining()){
+            var organismInfo = OrganismRuleConstants["grass"];
+            var newOrganism  = OrganismModelFactory.getOrganism(organism.ecoSystemModel,organismInfo,organism.position,organism.motionBounds);
+            organism.produceNewOrganism(newOrganism);
+        }
     },
 
     exit: function (organism) {
