@@ -28,18 +28,18 @@ inherit(BaseOrganismState, MushroomDyingState, {
 
     //gets executed only once per state- using this code in "step" is wrong, because state's step will fired as long as the model's step gets its own share of time slice
     entered: function (organism) {
-        //if it is raining add a Grass organism
-        if(organism.ecoSystemModel.isRaining()){
-            var organismInfo = {
-                name:"grass"
-            };
-            var newOrganism  = new GrassModel(organism.ecoSystemModel,organismInfo,organism.position,organism.motionBounds);
-            organism.produceNewOrganism(newOrganism);
-        }
+
     },
 
     exit: function (organism) {
-
+        //if it is raining add a Grass organism
+        if (organism.ecoSystemModel.isRaining()) {
+            var organismInfo = {
+                name: "grass"
+            };
+            var newOrganism = new GrassModel(organism.ecoSystemModel, organismInfo, organism.position, organism.motionBounds);
+            organism.ecoSystemModel.addOrganism(newOrganism)
+        }
     }
 
 });
