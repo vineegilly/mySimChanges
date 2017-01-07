@@ -44,6 +44,7 @@ inherit(BaseOrganismState, MushroomDyingState, {
             ecoSystemModel.addOrganism(newlyProducedModel);
             newlyProducedModel.setPosition(newPosition.plus(new Vector2(1,1)));
 
+
         }
     },
 

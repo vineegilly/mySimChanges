@@ -87,6 +87,7 @@ inherit(PropertySet, BaseOrganismModel, {
     defineTimeLapseRules: function () {
         this.timeElapsedWithoutFood = 0;
         this.timeElapsedSinceReproduction = OrganismRuleConstants[this.name].REPRODUCE_RULE.elapse; // start with the ability to reproduce
+
     },
 
     onRain: function () {
@@ -114,6 +115,9 @@ inherit(PropertySet, BaseOrganismModel, {
     },
 
     incrementTimeElapsedWithoutFood: function (dt) {
+        if(this.canGerminate()){
+            return; // the rain rules will increment the lapse
+        }
         this.timeElapsedWithoutFood += dt * 1000; // in milliseconds
     },
 
@@ -179,6 +183,7 @@ inherit(PropertySet, BaseOrganismModel, {
         this.setState(dyingState);
         this.ecoSystemModel.addDyingOrganisms(this);
         this.interactionState = EcoSystemConstants.DYING_STATE;
+
     },
 
     startReproducing: function (otherOrganism) {

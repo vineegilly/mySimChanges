@@ -30,7 +30,7 @@ function EcoSystemModel(organismInfos, screenBounds) {
         playPause: false,
         populationRange: 1,
         rain: false,
-        pauseFlag:0,
+        pauseFlag: 0,
         poisonSpray: false,
         replayMode: false
     });
@@ -53,6 +53,7 @@ function EcoSystemModel(organismInfos, screenBounds) {
     this.organismLifeLineSnapShots = [];
     this.snapShotCounter = -1;
     this.totalTimeLapse = 0; // in milli seconds
+    this.timeLapseSinceRaining = 0;
     this.totalLifeSpan = EcoSystemConstants.TOTAL_LIFE_SPAN;
 
     thisModel.replayState = {
@@ -75,6 +76,10 @@ function EcoSystemModel(organismInfos, screenBounds) {
         if (rain) {
             thisModel.onRain();
         }
+        else {
+            thisModel.timeLapseSinceRaining = 0;
+        }
+
     });
 
 
@@ -146,6 +151,12 @@ inherit(PropertySet, EcoSystemModel, {
 
         if (this.isPlaying()) {
 
+            if (this.isRaining()) {
+                this.timeLapseSinceRaining += dt * 1000;
+            }
+            else {
+                this.timeLapseSinceRaining = 0;
+            }
             var allModels = [].concat(this.residentOrganismModels.getArray());
             for (var i = 0; i < allModels.length; i++) {
                 for (var j = 0; j < allModels.length; j++) {
@@ -181,6 +192,7 @@ inherit(PropertySet, EcoSystemModel, {
         });
     },
 
+
     isSpraying: function () {
         return this.onPoisonSpray;
     },
@@ -196,7 +208,6 @@ inherit(PropertySet, EcoSystemModel, {
     addLifeLineSnapShot: function (dt) {
         var self = this;
         this.totalTimeLapse += dt * 1000;
-
         var currentCounter = this.totalTimeLapse / EcoSystemConstants.SNAPSHOT_CAPTURE_ELAPSE;
 
         if (currentCounter > this.snapShotCounter) {
@@ -205,6 +216,7 @@ inherit(PropertySet, EcoSystemModel, {
             var groupedElements = _.groupBy(this.residentOrganismModels.getArray(), function (organismModel) {
                 return organismModel.name;
             });
+
 
             _.each(groupedElements, function (elementArray, name) {
                 var organismLifeLineSnapShot = new OrganismLifeLineSnapShot(name, self.totalTimeLapse, elementArray.length);
@@ -294,7 +306,7 @@ inherit(PropertySet, EcoSystemModel, {
     },
 
     play: function () {
-    //  debugger;
+        //  debugger;
         var self = this;
         //this.resetPlayState();
         var gridSize = EcoSystemConstants.GRID_NODE_DIMENSION;
@@ -305,7 +317,7 @@ inherit(PropertySet, EcoSystemModel, {
         var organismInfos = this.organismInfos;
         organismInfos.forEach(function (organismInfo) {
             var quantity = self[organismInfo.name.toLowerCase() + "Quantity"].get();
-            if (quantity > 0 && self.pauseFlag == 1 ) {
+            if (quantity > 0 && self.pauseFlag == 1) {
                 var randomPosX = _.random(motionBounds.minX, motionBounds.maxX);
                 var randomPosY = _.random(motionBounds.minY, motionBounds.maxY);
                 var newPos = motionBounds.closestPointTo(new Vector2(randomPosX, randomPosY));

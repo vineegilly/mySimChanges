@@ -32,7 +32,15 @@ inherit(BaseProducerModel, MushroomModel, {
         this.setState(mushroomDyingState); // As usual the base flow will call the enter state (which now gets hooked into MushroomDyingState)
         this.ecoSystemModel.addDyingOrganisms(this); // do this so it can be removed from model (view which listens to organism array will take the respective node object from Nodegraph)
         this.interactionState = EcoSystemConstants.DYING_STATE;
+
     },
+
+    validateExpiryState: function (dt) {
+        BaseProducerModel.prototype.validateExpiryState.call(this, dt);
+        if(this.ecoSystemModel.timeLapseSinceRaining>10000){ // even with rain, mushroom dies within 10 seconds
+            this.moveToDyingStateBecauseOfNoFood();
+        }
+    }
 
 });
 

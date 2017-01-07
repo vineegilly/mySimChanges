@@ -83,7 +83,7 @@ function EcoSystemView(ecoSystemModel, options) {
     //Initial Organism Creation
     ecoSystemModel.residentOrganismModels.forEach(handleOrganismAdded);
 
-    thisView.populationChartNode = new PopulationChartNode();
+    thisView.populationChartNode = new PopulationChartNode(ecoSystemModel);
 
     // Observe new items
     ecoSystemModel.residentOrganismModels.addItemAddedListener(handleOrganismAdded);
