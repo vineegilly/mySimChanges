@@ -167,8 +167,6 @@ inherit(PropertySet, EcoSystemModel, {
 
         }
 
-
-
     },
 
     onRain: function () {

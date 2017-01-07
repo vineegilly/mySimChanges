@@ -60,6 +60,7 @@ function EcoSystemView(ecoSystemModel, options) {
     EcoSystemConstants.MOTION_BOUNDS = motionBounds;
 
     function handleOrganismAdded(addedOrganismModel) {
+
         // Add a representation of the number.
         var organismNode = new OrganismNode(addedOrganismModel);
         thisView.gridPanelNode.addOrganism(organismNode);

@@ -18,9 +18,12 @@ inherit(BaseOrganismState, DyingState, {
      * @param {number} dt
      */
     step: function (organism, dt) {
-        organism.opacity = Math.max(0, Math.min(organism.opacity - 0.05, 1));
+        organism.opacity = Math.max(0, Math.min(organism.opacity - 0.25, 1));
         if (organism.opacity <= 0) {
-            organism.die();
+            if(!organism.dead){
+                organism.die();
+            }
+
         }
     },
 
