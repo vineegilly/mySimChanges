@@ -37,6 +37,9 @@ inherit(BaseProducerModel, MushroomModel, {
 
     validateExpiryState: function (dt) {
         BaseProducerModel.prototype.validateExpiryState.call(this, dt);
+        if (this.interactionState == EcoSystemConstants.DYING_STATE) {
+            return;
+        }
         if(this.ecoSystemModel.timeLapseSinceRaining>10000){ // even with rain, mushroom dies within 10 seconds
             this.moveToDyingStateBecauseOfNoFood();
         }
