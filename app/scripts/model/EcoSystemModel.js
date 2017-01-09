@@ -290,6 +290,7 @@ inherit(PropertySet, EcoSystemModel, {
         this.playPause = false;
         this.pauseFlag = 1;
         this.resetPlayState();
+        self.timeLapseSinceRaining = 0;
         this.organismInfos.forEach(function (organismInfo) {
             self[organismInfo.name.toLowerCase() + "Quantity"].set(EcoSystemConstants.LOW_QUANTITY);
         });
