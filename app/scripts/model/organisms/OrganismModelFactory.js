@@ -13,7 +13,6 @@ var CoyoteModel = require('../organisms/carnivores/CoyoteModel');
 var SnakeModel = require('../organisms/carnivores/SnakeModel');
 
 var EarthwormModel = require('../organisms/decomposers/EarthwormModel');
-var MushroomModel = require('../organisms/decomposers/MushroomModel');
 
 var MouseModel = require('../organisms/omnivores/MouseModel');
 var RaccoonModel = require('../organisms/omnivores/RaccoonModel');
@@ -22,6 +21,7 @@ var SongbirdModel = require('../organisms/omnivores/SongbirdModel');
 var FlowerModel = require('../organisms/producers/FlowerModel');
 var GrassModel = require('../organisms/producers/GrassModel');
 var TreeModel = require('../organisms/producers/TreeModel');
+var MushroomModel = require('../organisms/producers/MushroomModel');
 
 
 function OrganismModelFactory() {

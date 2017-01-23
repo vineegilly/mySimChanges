@@ -1,7 +1,7 @@
 /**
  * Launches the Simulation , after doing things like showing splash screen,loading images etc
  *
- * @author Sharfudeen Ashraf
+ * @author
  */
 
 
@@ -21,11 +21,9 @@ module.exports = {
 
     //Need to do some preloading ,splash screen etc
     d3.json( url, function( err, organismInfos ) {
-      callback( organismInfos.organisms );
+      callback( organismInfos.test );
     } );
 
   }
 
 };
-
-

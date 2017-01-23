@@ -28,6 +28,7 @@ function QuantitySelectionBox(quantityProperty) {
         {value: EcoSystemConstants.LOW_QUANTITY, color: Color.CYAN, node: new Text(NONE_STR, {font: radioButtonFont})}
 
     ];
+
     var quantityRadioGroup = new RadioButtonGroup(quantityProperty, quantityRadioButtonContent, {
         orientation: 'horizontal',
         selectedLineWidth: 4,
@@ -39,6 +40,7 @@ function QuantitySelectionBox(quantityProperty) {
         children: [quantityRadioGroup],
         spacing: 1
     });
+
 
 }
 

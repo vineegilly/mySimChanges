@@ -1,6 +1,6 @@
 /**
  * The main model containing - EcoSystem
- * @author Sharfudeen Ashraf
+ * @author
  *
  */
 
@@ -9,6 +9,7 @@ var inherit = axon.inherit;
 var PropertySet = axon.PropertySet;
 var Property = axon.Property;
 var ObservableArray = axon.ObservableArray;
+var QuantitySelectionBox = require('../view/QuantitySelectionBox');
 var OverlapRulesFactory = require('../model/organisms/OverlapRulesFactory');
 var RainRulesFactory = require('../model/organisms/RainRulesFactory');
 var EcoSystemConstants = require('./EcoSystemConstants');
@@ -16,6 +17,9 @@ var OrganismModelFactory = require('../model/organisms/OrganismModelFactory');
 var OrganismLifeLineSnapShot = require('../model/organisms/OrganismLifeLineSnapShot');
 var Bounds2 = dot.Bounds2;
 var Vector2 = dot.Vector2;
+//var pauseflag=0;
+var globalModel;
+
 
 /**
  *
@@ -26,14 +30,15 @@ var Vector2 = dot.Vector2;
  */
 function EcoSystemModel(organismInfos, screenBounds) {
     var thisModel = this;
+    globalModel = thisModel;
     PropertySet.call(this, {
         playPause: false,
         populationRange: 1,
         rain: false,
+        pauseFlag:0,
         poisonSpray: false,
         replayMode: false
     });
-
     this.organismInfos = organismInfos;
 
 
@@ -52,6 +57,7 @@ function EcoSystemModel(organismInfos, screenBounds) {
     this.organismLifeLineSnapShots = [];
     this.snapShotCounter = -1;
     this.totalTimeLapse = 0; // in milli seconds
+    this.timeLapseSinceRaining = 0;
     this.totalLifeSpan = EcoSystemConstants.TOTAL_LIFE_SPAN;
 
     thisModel.replayState = {
@@ -66,6 +72,7 @@ function EcoSystemModel(organismInfos, screenBounds) {
             thisModel.play();
         }
         else {
+          //setTimeout(function() {thisModel.pause()}, 1000);
             thisModel.pause();
         }
     });
@@ -73,6 +80,9 @@ function EcoSystemModel(organismInfos, screenBounds) {
     this.rainProperty.link(function (rain) {
         if (rain) {
             thisModel.onRain();
+        }
+        else {
+            thisModel.timeLapseSinceRaining = 0;
         }
     });
 
@@ -85,6 +95,8 @@ function EcoSystemModel(organismInfos, screenBounds) {
 
 
 }
+
+
 
 
 inherit(PropertySet, EcoSystemModel, {
@@ -145,6 +157,13 @@ inherit(PropertySet, EcoSystemModel, {
 
         if (this.isPlaying()) {
 
+          if (this.isRaining()) {
+                this.timeLapseSinceRaining += dt * 1000;
+            }
+            else {
+                this.timeLapseSinceRaining = 0;
+            }
+
             var allModels = [].concat(this.residentOrganismModels.getArray());
             for (var i = 0; i < allModels.length; i++) {
                 for (var j = 0; j < allModels.length; j++) {
@@ -162,6 +181,7 @@ inherit(PropertySet, EcoSystemModel, {
                 RainRulesFactory.applyRainReproductionRule(this, allModels[i], dt);
             }
 
+            //setTimeout(function() { self.addLifeLineSnapShot(dt);}, 2000);
             self.addLifeLineSnapShot(dt);
 
         }
@@ -274,9 +294,19 @@ inherit(PropertySet, EcoSystemModel, {
     },
 
     onClearPlay: function () {
+      //debugger;
+      var self = this;
+        //pauseflag=1;
+        //console.log(pauseflag);
         this.residentOrganismModels.clear();
         this.playPause = false;
+        this.pauseFlag = 1;
         this.resetPlayState();
+        self.timeLapseSinceRaining = 0;
+
+        this.organismInfos.forEach(function (organismInfo) {
+            self[organismInfo.name.toLowerCase() + "Quantity"].set(EcoSystemConstants.LOW_QUANTITY);
+        });
     },
 
     resetPlayState: function () {
@@ -284,50 +314,57 @@ inherit(PropertySet, EcoSystemModel, {
         this.snapShotCounter = 0;
         this.organismLifeLineSnapShots = [];
         this.replayMode = false;
-
         this.replayState.graphStateList = [];
         this.replayState.organismState = [];
     },
 
     play: function () {
-    //  debugger;
+      //debugger;
+      //console.log(this);
         var self = this;
-        //this.resetPlayState();
         var gridSize = EcoSystemConstants.GRID_NODE_DIMENSION;
-        var motionBounds = Bounds2.rect(EcoSystemConstants.ORGANISM_RADIUS, EcoSystemConstants.ORGANISM_RADIUS,
-            gridSize.width - EcoSystemConstants.ORGANISM_RADIUS * 3,
-            gridSize.height - EcoSystemConstants.ORGANISM_RADIUS * 2);
+        var motionBounds = Bounds2.rect((EcoSystemConstants.ORGANISM_RADIUS+10), (EcoSystemConstants.ORGANISM_RADIUS+10),
+            (gridSize.width-10) - EcoSystemConstants.ORGANISM_RADIUS * 3,
+            (gridSize.height-10) - EcoSystemConstants.ORGANISM_RADIUS * 3);
 
         var organismInfos = this.organismInfos;
         organismInfos.forEach(function (organismInfo) {
             var quantity = self[organismInfo.name.toLowerCase() + "Quantity"].get();
-            if (quantity > 0) {
+            if (quantity > 0&& self.pauseFlag == 1 ) {
                 var randomPosX = _.random(motionBounds.minX, motionBounds.maxX);
                 var randomPosY = _.random(motionBounds.minY, motionBounds.maxY);
                 var newPos = motionBounds.closestPointTo(new Vector2(randomPosX, randomPosY));
                 var organismModel = OrganismModelFactory.getOrganism(self, organismInfo, newPos, motionBounds);
                 self.residentOrganismModels.add(organismModel);
                 organismModel.multiply(quantity);
+
             }
         });
 
 
         this.residentOrganismModels.forEach(function (organismModel) {
+          //console.log('1+++');
             organismModel.play();
 
             //keep the state
             self.replayState.organismState.push({
-                name: organismModel.organismInfo.name,
+                name: "organismModel.organismInfo.name",
                 position: organismModel.position
             })
         });
 
     },
 
-    pause: function () {
+    pause: function (dt) {
+      //  pauseflag = pauseflag+1;
+        this.pauseFlag = ++this.pauseFlag;
+
         this.residentOrganismModels.forEach(function (organismModel) {
-            organismModel.pause();
+          //setTimeout(function() { organismModel.pause()}, 1000);
+          organismModel.pause();
+
         });
+
     }
     ,
 

@@ -70,10 +70,3 @@ inherit( Panel, GridPanelNode, {
 } );
 
 module.exports = GridPanelNode;
-
-
-
-
-
-
-

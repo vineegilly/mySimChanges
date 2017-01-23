@@ -1,15 +1,23 @@
 var d3 = require( 'd3' );
+//var EcoSystemModel = require('./EcoSystemView');
+//var emptyArray = require('../model/EcoSystemModel').emptyArray;
+
+
 
 var legendStyle = {
   fill: "white",
   stroke: "black",
   opacity: 0.8
 };
+var userDefinedObj;
 
 
 function ChartLegend() {
 
-  d3.legend = function( g ) {
+
+  d3.legend = function( g,userDefined ) {
+  userDefinedObj = userDefined;
+
     g.each( function() {
       var g = d3.select( this ),
         items = {},
@@ -38,7 +46,20 @@ function ChartLegend() {
         .attr( "y", function( d, i ) { return i + "em"} )
         .attr( "x", "1em" )
         .text( function( d ) {
-          return d.key;
+            //if(d.key == "")
+
+          for(var i=0;i <= userDefinedObj.length ; i++){
+
+            if(userDefinedObj[i]== undefined){
+              return "Grass";
+            }
+            if(d.key == userDefinedObj[i].key){
+               return userDefinedObj[i].value;
+            }
+
+
+          }
+          //return d.key;
         } );
 
       li.selectAll( "circle" )
@@ -72,4 +93,3 @@ function ChartLegend() {
 ChartLegend();
 
 module.exports = ChartLegend; // Not strictly required
-

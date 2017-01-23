@@ -119,8 +119,8 @@ inherit( CanvasNode, EcoSystemEffectNode, {
     var center = ripple.center;
     ripple.incrementFrame();
     for ( var i = 0; i < width; ++i ) {
-      ctx.strokeStyle = i % 20 === 0 ? 'hsl(hue, 80%, 50%)'.replace( 'hue',
-        (360 / (width / 3) * i - frame) % 360
+      ctx.strokeStyle = i % 20 === 0 ? 'hsl(hue, 100%, 20%)'.replace( 'hue',
+        90
       ) : 'rgba(0, 0, 0, .08)';
       ctx.beginPath();
       ctx.arc( center.x, center.y, (i + frame) % width / 2, 0, Math.PI * 2 );

@@ -18,14 +18,20 @@ inherit(BaseOrganismState, DyingState, {
      * @param {number} dt
      */
     step: function (organism, dt) {
-        organism.opacity = Math.max(0, Math.min(organism.opacity - 0.05, 1));
+        organism.opacity = Math.max(0, Math.min(organism.opacity - 0.25, 1));
         if (organism.opacity <= 0) {
-            organism.die();
+          //  organism.die();
+            if(!organism.dead){
+                organism.die();
+            }
         }
     },
 
     entered: function (organism) {
-
+            if(organism.name == 'mushroom')
+            console.log(organism);
+            //console.log(ecoSystemModel.isRaining());
+            //organism.canReproduce();
     },
 
     exit: function (organism) {

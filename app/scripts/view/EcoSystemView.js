@@ -1,6 +1,6 @@
 /**
  * The main model containing - EcoSystem
- * @author Sharfudeen Ashraf
+ * @author
  *
  */
 
@@ -28,7 +28,11 @@ var CHART_PANEL_TOP_OFFSET = 20;
 var PANEL_VERTICAL_PADDING = 25;
 
 
-function EcoSystemView(ecoSystemModel, options) {
+function EcoSystemView(ecoSystemModel, options,organismsInfo) {
+
+      //console.log("ecoView");
+      //console.log(organismsInfo);
+
     var thisView = this;
     thisView.model = ecoSystemModel;
     BaseScreenView.call(thisView, {
@@ -82,7 +86,7 @@ function EcoSystemView(ecoSystemModel, options) {
     //Initial Organism Creation
     ecoSystemModel.residentOrganismModels.forEach(handleOrganismAdded);
 
-    thisView.populationChartNode = new PopulationChartNode();
+    thisView.populationChartNode = new PopulationChartNode(organismsInfo);
 
     // Observe new items
     ecoSystemModel.residentOrganismModels.addItemAddedListener(handleOrganismAdded);
@@ -109,6 +113,17 @@ function EcoSystemView(ecoSystemModel, options) {
         viewWrapper.translate(options.tx || 0, options.ty || 0);
     }
 
+    thisView.model.playPauseProperty.link(function (playpause) {
+        if(playpause){
+            thisView.organismPanelNode._children[1]._children[2]._children[1].visible = false;
+            setTimeout(function () {
+                thisView.organismPanelNode._children[1]._children[2]._children[1].visible = true;
+            },2000)
+        }
+
+    });
+
+    //console.log(thisView.organismPanelNode._children[1]._children[2]);
     $(window).resize(function () {
         // Do calcualtions here
         // you can scale organismPanel Node
@@ -129,10 +144,11 @@ inherit(BaseScreenView, EcoSystemView, {
             return;
         }
 
-        thisView.gridPanelNode.step(dt);
+            thisView.gridPanelNode.step(dt);
         if (thisView.model.isPlaying()) {
             thisView.populationChartNode.updateChart(thisView.model.organismLifeLineSnapShots);
         }
+
     },
 
     replay: function (prevReplayState) {
@@ -162,6 +178,11 @@ inherit(BaseScreenView, EcoSystemView, {
             this.gridPanelNode.scale(options.gridScale);
         }
 
+    },
+
+    constantsObj: function () {
+      var Obj = {A:100};
+      return Obj;
     }
 
 

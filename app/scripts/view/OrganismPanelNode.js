@@ -113,6 +113,7 @@ function OrganismPanelNode(ecoSystemModel, gridPaneNode, populationChartNode, mo
 
 
     var playerBox = new PlayerBox(ecoSystemModel.playPauseProperty, ecoSystemModel.rainProperty, function () {
+      
         populationChartNode.clearChart();
         ecoSystemModel.onClearPlay();
 

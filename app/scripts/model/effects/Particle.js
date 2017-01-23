@@ -34,12 +34,31 @@ inherit(Object, Particle, {
         context2D.scale(this.scale, this.scale);
 
         // drawing a filled circle in the particle's local space
-        context2D.beginPath();
-        context2D.arc(0, 0, this.radius, 0, Math.PI * 2, true);
-        context2D.closePath();
+        // context2D.beginPath();
+        // context2D.arc(0, 0, this.radius, 0, Math.PI * 2, true);
+        // context2D.closePath();
 
-        context2D.fillStyle = this.color;
-        context2D.fill();
+        context2D.beginPath();
+      context2D.moveTo(0, 0);
+      context2D.lineTo(20, 40);
+      context2D.lineWidth = 2;
+      context2D.strokeStyle = 'red';
+      context2D.stroke();
+
+      context2D.beginPath();
+    context2D.moveTo(0, 40);
+    context2D.lineTo(20, 0);
+  
+
+    //  context2D.lineTo(10, 10);
+    //  context2D.lineTo(420, 150);
+    //  context2D.closePath();
+      context2D.lineWidth = 2;
+      context2D.strokeStyle = 'red';
+      context2D.stroke();
+
+        //context2D.fillStyle = this.color;
+        //context2D.fill();
 
         context2D.restore();
     },
@@ -51,4 +70,3 @@ inherit(Object, Particle, {
 });
 
 module.exports = Particle;
-

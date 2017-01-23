@@ -21864,6 +21864,8 @@
 
         return inherit(Object, Input, {
                 batchEvent: function (domEvent, batchType, callback, triggerImmediate) {
+
+
                     // If our display is not interactive, do not respond to any events (but still prevent default)
                     if (this.display.interactive) {
                         this.batchedEvents.push(BatchedDOMEvent.createFromPool(domEvent, batchType, callback));
@@ -21877,7 +21879,7 @@
 
                     // Don't preventDefault for key events, which often need to be handled by the browser
                     // (such as F5, CMD+R, CMD+OPTION+J, etc), see #332
-                    if (batchType !== BatchedDOMEvent.KEY_TYPE) {
+                    if (batchType !== BatchedDOMEvent.KEY_TYPE && domEvent.target.id === "main-scene-sim") {
                         domEvent.preventDefault();
                     }
                 },
@@ -22562,7 +22564,7 @@
                     this.dispatchToTargets(trail, pointer, type, inputEvent, bubbles);
 
                     // TODO: better interactivity handling?
-                    if (!trail.lastNode().interactive && !pointer.isKey && event && event.preventDefault) {
+                    if (!trail.lastNode().interactive && !pointer.isKey && event && event.preventDefault && event.target.id === "main-scene-sim") {
                         event.preventDefault();
                     }
                 },

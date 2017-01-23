@@ -7,20 +7,26 @@ var d3 = require('d3');
 var OrganismRuleConstants = require('../model/OrganismRuleConstants');
 var ChartLegend = require('./ChartLegend');
 
+
 // constants
 var POPULATION_CHART_ID = "populationChartDiv";
 var MARGINS = {
     top: 20,
     right: 20,
     bottom: 20,
-    left: 35
+    left: 75
 };
 
 var CHART_WIDTH = EcoSystemConstants.CHART_NODE_DIMENSION.width;
 var CHART_HEIGHT = EcoSystemConstants.CHART_NODE_DIMENSION.height;
+var organismsInfoLocal;
 
 
-function PopulationChartNode() {
+function PopulationChartNode(organismsInfo) {
+
+
+  organismsInfoLocal = organismsInfo;
+
     var thisPanel = this;
     // vertical panel
     Node.call(thisPanel);
@@ -57,7 +63,7 @@ inherit(Node, PopulationChartNode, {
         var svgSelection = this.svgSelection;
         this.xScale = d3.scale.linear()
             .range([MARGINS.left, CHART_WIDTH - MARGINS.right])
-            .domain([0, EcoSystemConstants.TOTAL_LIFE_SPAN]);
+            .domain([180, EcoSystemConstants.TOTAL_LIFE_SPAN]);
 
         // number of organisms
         this.yScale = d3.scale.linear().range([CHART_HEIGHT - MARGINS.top, MARGINS.bottom])
@@ -65,7 +71,7 @@ inherit(Node, PopulationChartNode, {
 
         var xAxis = d3.svg.axis()
             .scale(this.xScale)
-            .ticks(12)
+            .ticks(15)
             .tickFormat(function (d) {
                 if (d === 0) {
                     return "";
@@ -83,7 +89,7 @@ inherit(Node, PopulationChartNode, {
             .call(xAxis);
 
         svgSelection.append("svg:g")
-            .attr("transform", "translate(" + (MARGINS.left) + ",0)")
+            .attr("transform", "translate(" + ((MARGINS.left)) + ",0)")
             .call(yAxis);
 
         this.organismLifeLine = d3.svg.line().interpolate("basis")
@@ -99,12 +105,13 @@ inherit(Node, PopulationChartNode, {
             .attr("transform", "translate(220,20)")
             .style("font-size", "12px")
             .style("font-size", "20px")
-            .attr("data-style-padding", 10);
+            .attr("data-style-padding", 50);
     },
 
     //private
     drawLegends: function () {
-        this.legend.call(d3.legend);
+
+        this.legend.call(d3.legend,organismsInfoLocal);
     },
 
     /**
@@ -113,6 +120,7 @@ inherit(Node, PopulationChartNode, {
      */
     updateChart: function (organismSnapShotCollection) {
         if (this.prevCollectionCount === organismSnapShotCollection.length) {
+          //console.log('2++++');
             return;
         }
 
@@ -121,9 +129,11 @@ inherit(Node, PopulationChartNode, {
         var groupedElements = _.groupBy(organismSnapShotCollection, function (organismSnapShot) {
             return organismSnapShot.name;
         });
+
         var data = [];
         _.each(groupedElements, function (organismSnapShots, name) {
             data.push({name: name, points: organismSnapShots});
+
         });
 
         var svgSelection = this.svgSelection;
@@ -168,6 +178,7 @@ inherit(Node, PopulationChartNode, {
 
     clearChart: function () {
         this.svgSelection.selectAll(".line").remove();
+        this.drawLegends();
     }
 
 

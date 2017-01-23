@@ -1,14 +1,15 @@
 /**
  * Main entry point for the app.
  *
- * @author Sharfudeen Ashraf
+ * @author
  */
 
 //constants
-var ASSERT = true; // ASSET slows down the code, so use nly for debugging
+var ASSERT = false; // ASSET slows down the code, so use nly for debugging
 
-var SimLauncher = require('./core/SimLauncher');
+
 var SimApp = require('./core/SimApp');
+var SimLauncher = require('./core/SimLauncher');
 var SimScreen = require('./core/Screen');
 var EcoSystemModel = require('./model/EcoSystemModel');
 var EcoSystemView = require('./view/EcoSystemView');
@@ -34,21 +35,24 @@ var SimLaunchAdapter = {
 
         }, url);
     },
-
     startApp: function (organismsInfo, sceneId, options) {
+            var names = organismsInfo.slice(organismsInfo.length-1, organismsInfo.length)[0].newNameObj;
+
+            //  console.log(names);
+            organismsInfo=organismsInfo.splice(0,organismsInfo.length-1);
+
         var createModel = function () {
             return new EcoSystemModel(organismsInfo);
         };
 
         var createView = function (model) {
-            ecoSystemView = new EcoSystemView(model, options); // store it globally
+            ecoSystemView = new EcoSystemView(model, options,names); // store it globally
             return ecoSystemView;
         };
 
         var energySimScreen = new SimScreen(energySimTitle, createModel, createView);
         var app = new SimApp(energySimTitle, energySimScreen, sceneId, options);
         //start rendering..
-
 
         app.start();
     },
@@ -82,6 +86,7 @@ var SimLaunchAdapter = {
     },
 
     clear: function () {
+      //debugger;
         ecoSystemView.clear();
     },
 

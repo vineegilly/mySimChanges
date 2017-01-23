@@ -9,6 +9,7 @@ var imageNode = new Image(beetle);
 
 var IMAGE_SCALE = 0.1;
 imageNode.scale(IMAGE_SCALE);
+//console.log(imageNode);
 
 
 var EcoSystemConstants = {
@@ -19,12 +20,12 @@ var EcoSystemConstants = {
         GRID_PANEL_STROKE_COLOR: new Color(100, 100, 100),
         PANEL_TITLE_FONT: new SimFont({family: 'Futura', size: 18, weight: 'bold'}),
         ANIMATION_VELOCITY: 500,
-        PLAY_STEP_DISTANCE: imageNode.width,
-        ORGANISM_RADIUS: imageNode.width / 2,
-        MOVE_APART_DISTANCE: imageNode.width / 2,
+        PLAY_STEP_DISTANCE: 58.2,
+        ORGANISM_RADIUS: 29.1,
+        MOVE_APART_DISTANCE: 29.1,
         IMAGE_SCALE: IMAGE_SCALE,
         GRID_NODE_DIMENSION: new Dimension2(450, 370),
-        CHART_NODE_DIMENSION: new Dimension2(350, 630),
+        CHART_NODE_DIMENSION: new Dimension2(820, 630),
         ORGANISM_PANEL_DIMENSION: new Dimension2(440, 150),
         PARTICLE_COLOR: new Color(255, 0, 0),
         SPRAY_COLOR: new Color(200, 200, 0),
@@ -35,6 +36,9 @@ var EcoSystemConstants = {
         SNAPSHOT_CAPTURE_ELAPSE: 500,
         TOTAL_LIFE_SPAN: 12000,
         LOW_QUANTITY:0,
+        BOUND_MINX:1,
+        BOUND_MINY:1,
+
 
         // interaction states
         DYING_STATE: 1,

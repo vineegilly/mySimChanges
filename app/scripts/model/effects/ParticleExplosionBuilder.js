@@ -20,8 +20,8 @@ inherit(Object, ParticleExplosionBuilder, {},
          */
         buildParticles: function (x, y, color) {
             var minSize = 0;
-            var maxSize = 0;
-            var count = 30;
+            var maxSize = 1;
+            var count = 1;
             var minSpeed = 60.0;
             var maxSpeed = 200.0;
             var minScaleSpeed = 1.0;

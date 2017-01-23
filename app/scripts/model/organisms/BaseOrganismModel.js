@@ -1,3 +1,4 @@
+
 var inherit = axon.inherit;
 var PropertySet = axon.PropertySet;
 var EcoSystemConstants = require('../EcoSystemConstants');
@@ -115,6 +116,9 @@ inherit(PropertySet, BaseOrganismModel, {
     },
 
     incrementTimeElapsedWithoutFood: function (dt) {
+      if(this.canGerminate()){
+            return; // the rain rules will increment the lapse
+        }
         this.timeElapsedWithoutFood += dt * 1000; // in milliseconds
     },
 
@@ -124,6 +128,9 @@ inherit(PropertySet, BaseOrganismModel, {
 
 
     validateExpiryState: function (dt) {
+      if (this.interactionState == EcoSystemConstants.DYING_STATE) {
+            return;
+        }
         if (this.timeElapsedWithoutFood >= this.getTimeThresholdWithoutFood()) {
             this.moveToDyingStateBecauseOfNoFood();
         }
@@ -496,6 +503,20 @@ inherit(PropertySet, BaseOrganismModel, {
             this.ecoSystemModel.addNewlyReproducedOrganism(newlyProducedModel);
             this.newlyProducedModels.push(newlyProducedModel);
         }
+
+    },
+
+    /**
+     * some dying organisms produce new organism
+     * @param organismToProduce
+     */
+    produceNewOrganism:function(organismToProduce){
+        var currentPosition = this.position;
+        var createdThroughInteraction = true;
+        var newlyProducedModel = this.ecoSystemModel.cloneOrganism(organismToProduce, currentPosition, EcoSystemConstants.BEING_PRODUCED_STATE, createdThroughInteraction);
+        newlyProducedModel.timeElapsedSinceReproduction = 0;
+      //  this.ecoSystemModel.addNewlyReproducedOrganism(newlyProducedModel);
+        this.newlyProducedModels.push(newlyProducedModel);
 
     },
 

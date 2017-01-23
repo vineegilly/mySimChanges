@@ -42,7 +42,14 @@ function PlayerBox(playPauseProperty, rainProperty, onClearPlay) {
         yMargin: 4,
         baseColor: new Color(239, 239, 195),
         stroke: null,
-        lineWidth: 0 // Only meaningful if stroke is non-null
+        lineWidth: 0, // Only meaningful if stroke is non-null
+        listener: function () {
+            alert('listener');//onClearPlay();
+        }
+        // listener: function () {
+        //     //onClearPlay();
+        //     console.log('palyerBox');
+        // }
     });
 
     var options = {
@@ -88,4 +95,3 @@ inherit(HBox, PlayerBox, {});
 
 
 module.exports = PlayerBox;
-

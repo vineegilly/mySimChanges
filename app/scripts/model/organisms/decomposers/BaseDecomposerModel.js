@@ -21,16 +21,27 @@ inherit(BaseOrganismModel, BaseDecomposerModel, {
      * decomposers have different set of rules
      * @param dt
      */
-    step: function (dt) {
-        if (!this.userControlled) {
-            this.stepState(dt);
-            this.doStep(dt);
-        }
-    },
+    // step: function (dt) {
+    //     if (!this.userControlled) {
+    //         this.stepState(dt);
+    //         this.doStep(dt);
+    //     }
+    // },
+
+    // doStep: function (dt) {
+    //
+    //
+    // },
+
+  
 
 
     initState: function () {
         this.goToRest();
+    },
+
+    getTimeThresholdForPoison: function () {
+        return 0;
     }
 
 

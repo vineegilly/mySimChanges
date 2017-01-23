@@ -3,6 +3,7 @@ var path = require('path');
 var $ = require('gulp-load-plugins')();
 var del = require('del');
 var strip = require('gulp-strip-comments');
+var wait = require('gulp-wait');
 // set variable via $ gulp --type production
 var environment = $.util.env.type || 'development';
 var isProduction = environment === 'production';
@@ -57,6 +58,7 @@ gulp.task('productionScript', function () {
 // copy html from app to dist
 gulp.task('html', function () {
     return gulp.src(app + 'index.html')
+        .pipe(wait(10000))
         .pipe(gulp.dest(dist))
         .pipe($.size({title: 'html'}))
         .pipe($.connect.reload());
