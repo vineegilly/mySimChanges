@@ -26,7 +26,7 @@ var GRID_PANEL_OFFSET_X = 50;
 var GRID_PANEL_OFFSET_Y = 70;
 var CHART_PANEL_TOP_OFFSET = 20;
 var PANEL_VERTICAL_PADDING = 25;
-
+var globalThis;
 
 function EcoSystemView(ecoSystemModel, options,organismsInfo) {
 
@@ -34,6 +34,7 @@ function EcoSystemView(ecoSystemModel, options,organismsInfo) {
       //console.log(organismsInfo);
 
     var thisView = this;
+
     thisView.model = ecoSystemModel;
     BaseScreenView.call(thisView, {
         layoutBounds: new Bounds2(0, 0, 1024, 704)
@@ -48,6 +49,7 @@ function EcoSystemView(ecoSystemModel, options,organismsInfo) {
     thisView.addChild(viewBoundsPath);
 
     var viewWrapper = new Node();
+    globalThis = viewWrapper;
 
     thisView.addChild(viewWrapper);
 
@@ -170,12 +172,11 @@ inherit(BaseScreenView, EcoSystemView, {
      * @param options
      */
     resizeParts: function (options) {
-        if (options && options.gridScale) {
-            this.gridPanelNode.scale(options.gridScale);
-        }
+      var thisView = this;
+        if (options && options.scale) {
+            thisView.translate(options.tx, options.ty);
+            thisView.scale(options.scale);
 
-        if (options && options.organismPanelScale) {
-            this.gridPanelNode.scale(options.gridScale);
         }
 
     },

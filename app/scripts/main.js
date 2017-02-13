@@ -22,6 +22,7 @@ var ecoSystemView = null;
 var SimLaunchAdapter = {
 
     launchByURL: function (url, sceneId, options) {
+
         options = _.extend({
                 tx: 0, ty: 0, scale: 1, transformOrder: 1
             }, options
@@ -64,6 +65,8 @@ var SimLaunchAdapter = {
      * @param options // backgroundColor: 'rgb( 242, 255, 204 )',screenWidth:1024,screenHeight:768
      */
     launchUsingData: function (organismsInfo, sceneId, options) {
+      console.log(sceneId);
+      debugger;
         var self = this;
         options = _.extend({
                 tx: 0, ty: 0, scale: 0.8, transformOrder: 1

@@ -16,7 +16,7 @@ var ButtonListener = scenery.ButtonListener;
 var Timer = require('./Timer');
 
 // constants
-var LAYOUT_BOUNDS = new Bounds2(0, 0, 1024, 704);
+var LAYOUT_BOUNDS = new Bounds2(0, 0, 980, 604);
 
 /**
  *
@@ -132,6 +132,7 @@ inherit(PropertySet, SimApp, {
     },
 
     resizeToWindow: function () {
+      console.log('simApp');
         //  this.resize(this.sceneWidth, this.sceneHeight);
         this.resize(window.innerWidth, window.innerHeight);
     },
@@ -163,8 +164,8 @@ inherit(PropertySet, SimApp, {
 
         // update our scale and bounds properties after other changes (so listeners can be fired after screens are resized)
         this.scale = scale;
-        this.bounds = new Bounds2(0, 0, width, height);
-        this.screenBounds = new Bounds2(0, 0, width, screenHeight);
+        this.bounds = new Bounds2(0, 0, 2*width, 2*height);
+        this.screenBounds = new Bounds2(0, 0, 2*width, 2*screenHeight);
 
         this.trigger('resized', this.bounds, this.screenBounds, this.scale);
     },

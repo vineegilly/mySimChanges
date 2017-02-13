@@ -34177,8 +34177,8 @@
             // renders what it can into a Canvas (so far, Canvas and SVG layers work fine)
             canvasSnapshot: function (callback) {
                 var canvas = document.createElement('canvas');
-                canvas.width = this._size.width;
-                canvas.height = this._size.height;
+                canvas.width = this._size.width+400;
+                canvas.height = this._size.height+400;
 
                 var context = canvas.getContext('2d');
 
