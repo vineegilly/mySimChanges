@@ -61,7 +61,7 @@ function BaseOrganismModel(ecoSystemModel, organismInfo, initialPosition, motion
     this.motionBounds = motionBounds;
     this.multipliedOrganisms = [this];// add the current one
 
-   this.defineTimeLapseRules();
+    this.defineTimeLapseRules();
 
     // to differentiate natural and death by predator
     this.causeOfDying = -1;
@@ -85,10 +85,10 @@ inherit(PropertySet, BaseOrganismModel, {
 
     },
 
-    defineTimeLapseRules:function()
-    {
+    defineTimeLapseRules: function () {
         this.timeElapsedWithoutFood = 0;
         this.timeElapsedSinceReproduction = OrganismRuleConstants[this.name].REPRODUCE_RULE.elapse; // start with the ability to reproduce
+
     },
 
     onRain: function () {
@@ -116,7 +116,11 @@ inherit(PropertySet, BaseOrganismModel, {
     },
 
     incrementTimeElapsedWithoutFood: function (dt) {
+<<<<<<< HEAD
       if(this.canGerminate()){
+=======
+        if(this.canGerminate()){
+>>>>>>> 2fed0dfadb2fb8ee5621d62ef388fc6ee8d0bde2
             return; // the rain rules will increment the lapse
         }
         this.timeElapsedWithoutFood += dt * 1000; // in milliseconds
@@ -128,7 +132,9 @@ inherit(PropertySet, BaseOrganismModel, {
 
 
     validateExpiryState: function (dt) {
+
       if (this.interactionState == EcoSystemConstants.DYING_STATE) {
+
             return;
         }
         if (this.timeElapsedWithoutFood >= this.getTimeThresholdWithoutFood()) {
@@ -184,6 +190,7 @@ inherit(PropertySet, BaseOrganismModel, {
         this.setState(dyingState);
         this.ecoSystemModel.addDyingOrganisms(this);
         this.interactionState = EcoSystemConstants.DYING_STATE;
+
     },
 
     startReproducing: function (otherOrganism) {
@@ -506,6 +513,7 @@ inherit(PropertySet, BaseOrganismModel, {
 
     },
 
+
     /**
      * some dying organisms produce new organism
      * @param organismToProduce
@@ -523,7 +531,7 @@ inherit(PropertySet, BaseOrganismModel, {
     /**
      * True only for non-animate beings like mushroom, grass etc
      */
-    germinate:function(){
+    germinate: function () {
 
     },
 
@@ -542,7 +550,7 @@ inherit(PropertySet, BaseOrganismModel, {
         }
     },
 
-    isInAnimate:function(){
+    isInAnimate: function () {
         return false;
     }
 

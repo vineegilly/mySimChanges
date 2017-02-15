@@ -123,8 +123,6 @@ inherit(Node, PopulationChartNode, {
           //console.log('2++++');
             return;
         }
-
-
         var self = this;
         var groupedElements = _.groupBy(organismSnapShotCollection, function (organismSnapShot) {
             return organismSnapShot.name;

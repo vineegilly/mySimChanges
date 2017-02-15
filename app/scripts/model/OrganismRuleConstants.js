@@ -120,6 +120,7 @@ var OrganismRuleConstants = {
     mushroom: {
        prey: ["beetle", "rabbit", "deer", "songbird", "mouse"], predator: [],
         color: "#c51b7d",
+        prey:["rabbit","mouse","deer"],
         DIE_NO_FOOD: 6000,
         REPRODUCE_RULE: {offspring: 0, elapse: 12000},
         growsByRain: true

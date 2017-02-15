@@ -19,9 +19,9 @@ inherit(Object, RainRulesFactory, {},
 
 
             if (ecoSystemModel.isRaining()) {
-
                 organism.timeElapsedSinceReproduction += dt * 1000;
                 organism.timeElapsedWithoutFood = 0;
+
                 var reproductionElapsedTime = OrganismRuleConstants[organism.name].REPRODUCE_RULE.elapse;
                 if (organism.timeElapsedSinceReproduction > reproductionElapsedTime) {
                     organism.germinate();
@@ -30,6 +30,7 @@ inherit(Object, RainRulesFactory, {},
             }
             else {
                 organism.timeElapsedWithoutFood += dt * 1000;
+
                 organism.timeElapsedSinceReproduction = 0;
             }
         }
