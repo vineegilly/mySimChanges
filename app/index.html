@@ -75,8 +75,8 @@
 <button onclick="review()">Review</button>
 
 <button id="sClear" onclick="clearSimulation()">Clear</button>
-<button id="magnific" onclick="resizeParts(scaleFactor)">Zoom</button>
-
+<button id="magnificOn" onclick="resizeParts(scaleFactor)">ZoomOn</button>
+<button id="magnificOff" onclick="resetResizeParts()">ZoomOff</button>
 <div id="main-scene" style="position:relative;">
 </div>
 
@@ -106,7 +106,7 @@ $(document).ready(function(){
   "earthworm":"HHHH"
 }
 ];
-var scaleFactor = {scale:2.2, tx:0, ty:0};
+var scaleFactor = {scale:1.2, tx:0, ty:0};
     var organisms = [{
       "name": "hawk"
     },
@@ -155,10 +155,9 @@ var scaleFactor = {scale:2.2, tx:0, ty:0};
     }
    function resizeParts(options) {
         EcoSystemLauncher.resizeParts(options);
-        console.log($('#main-scene-sim').width());
-
-
-
+    }
+    function resetResizeParts(){
+      EcoSystemLauncher.resetResizeParts();
     }
 
 </script>

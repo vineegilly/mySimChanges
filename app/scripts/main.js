@@ -66,7 +66,7 @@ var SimLaunchAdapter = {
      */
     launchUsingData: function (organismsInfo, sceneId, options) {
       console.log(sceneId);
-      debugger;
+      //debugger;
         var self = this;
         options = _.extend({
                 tx: 0, ty: 0, scale: 0.8, transformOrder: 1
@@ -95,6 +95,9 @@ var SimLaunchAdapter = {
 
     resizeParts: function (options) {
         ecoSystemView.resizeParts(options);
+    },
+    resetResizeParts: function () {
+      ecoSystemView.resetResizeParts();
     }
 
 };

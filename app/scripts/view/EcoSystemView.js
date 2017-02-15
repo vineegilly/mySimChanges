@@ -28,12 +28,14 @@ var CHART_PANEL_TOP_OFFSET = 20;
 var PANEL_VERTICAL_PADDING = 25;
 var globalThis;
 
+
 function EcoSystemView(ecoSystemModel, options,organismsInfo) {
 
-      //console.log("ecoView");
-      //console.log(organismsInfo);
+    //console.log("ecoView");
+    //console.log(organismsInfo);
 
     var thisView = this;
+    console.log(thisView);
 
     thisView.model = ecoSystemModel;
     BaseScreenView.call(thisView, {
@@ -49,7 +51,7 @@ function EcoSystemView(ecoSystemModel, options,organismsInfo) {
     thisView.addChild(viewBoundsPath);
 
     var viewWrapper = new Node();
-    globalThis = viewWrapper;
+    //globalThis = viewWrapper;
 
     thisView.addChild(viewWrapper);
 
@@ -124,6 +126,9 @@ function EcoSystemView(ecoSystemModel, options,organismsInfo) {
         }
 
     });
+    this.firststateView =  thisView;
+    console.log(this.firststateView);
+    globalThis = viewWrapper;
 
     //console.log(thisView.organismPanelNode._children[1]._children[2]);
     $(window).resize(function () {
@@ -146,7 +151,7 @@ inherit(BaseScreenView, EcoSystemView, {
             return;
         }
 
-            thisView.gridPanelNode.step(dt);
+        thisView.gridPanelNode.step(dt);
         if (thisView.model.isPlaying()) {
             thisView.populationChartNode.updateChart(thisView.model.organismLifeLineSnapShots);
         }
@@ -172,18 +177,36 @@ inherit(BaseScreenView, EcoSystemView, {
      * @param options
      */
     resizeParts: function (options) {
-      var thisView = this;
+        var thisView = this; // setting the current state to initial state
+         thisView= this.firststateView;
+         console.log("1234");
+         console.log(globalThis);
+         globalThis._children[2].x = globalThis.layoutBounds.x + GRID_PANEL_OFFSET_X;
+         globalThis._children[2].y = globalThis.layoutBounds.y + GRID_PANEL_OFFSET_Y;
+
+         globalThis._children[0].x = globalThis.gridPanelNode.bounds.left;
+         globalThis._children[0].y = globalThis.organismPanelNode.x + globalThis.organismPanelNode.bounds.width + 5;
+
+         globalThis._children[1].x = globalThis.gridPanelNode.bounds.bottom + PANEL_VERTICAL_PADDING;
+         globalThis._children[1].y = globalThis.gridPanelNode.y + CHART_PANEL_TOP_OFFSET;
+         console.log("exit");
+
         if (options && options.scale) {
             thisView.translate(options.tx, options.ty);
             thisView.scale(options.scale);
-
         }
 
     },
 
+    resetResizeParts: function () {
+        var thisView = this;
+        thisView.translate(0, 0);
+        thisView.scale(0.1);
+    },
+
     constantsObj: function () {
-      var Obj = {A:100};
-      return Obj;
+        var Obj = {A:100};
+        return Obj;
     }
 
 
