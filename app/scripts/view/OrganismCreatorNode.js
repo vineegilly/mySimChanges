@@ -18,7 +18,14 @@ function OrganismCreatorNode(organismModel, ecosystemModel) {
     appearanceNode.scale(EcoSystemConstants.IMAGE_SCALE);
 
     var quantityProperty = ecosystemModel[organismModel.name.toLowerCase() + "Quantity"];
-    var quantitySelectionBox = new QuantitySelectionBox(quantityProperty);
+    if(organismModel.name == "flower"){
+        var med_Quant = 18;
+        var high_Quant = 38;
+    }else{
+        var med_Quant = 10;
+        var high_Quant = 20;
+    }
+    var quantitySelectionBox = new QuantitySelectionBox(quantityProperty, med_Quant, high_Quant);
     var organismWithQuantity = new VBox({
         children: [appearanceNode, quantitySelectionBox],
         spacing: 4,

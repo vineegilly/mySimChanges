@@ -20,17 +20,9 @@ inherit(BaseOrganismState, DyingState, {
     step: function (organism, dt) {
         organism.opacity = Math.max(0, Math.min(organism.opacity - 0.25, 1));
         if (organism.opacity <= 0) {
-<<<<<<< HEAD
-          //  organism.die();
             if(!organism.dead){
                 organism.die();
             }
-=======
-            if(!organism.dead){
-                organism.die();
-            }
-
->>>>>>> 2fed0dfadb2fb8ee5621d62ef388fc6ee8d0bde2
         }
     },
 

@@ -27,6 +27,7 @@ var GRID_PANEL_OFFSET_Y = 70;
 var CHART_PANEL_TOP_OFFSET = 20;
 var PANEL_VERTICAL_PADDING = 25;
 var globalThis;
+var globalWrapper;
 
 
 function EcoSystemView(ecoSystemModel, options,organismsInfo) {
@@ -35,7 +36,8 @@ function EcoSystemView(ecoSystemModel, options,organismsInfo) {
     //console.log(organismsInfo);
 
     var thisView = this;
-    console.log(thisView);
+        //globalThis = this;
+    globalThis = thisView;
 
     thisView.model = ecoSystemModel;
     BaseScreenView.call(thisView, {
@@ -130,8 +132,9 @@ function EcoSystemView(ecoSystemModel, options,organismsInfo) {
 
     });
     this.firststateView =  thisView;
-    console.log(this.firststateView);
-    globalThis = viewWrapper;
+   // console.log(this.firststateView);
+
+    globalWrapper = viewWrapper;
 
     //console.log(thisView.organismPanelNode._children[1]._children[2]);
     $(window).resize(function () {
@@ -153,7 +156,7 @@ inherit(BaseScreenView, EcoSystemView, {
             thisView.populationChartNode.updateChart(thisView.model.organismLifeLineSnapShots);
             return;
         }
-
+        //setTimeout(function() {thisView.gridPanelNode.step(dt)}, 1000);
         thisView.gridPanelNode.step(dt);
         if (thisView.model.isPlaying()) {
             thisView.populationChartNode.updateChart(thisView.model.organismLifeLineSnapShots);
@@ -181,22 +184,15 @@ inherit(BaseScreenView, EcoSystemView, {
      */
     resizeParts: function (options) {
         var thisView = this; // setting the current state to initial state
-         thisView= this.firststateView;
-         console.log("1234");
-         console.log(globalThis);
-         globalThis._children[2].x = globalThis.layoutBounds.x + GRID_PANEL_OFFSET_X;
-         globalThis._children[2].y = globalThis.layoutBounds.y + GRID_PANEL_OFFSET_Y;
+         //thisView= this.firststateView;
 
-         globalThis._children[0].x = globalThis.gridPanelNode.bounds.left;
-         globalThis._children[0].y = globalThis.organismPanelNode.x + globalThis.organismPanelNode.bounds.width + 5;
-
-         globalThis._children[1].x = globalThis.gridPanelNode.bounds.bottom + PANEL_VERTICAL_PADDING;
-         globalThis._children[1].y = globalThis.gridPanelNode.y + CHART_PANEL_TOP_OFFSET;
-         console.log("exit");
 
         if (options && options.scale) {
             thisView.translate(options.tx, options.ty);
             thisView.scale(options.scale);
+            
+
+
         }
 
     },

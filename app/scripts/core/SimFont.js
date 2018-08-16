@@ -23,7 +23,7 @@ function SimFont( options ) {
 
   //  defaults
   options = _.extend( {
-    family: 'Arial'
+    family: 'Verdana'
   }, options );
 
   // Guarantee a fallback family

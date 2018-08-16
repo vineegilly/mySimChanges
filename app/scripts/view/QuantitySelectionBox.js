@@ -19,12 +19,12 @@ var NONE_STR = "N";
  * @param quantityProperty
  * @constructor
  */
-function QuantitySelectionBox(quantityProperty) {
+function QuantitySelectionBox(quantityProperty, med_Quant, high_Quant) {
     var thisBox = this;
     var radioButtonFont = RADIO_BUTTON_TEXT_OPTIONS.font;
     var quantityRadioButtonContent = [
-        {value: 20, color: Color.GREEN, node: new Text(HIGH_STR, {font: radioButtonFont})},
-        {value: 10, color: Color.ORANGE, node: new Text(MEDIUM_STR, {font: radioButtonFont})},
+        {value: high_Quant, color: Color.GREEN, node: new Text(HIGH_STR, {font: radioButtonFont})},
+        {value: med_Quant, color: Color.ORANGE, node: new Text(MEDIUM_STR, {font: radioButtonFont})},
         {value: EcoSystemConstants.LOW_QUANTITY, color: Color.CYAN, node: new Text(NONE_STR, {font: radioButtonFont})}
 
     ];

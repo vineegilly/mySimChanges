@@ -1,8 +1,23 @@
 var d3 = require( 'd3' );
 //var EcoSystemModel = require('./EcoSystemView');
 //var emptyArray = require('../model/EcoSystemModel').emptyArray;
-
-
+//var beetle = require("../../assets/images/beetle.png");
+var beetle = require("../../assets/images/beetle.png");
+var grass = require("../../assets/images/grass.png");
+var earthworm = require("../../assets/images/earthworm.png");
+var flower = require("../../assets/images/flower.png");
+var hawk = require("../../assets/images/hawk.png");
+var mushroom = require("../../assets/images/mushroom.png");
+var snake = require("../../assets/images/snake.png");
+var tree = require("../../assets/images/tree.png");
+var mouse = require("../../assets/images/mouse.png");
+var butterfly = require("../../assets/images/butterfly.png");
+var raccoon = require("../../assets/images/raccoon.png");
+var deer = require("../../assets/images/deer.png");
+var rabbit = require("../../assets/images/rabbit.png");
+var coyote = require("../../assets/images/coyote.png");
+var frog = require("../../assets/images/frog.png");
+var songbird = require("../../assets/images/bird.png");
 
 var legendStyle = {
   fill: "white",
@@ -10,6 +25,8 @@ var legendStyle = {
   opacity: 0.8
 };
 var userDefinedObj;
+
+var strokeStyleArray = ['20, 5, 10, 5','4, 4, 4','10, 2, 2'];
 
 
 function ChartLegend() {
@@ -31,11 +48,27 @@ function ChartLegend() {
 
       svg.selectAll( "[data-legend]" ).each( function() {
         var self = d3.select( this );
+        var str = self.attr("style");
+        //var String=str.substring(str.lastIndexOf(":")+1,str.lastIndexOf(";"));
+          //console.log(String);
         items[ self.attr( "data-legend" ) ] = {
-          pos: self.attr( "data-legend-pos" ) || this.getBBox().y,
-          color: self.attr( "data-legend-color" ) != undefined ? self.attr( "data-legend-color" ) : self.style( "fill" ) != 'none' ? self.style( "fill" ) : self.style( "stroke" )
+          pos: self.attr( "data-legend-pos" ) || 374,
+          //strokeStyle: String != undefined ? String : '',
+          color: self.attr( "data-legend-color" ) != undefined ? self.attr( "data-legend-color" ) : self.style( "fill" ) != 'none' ? self.style( "fill" ) : self.style("stroke")
         }
       } );
+
+      svg.selectAll(".legend")
+      .attr("transform", "translate(730,54)")
+      
+      .attr("style", "outline: solid grey; outline-offset: 10px;");
+
+
+       
+
+      // svg.selectAll("[data-legend]")
+      // .attr("transform", "translate(-30,0)");
+      
 
       items = d3.entries( items ).sort( function( a, b ) { return a.value.pos - b.value.pos} );
 
@@ -43,8 +76,9 @@ function ChartLegend() {
         .data( items, function( d ) { return d.key} )
         .call( function( d ) { d.enter().append( "text" )} )
         .call( function( d ) { d.exit().remove()} )
-        .attr( "y", function( d, i ) { return i + "em"} )
-        .attr( "x", "1em" )
+        .attr( "y", function( d, i ) { return (i*2.8)+1 + "em"} )
+        .attr( "x", "-0.6em" )
+        .style("font", "14pt verdana")
         .text( function( d ) {
             //if(d.key == "")
 
@@ -62,26 +96,34 @@ function ChartLegend() {
           //return d.key;
         } );
 
-      li.selectAll( "circle" )
+
+      li.selectAll("image")
+                    .data( items, function( d ) { return d.key} )
+                    .call( function( d ) { d.enter().append( "image" )} )
+                    .call( function( d ) { d.exit().remove()} )
+                    .attr('x',"-3.5em" )
+                    .attr('y',function( d, i ) { return (i*2.8)-0.5 + "em"} )
+                    .attr('width', 40)
+                    .attr('height', 40)
+                    .attr("xlink:href",function( d, i ) {return eval(d.key)} );
+
+
+//stroke="#000000" stroke-width="4" fill="none" style="stroke-dasharray: 12, 2, 12;"
+      li.selectAll( "line" )
         .data( items, function( d ) { return d.key} )
-        .call( function( d ) { d.enter().append( "circle" )} )
+        .call( function( d ) { d.enter().append( "line" )} )
         .call( function( d ) { d.exit().remove()} )
-        .attr( "cy", function( d, i ) { return i - 0.25 + "em"} )
-        .attr( "cx", 0 )
-        .attr( "r", "0.4em" )
-        .style( "fill", function( d ) {
-          return d.value.color
+        .attr( "x1","12em")
+        .attr( "y1", function( d, i ) { return (i*2.8)+0.8 + "em"} )
+        .attr( "y2", function( d, i ) { return (i*2.8)+0.8 + "em"} )
+        .attr("x2", 120)
+        .attr("stroke-width", "2.5")
+        .attr("stroke", "#000000")
+        .style( "stroke-dasharray", function( d ,i) {
+          return strokeStyleArray[i]
         } );
 
-      // Reposition and resize the box
-      /*
 
-       var lbbox = li[ 0 ][ 0 ].getBBox();
-       lb.attr( "x", (lbbox.x - legendPadding) )
-       .attr( "y", (lbbox.y - legendPadding) )
-       .attr( "height", (lbbox.height + 2 * legendPadding) )
-       .attr( "width", (lbbox.width + 2 * legendPadding) )
-       */
 
     } );
 

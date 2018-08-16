@@ -22,9 +22,14 @@ inherit(Object, OverlapRulesFactory, {},
                 return;
             }
 
+
             var preyPredatorOverlapResult = this.checkForPreyPredatorRule(organism1, organism2);
             if (preyPredatorOverlapResult.prey && preyPredatorOverlapResult.predator) {
-                this.preyOverlapWithPredator(preyPredatorOverlapResult.prey, preyPredatorOverlapResult.predator);
+                var me=this;
+                setTimeout(function(){
+                     me.preyOverlapWithPredator(preyPredatorOverlapResult.prey, preyPredatorOverlapResult.predator);
+                },500);
+               
                 return;
             }
 
@@ -33,7 +38,19 @@ inherit(Object, OverlapRulesFactory, {},
                 this.reproduce(reproduceRule.partner1, reproduceRule.partner2);
             }
 
+             //if (organism1.canPollinate()||organism2.canPollinate()) {
+                
+                var pollinateRule = this.checkForPollinationRule(organism1,organism2);
+            if (pollinateRule.partner1) {
+                this.pollinate(pollinateRule.partner1, pollinateRule.partner2);
+
+            }
+                
+            //}
+            
+
         },
+
 
         checkForPreyPredatorRule: function (organism1, organism2) {
             var preyPredatorOverlapResult = {};
@@ -49,6 +66,25 @@ inherit(Object, OverlapRulesFactory, {},
             }
 
             return preyPredatorOverlapResult;
+        },
+
+        checkForPollinationRule: function (organism1, organism2) {
+            var pollinationRuleResult = {};
+
+                //min time must have been elapsed
+                if (organism1.name=='beetle' && organism2.canPollinate()) {
+                    // they must  overlap
+                    if (organism2.overlapBounds(organism1)) {
+                         pollinationRuleResult["partner1"] = organism1;
+                         pollinationRuleResult["partner2"] = organism2;
+                        
+                    }
+                }
+
+
+            
+            
+            return pollinationRuleResult;
         },
 
         checkForReproductionRule: function (organism1, organism2) {
@@ -67,7 +103,9 @@ inherit(Object, OverlapRulesFactory, {},
                     }
                 }
 
+
             }
+            
             return reproductionRuleResult;
         },
 
@@ -79,6 +117,20 @@ inherit(Object, OverlapRulesFactory, {},
             }
         },
 
+        pollinate: function(organism1, organism2){
+            if (organism1.ecoSystemModel.reachedLimit()) {
+                return;
+            }
+            if (organism1.canReproduce() && organism2.canReproduce()) {
+                //if (organism1.overlapBounds(organism2)) {
+                    organism1.startPollinating(organism2);
+                    //console.log("beetle overlap flower");
+                //}
+            }
+            
+
+        },
+
         reproduce: function (organism1, organism2) {
             if (organism1.ecoSystemModel.reachedLimit()) {
                 return;
@@ -88,6 +140,7 @@ inherit(Object, OverlapRulesFactory, {},
                     organism1.startReproducing(organism2);
                 }
             }
+            
         }
 
     });

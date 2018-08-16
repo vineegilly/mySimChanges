@@ -37,6 +37,7 @@ var SimLaunchAdapter = {
         }, url);
     },
     startApp: function (organismsInfo, sceneId, options) {
+        console.log(organismsInfo);
             var names = organismsInfo.slice(organismsInfo.length-1, organismsInfo.length)[0].newNameObj;
 
             //  console.log(names);

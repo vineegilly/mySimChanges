@@ -12,7 +12,7 @@ var Color = scenery.Color;
  * @param {hash} options
  * @constructor
  */
-function TitleBarNode( titleBarSize, titleStr, options ) {
+function TitleBarNode( titleBarSize, titleStr1, titleStr2, options ) {
 
   options = _.extend( {
     xMargin: 1,
@@ -24,20 +24,25 @@ function TitleBarNode( titleBarSize, titleStr, options ) {
   var titleBarNode = this;
   Node.call( titleBarNode );
 
-  var barNode = new Rectangle( 0, 0, titleBarSize.width, titleBarSize.height, 0, 0, {
+  var barNode = new Rectangle( 0, 0, titleBarSize.width, titleBarSize.height+10, 0, 0, {
     fill: options.barFill,
     stroke: options.barStroke,
     lineWidth: options.barLineWidth
   } );
 
   // Title
-  var titleNode = new Text( titleStr, { font: EcoSystemConstants.PANEL_TITLE_FONT } );
+  var titleNode1 = new Text( titleStr1, { font: EcoSystemConstants.PANEL_TITLE_FONT } );
+  var titleNode2 = new Text( titleStr2, { font: EcoSystemConstants.PANEL_TITLE_FONT } );
 
   titleBarNode.addChild( barNode );
-  titleBarNode.addChild( titleNode );
+  titleBarNode.addChild( titleNode1);
+  titleBarNode.addChild( titleNode2);
   // layout
-  titleNode.centerX = barNode.centerX;
-  titleNode.centerY = barNode.centerY;
+  titleNode1.centerX = barNode.centerX;
+  titleNode1.centerY = barNode.centerY-5;
+
+  titleNode2.centerX = barNode.centerX;
+  titleNode2.centerY = barNode.centerY+10;
 }
 
 inherit( Node, TitleBarNode, {} );

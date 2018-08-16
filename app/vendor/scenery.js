@@ -36149,7 +36149,7 @@
                     padding: '0 !important',
                     margin: '0 !important',
                     position: 'absolute',
-                    left: 0,
+                    left: 40,
                     top: 0,
                     width: 65535,
                     height: 65535
@@ -37177,6 +37177,8 @@
                 }
                 updateSVGTextToMeasure(svgTextSizeElement, this);
                 var rect = svgTextSizeElement.getBBox();
+                //console.log("in Scenery file");
+                //console.log(rect);
                 return new Bounds2(rect.x, rect.y, rect.x + rect.width, rect.y + rect.height);
             },
 

@@ -57,6 +57,7 @@ function BaseOrganismModel(ecoSystemModel, organismInfo, initialPosition, motion
 
     thisModel.organismBeingEaten = null;
     thisModel.organismReproducingWith = null;
+    thisModel.organismPollinatingWith = null;
     thisModel.newlyProducedModels = [];
     this.motionBounds = motionBounds;
     this.multipliedOrganisms = [this];// add the current one
@@ -87,8 +88,8 @@ inherit(PropertySet, BaseOrganismModel, {
 
     defineTimeLapseRules: function () {
         this.timeElapsedWithoutFood = 0;
-        this.timeElapsedSinceReproduction = OrganismRuleConstants[this.name].REPRODUCE_RULE.elapse; // start with the ability to reproduce
-
+        //this.timeElapsedSinceReproduction = OrganismRuleConstants[this.name].REPRODUCE_RULE.elapse; // start with the ability to reproduce
+        this.timeElapsedSinceReproduction = 8000;
     },
 
     onRain: function () {
@@ -116,11 +117,8 @@ inherit(PropertySet, BaseOrganismModel, {
     },
 
     incrementTimeElapsedWithoutFood: function (dt) {
-<<<<<<< HEAD
-      if(this.canGerminate()){
-=======
+
         if(this.canGerminate()){
->>>>>>> 2fed0dfadb2fb8ee5621d62ef388fc6ee8d0bde2
             return; // the rain rules will increment the lapse
         }
         this.timeElapsedWithoutFood += dt * 1000; // in milliseconds
@@ -190,6 +188,28 @@ inherit(PropertySet, BaseOrganismModel, {
         this.setState(dyingState);
         this.ecoSystemModel.addDyingOrganisms(this);
         this.interactionState = EcoSystemConstants.DYING_STATE;
+
+    },
+
+    startPollinating: function(otherOrganism){
+        // this.organismPollinatingWith = otherOrganism;
+        // var otherPartnerPos = otherOrganism.position;
+        //  this.setDestination(otherPartnerPos, true, EcoSystemConstants.ANIMATION_VELOCITY / 2);
+        // this.interactionState = EcoSystemConstants.REPRODUCING_STATE;
+
+        // //set the current state
+        // this.setState(reproducingState);
+        otherOrganism.supportPollinating();
+         otherOrganism.pollinate();
+         this.timeElapsedSinceReproduction = 0;
+
+    },
+
+    supportPollinating: function(){
+        // this.interactionState = EcoSystemConstants.REPRODUCING_STATE;
+         this.timeElapsedSinceReproduction = 0;
+        // //set the current to support reproducing
+        // this.setState(supportReproducingState);
 
     },
 
@@ -300,6 +320,10 @@ inherit(PropertySet, BaseOrganismModel, {
     },
 
     canGerminate: function () {
+        return false;
+    },
+
+    canPollinate: function () {
         return false;
     },
 

@@ -17,7 +17,8 @@ var Vector2 = dot.Vector2;
 var GridLayout = require('../util/GridLayout');
 
 // constants
-var ORGANISMS_STR = "Organisms(Choose up to 4 organisms)";
+var ORGANISMS_STR1 = "Organisms";
+var ORGANISMS_STR2 = "Choose up to four organisms.";
 var CHECK_BOX_OPTIONS = {boxWidth: 30};
 var CONTROL_TEXT_OPTIONS = {font: new SimFont(15)};
 var POPULATION_TEXT_OPTIONS = {font: new SimFont(25)};
@@ -96,7 +97,7 @@ function OrganismPanelNode(ecoSystemModel, gridPaneNode, populationChartNode, mo
         appearanceLayerNode.addChild(creatorNode);
     }
 
-    var titleBarNode = new TitleBarNode(TITLE_SIZE, ORGANISMS_STR);
+    var titleBarNode = new TitleBarNode(TITLE_SIZE, ORGANISMS_STR1,ORGANISMS_STR2);
     var rainProperty = ecoSystemModel.rainProperty;
 
     var checkBoxes = [];
@@ -113,7 +114,7 @@ function OrganismPanelNode(ecoSystemModel, gridPaneNode, populationChartNode, mo
 
 
     var playerBox = new PlayerBox(ecoSystemModel.playPauseProperty, ecoSystemModel.rainProperty, function () {
-      
+
         populationChartNode.clearChart();
         ecoSystemModel.onClearPlay();
 

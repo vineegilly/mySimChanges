@@ -59,6 +59,8 @@ function EcoSystemModel(organismInfos, screenBounds) {
     this.totalTimeLapse = 0; // in milli seconds
     this.timeLapseSinceRaining = 0;
     this.totalLifeSpan = EcoSystemConstants.TOTAL_LIFE_SPAN;
+    this.organismsArrayCheck = [];
+    this.flagAllow = false;
 
     thisModel.replayState = {
         graphStateList: [],
@@ -84,10 +86,6 @@ function EcoSystemModel(organismInfos, screenBounds) {
         else {
             thisModel.timeLapseSinceRaining = 0;
         }
-<<<<<<< HEAD
-=======
-
->>>>>>> 2fed0dfadb2fb8ee5621d62ef388fc6ee8d0bde2
     });
 
 
@@ -161,20 +159,13 @@ inherit(PropertySet, EcoSystemModel, {
 
         if (this.isPlaying()) {
 
-<<<<<<< HEAD
-          if (this.isRaining()) {
-=======
             if (this.isRaining()) {
->>>>>>> 2fed0dfadb2fb8ee5621d62ef388fc6ee8d0bde2
                 this.timeLapseSinceRaining += dt * 1000;
             }
             else {
                 this.timeLapseSinceRaining = 0;
             }
-<<<<<<< HEAD
 
-=======
->>>>>>> 2fed0dfadb2fb8ee5621d62ef388fc6ee8d0bde2
             var allModels = [].concat(this.residentOrganismModels.getArray());
             for (var i = 0; i < allModels.length; i++) {
                 for (var j = 0; j < allModels.length; j++) {
@@ -226,21 +217,55 @@ inherit(PropertySet, EcoSystemModel, {
      */
     addLifeLineSnapShot: function (dt) {
         var self = this;
-        this.totalTimeLapse += dt * 1000;
+        var createOrg;
+        this.totalTimeLapse += (dt) * 1000;
         var currentCounter = this.totalTimeLapse / EcoSystemConstants.SNAPSHOT_CAPTURE_ELAPSE;
 
         if (currentCounter > this.snapShotCounter) {
             this.snapShotCounter++;
 
+
+
             var groupedElements = _.groupBy(this.residentOrganismModels.getArray(), function (organismModel) {
                 return organismModel.name;
             });
+            this.organismsArrayCheck.push(groupedElements);
 
 
-            _.each(groupedElements, function (elementArray, name) {
+            if(this.organismsArrayCheck.length > 1){
+            if( Object.keys(this.organismsArrayCheck[0]).length == Object.keys(groupedElements).length){
+              _.each(groupedElements, function (elementArray, name) {
+                if(self.totalTimeLapse != 0 && self.flagAllow == false){
+                    var organismLifeLineSnapShot = new OrganismLifeLineSnapShot(name,0, elementArray.length);
+                  self.organismLifeLineSnapShots.push(organismLifeLineSnapShot);
+                }
+
                 var organismLifeLineSnapShot = new OrganismLifeLineSnapShot(name, self.totalTimeLapse, elementArray.length);
-                self.organismLifeLineSnapShots.push(organismLifeLineSnapShot);
-            });
+                  self.organismLifeLineSnapShots.push(organismLifeLineSnapShot);
+              });
+              this.flagAllow = true;
+            }else{
+              _.each(Object.keys(this.organismsArrayCheck[0]),function(name){
+                if(groupedElements[name] != undefined){
+                   createOrg = groupedElements[name].length;
+                }else{
+                   createOrg = 0;
+                }
+
+                var organismLifeLineSnapShot = new OrganismLifeLineSnapShot(name, self.totalTimeLapse,createOrg);
+                  self.organismLifeLineSnapShots.push(organismLifeLineSnapShot);
+              })
+     
+            }
+            
+
+
+              // })
+            }
+
+
+
+
 
             var elementGroupCountMap = {};
 
@@ -304,23 +329,14 @@ inherit(PropertySet, EcoSystemModel, {
     },
 
     onClearPlay: function () {
-<<<<<<< HEAD
-      //debugger;
-      var self = this;
-        //pauseflag=1;
-        //console.log(pauseflag);
-=======
         var self = this;
->>>>>>> 2fed0dfadb2fb8ee5621d62ef388fc6ee8d0bde2
         this.residentOrganismModels.clear();
         this.playPause = false;
         this.pauseFlag = 1;
         this.resetPlayState();
         self.timeLapseSinceRaining = 0;
-<<<<<<< HEAD
-
-=======
->>>>>>> 2fed0dfadb2fb8ee5621d62ef388fc6ee8d0bde2
+        self.organismsArrayCheck = [];
+        self.flagAllow = false;
         this.organismInfos.forEach(function (organismInfo) {
             self[organismInfo.name.toLowerCase() + "Quantity"].set(EcoSystemConstants.LOW_QUANTITY);
         });
@@ -336,12 +352,6 @@ inherit(PropertySet, EcoSystemModel, {
     },
 
     play: function () {
-<<<<<<< HEAD
-      //debugger;
-      //console.log(this);
-=======
-        //  debugger;
->>>>>>> 2fed0dfadb2fb8ee5621d62ef388fc6ee8d0bde2
         var self = this;
         var gridSize = EcoSystemConstants.GRID_NODE_DIMENSION;
         var motionBounds = Bounds2.rect((EcoSystemConstants.ORGANISM_RADIUS+10), (EcoSystemConstants.ORGANISM_RADIUS+10),
@@ -350,18 +360,18 @@ inherit(PropertySet, EcoSystemModel, {
 
         var organismInfos = this.organismInfos;
         organismInfos.forEach(function (organismInfo) {
+            //console.log(self);
             var quantity = self[organismInfo.name.toLowerCase() + "Quantity"].get();
-<<<<<<< HEAD
-            if (quantity > 0&& self.pauseFlag == 1 ) {
-=======
+            //console.log(quantity);
             if (quantity > 0 && self.pauseFlag == 1) {
->>>>>>> 2fed0dfadb2fb8ee5621d62ef388fc6ee8d0bde2
                 var randomPosX = _.random(motionBounds.minX, motionBounds.maxX);
                 var randomPosY = _.random(motionBounds.minY, motionBounds.maxY);
                 var newPos = motionBounds.closestPointTo(new Vector2(randomPosX, randomPosY));
                 var organismModel = OrganismModelFactory.getOrganism(self, organismInfo, newPos, motionBounds);
                 self.residentOrganismModels.add(organismModel);
+                //setTimeout(function() { organismModel.multiply(quantity)}, 1000);
                 organismModel.multiply(quantity);
+                //setTimeout(function(){},1000);
 
             }
         });
@@ -380,15 +390,8 @@ inherit(PropertySet, EcoSystemModel, {
 
     },
 
-<<<<<<< HEAD
-    pause: function (dt) {
-      //  pauseflag = pauseflag+1;
-        this.pauseFlag = ++this.pauseFlag;
-
-=======
     pause: function () {
         this.pauseFlag = ++this.pauseFlag;
->>>>>>> 2fed0dfadb2fb8ee5621d62ef388fc6ee8d0bde2
         this.residentOrganismModels.forEach(function (organismModel) {
           //setTimeout(function() { organismModel.pause()}, 1000);
           organismModel.pause();

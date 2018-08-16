@@ -40,6 +40,7 @@
     <script src="vendor/scenery.js"></script>
     <script src="vendor/axonbuild.js"></script>
     <script src="vendor/hammer.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
 
     <!-- end of vendor js -->
 
@@ -100,18 +101,32 @@ $(document).ready(function(){
 
 });
   var testArray = [{
-    "hawk":"unKnown"
+    "hawk":"Hawk"
   },
 {
-  "earthworm":"HHHH"
-}
+  "earthworm":"EarthWorm"
+},{
+  "coyote":"Coyote"
+},{
+  "mouse":"Mouse"
+},{
+  "grass":"Grass"
+},{
+  "mushroom":"Mushroom"
+},{
+  "frog":"Frog"
+},{
+  "butterfly":"Butterfly"
+},{
+  "deer":"Deer"
+},
 ];
 var scaleFactor = {scale:1.2, tx:0, ty:0};
     var organisms = [{
       "name": "hawk"
     },
     {
-      "name": "earthworm"
+      "name": "beetle"
     },
     {
       "name": "coyote"
@@ -132,11 +147,22 @@ var scaleFactor = {scale:1.2, tx:0, ty:0};
       "name": "butterfly"
     },
     {
+      "name":"flower"
+    },
+    {
       "name": "deer"
     }
   ,
   {
-    "newNameObj":[{"key":"deer","value":"nakka"},{"key":"frog","value":"kukka"}]
+    "newNameObj":[{"key":"hawk","value":"Hawk"},
+                  {"key":"earthworm","value":"EarthWorm"},
+                {"key":"coyote","value":"Coyote"},
+              {"key":"mouse","value":"Mouse"},
+            {"key":"grass","value":"Grass"},
+          {"key":"mushroom","value":"Mushroom"},
+        {"key":"frog","value":"Frog"},
+      {"key":"butterfly","value":"ButterFly"},
+    {"key":"deer","value":"Deer"},]
   }
 ];
 

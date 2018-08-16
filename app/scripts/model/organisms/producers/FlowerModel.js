@@ -1,5 +1,7 @@
 var inherit = axon.inherit;
 var BaseProducerModel = require('./BaseProducerModel');
+var GerminatingMixin = require('../GerminatingMixin');
+var PollinateMixin = require('../PollinateMixin');
 
 /**
  * @param {EcoSystemModel} ecoSystemModel
@@ -10,6 +12,7 @@ var BaseProducerModel = require('./BaseProducerModel');
  */
 function FlowerModel(ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction) {
     BaseProducerModel.call(this, ecoSystemModel, organismInfo, initialPosition, bounds, createdThroughInteraction);
+    _.extend(this, GerminatingMixin, PollinateMixin);
 }
 
 inherit(BaseProducerModel, FlowerModel, {
